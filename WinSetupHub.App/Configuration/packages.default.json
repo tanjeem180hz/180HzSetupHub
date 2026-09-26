@@ -1,0 +1,4025 @@
+﻿[
+    {
+        "id":  "Brave.Brave",
+        "name":  "Brave Browser",
+        "category":  "Browsers",
+        "description":  "Privacy-focused Chromium browser with tracker blocking.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=brave.com\u0026sz=128",
+        "accentColor":  "#FB542B",
+        "essential":  true
+    },
+    {
+        "id":  "Hibbiki.Chromium",
+        "source":  "winget",
+        "name":  "Chromium",
+        "category":  "Browsers",
+        "description":  "Open-source Chromium browser build for testing.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=chromium.org\u0026sz=128",
+        "accentColor":  "#4A90E2",
+        "essential":  false
+    },
+    {
+        "id":  "Mozilla.Firefox.DeveloperEdition",
+        "source":  "winget",
+        "name":  "Firefox Developer Edition",
+        "category":  "Browsers",
+        "description":  "Firefox build tuned for web development and testing.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mozilla.org\u0026sz=128",
+        "accentColor":  "#FF7139",
+        "essential":  false
+    },
+    {
+        "id":  "Mozilla.Firefox.ESR",
+        "source":  "winget",
+        "name":  "Firefox ESR",
+        "category":  "Browsers",
+        "description":  "Extended support Firefox release for stable environments.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mozilla.org\u0026sz=128",
+        "accentColor":  "#FF7139",
+        "essential":  false
+    },
+    {
+        "id":  "Ablaze.Floorp",
+        "source":  "winget",
+        "name":  "Floorp",
+        "category":  "Browsers",
+        "description":  "Customizable Firefox-based browser for productivity workflows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=floorp.app\u0026sz=128",
+        "accentColor":  "#3D7BFF",
+        "essential":  false
+    },
+    {
+        "id":  "Google.Chrome",
+        "name":  "Google Chrome",
+        "category":  "Browsers",
+        "description":  "Fast mainstream browser for daily use, Google services, and testing.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=google.com/chrome\u0026sz=128",
+        "accentColor":  "#4285F4",
+        "detectionNames":  [
+                               "Google Chrome",
+                               "Google.Chrome.EXE"
+                           ],
+        "essential":  true
+    },
+    {
+        "id":  "Google.Chrome.Beta",
+        "source":  "winget",
+        "name":  "Google Chrome Beta",
+        "category":  "Browsers",
+        "description":  "Preview Chrome build for testing upcoming web features.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=google.com/chrome\u0026sz=128",
+        "accentColor":  "#4285F4",
+        "essential":  false
+    },
+    {
+        "id":  "Google.Chrome.Dev",
+        "source":  "winget",
+        "name":  "Google Chrome Dev",
+        "category":  "Browsers",
+        "description":  "Developer Chrome build for early browser testing.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=google.com/chrome\u0026sz=128",
+        "accentColor":  "#4285F4",
+        "essential":  false
+    },
+    {
+        "id":  "LibreWolf.LibreWolf",
+        "source":  "winget",
+        "name":  "LibreWolf",
+        "category":  "Browsers",
+        "description":  "Privacy-focused Firefox fork with hardened defaults.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=librewolf.net\u0026sz=128",
+        "accentColor":  "#00ACFF",
+        "essential":  false
+    },
+    {
+        "id":  "Maxthon.Maxthon",
+        "source":  "winget",
+        "name":  "Maxthon",
+        "category":  "Browsers",
+        "description":  "Multi-platform browser with cloud and productivity features.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=maxthon.com\u0026sz=128",
+        "accentColor":  "#2F71DA",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.Edge",
+        "name":  "Microsoft Edge",
+        "category":  "Browsers",
+        "description":  "Microsoft Chromium browser with Windows integration.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com/edge\u0026sz=128",
+        "accentColor":  "#0A84FF",
+        "essential":  false
+    },
+    {
+        "id":  "Mozilla.Firefox",
+        "name":  "Mozilla Firefox",
+        "category":  "Browsers",
+        "description":  "Independent browser engine for compatibility testing and privacy.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mozilla.org/firefox\u0026sz=128",
+        "accentColor":  "#FF7139",
+        "essential":  false
+    },
+    {
+        "id":  "MullvadVPN.MullvadBrowser",
+        "source":  "winget",
+        "name":  "Mullvad Browser",
+        "category":  "Browsers",
+        "description":  "Privacy browser built to reduce tracking and fingerprinting.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mullvad.net\u0026sz=128",
+        "accentColor":  "#1BA39C",
+        "essential":  false
+    },
+    {
+        "id":  "NAVER.Whale",
+        "source":  "winget",
+        "name":  "Naver Whale",
+        "category":  "Browsers",
+        "description":  "Chromium-based browser with split-screen productivity tools.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=whale.naver.com\u0026sz=128",
+        "accentColor":  "#05C3A7",
+        "essential":  false
+    },
+    {
+        "id":  "Opera.Opera",
+        "name":  "Opera",
+        "category":  "Browsers",
+        "description":  "Chromium browser with sidebar tools and built-in conveniences.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=opera.com\u0026sz=128",
+        "accentColor":  "#FF1B2D",
+        "essential":  false
+    },
+    {
+        "id":  "Opera.OperaGX",
+        "source":  "winget",
+        "name":  "Opera GX",
+        "category":  "Browsers",
+        "description":  "Gaming-focused Opera browser with resource controls.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=opera.com/gx\u0026sz=128",
+        "accentColor":  "#FF1B2D",
+        "essential":  false
+    },
+    {
+        "id":  "MoonchildProductions.PaleMoon",
+        "source":  "winget",
+        "name":  "Pale Moon",
+        "category":  "Browsers",
+        "description":  "Independent browser focused on classic customization.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=palemoon.org\u0026sz=128",
+        "accentColor":  "#3D74B8",
+        "essential":  false
+    },
+    {
+        "id":  "TorProject.TorBrowser",
+        "name":  "Tor Browser",
+        "category":  "Browsers",
+        "description":  "Privacy browser for Tor network access.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=torproject.org\u0026sz=128",
+        "accentColor":  "#7D4698",
+        "essential":  false
+    },
+    {
+        "id":  "Vivaldi.Vivaldi",
+        "name":  "Vivaldi",
+        "category":  "Browsers",
+        "description":  "Customizable power-user browser.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=vivaldi.com\u0026sz=128",
+        "accentColor":  "#EF3939",
+        "essential":  false
+    },
+    {
+        "id":  "Waterfox.Waterfox",
+        "source":  "winget",
+        "name":  "Waterfox",
+        "category":  "Browsers",
+        "description":  "Independent Firefox-based browser with customization focus.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=waterfox.net\u0026sz=128",
+        "accentColor":  "#2B7FFF",
+        "essential":  false
+    },
+    {
+        "id":  "Yandex.Browser",
+        "source":  "winget",
+        "name":  "Yandex Browser",
+        "category":  "Browsers",
+        "description":  "Chromium-based browser with Yandex services.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=browser.yandex.com\u0026sz=128",
+        "accentColor":  "#FC3F1D",
+        "essential":  false
+    },
+    {
+        "id":  "AnyDesk.AnyDesk",
+        "name":  "AnyDesk",
+        "category":  "Communication",
+        "description":  "Lightweight remote desktop and support tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=anydesk.com\u0026sz=128",
+        "accentColor":  "#EF443B",
+        "essential":  false
+    },
+    {
+        "id":  "Beeper.Beeper",
+        "name":  "Beeper",
+        "category":  "Communication",
+        "description":  "Unified messaging client for multiple chat networks.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=beeper.com\u0026sz=128",
+        "accentColor":  "#7C3AED",
+        "essential":  false
+    },
+    {
+        "id":  "Discord.Discord",
+        "name":  "Discord",
+        "category":  "Communication",
+        "description":  "Voice, video, and community chat for gamers and teams.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=discord.com\u0026sz=128",
+        "accentColor":  "#5865F2",
+        "essential":  false
+    },
+    {
+        "id":  "Element.Element",
+        "source":  "winget",
+        "name":  "Element",
+        "category":  "Communication",
+        "description":  "Matrix-based secure chat and collaboration client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=element.io\u0026sz=128",
+        "accentColor":  "#0DBD8B",
+        "essential":  false
+    },
+    {
+        "id":  "Ferdium.Ferdium",
+        "source":  "winget",
+        "name":  "Ferdium",
+        "category":  "Communication",
+        "description":  "Multi-service messaging workspace.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ferdium.org\u0026sz=128",
+        "accentColor":  "#6C63FF",
+        "essential":  false
+    },
+    {
+        "id":  "arjun-g.google-meet-desktop",
+        "source":  "winget",
+        "name":  "Google Meet Desktop",
+        "category":  "Communication",
+        "description":  "Desktop wrapper for Google Meet meetings.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=meet.google.com\u0026sz=128",
+        "accentColor":  "#00897B",
+        "essential":  false
+    },
+    {
+        "id":  "Jitsi.Meet",
+        "source":  "winget",
+        "name":  "Jitsi Meet",
+        "category":  "Communication",
+        "description":  "Open video meeting desktop client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=jitsi.org\u0026sz=128",
+        "accentColor":  "#9795FF",
+        "essential":  false
+    },
+    {
+        "id":  "Mailbird.Mailbird",
+        "source":  "winget",
+        "name":  "Mailbird",
+        "category":  "Communication",
+        "description":  "Modern desktop email client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=getmailbird.com\u0026sz=128",
+        "accentColor":  "#2196F3",
+        "essential":  false
+    },
+    {
+        "id":  "Mattermost.MattermostDesktop",
+        "source":  "winget",
+        "name":  "Mattermost",
+        "category":  "Communication",
+        "description":  "Team messaging client for Mattermost workspaces.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mattermost.com\u0026sz=128",
+        "accentColor":  "#0058CC",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.Teams",
+        "name":  "Microsoft Teams",
+        "category":  "Communication",
+        "description":  "Microsoft collaboration, meetings, and chat.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com/microsoft-teams\u0026sz=128",
+        "accentColor":  "#6264A7",
+        "essential":  false
+    },
+    {
+        "id":  "Mozilla.Thunderbird",
+        "source":  "winget",
+        "name":  "Mozilla Thunderbird",
+        "category":  "Communication",
+        "description":  "Email, calendar, and contacts client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=thunderbird.net\u0026sz=128",
+        "accentColor":  "#0A84FF",
+        "essential":  false
+    },
+    {
+        "id":  "Proton.ProtonMail",
+        "source":  "winget",
+        "name":  "Proton Mail",
+        "category":  "Communication",
+        "description":  "Privacy-focused encrypted email desktop app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=proton.me\u0026sz=128",
+        "accentColor":  "#6D4AFF",
+        "essential":  false
+    },
+    {
+        "id":  "Rambox.Rambox",
+        "source":  "winget",
+        "name":  "Rambox",
+        "category":  "Communication",
+        "description":  "Workspace for messaging email and web apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=rambox.app\u0026sz=128",
+        "accentColor":  "#00A8A8",
+        "essential":  false
+    },
+    {
+        "id":  "RocketChat.RocketChat",
+        "source":  "winget",
+        "name":  "Rocket.Chat",
+        "category":  "Communication",
+        "description":  "Open-source team chat desktop client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=rocket.chat\u0026sz=128",
+        "accentColor":  "#F5455C",
+        "essential":  false
+    },
+    {
+        "id":  "OpenWhisperSystems.Signal",
+        "source":  "winget",
+        "name":  "Signal",
+        "category":  "Communication",
+        "description":  "Private encrypted messaging for desktop.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=signal.org\u0026sz=128",
+        "accentColor":  "#3A76F0",
+        "essential":  false
+    },
+    {
+        "id":  "SlackTechnologies.Slack",
+        "name":  "Slack",
+        "category":  "Communication",
+        "description":  "Team chat and workspace communication.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=slack.com\u0026sz=128",
+        "accentColor":  "#4A154B",
+        "essential":  false
+    },
+    {
+        "id":  "TeamViewer.TeamViewer",
+        "name":  "TeamViewer",
+        "category":  "Communication",
+        "description":  "Remote support and remote desktop access.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=teamviewer.com\u0026sz=128",
+        "accentColor":  "#0E8EE9",
+        "essential":  false
+    },
+    {
+        "id":  "Telegram.TelegramDesktop",
+        "name":  "Telegram Desktop",
+        "category":  "Communication",
+        "description":  "Fast desktop messaging client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=telegram.org\u0026sz=128",
+        "accentColor":  "#26A5E4",
+        "essential":  false
+    },
+    {
+        "id":  "DucFabulous.UltraViewer",
+        "source":  "winget",
+        "name":  "UltraViewer",
+        "category":  "Communication",
+        "description":  "Remote desktop support tool for quick screen sharing and PC assistance.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ultraviewer.net\u0026sz=128",
+        "accentColor":  "#1E88E5",
+        "essential":  false
+    },
+    {
+        "id":  "Rakuten.Viber",
+        "source":  "winget",
+        "name":  "Viber",
+        "category":  "Communication",
+        "description":  "Desktop messaging and calling client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=viber.com\u0026sz=128",
+        "accentColor":  "#7360F2",
+        "essential":  false
+    },
+    {
+        "id":  "Cisco.Webex",
+        "source":  "winget",
+        "name":  "Webex",
+        "category":  "Communication",
+        "description":  "Cisco Webex meetings and messaging client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=webex.com\u0026sz=128",
+        "accentColor":  "#00A0D2",
+        "essential":  false
+    },
+    {
+        "id":  "Tencent.WeChat",
+        "source":  "winget",
+        "name":  "WeChat",
+        "category":  "Communication",
+        "description":  "WeChat desktop client for messaging and calls.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=wechat.com\u0026sz=128",
+        "accentColor":  "#07C160",
+        "essential":  false
+    },
+    {
+        "id":  "9NKSQGP7F2NH",
+        "source":  "msstore",
+        "name":  "WhatsApp",
+        "category":  "Communication",
+        "description":  "Official WhatsApp desktop app from Microsoft Store.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=whatsapp.com\u0026sz=128",
+        "accentColor":  "#25D366",
+        "essential":  false
+    },
+    {
+        "id":  "VNGCorp.Zalo",
+        "source":  "winget",
+        "name":  "Zalo",
+        "category":  "Communication",
+        "description":  "Popular messaging app for chat and calling.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=zalo.me\u0026sz=128",
+        "accentColor":  "#0068FF",
+        "essential":  false
+    },
+    {
+        "id":  "Zoom.Zoom",
+        "name":  "Zoom",
+        "category":  "Communication",
+        "description":  "Video meetings, classes, and team calls.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=zoom.us\u0026sz=128",
+        "accentColor":  "#0B5CFF",
+        "essential":  false
+    },
+    {
+        "id":  "Zulip.Zulip",
+        "source":  "winget",
+        "name":  "Zulip",
+        "category":  "Communication",
+        "description":  "Threaded team chat client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=zulip.com\u0026sz=128",
+        "accentColor":  "#6492FE",
+        "essential":  false
+    },
+    {
+        "id":  "qishibo.AnotherRedisDesktopManager",
+        "source":  "winget",
+        "name":  "Another Redis Desktop Manager",
+        "category":  "Databases",
+        "description":  "Redis GUI client for browsing and managing keys.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/qishibo/AnotherRedisDesktopManager\u0026sz=128",
+        "accentColor":  "#D82C20",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.Azure.DataStudio",
+        "source":  "winget",
+        "name":  "Azure Data Studio",
+        "category":  "Databases",
+        "description":  "Cross-platform SQL and cloud database tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=azure.microsoft.com/products/data-studio\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  false
+    },
+    {
+        "id":  "beekeeper-studio.beekeeper-studio",
+        "source":  "winget",
+        "name":  "Beekeeper Studio",
+        "category":  "Databases",
+        "description":  "Modern SQL editor and database manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=beekeeperstudio.io\u0026sz=128",
+        "accentColor":  "#F6C343",
+        "essential":  false
+    },
+    {
+        "id":  "JetBrains.DataGrip",
+        "source":  "winget",
+        "name":  "DataGrip",
+        "category":  "Databases",
+        "description":  "JetBrains IDE for databases and SQL.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=jetbrains.com/datagrip\u0026sz=128",
+        "accentColor":  "#8A2BE2",
+        "essential":  false
+    },
+    {
+        "id":  "DBBrowserForSQLite.DBBrowserForSQLite",
+        "name":  "DB Browser for SQLite",
+        "category":  "Databases",
+        "description":  "SQLite database browser and editor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=sqlitebrowser.org\u0026sz=128",
+        "accentColor":  "#044A64",
+        "essential":  false
+    },
+    {
+        "id":  "DBeaver.DBeaver.Community",
+        "name":  "DBeaver Community",
+        "category":  "Databases",
+        "description":  "Universal database client for SQL and NoSQL workflows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dbeaver.io\u0026sz=128",
+        "accentColor":  "#5B3A29",
+        "essential":  false
+    },
+    {
+        "id":  "JanProchazka.dbgate",
+        "source":  "winget",
+        "name":  "DbGate",
+        "category":  "Databases",
+        "description":  "Open-source database manager for SQL and NoSQL engines.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dbgate.org\u0026sz=128",
+        "accentColor":  "#0081CB",
+        "essential":  false
+    },
+    {
+        "id":  "DBVis.DBVisualizer",
+        "source":  "winget",
+        "name":  "DbVisualizer",
+        "category":  "Databases",
+        "description":  "Universal database client and SQL tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dbvis.com\u0026sz=128",
+        "accentColor":  "#2A6BB0",
+        "essential":  false
+    },
+    {
+        "id":  "HeidiSQL.HeidiSQL",
+        "source":  "winget",
+        "name":  "HeidiSQL",
+        "category":  "Databases",
+        "description":  "Lightweight client for MySQL MariaDB PostgreSQL and SQL Server.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=heidisql.com\u0026sz=128",
+        "accentColor":  "#4D8CBF",
+        "essential":  false
+    },
+    {
+        "id":  "MariaDB.Server",
+        "source":  "winget",
+        "name":  "MariaDB Server",
+        "category":  "Databases",
+        "description":  "Open-source relational database server.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mariadb.org\u0026sz=128",
+        "accentColor":  "#003545",
+        "essential":  false
+    },
+    {
+        "id":  "MongoDB.Compass.Full",
+        "name":  "MongoDB Compass",
+        "category":  "Databases",
+        "description":  "GUI for MongoDB databases and collections.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mongodb.com\u0026sz=128",
+        "accentColor":  "#47A248",
+        "essential":  false
+    },
+    {
+        "id":  "MongoDB.Shell",
+        "source":  "winget",
+        "name":  "MongoDB Shell",
+        "category":  "Databases",
+        "description":  "Command-line shell for MongoDB.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mongodb.com\u0026sz=128",
+        "accentColor":  "#47A248",
+        "essential":  false
+    },
+    {
+        "id":  "Oracle.MySQLWorkbench",
+        "name":  "MySQL Workbench",
+        "category":  "Databases",
+        "description":  "MySQL database design, query, and administration tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mysql.com\u0026sz=128",
+        "accentColor":  "#00758F",
+        "essential":  false
+    },
+    {
+        "id":  "NoSQLBooster.NoSQLBooster",
+        "source":  "winget",
+        "name":  "NoSQLBooster for MongoDB",
+        "category":  "Databases",
+        "description":  "MongoDB GUI query builder and shell tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nosqlbooster.com\u0026sz=128",
+        "accentColor":  "#13AA52",
+        "essential":  false
+    },
+    {
+        "id":  "PostgreSQL.pgAdmin",
+        "name":  "pgAdmin",
+        "category":  "Databases",
+        "description":  "PostgreSQL administration and query tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=pgadmin.org\u0026sz=128",
+        "accentColor":  "#336791",
+        "essential":  false
+    },
+    {
+        "id":  "PostgreSQL.PostgreSQL.18",
+        "source":  "winget",
+        "name":  "PostgreSQL 18",
+        "category":  "Databases",
+        "description":  "PostgreSQL database server.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=postgresql.org\u0026sz=128",
+        "accentColor":  "#336791",
+        "essential":  false
+    },
+    {
+        "id":  "RedisInsight.RedisInsight",
+        "name":  "Redis Insight",
+        "category":  "Databases",
+        "description":  "Redis database browser, profiler, and query workbench.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=redis.io\u0026sz=128",
+        "accentColor":  "#DC382D",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.SQLServerManagementStudio.22",
+        "source":  "winget",
+        "name":  "SQL Server Management Studio 22",
+        "category":  "Databases",
+        "description":  "Microsoft SQL Server management environment.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/sql\u0026sz=128",
+        "accentColor":  "#CC2927",
+        "essential":  false
+    },
+    {
+        "id":  "PawelSalawa.SQLiteStudio",
+        "source":  "winget",
+        "name":  "SQLiteStudio",
+        "category":  "Databases",
+        "description":  "SQLite database manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=sqlitestudio.pl\u0026sz=128",
+        "accentColor":  "#4B7BAE",
+        "essential":  false
+    },
+    {
+        "id":  "TablePlus.TablePlus",
+        "source":  "winget",
+        "name":  "TablePlus",
+        "category":  "Databases",
+        "description":  "Native database GUI for multiple database engines.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=tableplus.com\u0026sz=128",
+        "accentColor":  "#F9B233",
+        "essential":  false
+    },
+    {
+        "id":  "Canva.Affinity",
+        "source":  "winget",
+        "name":  "Affinity",
+        "category":  "Design \u0026 Creative",
+        "description":  "Affinity creative suite desktop app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=affinity.serif.com\u0026sz=128",
+        "accentColor":  "#7E57C2",
+        "essential":  false
+    },
+    {
+        "id":  "BlenderFoundation.Blender",
+        "name":  "Blender",
+        "category":  "Design \u0026 Creative",
+        "description":  "3D modeling, animation, rendering, and VFX suite.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=blender.org\u0026sz=128",
+        "accentColor":  "#F5792A",
+        "essential":  false
+    },
+    {
+        "id":  "Canva.Canva",
+        "name":  "Canva",
+        "category":  "Design \u0026 Creative",
+        "description":  "Design tool for social posts, thumbnails, documents, and presentations.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=canva.com\u0026sz=128",
+        "accentColor":  "#00C4CC",
+        "essential":  false
+    },
+    {
+        "id":  "darktable.darktable",
+        "source":  "winget",
+        "name":  "darktable",
+        "category":  "Design \u0026 Creative",
+        "description":  "RAW photo workflow and editing app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=darktable.org\u0026sz=128",
+        "accentColor":  "#2D2D2D",
+        "essential":  false
+    },
+    {
+        "id":  "Figma.Figma",
+        "name":  "Figma",
+        "category":  "Design \u0026 Creative",
+        "description":  "Interface design and collaboration desktop app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=figma.com\u0026sz=128",
+        "accentColor":  "#A259FF",
+        "essential":  false
+    },
+    {
+        "id":  "FreeCAD.FreeCAD",
+        "source":  "winget",
+        "name":  "FreeCAD",
+        "category":  "Design \u0026 Creative",
+        "description":  "Parametric 3D CAD modeler.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=freecad.org\u0026sz=128",
+        "accentColor":  "#729FCF",
+        "essential":  false
+    },
+    {
+        "id":  "GIMP.GIMP",
+        "name":  "GIMP",
+        "category":  "Design \u0026 Creative",
+        "description":  "Image editing and graphics tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=gimp.org\u0026sz=128",
+        "accentColor":  "#5C5543",
+        "essential":  false
+    },
+    {
+        "id":  "Inkscape.Inkscape",
+        "name":  "Inkscape",
+        "category":  "Design \u0026 Creative",
+        "description":  "Vector illustration and SVG editing app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=inkscape.org\u0026sz=128",
+        "accentColor":  "#111111",
+        "essential":  false
+    },
+    {
+        "id":  "KDE.Krita",
+        "name":  "Krita",
+        "category":  "Design \u0026 Creative",
+        "description":  "Digital painting and illustration app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=krita.org\u0026sz=128",
+        "accentColor":  "#3BABFF",
+        "essential":  false
+    },
+    {
+        "id":  "Icons8.Lunacy",
+        "source":  "winget",
+        "name":  "Lunacy",
+        "category":  "Design \u0026 Creative",
+        "description":  "UI and UX design app with vector and asset tools.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=icons8.com/lunacy\u0026sz=128",
+        "accentColor":  "#1C7CFF",
+        "essential":  false
+    },
+    {
+        "id":  "nomacs.nomacs",
+        "source":  "winget",
+        "name":  "nomacs",
+        "category":  "Design \u0026 Creative",
+        "description":  "Image lounge viewer and lightweight editor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nomacs.org\u0026sz=128",
+        "accentColor":  "#4AA3DF",
+        "essential":  false
+    },
+    {
+        "id":  "OpenSCAD.OpenSCAD",
+        "source":  "winget",
+        "name":  "OpenSCAD",
+        "category":  "Design \u0026 Creative",
+        "description":  "Script-based 3D CAD modeler.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=openscad.org\u0026sz=128",
+        "accentColor":  "#F9D423",
+        "essential":  false
+    },
+    {
+        "id":  "dotPDN.PaintDotNet",
+        "source":  "winget",
+        "name":  "paint.net",
+        "category":  "Design \u0026 Creative",
+        "description":  "Fast image editor for Windows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=getpaint.net\u0026sz=128",
+        "accentColor":  "#4A90E2",
+        "essential":  false
+    },
+    {
+        "id":  "Pencil2D.Pencil",
+        "source":  "winget",
+        "name":  "Pencil2D",
+        "category":  "Design \u0026 Creative",
+        "description":  "2D hand-drawn animation app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=pencil2d.org\u0026sz=128",
+        "accentColor":  "#E6A23C",
+        "essential":  false
+    },
+    {
+        "id":  "AuthorMore.PenpotDesktop",
+        "source":  "winget",
+        "name":  "Penpot Desktop",
+        "category":  "Design \u0026 Creative",
+        "description":  "Open-source design and prototyping desktop client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=penpot.app\u0026sz=128",
+        "accentColor":  "#FF6F61",
+        "essential":  false
+    },
+    {
+        "id":  "RawTherapee.RawTherapee",
+        "source":  "winget",
+        "name":  "RawTherapee",
+        "category":  "Design \u0026 Creative",
+        "description":  "RAW photo processing and color correction.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=rawtherapee.com\u0026sz=128",
+        "accentColor":  "#4B8B3B",
+        "essential":  false
+    },
+    {
+        "id":  "Scribus.Scribus",
+        "source":  "winget",
+        "name":  "Scribus",
+        "category":  "Design \u0026 Creative",
+        "description":  "Open-source desktop publishing app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=scribus.net\u0026sz=128",
+        "accentColor":  "#1D6DB2",
+        "essential":  false
+    },
+    {
+        "id":  "Trimble.SketchUp.2025",
+        "source":  "winget",
+        "name":  "SketchUp 2025",
+        "category":  "Design \u0026 Creative",
+        "description":  "3D modeling tool for design and architecture.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=sketchup.com\u0026sz=128",
+        "accentColor":  "#005F9E",
+        "essential":  false
+    },
+    {
+        "id":  "Ultimaker.Cura",
+        "source":  "winget",
+        "name":  "Ultimaker Cura",
+        "category":  "Design \u0026 Creative",
+        "description":  "3D printing slicer and preparation tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ultimaker.com\u0026sz=128",
+        "accentColor":  "#00AEEF",
+        "essential":  false
+    },
+    {
+        "id":  "XnSoft.XnViewMP",
+        "source":  "winget",
+        "name":  "XnView MP",
+        "category":  "Design \u0026 Creative",
+        "description":  "Image viewer browser and converter.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=xnview.com\u0026sz=128",
+        "accentColor":  "#FF9900",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.DotNet.SDK.8",
+        "name":  ".NET SDK 8",
+        "category":  "Developer",
+        "description":  ".NET SDK for building desktop, web, and service apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
+        "accentColor":  "#512BD4",
+        "essential":  false
+    },
+    {
+        "id":  "Amazon.AWSCLI",
+        "name":  "AWS CLI",
+        "category":  "Developer",
+        "description":  "Command-line tools for Amazon Web Services.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=aws.amazon.com\u0026sz=128",
+        "accentColor":  "#FF9900",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.AzureCLI",
+        "name":  "Azure CLI",
+        "category":  "Developer",
+        "description":  "Command-line tools for Microsoft Azure cloud management.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=azure.microsoft.com\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  false
+    },
+    {
+        "id":  "Oven-sh.Bun",
+        "name":  "Bun",
+        "category":  "Developer",
+        "description":  "Fast JavaScript runtime, bundler, and package manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=bun.sh\u0026sz=128",
+        "accentColor":  "#F4A261",
+        "essential":  false
+    },
+    {
+        "id":  "Docker.DockerDesktop",
+        "name":  "Docker Desktop",
+        "category":  "Developer",
+        "description":  "Containers and local services for full-stack development.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=docker.com\u0026sz=128",
+        "accentColor":  "#2496ED",
+        "essential":  false
+    },
+    {
+        "id":  "Git.Git",
+        "name":  "Git",
+        "category":  "Developer",
+        "description":  "Version control CLI and Windows shell integration.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=git-scm.com\u0026sz=128",
+        "accentColor":  "#F05032",
+        "essential":  true
+    },
+    {
+        "id":  "GitHub.cli",
+        "name":  "GitHub CLI",
+        "category":  "Developer",
+        "description":  "GitHub command-line tool for repos, issues, pull requests, and workflows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=cli.github.com\u0026sz=128",
+        "accentColor":  "#24292F",
+        "essential":  false
+    },
+    {
+        "id":  "GitHub.GitHubDesktop",
+        "name":  "GitHub Desktop",
+        "category":  "Developer",
+        "description":  "Desktop Git client for GitHub repositories.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=desktop.github.com\u0026sz=128",
+        "accentColor":  "#24292F",
+        "essential":  false
+    },
+    {
+        "id":  "GoLang.Go",
+        "name":  "Go",
+        "category":  "Developer",
+        "description":  "Go toolchain for backend services and CLI apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=go.dev\u0026sz=128",
+        "accentColor":  "#00ADD8",
+        "essential":  false
+    },
+    {
+        "id":  "Helm.Helm",
+        "name":  "Helm",
+        "category":  "Developer",
+        "description":  "Kubernetes package manager for charts and releases.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=helm.sh\u0026sz=128",
+        "accentColor":  "#0F1689",
+        "essential":  false
+    },
+    {
+        "id":  "Insomnia.Insomnia",
+        "name":  "Insomnia",
+        "category":  "Developer",
+        "description":  "REST, GraphQL, and gRPC API client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=insomnia.rest\u0026sz=128",
+        "accentColor":  "#4000BF",
+        "essential":  false
+    },
+    {
+        "id":  "JetBrains.Toolbox",
+        "name":  "JetBrains Toolbox",
+        "category":  "Developer",
+        "description":  "Manager for JetBrains IDEs and development tools.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=jetbrains.com\u0026sz=128",
+        "accentColor":  "#FF2D55",
+        "essential":  false
+    },
+    {
+        "id":  "Kubernetes.kubectl",
+        "name":  "kubectl",
+        "category":  "Developer",
+        "description":  "Kubernetes command-line client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=kubernetes.io\u0026sz=128",
+        "accentColor":  "#326CE5",
+        "essential":  false
+    },
+    {
+        "id":  "Meld.Meld",
+        "name":  "Meld",
+        "category":  "Developer",
+        "description":  "Visual diff and merge tool for files, folders, and version control.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=meldmerge.org\u0026sz=128",
+        "accentColor":  "#3A7CA5",
+        "essential":  false
+    },
+    {
+        "id":  "Neovim.Neovim",
+        "name":  "Neovim",
+        "category":  "Developer",
+        "description":  "Modern Vim-based editor for keyboard-driven workflows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=neovim.io\u0026sz=128",
+        "accentColor":  "#57A143",
+        "essential":  false
+    },
+    {
+        "id":  "OpenJS.NodeJS.LTS",
+        "name":  "Node.js LTS",
+        "category":  "Developer",
+        "description":  "LTS JavaScript runtime with npm for frontend and backend development.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nodejs.org\u0026sz=128",
+        "accentColor":  "#539E43",
+        "detectionNames":  [
+                               "Node.js",
+                               "Node.js LTS"
+                           ],
+        "essential":  true
+    },
+    {
+        "id":  "Notepad++.Notepad++",
+        "name":  "Notepad++",
+        "category":  "Developer",
+        "description":  "Fast text and source-code editor for Windows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=notepad-plus-plus.org\u0026sz=128",
+        "accentColor":  "#78A82A",
+        "essential":  true
+    },
+    {
+        "id":  "pnpm.pnpm",
+        "name":  "pnpm",
+        "category":  "Developer",
+        "description":  "Fast disk-efficient JavaScript package manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=pnpm.io\u0026sz=128",
+        "accentColor":  "#F69220",
+        "essential":  false
+    },
+    {
+        "id":  "Postman.Postman",
+        "name":  "Postman",
+        "category":  "Developer",
+        "description":  "API testing, documentation, and collaboration tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=postman.com\u0026sz=128",
+        "accentColor":  "#FF6C37",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.PowerShell",
+        "name":  "PowerShell",
+        "category":  "Developer",
+        "description":  "Modern command shell and automation platform.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/powershell\u0026sz=128",
+        "accentColor":  "#012456",
+        "detectionNames":  [
+                               "PowerShell",
+                               "PowerShell 7-x64"
+                           ],
+        "essential":  true
+    },
+    {
+        "id":  "Python.Python.3.13",
+        "name":  "Python 3.13",
+        "category":  "Developer",
+        "description":  "Modern Python runtime for automation, scripting, and problem solving.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=python.org\u0026sz=128",
+        "accentColor":  "#3776AB",
+        "essential":  true
+    },
+    {
+        "id":  "Rustlang.Rustup",
+        "name":  "Rustup",
+        "category":  "Developer",
+        "description":  "Rust toolchain installer and version manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=rust-lang.org\u0026sz=128",
+        "accentColor":  "#B7410E",
+        "essential":  false
+    },
+    {
+        "id":  "SublimeHQ.SublimeText.4",
+        "name":  "Sublime Text",
+        "category":  "Developer",
+        "description":  "Fast code and text editor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=sublimetext.com\u0026sz=128",
+        "accentColor":  "#FF9800",
+        "essential":  false
+    },
+    {
+        "id":  "EclipseAdoptium.Temurin.21.JDK",
+        "name":  "Temurin JDK 21",
+        "category":  "Developer",
+        "description":  "LTS Java Development Kit for Java and Android-related workflows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=adoptium.net\u0026sz=128",
+        "accentColor":  "#FF1464",
+        "essential":  false
+    },
+    {
+        "id":  "Hashicorp.Terraform",
+        "name":  "Terraform",
+        "category":  "Developer",
+        "description":  "Infrastructure as code CLI for cloud and platform automation.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=terraform.io\u0026sz=128",
+        "accentColor":  "#7B42BC",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.VisualStudio.2022.Community",
+        "name":  "Visual Studio 2022 Community",
+        "category":  "Developer",
+        "description":  "Full IDE for .NET, C++, desktop, mobile, and game tooling.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=visualstudio.microsoft.com\u0026sz=128",
+        "accentColor":  "#5C2D91",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.VisualStudio.2022.BuildTools",
+        "name":  "Visual Studio Build Tools 2022",
+        "category":  "Developer",
+        "description":  "Build tools and compilers without the full Visual Studio IDE.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=visualstudio.microsoft.com\u0026sz=128",
+        "accentColor":  "#5C2D91",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.VisualStudioCode",
+        "name":  "Visual Studio Code",
+        "category":  "Developer",
+        "description":  "Lightweight editor for web, backend, Python, and full-stack work.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=code.visualstudio.com\u0026sz=128",
+        "accentColor":  "#007ACC",
+        "detectionNames":  [
+                               "Microsoft Visual Studio Code",
+                               "Visual Studio Code"
+                           ],
+        "essential":  true
+    },
+    {
+        "id":  "Microsoft.WSL",
+        "name":  "Windows Subsystem for Linux",
+        "category":  "Developer",
+        "description":  "Run Linux environments and developer tooling on Windows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/windows/wsl\u0026sz=128",
+        "accentColor":  "#107C10",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.WindowsTerminal",
+        "name":  "Windows Terminal",
+        "category":  "Developer",
+        "description":  "Modern terminal app for PowerShell, Command Prompt, and WSL.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/microsoft/terminal\u0026sz=128",
+        "accentColor":  "#4D4D4D",
+        "essential":  true
+    },
+    {
+        "id":  "WinMerge.WinMerge",
+        "name":  "WinMerge",
+        "category":  "Developer",
+        "description":  "File and folder diff and merge tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=winmerge.org\u0026sz=128",
+        "accentColor":  "#2D74C4",
+        "essential":  false
+    },
+    {
+        "id":  "WinSCP.WinSCP",
+        "name":  "WinSCP",
+        "category":  "Developer",
+        "description":  "SFTP, SCP, FTP, and WebDAV client for server file transfers.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=winscp.net\u0026sz=128",
+        "accentColor":  "#2C6AA0",
+        "essential":  false
+    },
+    {
+        "id":  "Yarn.Yarn",
+        "name":  "Yarn",
+        "category":  "Developer",
+        "description":  "JavaScript package manager for frontend and Node projects.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=yarnpkg.com\u0026sz=128",
+        "accentColor":  "#2C8EBB",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.DotNet.DesktopRuntime.6",
+        "source":  "winget",
+        "name":  ".NET Desktop Runtime 6",
+        "category":  "Drivers",
+        "description":  ".NET desktop runtime for older apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
+        "accentColor":  "#512BD4",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.DotNet.DesktopRuntime.8",
+        "name":  ".NET Desktop Runtime 8",
+        "category":  "Drivers",
+        "description":  "Runtime for modern .NET desktop applications.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
+        "accentColor":  "#512BD4",
+        "detectionNames":  [
+                               "Microsoft Windows Desktop Runtime - 8",
+                               "Microsoft .NET Runtime - 8"
+                           ],
+        "essential":  true
+    },
+    {
+        "id":  "Microsoft.DotNet.DesktopRuntime.9",
+        "source":  "winget",
+        "name":  ".NET Desktop Runtime 9",
+        "category":  "Drivers",
+        "description":  ".NET desktop runtime for modern apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
+        "accentColor":  "#512BD4",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.DotNet.Runtime.8",
+        "source":  "winget",
+        "name":  ".NET Runtime 8",
+        "category":  "Drivers",
+        "description":  ".NET runtime for console and server apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
+        "accentColor":  "#512BD4",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.DotNet.Runtime.9",
+        "source":  "winget",
+        "name":  ".NET Runtime 9",
+        "category":  "Drivers",
+        "description":  ".NET runtime for modern console and server apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
+        "accentColor":  "#512BD4",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.DotNet.AspNetCore.8",
+        "source":  "winget",
+        "name":  "ASP.NET Core Runtime 8",
+        "category":  "Drivers",
+        "description":  "ASP.NET Core hosting runtime.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
+        "accentColor":  "#512BD4",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.DotNet.AspNetCore.9",
+        "source":  "winget",
+        "name":  "ASP.NET Core Runtime 9",
+        "category":  "Drivers",
+        "description":  "ASP.NET Core hosting runtime.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
+        "accentColor":  "#512BD4",
+        "essential":  false
+    },
+    {
+        "id":  "Crucial.StorageExecutive",
+        "source":  "winget",
+        "name":  "Crucial Storage Executive",
+        "category":  "Drivers",
+        "description":  "Crucial SSD monitoring firmware and maintenance utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=crucial.com\u0026sz=128",
+        "accentColor":  "#005DAC",
+        "essential":  false
+    },
+    {
+        "id":  "XPDCCXDN26VNBT",
+        "source":  "msstore",
+        "name":  "Dell SupportAssist",
+        "category":  "Drivers",
+        "description":  "Dell support utility for diagnostics driver updates and system maintenance.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dell.com\u0026sz=128",
+        "accentColor":  "#0672CB",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.DirectX",
+        "name":  "DirectX Runtime",
+        "category":  "Drivers",
+        "description":  "DirectX runtime components used by older games and media tools.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  true
+    },
+    {
+        "id":  "IObit.DriverBooster",
+        "source":  "winget",
+        "name":  "Driver Booster",
+        "category":  "Drivers",
+        "description":  "Driver update utility for scanning and installing device driver updates.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=iobit.com\u0026sz=128",
+        "accentColor":  "#1E88E5",
+        "essential":  false
+    },
+    {
+        "id":  "Easeware.DriverEasy",
+        "source":  "winget",
+        "name":  "Driver Easy",
+        "category":  "Drivers",
+        "description":  "Driver scanning and update utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=drivereasy.com\u0026sz=128",
+        "accentColor":  "#1976D2",
+        "essential":  false
+    },
+    {
+        "id":  "Elgato.ControlCenter",
+        "source":  "winget",
+        "name":  "Elgato Control Center",
+        "category":  "Drivers",
+        "description":  "Elgato device control utility for supported lights and accessories.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=elgato.com\u0026sz=128",
+        "accentColor":  "#101820",
+        "essential":  false
+    },
+    {
+        "id":  "GIGABYTE.BIOS",
+        "source":  "winget",
+        "name":  "GIGABYTE atBIOS Utility",
+        "category":  "Drivers",
+        "description":  "GIGABYTE BIOS utility for supported systems.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=gigabyte.com\u0026sz=128",
+        "accentColor":  "#FF6A00",
+        "essential":  false
+    },
+    {
+        "id":  "GIGABYTE.DRMFixTool",
+        "source":  "winget",
+        "name":  "GIGABYTE DRM Fix Tool",
+        "category":  "Drivers",
+        "description":  "GIGABYTE support tool for supported AORUS and GIGABYTE devices.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=gigabyte.com\u0026sz=128",
+        "accentColor":  "#FF6A00",
+        "essential":  false
+    },
+    {
+        "id":  "GIGABYTE.RGBFusion",
+        "source":  "winget",
+        "name":  "GIGABYTE RGB Fusion",
+        "category":  "Drivers",
+        "description":  "GIGABYTE RGB lighting control utility for supported motherboards and devices.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=gigabyte.com\u0026sz=128",
+        "accentColor":  "#FF6A00",
+        "essential":  false
+    },
+    {
+        "id":  "HPInc.HPSupportAssistant",
+        "source":  "winget",
+        "name":  "HP Support Assistant",
+        "category":  "Drivers",
+        "description":  "HP support utility for updates diagnostics and device maintenance.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=hp.com\u0026sz=128",
+        "accentColor":  "#0096D6",
+        "essential":  false
+    },
+    {
+        "id":  "Oracle.JavaRuntimeEnvironment",
+        "name":  "Java Runtime Environment",
+        "category":  "Drivers",
+        "description":  "Java runtime needed by some tools, launchers, and older apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=java.com\u0026sz=128",
+        "accentColor":  "#E76F00",
+        "essential":  false
+    },
+    {
+        "id":  "Kingston.SSDManager",
+        "source":  "winget",
+        "name":  "Kingston SSD Manager",
+        "category":  "Drivers",
+        "description":  "Kingston SSD health firmware and maintenance utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=kingston.com\u0026sz=128",
+        "accentColor":  "#C8102E",
+        "essential":  false
+    },
+    {
+        "id":  "Lenovo.SystemUpdate",
+        "source":  "winget",
+        "name":  "Lenovo System Update",
+        "category":  "Drivers",
+        "description":  "Lenovo update utility for drivers BIOS and system software.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=lenovo.com\u0026sz=128",
+        "accentColor":  "#E2231A",
+        "essential":  false
+    },
+    {
+        "id":  "9WZDNCRFJ4MV",
+        "source":  "msstore",
+        "name":  "Lenovo Vantage",
+        "category":  "Drivers",
+        "description":  "Lenovo device utility for drivers updates diagnostics and hardware settings.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=lenovo.com\u0026sz=128",
+        "accentColor":  "#E2231A",
+        "essential":  false
+    },
+    {
+        "id":  "Logitech.Options",
+        "source":  "winget",
+        "name":  "Logitech Options",
+        "category":  "Drivers",
+        "description":  "Logitech device configuration utility for supported mice and keyboards.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=logitech.com\u0026sz=128",
+        "accentColor":  "#00B8FC",
+        "essential":  false
+    },
+    {
+        "id":  "9NVMNJCR03XV",
+        "source":  "msstore",
+        "name":  "MSI Center",
+        "category":  "Drivers",
+        "description":  "MSI system control utility for updates hardware features and device tuning.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=msi.com\u0026sz=128",
+        "accentColor":  "#D71920",
+        "essential":  false
+    },
+    {
+        "id":  "9NQ4LGT81KGC",
+        "source":  "msstore",
+        "name":  "MSI Center Pro",
+        "category":  "Drivers",
+        "description":  "MSI business system utility for updates and device management.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=msi.com\u0026sz=128",
+        "accentColor":  "#D71920",
+        "essential":  false
+    },
+    {
+        "id":  "9N7R5S6B0ZZH",
+        "source":  "msstore",
+        "name":  "MyASUS",
+        "category":  "Drivers",
+        "description":  "ASUS support utility for device updates diagnostics and system tools.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=asus.com\u0026sz=128",
+        "accentColor":  "#00539B",
+        "essential":  false
+    },
+    {
+        "id":  "9NF8H0H7WMLT",
+        "source":  "msstore",
+        "name":  "NVIDIA Control Panel",
+        "category":  "Drivers",
+        "description":  "NVIDIA graphics control panel from Microsoft Store.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nvidia.com\u0026sz=128",
+        "accentColor":  "#76B900",
+        "essential":  false
+    },
+    {
+        "id":  "Nvidia.PhysX",
+        "name":  "NVIDIA PhysX",
+        "category":  "Drivers",
+        "description":  "PhysX runtime used by some games.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nvidia.com\u0026sz=128",
+        "accentColor":  "#76B900",
+        "essential":  false
+    },
+    {
+        "id":  "Nvidia.PhysXLegacy",
+        "source":  "winget",
+        "name":  "NVIDIA PhysX Legacy",
+        "category":  "Drivers",
+        "description":  "Legacy PhysX runtime required by some older games and apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nvidia.com\u0026sz=128",
+        "accentColor":  "#76B900",
+        "essential":  false
+    },
+    {
+        "id":  "CreativeTechnology.OpenAL",
+        "source":  "winget",
+        "name":  "OpenAL",
+        "category":  "Drivers",
+        "description":  "Audio runtime used by older games and multimedia apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=openal.org\u0026sz=128",
+        "accentColor":  "#6F42C1",
+        "essential":  false
+    },
+    {
+        "id":  "9PK9W5QV2PKX",
+        "source":  "msstore",
+        "name":  "Razer Cortex",
+        "category":  "Drivers",
+        "description":  "Razer game and system optimization utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=razer.com\u0026sz=128",
+        "accentColor":  "#44D62C",
+        "essential":  false
+    },
+    {
+        "id":  "RazerInc.RazerInstaller.Synapse3",
+        "source":  "winget",
+        "name":  "Razer Synapse 3",
+        "category":  "Drivers",
+        "description":  "Legacy Razer device configuration software for supported devices.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=razer.com\u0026sz=128",
+        "accentColor":  "#44D62C",
+        "essential":  false
+    },
+    {
+        "id":  "RazerInc.RazerInstaller.Synapse4",
+        "source":  "winget",
+        "name":  "Razer Synapse 4",
+        "category":  "Drivers",
+        "description":  "Razer device configuration software for keyboards mice headsets and accessories.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=razer.com\u0026sz=128",
+        "accentColor":  "#44D62C",
+        "essential":  false
+    },
+    {
+        "id":  "XPDDT99J9GKB5C",
+        "source":  "msstore",
+        "name":  "Samsung Magician",
+        "category":  "Drivers",
+        "description":  "Samsung SSD management and firmware utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=semiconductor.samsung.com\u0026sz=128",
+        "accentColor":  "#1428A0",
+        "essential":  false
+    },
+    {
+        "id":  "samlab-ws.SnappyDriverInstaller",
+        "source":  "winget",
+        "name":  "Snappy Driver Installer",
+        "category":  "Drivers",
+        "description":  "Offline-capable driver installation utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=sdi-tool.org\u0026sz=128",
+        "accentColor":  "#3F51B5",
+        "essential":  false
+    },
+    {
+        "id":  "GlennDelahoy.SnappyDriverInstallerOrigin",
+        "source":  "winget",
+        "name":  "Snappy Driver Installer Origin",
+        "category":  "Drivers",
+        "description":  "Open-source driver installation and update utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=snappy-driver-installer.org\u0026sz=128",
+        "accentColor":  "#3F51B5",
+        "essential":  false
+    },
+    {
+        "id":  "EclipseAdoptium.Temurin.21.JRE",
+        "source":  "winget",
+        "name":  "Temurin JRE 21",
+        "category":  "Drivers",
+        "description":  "Java runtime environment for Java apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=adoptium.net\u0026sz=128",
+        "accentColor":  "#F58220",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.VCRedist.2010.x64",
+        "name":  "Visual C++ Redistributable 2010 x64",
+        "category":  "Drivers",
+        "description":  "Legacy 64-bit Visual C++ 2010 runtime for older apps and games.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp\u0026sz=128",
+        "accentColor":  "#5C2D91",
+        "detectionNames":  [
+                               "Microsoft Visual C++ 2010  x64 Redistributable"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.VCRedist.2010.x86",
+        "name":  "Visual C++ Redistributable 2010 x86",
+        "category":  "Drivers",
+        "description":  "Legacy 32-bit Visual C++ 2010 runtime for older apps and games.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp\u0026sz=128",
+        "accentColor":  "#5C2D91",
+        "detectionNames":  [
+                               "Microsoft Visual C++ 2010  x86 Redistributable"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.VCRedist.2012.x64",
+        "source":  "winget",
+        "name":  "Visual C++ Redistributable 2012 x64",
+        "category":  "Drivers",
+        "description":  "VC++ 2012 runtime for older apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.VCRedist.2012.x86",
+        "source":  "winget",
+        "name":  "Visual C++ Redistributable 2012 x86",
+        "category":  "Drivers",
+        "description":  "VC++ 2012 runtime for 32-bit apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.VCRedist.2013.x64",
+        "name":  "Visual C++ Redistributable 2013 x64",
+        "category":  "Drivers",
+        "description":  "Legacy 64-bit Visual C++ 2013 runtime used by older games and software.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp\u0026sz=128",
+        "accentColor":  "#5C2D91",
+        "detectionNames":  [
+                               "Microsoft Visual C++ 2013 Redistributable (x64)"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.VCRedist.2013.x86",
+        "name":  "Visual C++ Redistributable 2013 x86",
+        "category":  "Drivers",
+        "description":  "Legacy 32-bit Visual C++ 2013 runtime used by older games and software.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp\u0026sz=128",
+        "accentColor":  "#5C2D91",
+        "detectionNames":  [
+                               "Microsoft Visual C++ 2013 Redistributable (x86)"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.VCRedist.2015+.x64",
+        "name":  "Visual C++ Redistributable x64",
+        "category":  "Drivers",
+        "description":  "Common Microsoft C++ runtime required by many games and apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp\u0026sz=128",
+        "accentColor":  "#5C2D91",
+        "detectionNames":  [
+                               "Microsoft Visual C++ 2015-2022 Redistributable (x64)"
+                           ],
+        "essential":  true
+    },
+    {
+        "id":  "Microsoft.VCRedist.2015+.x86",
+        "name":  "Visual C++ Redistributable x86",
+        "category":  "Drivers",
+        "description":  "32-bit Microsoft C++ runtime required by many games and legacy apps.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp\u0026sz=128",
+        "accentColor":  "#5C2D91",
+        "detectionNames":  [
+                               "Microsoft Visual C++ 2015-2022 Redistributable (x86)"
+                           ],
+        "essential":  true
+    },
+    {
+        "id":  "KhronosGroup.VulkanRT",
+        "source":  "winget",
+        "name":  "Vulkan Runtime",
+        "category":  "Drivers",
+        "description":  "Vulkan graphics runtime.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=vulkan.org\u0026sz=128",
+        "accentColor":  "#AC162C",
+        "essential":  false
+    },
+    {
+        "id":  "Google.AndroidStudio",
+        "source":  "winget",
+        "name":  "Android Studio",
+        "category":  "Game Development",
+        "description":  "Android IDE for mobile game and app development.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=developer.android.com\u0026sz=128",
+        "accentColor":  "#3DDC84",
+        "essential":  false
+    },
+    {
+        "id":  "YoYoGames.GameMaker.Studio.2",
+        "source":  "winget",
+        "name":  "GameMaker",
+        "category":  "Game Development",
+        "description":  "2D game engine and editor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=gamemaker.io\u0026sz=128",
+        "accentColor":  "#00A86B",
+        "essential":  false
+    },
+    {
+        "id":  "GDevelop.GDevelop",
+        "source":  "winget",
+        "name":  "GDevelop",
+        "category":  "Game Development",
+        "description":  "No-code and visual game development engine.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=gdevelop.io\u0026sz=128",
+        "accentColor":  "#4F9CF9",
+        "essential":  false
+    },
+    {
+        "id":  "GDQuest.GDScript.Formatter",
+        "source":  "winget",
+        "name":  "GDScript Formatter",
+        "category":  "Game Development",
+        "description":  "Formatter for Godot GDScript projects.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=gdquest.com\u0026sz=128",
+        "accentColor":  "#478CBF",
+        "essential":  false
+    },
+    {
+        "id":  "GodotEngine.GodotEngine",
+        "name":  "Godot Engine",
+        "category":  "Game Development",
+        "description":  "Open-source game engine for 2D and 3D projects.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=godotengine.org\u0026sz=128",
+        "accentColor":  "#478CBF",
+        "essential":  false
+    },
+    {
+        "id":  "GodotEngine.GodotEngine.Mono",
+        "source":  "winget",
+        "name":  "Godot Engine Mono",
+        "category":  "Game Development",
+        "description":  "Godot engine build with C# support.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=godotengine.org\u0026sz=128",
+        "accentColor":  "#478CBF",
+        "essential":  false
+    },
+    {
+        "id":  "deepnight.LDtk",
+        "source":  "winget",
+        "name":  "LDtk",
+        "category":  "Game Development",
+        "description":  "Level designer toolkit for 2D games.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ldtk.io\u0026sz=128",
+        "accentColor":  "#2E3440",
+        "essential":  false
+    },
+    {
+        "id":  "LMMS.LMMS",
+        "source":  "winget",
+        "name":  "LMMS",
+        "category":  "Game Development",
+        "description":  "Music production tool for game audio.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=lmms.io\u0026sz=128",
+        "accentColor":  "#10A040",
+        "essential":  false
+    },
+    {
+        "id":  "Love2d.Love2d",
+        "source":  "winget",
+        "name":  "LOVE",
+        "category":  "Game Development",
+        "description":  "Lua framework for 2D games.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=love2d.org\u0026sz=128",
+        "accentColor":  "#E66DAA",
+        "essential":  false
+    },
+    {
+        "id":  "MonoGame.MonoGame",
+        "source":  "winget",
+        "name":  "MonoGame SDK",
+        "category":  "Game Development",
+        "description":  "Framework for cross-platform C# game development.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=monogame.net\u0026sz=128",
+        "accentColor":  "#E73C00",
+        "essential":  false
+    },
+    {
+        "id":  "PCSX2Team.PCSX2",
+        "source":  "winget",
+        "name":  "PCSX2",
+        "category":  "Game Development",
+        "description":  "PlayStation 2 emulator for testing and preservation.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=pcsx2.net\u0026sz=128",
+        "accentColor":  "#4169E1",
+        "essential":  false
+    },
+    {
+        "id":  "OramaInteractive.Pixelorama",
+        "source":  "winget",
+        "name":  "Pixelorama",
+        "category":  "Game Development",
+        "description":  "Pixel art sprite editor for games.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=orama-interactive.itch.io\u0026sz=128",
+        "accentColor":  "#7B61FF",
+        "essential":  false
+    },
+    {
+        "id":  "RenPy.RenPySDK",
+        "source":  "winget",
+        "name":  "Ren\u0027Py SDK",
+        "category":  "Game Development",
+        "description":  "Visual novel engine and SDK.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=renpy.org\u0026sz=128",
+        "accentColor":  "#FF7F7F",
+        "essential":  false
+    },
+    {
+        "id":  "Libretro.RetroArch",
+        "source":  "winget",
+        "name":  "RetroArch",
+        "category":  "Game Development",
+        "description":  "Frontend for emulators and game testing cores.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=retroarch.com\u0026sz=128",
+        "accentColor":  "#E64A19",
+        "essential":  false
+    },
+    {
+        "id":  "Roblox.RobloxStudio",
+        "source":  "winget",
+        "name":  "Roblox Studio",
+        "category":  "Game Development",
+        "description":  "Roblox game creation environment.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=create.roblox.com\u0026sz=128",
+        "accentColor":  "#111111",
+        "essential":  false
+    },
+    {
+        "id":  "Valve.SteamCMD",
+        "source":  "winget",
+        "name":  "SteamCMD",
+        "category":  "Game Development",
+        "description":  "Command-line Steam tool for servers and builds.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=developer.valvesoftware.com\u0026sz=128",
+        "accentColor":  "#1B2838",
+        "essential":  false
+    },
+    {
+        "id":  "Tiled.Tiled",
+        "source":  "winget",
+        "name":  "Tiled",
+        "category":  "Game Development",
+        "description":  "2D tile map editor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mapeditor.org\u0026sz=128",
+        "accentColor":  "#5FA04E",
+        "essential":  false
+    },
+    {
+        "id":  "ChrisKlimas.Twine",
+        "source":  "winget",
+        "name":  "Twine",
+        "category":  "Game Development",
+        "description":  "Interactive fiction and branching story tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=twinery.org\u0026sz=128",
+        "accentColor":  "#D95B43",
+        "essential":  false
+    },
+    {
+        "id":  "Unity.UnityHub",
+        "name":  "Unity Hub",
+        "category":  "Game Development",
+        "description":  "Unity project, editor, and module manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=unity.com\u0026sz=128",
+        "accentColor":  "#000000",
+        "essential":  false
+    },
+    {
+        "id":  "xemu-project.xemu",
+        "source":  "winget",
+        "name":  "xemu",
+        "category":  "Game Development",
+        "description":  "Original Xbox emulator for testing and preservation workflows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=xemu.app\u0026sz=128",
+        "accentColor":  "#2E7D32",
+        "essential":  false
+    },
+    {
+        "id":  "Blizzard.BattleNet",
+        "name":  "Battle.net",
+        "category":  "Gaming",
+        "description":  "Blizzard game launcher and account client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=battle.net\u0026sz=128",
+        "accentColor":  "#00AEFF",
+        "essential":  false
+    },
+    {
+        "id":  "Corsair.iCUE.5",
+        "name":  "Corsair iCUE",
+        "category":  "Gaming",
+        "description":  "Corsair device control, RGB, cooling, and profiles.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=corsair.com\u0026sz=128",
+        "accentColor":  "#FECb00",
+        "essential":  false
+    },
+    {
+        "id":  "CPUID.CPU-Z",
+        "name":  "CPU-Z",
+        "category":  "Gaming",
+        "description":  "CPU, motherboard, RAM, and system information utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=cpuid.com\u0026sz=128",
+        "accentColor":  "#744DA9",
+        "essential":  false
+    },
+    {
+        "id":  "Wagnardsoft.DisplayDriverUninstaller",
+        "name":  "Display Driver Uninstaller",
+        "category":  "Gaming",
+        "description":  "Clean GPU driver removal tool for troubleshooting.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=wagnardsoft.com\u0026sz=128",
+        "accentColor":  "#546E7A",
+        "essential":  false
+    },
+    {
+        "id":  "Recol.DLSSUpdater",
+        "name":  "DLSS Updater",
+        "category":  "Gaming",
+        "description":  "Manage NVIDIA DLSS files for supported games.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com\u0026sz=128",
+        "accentColor":  "#76B900",
+        "essential":  false
+    },
+    {
+        "id":  "ElectronicArts.EADesktop",
+        "name":  "EA app",
+        "category":  "Gaming",
+        "description":  "EA game launcher and library app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ea.com\u0026sz=128",
+        "accentColor":  "#FF4747",
+        "essential":  false
+    },
+    {
+        "id":  "EpicGames.EpicGamesLauncher",
+        "name":  "Epic Games Launcher",
+        "category":  "Gaming",
+        "description":  "Epic Games store and game launcher.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epicgames.com\u0026sz=128",
+        "accentColor":  "#313131",
+        "essential":  false
+    },
+    {
+        "id":  "GOG.Galaxy",
+        "name":  "GOG Galaxy",
+        "category":  "Gaming",
+        "description":  "Game library and launcher for GOG titles.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=gog.com\u0026sz=128",
+        "accentColor":  "#78387B",
+        "essential":  false
+    },
+    {
+        "id":  "TechPowerUp.GPU-Z",
+        "name":  "GPU-Z",
+        "category":  "Gaming",
+        "description":  "Graphics card information and sensor monitor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=techpowerup.com\u0026sz=128",
+        "accentColor":  "#1E88E5",
+        "essential":  false
+    },
+    {
+        "id":  "REALiX.HWiNFO",
+        "name":  "HWiNFO",
+        "category":  "Gaming",
+        "description":  "Detailed hardware monitoring for gaming PCs and workstations.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=hwinfo.com\u0026sz=128",
+        "accentColor":  "#1976D2",
+        "essential":  false
+    },
+    {
+        "id":  "CPUID.HWMonitor",
+        "name":  "HWMonitor",
+        "category":  "Gaming",
+        "description":  "Hardware temperature, voltage, and fan monitoring.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=cpuid.com\u0026sz=128",
+        "accentColor":  "#7E57C2",
+        "essential":  false
+    },
+    {
+        "id":  "Logitech.GHUB",
+        "name":  "Logitech G HUB",
+        "category":  "Gaming",
+        "description":  "Logitech gaming device profiles, RGB, and macros.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=logitechg.com\u0026sz=128",
+        "accentColor":  "#00B8FC",
+        "essential":  false
+    },
+    {
+        "id":  "MoonlightGameStreamingProject.Moonlight",
+        "name":  "Moonlight",
+        "category":  "Gaming",
+        "description":  "GameStream client for remote gaming.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=moonlight-stream.org\u0026sz=128",
+        "accentColor":  "#38BDF8",
+        "essential":  false
+    },
+    {
+        "id":  "Guru3D.Afterburner",
+        "name":  "MSI Afterburner",
+        "category":  "Gaming",
+        "description":  "GPU monitoring, fan curve, and performance tuning utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=guru3d.com\u0026sz=128",
+        "accentColor":  "#C20E1A",
+        "essential":  false
+    },
+    {
+        "id":  "TechPowerUp.NVCleanstall",
+        "name":  "NVCleanstall",
+        "category":  "Gaming",
+        "description":  "Customize and clean NVIDIA driver installations.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=techpowerup.com\u0026sz=128",
+        "accentColor":  "#76B900",
+        "essential":  false
+    },
+    {
+        "id":  "Nvidia.FrameView",
+        "name":  "NVIDIA FrameView",
+        "category":  "Gaming",
+        "description":  "Frame rate and performance capture utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nvidia.com\u0026sz=128",
+        "accentColor":  "#76B900",
+        "essential":  false
+    },
+    {
+        "id":  "Nvidia.GeForceNow",
+        "name":  "NVIDIA GeForce NOW",
+        "category":  "Gaming",
+        "description":  "NVIDIA cloud gaming client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nvidia.com\u0026sz=128",
+        "accentColor":  "#76B900",
+        "essential":  false
+    },
+    {
+        "id":  "Orbmu2k.nvidiaProfileInspector",
+        "name":  "NVIDIA Profile Inspector",
+        "category":  "Gaming",
+        "description":  "Advanced NVIDIA driver profile editor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com\u0026sz=128",
+        "accentColor":  "#76B900",
+        "essential":  false
+    },
+    {
+        "id":  "Parsec.Parsec",
+        "name":  "Parsec",
+        "category":  "Gaming",
+        "description":  "Low-latency remote desktop and game streaming app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=parsec.app\u0026sz=128",
+        "accentColor":  "#FF4F64",
+        "essential":  false
+    },
+    {
+        "id":  "Valve.Steam",
+        "name":  "Steam",
+        "category":  "Gaming",
+        "description":  "PC game store, library, and community launcher.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=steampowered.com\u0026sz=128",
+        "accentColor":  "#1B2838",
+        "essential":  false
+    },
+    {
+        "id":  "SteelSeries.GG",
+        "name":  "SteelSeries GG",
+        "category":  "Gaming",
+        "description":  "SteelSeries gear control, audio tools, and clips.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=steelseries.com\u0026sz=128",
+        "accentColor":  "#FF5200",
+        "essential":  false
+    },
+    {
+        "id":  "Ubisoft.Connect",
+        "name":  "Ubisoft Connect",
+        "category":  "Gaming",
+        "description":  "Ubisoft launcher, store, and friends app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ubisoft.com\u0026sz=128",
+        "accentColor":  "#0070FF",
+        "essential":  false
+    },
+    {
+        "id":  "AIMP.AIMP",
+        "source":  "winget",
+        "name":  "AIMP",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Music player with playlist and audio tools.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=aimp.ru\u0026sz=128",
+        "accentColor":  "#FF9E1B",
+        "essential":  false
+    },
+    {
+        "id":  "Clementine.Clementine",
+        "source":  "winget",
+        "name":  "Clementine",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Music player and library organizer.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=clementine-player.org\u0026sz=128",
+        "accentColor":  "#FF8C00",
+        "essential":  false
+    },
+    {
+        "id":  "PeterPawlowski.foobar2000",
+        "source":  "winget",
+        "name":  "foobar2000",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Advanced lightweight audio player.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=foobar2000.org\u0026sz=128",
+        "accentColor":  "#6A6A6A",
+        "essential":  false
+    },
+    {
+        "id":  "Apple.iTunes",
+        "source":  "winget",
+        "name":  "iTunes",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Apple media player and device sync app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=apple.com/itunes\u0026sz=128",
+        "accentColor":  "#FB5BC5",
+        "essential":  false
+    },
+    {
+        "id":  "Jellyfin.JellyfinMediaPlayer",
+        "source":  "winget",
+        "name":  "Jellyfin Media Player",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Desktop player for Jellyfin servers.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=jellyfin.org\u0026sz=128",
+        "accentColor":  "#00A4DC",
+        "essential":  false
+    },
+    {
+        "id":  "CodecGuide.K-LiteCodecPack.Standard",
+        "source":  "winget",
+        "name":  "K-Lite Codec Pack Standard",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Codec pack for broad video playback support.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=codecguide.com\u0026sz=128",
+        "accentColor":  "#005EB8",
+        "essential":  false
+    },
+    {
+        "id":  "XBMCFoundation.Kodi",
+        "source":  "winget",
+        "name":  "Kodi",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Home theater media center.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=kodi.tv\u0026sz=128",
+        "accentColor":  "#17B2E7",
+        "essential":  false
+    },
+    {
+        "id":  "MPC-BE.MPC-BE",
+        "source":  "winget",
+        "name":  "MPC-BE",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Media Player Classic Black Edition.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=sourceforge.net/projects/mpcbe\u0026sz=128",
+        "accentColor":  "#202020",
+        "essential":  false
+    },
+    {
+        "id":  "clsid2.mpc-hc",
+        "source":  "winget",
+        "name":  "MPC-HC",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Classic lightweight media player.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/clsid2/mpc-hc\u0026sz=128",
+        "accentColor":  "#4E8BD6",
+        "essential":  false
+    },
+    {
+        "id":  "Plex.Plex",
+        "source":  "winget",
+        "name":  "Plex",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Media library and streaming client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=plex.tv\u0026sz=128",
+        "accentColor":  "#E5A00D",
+        "essential":  false
+    },
+    {
+        "id":  "Plex.PlexHTPC",
+        "source":  "winget",
+        "name":  "Plex HTPC",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Home theater Plex client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=plex.tv\u0026sz=128",
+        "accentColor":  "#E5A00D",
+        "essential":  false
+    },
+    {
+        "id":  "Plex.Plexamp",
+        "source":  "winget",
+        "name":  "Plexamp",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Music player for Plex libraries.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=plexamp.com\u0026sz=128",
+        "accentColor":  "#E5A00D",
+        "essential":  false
+    },
+    {
+        "id":  "Daum.PotPlayer",
+        "source":  "winget",
+        "name":  "PotPlayer",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Feature-rich media player.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=potplayer.daum.net\u0026sz=128",
+        "accentColor":  "#7B4DFF",
+        "essential":  false
+    },
+    {
+        "id":  "Starpine.Screenbox",
+        "source":  "winget",
+        "name":  "Screenbox",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Modern Windows media player.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/huynhsontung/Screenbox\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  false
+    },
+    {
+        "id":  "SMPlayer.SMPlayer",
+        "source":  "winget",
+        "name":  "SMPlayer",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Media player frontend for mpv and mplayer.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=smplayer.info\u0026sz=128",
+        "accentColor":  "#F58220",
+        "essential":  false
+    },
+    {
+        "id":  "Spotify.Spotify",
+        "name":  "Spotify",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Music and podcast streaming app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=spotify.com\u0026sz=128",
+        "accentColor":  "#1DB954",
+        "essential":  false
+    },
+    {
+        "id":  "Stremio.Stremio",
+        "source":  "winget",
+        "name":  "Stremio",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Media center for streaming catalogs.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=stremio.com\u0026sz=128",
+        "accentColor":  "#7D55FF",
+        "essential":  false
+    },
+    {
+        "id":  "TIDALMusicAS.TIDAL",
+        "source":  "winget",
+        "name":  "TIDAL",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Hi-fi music streaming desktop app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=tidal.com\u0026sz=128",
+        "accentColor":  "#111111",
+        "essential":  false
+    },
+    {
+        "id":  "VideoLAN.VLC",
+        "name":  "VLC media player",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Reliable media player with broad codec support.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=videolan.org\u0026sz=128",
+        "accentColor":  "#FF8800",
+        "essential":  true
+    },
+    {
+        "id":  "Winamp.Winamp",
+        "source":  "winget",
+        "name":  "Winamp",
+        "category":  "Media \u0026 Streaming",
+        "description":  "Classic music player.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=winamp.com\u0026sz=128",
+        "accentColor":  "#F6B100",
+        "essential":  false
+    },
+    {
+        "id":  "Famatech.AdvancedIPScanner",
+        "source":  "winget",
+        "name":  "Advanced IP Scanner",
+        "category":  "Networking",
+        "description":  "LAN scanner for discovering network devices.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=advanced-ip-scanner.com\u0026sz=128",
+        "accentColor":  "#0B7BD3",
+        "essential":  false
+    },
+    {
+        "id":  "angryziber.AngryIPScanner",
+        "source":  "winget",
+        "name":  "Angry IP Scanner",
+        "category":  "Networking",
+        "description":  "Fast IP and port scanner.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=angryip.org\u0026sz=128",
+        "accentColor":  "#E53935",
+        "essential":  false
+    },
+    {
+        "id":  "Amazon.AWSVPNClient",
+        "source":  "winget",
+        "name":  "AWS VPN Client",
+        "category":  "Networking",
+        "description":  "AWS Client VPN desktop client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=aws.amazon.com/vpn/client-vpn-download\u0026sz=128",
+        "accentColor":  "#FF9900",
+        "essential":  false
+    },
+    {
+        "id":  "Cloudflare.Warp",
+        "name":  "Cloudflare WARP",
+        "category":  "Networking",
+        "description":  "Cloudflare DNS, WARP VPN, and secure network client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=one.one.one.one\u0026sz=128",
+        "accentColor":  "#F48120",
+        "essential":  false
+    },
+    {
+        "id":  "Iterate.Cyberduck",
+        "source":  "winget",
+        "name":  "Cyberduck",
+        "category":  "Networking",
+        "description":  "FTP SFTP WebDAV and cloud storage client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=cyberduck.io\u0026sz=128",
+        "accentColor":  "#F9C642",
+        "essential":  false
+    },
+    {
+        "id":  "Mobatek.MobaXterm",
+        "source":  "winget",
+        "name":  "MobaXterm",
+        "category":  "Networking",
+        "description":  "Remote terminal and network toolbox.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mobaxterm.mobatek.net\u0026sz=128",
+        "accentColor":  "#0086C9",
+        "essential":  false
+    },
+    {
+        "id":  "mRemoteNG.mRemoteNG",
+        "name":  "mRemoteNG",
+        "category":  "Networking",
+        "description":  "Tabbed remote connection manager for RDP, SSH, VNC, and more.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mremoteng.org\u0026sz=128",
+        "accentColor":  "#4B8BBE",
+        "essential":  false
+    },
+    {
+        "id":  "MullvadVPN.MullvadVPN",
+        "source":  "winget",
+        "name":  "Mullvad VPN",
+        "category":  "Networking",
+        "description":  "Privacy-focused VPN client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mullvad.net\u0026sz=128",
+        "accentColor":  "#1BA39C",
+        "essential":  false
+    },
+    {
+        "id":  "BornToBeRoot.NETworkManager",
+        "source":  "winget",
+        "name":  "NETworkManager",
+        "category":  "Networking",
+        "description":  "Network management and diagnostic toolkit.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=borntoberoot.net/NETworkManager\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  false
+    },
+    {
+        "id":  "Insecure.Nmap",
+        "source":  "winget",
+        "name":  "Nmap",
+        "category":  "Networking",
+        "description":  "Network discovery and security scanning tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nmap.org\u0026sz=128",
+        "accentColor":  "#4682B4",
+        "essential":  false
+    },
+    {
+        "id":  "OpenVPNTechnologies.OpenVPN",
+        "source":  "winget",
+        "name":  "OpenVPN",
+        "category":  "Networking",
+        "description":  "OpenVPN community VPN client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=openvpn.net\u0026sz=128",
+        "accentColor":  "#EA7E20",
+        "essential":  false
+    },
+    {
+        "id":  "OpenVPNTechnologies.OpenVPNConnect",
+        "name":  "OpenVPN Connect",
+        "category":  "Networking",
+        "description":  "OpenVPN client for work, server, and private VPN profiles.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=openvpn.net\u0026sz=128",
+        "accentColor":  "#EA7E20",
+        "essential":  false
+    },
+    {
+        "id":  "Proton.ProtonVPN",
+        "source":  "winget",
+        "name":  "Proton VPN",
+        "category":  "Networking",
+        "description":  "Privacy-focused VPN client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=protonvpn.com\u0026sz=128",
+        "accentColor":  "#6D4AFF",
+        "essential":  false
+    },
+    {
+        "id":  "PuTTY.PuTTY",
+        "name":  "PuTTY",
+        "category":  "Networking",
+        "description":  "SSH, Telnet, and serial terminal client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=putty.org\u0026sz=128",
+        "accentColor":  "#1565C0",
+        "essential":  false
+    },
+    {
+        "id":  "JimRadford.SuperPuTTY",
+        "source":  "winget",
+        "name":  "SuperPuTTY",
+        "category":  "Networking",
+        "description":  "Tabbed PuTTY session manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/jimradford/superputty\u0026sz=128",
+        "accentColor":  "#00ADEF",
+        "essential":  false
+    },
+    {
+        "id":  "Tailscale.Tailscale",
+        "name":  "Tailscale",
+        "category":  "Networking",
+        "description":  "Private mesh VPN for secure remote device access.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=tailscale.com\u0026sz=128",
+        "accentColor":  "#242424",
+        "essential":  false
+    },
+    {
+        "id":  "Termius.Termius",
+        "name":  "Termius",
+        "category":  "Networking",
+        "description":  "Modern SSH client with saved hosts and key management.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=termius.com\u0026sz=128",
+        "accentColor":  "#111827",
+        "essential":  false
+    },
+    {
+        "id":  "Windscribe.Windscribe",
+        "source":  "winget",
+        "name":  "Windscribe",
+        "category":  "Networking",
+        "description":  "VPN client for secure network access.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=windscribe.com\u0026sz=128",
+        "accentColor":  "#00ADEF",
+        "essential":  false
+    },
+    {
+        "id":  "WireGuard.WireGuard",
+        "name":  "WireGuard",
+        "category":  "Networking",
+        "description":  "Fast modern VPN tunnel client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=wireguard.com\u0026sz=128",
+        "accentColor":  "#88171A",
+        "essential":  false
+    },
+    {
+        "id":  "WiresharkFoundation.Wireshark",
+        "name":  "Wireshark",
+        "category":  "Networking",
+        "description":  "Network protocol analyzer for troubleshooting and learning.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=wireshark.org\u0026sz=128",
+        "accentColor":  "#1679A7",
+        "essential":  false
+    },
+    {
+        "id":  "Anaconda.Anaconda3",
+        "source":  "winget",
+        "name":  "Anaconda3",
+        "category":  "Problem Solving",
+        "description":  "Python distribution for data science.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=anaconda.com\u0026sz=128",
+        "accentColor":  "#44A833",
+        "essential":  false
+    },
+    {
+        "id":  "Kitware.CMake",
+        "name":  "CMake",
+        "category":  "Problem Solving",
+        "description":  "Cross-platform build system for C and C++ projects.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=cmake.org\u0026sz=128",
+        "accentColor":  "#064F8C",
+        "essential":  false
+    },
+    {
+        "id":  "Google.DartSDK",
+        "source":  "winget",
+        "name":  "Dart SDK",
+        "category":  "Problem Solving",
+        "description":  "Dart programming SDK.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dart.dev\u0026sz=128",
+        "accentColor":  "#0175C2",
+        "essential":  false
+    },
+    {
+        "id":  "DimitriVanHeesch.Doxygen",
+        "source":  "winget",
+        "name":  "Doxygen",
+        "category":  "Problem Solving",
+        "description":  "Documentation generator for codebases.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=doxygen.nl\u0026sz=128",
+        "accentColor":  "#2C4AA5",
+        "essential":  false
+    },
+    {
+        "id":  "GeoGebra.CalculatorSuite",
+        "source":  "winget",
+        "name":  "GeoGebra Calculator Suite",
+        "category":  "Problem Solving",
+        "description":  "Math graphing geometry and CAS tools.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=geogebra.org\u0026sz=128",
+        "accentColor":  "#8A66CC",
+        "essential":  false
+    },
+    {
+        "id":  "Graphviz.Graphviz",
+        "source":  "winget",
+        "name":  "Graphviz",
+        "category":  "Problem Solving",
+        "description":  "Graph visualization toolkit.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=graphviz.org\u0026sz=128",
+        "accentColor":  "#3F7E44",
+        "essential":  false
+    },
+    {
+        "id":  "Julialang.Julia",
+        "source":  "winget",
+        "name":  "Julia",
+        "category":  "Problem Solving",
+        "description":  "High-performance language for scientific computing.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=julialang.org\u0026sz=128",
+        "accentColor":  "#9558B2",
+        "essential":  false
+    },
+    {
+        "id":  "Julialang.Juliaup",
+        "source":  "winget",
+        "name":  "Juliaup",
+        "category":  "Problem Solving",
+        "description":  "Julia version manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=julialang.org\u0026sz=128",
+        "accentColor":  "#9558B2",
+        "essential":  false
+    },
+    {
+        "id":  "LLVM.LLVM",
+        "name":  "LLVM",
+        "category":  "Problem Solving",
+        "description":  "Compiler infrastructure with Clang and developer tools.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=llvm.org\u0026sz=128",
+        "accentColor":  "#5C6BC0",
+        "essential":  false
+    },
+    {
+        "id":  "MaximaTeam.Maxima",
+        "source":  "winget",
+        "name":  "Maxima",
+        "category":  "Problem Solving",
+        "description":  "Computer algebra system.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=maxima.sourceforge.io\u0026sz=128",
+        "accentColor":  "#1D4E89",
+        "essential":  false
+    },
+    {
+        "id":  "MiKTeX.MiKTeX",
+        "source":  "winget",
+        "name":  "MiKTeX",
+        "category":  "Problem Solving",
+        "description":  "LaTeX distribution for technical documents.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=miktex.org\u0026sz=128",
+        "accentColor":  "#2B5F87",
+        "essential":  false
+    },
+    {
+        "id":  "Anaconda.Miniconda3",
+        "source":  "winget",
+        "name":  "Miniconda3",
+        "category":  "Problem Solving",
+        "description":  "Minimal conda Python distribution.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=anaconda.com\u0026sz=128",
+        "accentColor":  "#44A833",
+        "essential":  false
+    },
+    {
+        "id":  "CondaForge.Miniforge3",
+        "source":  "winget",
+        "name":  "Miniforge3",
+        "category":  "Problem Solving",
+        "description":  "Conda-forge based Python distribution.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=conda-forge.org\u0026sz=128",
+        "accentColor":  "#44A833",
+        "essential":  false
+    },
+    {
+        "id":  "MSYS2.MSYS2",
+        "source":  "winget",
+        "name":  "MSYS2",
+        "category":  "Problem Solving",
+        "description":  "Unix-like build environment for Windows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=msys2.org\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  false
+    },
+    {
+        "id":  "Ninja-build.Ninja",
+        "name":  "Ninja",
+        "category":  "Problem Solving",
+        "description":  "Small fast build system used by CMake and engineering projects.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ninja-build.org\u0026sz=128",
+        "accentColor":  "#1E1E1E",
+        "essential":  false
+    },
+    {
+        "id":  "Nvidia.CUDA",
+        "name":  "NVIDIA CUDA Toolkit",
+        "category":  "Problem Solving",
+        "description":  "GPU compute toolkit for AI, CUDA, and engineering workloads.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=developer.nvidia.com/cuda-toolkit\u0026sz=128",
+        "accentColor":  "#76B900",
+        "essential":  false
+    },
+    {
+        "id":  "Posit.RStudio",
+        "name":  "RStudio",
+        "category":  "Problem Solving",
+        "description":  "IDE for R, statistics, data analysis, and research work.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=posit.co\u0026sz=128",
+        "accentColor":  "#75AADB",
+        "essential":  false
+    },
+    {
+        "id":  "Scilab.Scilab",
+        "source":  "winget",
+        "name":  "Scilab",
+        "category":  "Problem Solving",
+        "description":  "Numerical computation platform.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=scilab.org\u0026sz=128",
+        "accentColor":  "#C42B2B",
+        "essential":  false
+    },
+    {
+        "id":  "StrawberryPerl.StrawberryPerl",
+        "source":  "winget",
+        "name":  "Strawberry Perl",
+        "category":  "Problem Solving",
+        "description":  "Perl distribution for Windows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=strawberryperl.com\u0026sz=128",
+        "accentColor":  "#D9480F",
+        "essential":  false
+    },
+    {
+        "id":  "zig.zig",
+        "source":  "winget",
+        "name":  "Zig",
+        "category":  "Problem Solving",
+        "description":  "Systems programming language and toolchain.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ziglang.org\u0026sz=128",
+        "accentColor":  "#F7A41D",
+        "essential":  false
+    },
+    {
+        "id":  "Adobe.Acrobat.Reader.64-bit",
+        "source":  "winget",
+        "name":  "Adobe Acrobat Reader",
+        "category":  "Productivity",
+        "description":  "PDF reader and annotation app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=adobe.com/acrobat\u0026sz=128",
+        "accentColor":  "#EC1C24",
+        "essential":  false
+    },
+    {
+        "id":  "calibre.calibre",
+        "source":  "winget",
+        "name":  "calibre",
+        "category":  "Productivity",
+        "description":  "E-book library manager and reader.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=calibre-ebook.com\u0026sz=128",
+        "accentColor":  "#5E8BBE",
+        "essential":  false
+    },
+    {
+        "id":  "Dropbox.Dropbox",
+        "name":  "Dropbox",
+        "category":  "Productivity",
+        "description":  "Cloud file sync and sharing app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dropbox.com\u0026sz=128",
+        "accentColor":  "#0061FF",
+        "essential":  false
+    },
+    {
+        "id":  "Evernote.Evernote",
+        "source":  "winget",
+        "name":  "Evernote",
+        "category":  "Productivity",
+        "description":  "Notes tasks and organization app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=evernote.com\u0026sz=128",
+        "accentColor":  "#00A82D",
+        "essential":  false
+    },
+    {
+        "id":  "Google.GoogleDrive",
+        "name":  "Google Drive",
+        "category":  "Productivity",
+        "description":  "Google Drive sync and desktop file access.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=drive.google.com\u0026sz=128",
+        "accentColor":  "#0F9D58",
+        "essential":  false
+    },
+    {
+        "id":  "Joplin.Joplin",
+        "source":  "winget",
+        "name":  "Joplin",
+        "category":  "Productivity",
+        "description":  "Open-source notes and to-do app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=joplinapp.org\u0026sz=128",
+        "accentColor":  "#1071D3",
+        "essential":  false
+    },
+    {
+        "id":  "TheDocumentFoundation.LibreOffice",
+        "name":  "LibreOffice",
+        "category":  "Productivity",
+        "description":  "Free office suite for documents, spreadsheets, and presentations.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=libreoffice.org\u0026sz=128",
+        "accentColor":  "#18A303",
+        "essential":  false
+    },
+    {
+        "id":  "Mega.MEGASync",
+        "source":  "winget",
+        "name":  "MEGAsync",
+        "category":  "Productivity",
+        "description":  "Cloud storage sync client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=mega.io\u0026sz=128",
+        "accentColor":  "#D90007",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.Office",
+        "name":  "Microsoft Office",
+        "category":  "Productivity",
+        "description":  "Microsoft Office installer for Word, Excel, PowerPoint, and more.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com/microsoft-365\u0026sz=128",
+        "accentColor":  "#D83B01",
+        "essential":  false
+    },
+    {
+        "id":  "Notion.Notion",
+        "name":  "Notion",
+        "category":  "Productivity",
+        "description":  "Workspace for notes, docs, planning, and knowledge bases.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=notion.so\u0026sz=128",
+        "accentColor":  "#111111",
+        "essential":  false
+    },
+    {
+        "id":  "Notion.NotionCalendar",
+        "source":  "winget",
+        "name":  "Notion Calendar",
+        "category":  "Productivity",
+        "description":  "Calendar app integrated with Notion.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=notion.so\u0026sz=128",
+        "accentColor":  "#000000",
+        "essential":  false
+    },
+    {
+        "id":  "Obsidian.Obsidian",
+        "name":  "Obsidian",
+        "category":  "Productivity",
+        "description":  "Markdown knowledge base and note app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=obsidian.md\u0026sz=128",
+        "accentColor":  "#7C3AED",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.OneDrive",
+        "name":  "OneDrive",
+        "category":  "Productivity",
+        "description":  "Microsoft cloud file sync client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=onedrive.live.com\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  false
+    },
+    {
+        "id":  "ONLYOFFICE.DesktopEditors",
+        "source":  "winget",
+        "name":  "ONLYOFFICE Desktop Editors",
+        "category":  "Productivity",
+        "description":  "Office document editor suite.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=onlyoffice.com\u0026sz=128",
+        "accentColor":  "#FF6F3D",
+        "essential":  false
+    },
+    {
+        "id":  "Automattic.Simplenote",
+        "source":  "winget",
+        "name":  "Simplenote",
+        "category":  "Productivity",
+        "description":  "Simple note-taking app with sync.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=simplenote.com\u0026sz=128",
+        "accentColor":  "#3361CC",
+        "essential":  false
+    },
+    {
+        "id":  "StandardNotes.StandardNotes",
+        "source":  "winget",
+        "name":  "Standard Notes",
+        "category":  "Productivity",
+        "description":  "Private encrypted notes app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=standardnotes.com\u0026sz=128",
+        "accentColor":  "#0F111A",
+        "essential":  false
+    },
+    {
+        "id":  "Appest.TickTick",
+        "source":  "winget",
+        "name":  "TickTick",
+        "category":  "Productivity",
+        "description":  "Tasks calendar and habit tracking app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ticktick.com\u0026sz=128",
+        "accentColor":  "#4772FA",
+        "essential":  false
+    },
+    {
+        "id":  "Doist.Todoist",
+        "source":  "winget",
+        "name":  "Todoist",
+        "category":  "Productivity",
+        "description":  "Task manager and planner.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=todoist.com\u0026sz=128",
+        "accentColor":  "#E44332",
+        "essential":  false
+    },
+    {
+        "id":  "Kingsoft.WPSOffice",
+        "source":  "winget",
+        "name":  "WPS Office",
+        "category":  "Productivity",
+        "description":  "Office suite for documents sheets and slides.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=wps.com\u0026sz=128",
+        "accentColor":  "#E74C3C",
+        "essential":  false
+    },
+    {
+        "id":  "Apryse.XodoPDFReader",
+        "source":  "winget",
+        "name":  "Xodo PDF Reader",
+        "category":  "Productivity",
+        "description":  "PDF reader annotator and editor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=xodo.com\u0026sz=128",
+        "accentColor":  "#00A3E0",
+        "essential":  false
+    },
+    {
+        "id":  "AgileBits.1Password",
+        "name":  "1Password",
+        "category":  "Security",
+        "description":  "Password manager and secure item vault.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=1password.com\u0026sz=128",
+        "accentColor":  "#0070F4",
+        "essential":  false
+    },
+    {
+        "id":  "AgileBits.1Password.CLI",
+        "source":  "winget",
+        "name":  "1Password CLI",
+        "category":  "Security",
+        "description":  "Command-line client for 1Password.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=1password.com\u0026sz=128",
+        "accentColor":  "#2368FB",
+        "essential":  false
+    },
+    {
+        "id":  "Malwarebytes.AdwCleaner",
+        "source":  "winget",
+        "name":  "AdwCleaner",
+        "category":  "Security",
+        "description":  "Adware and unwanted software cleaner.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=malwarebytes.com/adwcleaner\u0026sz=128",
+        "accentColor":  "#0070E0",
+        "essential":  false
+    },
+    {
+        "id":  "Authpass.Authpass",
+        "source":  "winget",
+        "name":  "AuthPass",
+        "category":  "Security",
+        "description":  "KeePass-compatible password manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=authpass.app\u0026sz=128",
+        "accentColor":  "#00A86B",
+        "essential":  false
+    },
+    {
+        "id":  "Bitwarden.Bitwarden",
+        "name":  "Bitwarden",
+        "category":  "Security",
+        "description":  "Password manager for secure vaults, logins, and secrets.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=bitwarden.com\u0026sz=128",
+        "accentColor":  "#175DDC",
+        "essential":  false
+    },
+    {
+        "id":  "Bitwarden.CLI",
+        "source":  "winget",
+        "name":  "Bitwarden CLI",
+        "category":  "Security",
+        "description":  "Command-line client for Bitwarden vaults.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=bitwarden.com\u0026sz=128",
+        "accentColor":  "#175DDC",
+        "essential":  false
+    },
+    {
+        "id":  "ClamWin.ClamWin",
+        "source":  "winget",
+        "name":  "ClamWin Free Antivirus",
+        "category":  "Security",
+        "description":  "Open-source antivirus scanner.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=clamwin.com\u0026sz=128",
+        "accentColor":  "#2F7D32",
+        "essential":  false
+    },
+    {
+        "id":  "Cryptomator.Cryptomator",
+        "source":  "winget",
+        "name":  "Cryptomator",
+        "category":  "Security",
+        "description":  "Client-side encrypted cloud vaults.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=cryptomator.org\u0026sz=128",
+        "accentColor":  "#49B04A",
+        "essential":  false
+    },
+    {
+        "id":  "Dashlane.Dashlane",
+        "source":  "winget",
+        "name":  "Dashlane",
+        "category":  "Security",
+        "description":  "Password manager and security dashboard.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dashlane.com\u0026sz=128",
+        "accentColor":  "#0E353D",
+        "essential":  false
+    },
+    {
+        "id":  "GlassWire.GlassWire",
+        "source":  "winget",
+        "name":  "GlassWire",
+        "category":  "Security",
+        "description":  "Firewall and network security monitor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=glasswire.com\u0026sz=128",
+        "accentColor":  "#3A9BE8",
+        "essential":  false
+    },
+    {
+        "id":  "GnuPG.Gpg4win",
+        "source":  "winget",
+        "name":  "Gpg4win",
+        "category":  "Security",
+        "description":  "GnuPG encryption suite for Windows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=gpg4win.org\u0026sz=128",
+        "accentColor":  "#0093DD",
+        "essential":  false
+    },
+    {
+        "id":  "DominikReichl.KeePass",
+        "source":  "winget",
+        "name":  "KeePass",
+        "category":  "Security",
+        "description":  "Classic local password manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=keepass.info\u0026sz=128",
+        "accentColor":  "#2E7D32",
+        "essential":  false
+    },
+    {
+        "id":  "KeePassXCTeam.KeePassXC",
+        "name":  "KeePassXC",
+        "category":  "Security",
+        "description":  "Offline password manager compatible with KeePass databases.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=keepassxc.org\u0026sz=128",
+        "accentColor":  "#6CAC4D",
+        "essential":  false
+    },
+    {
+        "id":  "NordSecurity.NordLocker",
+        "source":  "winget",
+        "name":  "NordLocker",
+        "category":  "Security",
+        "description":  "Encrypted file vault and cloud storage.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nordlocker.com\u0026sz=128",
+        "accentColor":  "#4687FF",
+        "essential":  false
+    },
+    {
+        "id":  "NordSecurity.NordPass",
+        "source":  "winget",
+        "name":  "NordPass",
+        "category":  "Security",
+        "description":  "Password manager from Nord Security.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nordpass.com\u0026sz=128",
+        "accentColor":  "#3A78FF",
+        "essential":  false
+    },
+    {
+        "id":  "Proton.ProtonPass",
+        "source":  "winget",
+        "name":  "Proton Pass",
+        "category":  "Security",
+        "description":  "Encrypted password manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=proton.me/pass\u0026sz=128",
+        "accentColor":  "#6D4AFF",
+        "essential":  false
+    },
+    {
+        "id":  "Henry++.simplewall",
+        "source":  "winget",
+        "name":  "simplewall",
+        "category":  "Security",
+        "description":  "Lightweight Windows firewall controller.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=henrypp.org\u0026sz=128",
+        "accentColor":  "#455A64",
+        "essential":  false
+    },
+    {
+        "id":  "IDRIX.VeraCrypt",
+        "source":  "winget",
+        "name":  "VeraCrypt",
+        "category":  "Security",
+        "description":  "Disk and container encryption tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=veracrypt.fr\u0026sz=128",
+        "accentColor":  "#2D6A4F",
+        "essential":  false
+    },
+    {
+        "id":  "Wazuh.WazuhAgent",
+        "source":  "winget",
+        "name":  "Wazuh Agent",
+        "category":  "Security",
+        "description":  "Endpoint security monitoring agent.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=wazuh.com\u0026sz=128",
+        "accentColor":  "#005EB8",
+        "essential":  false
+    },
+    {
+        "id":  "Yubico.Authenticator",
+        "source":  "winget",
+        "name":  "Yubico Authenticator",
+        "category":  "Security",
+        "description":  "Authenticator app for YubiKeys.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=yubico.com\u0026sz=128",
+        "accentColor":  "#84BD00",
+        "essential":  false
+    },
+    {
+        "id":  "7zip.7zip",
+        "name":  "7-Zip",
+        "category":  "Utilities",
+        "description":  "Archive manager for common compressed formats.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=7-zip.org\u0026sz=128",
+        "accentColor":  "#46637F",
+        "essential":  true
+    },
+    {
+        "id":  "Balena.Etcher",
+        "name":  "balenaEtcher",
+        "category":  "Utilities",
+        "description":  "Flash OS images to USB drives and SD cards.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=balena.io/etcher\u0026sz=128",
+        "accentColor":  "#4383FF",
+        "essential":  false
+    },
+    {
+        "id":  "BleachBit.BleachBit",
+        "name":  "BleachBit",
+        "category":  "Utilities",
+        "description":  "Disk cleanup and privacy cleaner.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=bleachbit.org\u0026sz=128",
+        "accentColor":  "#4CAF50",
+        "essential":  false
+    },
+    {
+        "id":  "Klocman.BulkCrapUninstaller",
+        "source":  "winget",
+        "name":  "Bulk Crap Uninstaller",
+        "category":  "Utilities",
+        "description":  "Advanced bulk uninstall tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=bcuninstaller.com\u0026sz=128",
+        "accentColor":  "#6A5ACD",
+        "essential":  false
+    },
+    {
+        "id":  "CrystalDewWorld.CrystalDiskInfo",
+        "name":  "CrystalDiskInfo",
+        "category":  "Utilities",
+        "description":  "Storage health and SMART status monitor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=crystalmark.info\u0026sz=128",
+        "accentColor":  "#4FC3F7",
+        "essential":  false
+    },
+    {
+        "id":  "CrystalDewWorld.CrystalDiskMark",
+        "name":  "CrystalDiskMark",
+        "category":  "Utilities",
+        "description":  "Storage benchmark utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=crystalmark.info\u0026sz=128",
+        "accentColor":  "#81D4FA",
+        "essential":  false
+    },
+    {
+        "id":  "File-New-Project.EarTrumpet",
+        "source":  "winget",
+        "name":  "EarTrumpet",
+        "category":  "Utilities",
+        "description":  "Better volume mixer for Windows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=eartrumpet.app\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  false
+    },
+    {
+        "id":  "voidtools.Everything",
+        "name":  "Everything",
+        "category":  "Utilities",
+        "description":  "Instant file and folder search for Windows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=voidtools.com\u0026sz=128",
+        "accentColor":  "#F2C94C",
+        "essential":  true
+    },
+    {
+        "id":  "flux.flux",
+        "source":  "winget",
+        "name":  "f.lux",
+        "category":  "Utilities",
+        "description":  "Automatic screen color temperature adjustment.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=justgetflux.com\u0026sz=128",
+        "accentColor":  "#FF8C1A",
+        "essential":  false
+    },
+    {
+        "id":  "Flameshot.Flameshot",
+        "name":  "Flameshot",
+        "category":  "Utilities",
+        "description":  "Screenshot capture and annotation tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=flameshot.org\u0026sz=128",
+        "accentColor":  "#E91E63",
+        "essential":  false
+    },
+    {
+        "id":  "Flow-Launcher.Flow-Launcher",
+        "source":  "winget",
+        "name":  "Flow Launcher",
+        "category":  "Utilities",
+        "description":  "Fast app launcher and search tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=flowlauncher.com\u0026sz=128",
+        "accentColor":  "#00A6FB",
+        "essential":  false
+    },
+    {
+        "id":  "Greenshot.Greenshot",
+        "name":  "Greenshot",
+        "category":  "Utilities",
+        "description":  "Lightweight screenshot capture and annotation tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=getgreenshot.org\u0026sz=128",
+        "accentColor":  "#8CC63E",
+        "essential":  false
+    },
+    {
+        "id":  "Bopsoft.Listary",
+        "source":  "winget",
+        "name":  "Listary",
+        "category":  "Utilities",
+        "description":  "File search and launcher utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=listary.com\u0026sz=128",
+        "accentColor":  "#0085FF",
+        "essential":  false
+    },
+    {
+        "id":  "Malwarebytes.Malwarebytes",
+        "name":  "Malwarebytes",
+        "category":  "Utilities",
+        "description":  "Anti-malware scanner and protection utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=malwarebytes.com\u0026sz=128",
+        "accentColor":  "#0057FF",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.PowerToys",
+        "name":  "Microsoft PowerToys",
+        "category":  "Utilities",
+        "description":  "Windows power-user utilities including FancyZones and quick tools.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/windows/powertoys\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  true
+    },
+    {
+        "id":  "Nilesoft.Shell",
+        "source":  "winget",
+        "name":  "Nilesoft Shell",
+        "category":  "Utilities",
+        "description":  "Modern Windows context menu manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nilesoft.org\u0026sz=128",
+        "accentColor":  "#0D9488",
+        "essential":  false
+    },
+    {
+        "id":  "qBittorrent.qBittorrent",
+        "name":  "qBittorrent",
+        "category":  "Utilities",
+        "description":  "Open-source BitTorrent client.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=qbittorrent.org\u0026sz=128",
+        "accentColor":  "#2F67BA",
+        "essential":  false
+    },
+    {
+        "id":  "QL-Win.QuickLook",
+        "source":  "winget",
+        "name":  "QuickLook",
+        "category":  "Utilities",
+        "description":  "Spacebar preview for files.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=pooi.moe/QuickLook\u0026sz=128",
+        "accentColor":  "#2196F3",
+        "essential":  false
+    },
+    {
+        "id":  "Rainmeter.Rainmeter",
+        "source":  "winget",
+        "name":  "Rainmeter",
+        "category":  "Utilities",
+        "description":  "Desktop customization and widget platform.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=rainmeter.net\u0026sz=128",
+        "accentColor":  "#49A942",
+        "essential":  false
+    },
+    {
+        "id":  "RevoUninstaller.RevoUninstaller",
+        "name":  "Revo Uninstaller",
+        "category":  "Utilities",
+        "description":  "App uninstaller and cleanup utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=revouninstaller.com\u0026sz=128",
+        "accentColor":  "#1E88E5",
+        "essential":  false
+    },
+    {
+        "id":  "Rufus.Rufus",
+        "name":  "Rufus",
+        "category":  "Utilities",
+        "description":  "Create bootable USB drives for Windows and Linux installers.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=rufus.ie\u0026sz=128",
+        "accentColor":  "#2C7BE5",
+        "essential":  false
+    },
+    {
+        "id":  "ShareX.ShareX",
+        "name":  "ShareX",
+        "category":  "Utilities",
+        "description":  "Screenshot, screen capture, OCR, and sharing tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=getsharex.com\u0026sz=128",
+        "accentColor":  "#2780D8",
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.Sysinternals.Suite",
+        "name":  "Sysinternals Suite",
+        "category":  "Utilities",
+        "description":  "Advanced Microsoft troubleshooting utilities for Windows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/sysinternals\u0026sz=128",
+        "accentColor":  "#0078D4",
+        "essential":  false
+    },
+    {
+        "id":  "CharlesMilette.TranslucentTB",
+        "source":  "winget",
+        "name":  "TranslucentTB",
+        "category":  "Utilities",
+        "description":  "Customize Windows taskbar appearance.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=translucenttb.com\u0026sz=128",
+        "accentColor":  "#00AEEF",
+        "essential":  false
+    },
+    {
+        "id":  "xanderfrangos.twinkletray",
+        "source":  "winget",
+        "name":  "Twinkle Tray",
+        "category":  "Utilities",
+        "description":  "Control monitor brightness from the tray.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=twinkletray.com\u0026sz=128",
+        "accentColor":  "#FFB300",
+        "essential":  false
+    },
+    {
+        "id":  "OliverSchwendener.ueli",
+        "source":  "winget",
+        "name":  "ueli",
+        "category":  "Utilities",
+        "description":  "Keystroke launcher for apps and files.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ueli.app\u0026sz=128",
+        "accentColor":  "#303F9F",
+        "essential":  false
+    },
+    {
+        "id":  "Ventoy.Ventoy",
+        "name":  "Ventoy",
+        "category":  "Utilities",
+        "description":  "Create multi-ISO bootable USB drives.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ventoy.net\u0026sz=128",
+        "accentColor":  "#00A7E1",
+        "essential":  false
+    },
+    {
+        "id":  "WinDirStat.WinDirStat",
+        "name":  "WinDirStat",
+        "category":  "Utilities",
+        "description":  "Disk usage analyzer with visual treemap.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=windirstat.net\u0026sz=128",
+        "accentColor":  "#4CAF50",
+        "essential":  false
+    },
+    {
+        "id":  "RARLab.WinRAR",
+        "name":  "WinRAR",
+        "category":  "Utilities",
+        "description":  "Archive manager for RAR, ZIP, and compressed files.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=win-rar.com\u0026sz=128",
+        "accentColor":  "#8B5CF6",
+        "essential":  false
+    },
+    {
+        "id":  "AntibodySoftware.WizTree",
+        "name":  "WizTree",
+        "category":  "Utilities",
+        "description":  "Fast disk space analyzer for large drives.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=diskanalyzer.com\u0026sz=128",
+        "accentColor":  "#1E88E5",
+        "essential":  false
+    },
+    {
+        "id":  "Adobe.CreativeCloud",
+        "name":  "Adobe Creative Cloud",
+        "category":  "Video Editing",
+        "description":  "Adobe app manager for Premiere Pro, After Effects, Photoshop, and more.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=adobe.com\u0026sz=128",
+        "accentColor":  "#DA1F26",
+        "essential":  false
+    },
+    {
+        "id":  "Audacity.Audacity",
+        "name":  "Audacity",
+        "category":  "Video Editing",
+        "description":  "Audio recording and editing for content creators.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=audacityteam.org\u0026sz=128",
+        "accentColor":  "#1C4DFF",
+        "essential":  false
+    },
+    {
+        "id":  "Avidemux.Avidemux",
+        "source":  "winget",
+        "name":  "Avidemux",
+        "category":  "Video Editing",
+        "description":  "Simple video cutting filtering and encoding tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=avidemux.sourceforge.net\u0026sz=128",
+        "accentColor":  "#6A5ACD",
+        "essential":  false
+    },
+    {
+        "id":  "ByteDance.CapCut",
+        "name":  "CapCut",
+        "category":  "Video Editing",
+        "description":  "Creator-focused video editor for social content.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=capcut.com\u0026sz=128",
+        "accentColor":  "#00F0FF",
+        "essential":  false
+    },
+    {
+        "id":  "Elgato.StreamDeck",
+        "name":  "Elgato Stream Deck",
+        "category":  "Video Editing",
+        "description":  "Control software for Stream Deck devices and creator shortcuts.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=elgato.com\u0026sz=128",
+        "accentColor":  "#00ADEF",
+        "essential":  false
+    },
+    {
+        "id":  "Gyan.FFmpeg",
+        "name":  "FFmpeg",
+        "category":  "Video Editing",
+        "description":  "Command-line video, audio, conversion, and processing toolkit.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ffmpeg.org\u0026sz=128",
+        "accentColor":  "#007808",
+        "essential":  false
+    },
+    {
+        "id":  "HandBrake.HandBrake",
+        "name":  "HandBrake",
+        "category":  "Video Editing",
+        "description":  "Video transcoder and compression tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=handbrake.fr\u0026sz=128",
+        "accentColor":  "#8BC34A",
+        "essential":  false
+    },
+    {
+        "id":  "ImageMagick.ImageMagick",
+        "name":  "ImageMagick",
+        "category":  "Video Editing",
+        "description":  "Command-line image conversion and batch processing toolkit.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=imagemagick.org\u0026sz=128",
+        "accentColor":  "#6A5ACD",
+        "essential":  false
+    },
+    {
+        "id":  "KDE.Kdenlive",
+        "name":  "Kdenlive",
+        "category":  "Video Editing",
+        "description":  "Open-source non-linear video editor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=kdenlive.org\u0026sz=128",
+        "accentColor":  "#3DAEE9",
+        "essential":  false
+    },
+    {
+        "id":  "LWKS.Lightworks",
+        "source":  "winget",
+        "name":  "Lightworks",
+        "category":  "Video Editing",
+        "description":  "Professional video editing app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=lwks.com\u0026sz=128",
+        "accentColor":  "#BA1B1D",
+        "essential":  false
+    },
+    {
+        "id":  "ch.LosslessCut",
+        "source":  "winget",
+        "name":  "LosslessCut",
+        "category":  "Video Editing",
+        "description":  "Fast lossless video and audio trimming.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/mifi/lossless-cut\u0026sz=128",
+        "accentColor":  "#00AEEF",
+        "essential":  false
+    },
+    {
+        "id":  "9P1J8S7CCWWT",
+        "source":  "msstore",
+        "name":  "Microsoft Clipchamp",
+        "category":  "Video Editing",
+        "description":  "Microsoft video editor from Store.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=clipchamp.com\u0026sz=128",
+        "accentColor":  "#7C3AED",
+        "essential":  false
+    },
+    {
+        "id":  "Natron.Natron",
+        "source":  "winget",
+        "name":  "Natron",
+        "category":  "Video Editing",
+        "description":  "Open-source compositing and VFX app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=natrongithub.github.io\u0026sz=128",
+        "accentColor":  "#303F9F",
+        "essential":  false
+    },
+    {
+        "id":  "OBSProject.OBSStudio",
+        "name":  "OBS Studio",
+        "category":  "Video Editing",
+        "description":  "Screen recording, streaming, and capture studio.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=obsproject.com\u0026sz=128",
+        "accentColor":  "#302E31",
+        "essential":  false
+    },
+    {
+        "id":  "OliveTeam.OliveVideoEditor",
+        "source":  "winget",
+        "name":  "Olive Video Editor",
+        "category":  "Video Editing",
+        "description":  "Open-source non-linear video editor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=olivevideoeditor.org\u0026sz=128",
+        "accentColor":  "#4A90E2",
+        "essential":  false
+    },
+    {
+        "id":  "OpenShot.OpenShot",
+        "source":  "winget",
+        "name":  "OpenShot Video Editor",
+        "category":  "Video Editing",
+        "description":  "Open-source video editor for quick edits.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=openshot.org\u0026sz=128",
+        "accentColor":  "#2B8C44",
+        "essential":  false
+    },
+    {
+        "id":  "Meltytech.Shotcut",
+        "name":  "Shotcut",
+        "category":  "Video Editing",
+        "description":  "Free cross-platform video editor.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=shotcut.org\u0026sz=128",
+        "accentColor":  "#00AEEF",
+        "essential":  false
+    },
+    {
+        "id":  "Nikse.SubtitleEdit",
+        "source":  "winget",
+        "name":  "Subtitle Edit",
+        "category":  "Video Editing",
+        "description":  "Subtitle editing and synchronization tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=nikse.dk/subtitleedit\u0026sz=128",
+        "accentColor":  "#1976D2",
+        "essential":  false
+    },
+    {
+        "id":  "XnSoft.XnConvert",
+        "source":  "winget",
+        "name":  "XnConvert",
+        "category":  "Video Editing",
+        "description":  "Batch image converter for creator workflows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=xnview.com\u0026sz=128",
+        "accentColor":  "#FF9900",
+        "essential":  false
+    },
+    {
+        "id":  "yt-dlp.yt-dlp",
+        "name":  "yt-dlp",
+        "category":  "Video Editing",
+        "description":  "Media downloader CLI for creator workflows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com\u0026sz=128",
+        "accentColor":  "#3D3D3D",
+        "essential":  false
+    },
+    {
+        "id":  "Debian.Debian",
+        "source":  "winget",
+        "name":  "Debian for WSL",
+        "category":  "Virtualization",
+        "description":  "Debian distribution for WSL.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=debian.org\u0026sz=128",
+        "accentColor":  "#A81D33",
+        "essential":  false
+    },
+    {
+        "id":  "Enigma.VirtualBox",
+        "source":  "winget",
+        "name":  "Enigma Virtual Box",
+        "category":  "Virtualization",
+        "description":  "Application virtualization and packaging utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=enigmaprotector.com\u0026sz=128",
+        "accentColor":  "#0B62A3",
+        "essential":  false
+    },
+    {
+        "id":  "whitewaterfoundry.fedora-remix-for-wsl",
+        "source":  "winget",
+        "name":  "Fedora Remix for WSL",
+        "category":  "Virtualization",
+        "description":  "Fedora Remix distribution for WSL.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=fedoraremixforwsl.com\u0026sz=128",
+        "accentColor":  "#51A2DA",
+        "essential":  false
+    },
+    {
+        "id":  "OffSec.KaliLinux",
+        "source":  "winget",
+        "name":  "Kali Linux for WSL",
+        "category":  "Virtualization",
+        "description":  "Kali Linux distribution for WSL.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=kali.org\u0026sz=128",
+        "accentColor":  "#557C94",
+        "essential":  false
+    },
+    {
+        "id":  "Kubernetes.kind",
+        "source":  "winget",
+        "name":  "kind",
+        "category":  "Virtualization",
+        "description":  "Run local Kubernetes clusters in containers.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=kind.sigs.k8s.io\u0026sz=128",
+        "accentColor":  "#326CE5",
+        "essential":  false
+    },
+    {
+        "id":  "Kubernetes.minikube",
+        "source":  "winget",
+        "name":  "Minikube",
+        "category":  "Virtualization",
+        "description":  "Local Kubernetes cluster runner.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=minikube.sigs.k8s.io\u0026sz=128",
+        "accentColor":  "#326CE5",
+        "essential":  false
+    },
+    {
+        "id":  "Canonical.Multipass",
+        "source":  "winget",
+        "name":  "Multipass",
+        "category":  "Virtualization",
+        "description":  "Lightweight Ubuntu VM manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=multipass.run\u0026sz=128",
+        "accentColor":  "#E95420",
+        "essential":  false
+    },
+    {
+        "id":  "SUSE.openSUSE.Leap.15.6",
+        "source":  "winget",
+        "name":  "openSUSE Leap for WSL",
+        "category":  "Virtualization",
+        "description":  "Stable openSUSE distribution for WSL.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=opensuse.org\u0026sz=128",
+        "accentColor":  "#73BA25",
+        "essential":  false
+    },
+    {
+        "id":  "SUSE.openSUSE.Tumbleweed",
+        "source":  "winget",
+        "name":  "openSUSE Tumbleweed for WSL",
+        "category":  "Virtualization",
+        "description":  "Rolling openSUSE distribution for WSL.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=opensuse.org\u0026sz=128",
+        "accentColor":  "#73BA25",
+        "essential":  false
+    },
+    {
+        "id":  "Oracle.OracleLinux.8.10",
+        "source":  "winget",
+        "name":  "Oracle Linux 8.10 for WSL",
+        "category":  "Virtualization",
+        "description":  "Oracle Linux WSL distribution.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=oracle.com/linux\u0026sz=128",
+        "accentColor":  "#F80000",
+        "essential":  false
+    },
+    {
+        "id":  "Oracle.OracleLinux.9.5",
+        "source":  "winget",
+        "name":  "Oracle Linux 9.5 for WSL",
+        "category":  "Virtualization",
+        "description":  "Oracle Linux WSL distribution.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=oracle.com/linux\u0026sz=128",
+        "accentColor":  "#F80000",
+        "essential":  false
+    },
+    {
+        "id":  "RedHat.Podman-Desktop",
+        "source":  "winget",
+        "name":  "Podman Desktop",
+        "category":  "Virtualization",
+        "description":  "Container and Kubernetes desktop tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=podman-desktop.io\u0026sz=128",
+        "accentColor":  "#892CA0",
+        "essential":  false
+    },
+    {
+        "id":  "SoftwareFreedomConservancy.QEMU",
+        "source":  "winget",
+        "name":  "QEMU",
+        "category":  "Virtualization",
+        "description":  "Machine emulator and virtualizer.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=qemu.org\u0026sz=128",
+        "accentColor":  "#FF6600",
+        "essential":  false
+    },
+    {
+        "id":  "SUSE.RancherDesktop",
+        "source":  "winget",
+        "name":  "Rancher Desktop",
+        "category":  "Virtualization",
+        "description":  "Container and Kubernetes desktop environment.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=rancherdesktop.io\u0026sz=128",
+        "accentColor":  "#0075A8",
+        "essential":  false
+    },
+    {
+        "id":  "Canonical.Ubuntu.2004",
+        "source":  "winget",
+        "name":  "Ubuntu 20.04 LTS for WSL",
+        "category":  "Virtualization",
+        "description":  "Ubuntu 20.04 WSL distribution.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ubuntu.com\u0026sz=128",
+        "accentColor":  "#E95420",
+        "essential":  false
+    },
+    {
+        "id":  "Canonical.Ubuntu.2204",
+        "source":  "winget",
+        "name":  "Ubuntu 22.04 LTS for WSL",
+        "category":  "Virtualization",
+        "description":  "Ubuntu 22.04 WSL distribution.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ubuntu.com\u0026sz=128",
+        "accentColor":  "#E95420",
+        "essential":  false
+    },
+    {
+        "id":  "Canonical.Ubuntu",
+        "source":  "winget",
+        "name":  "Ubuntu for WSL",
+        "category":  "Virtualization",
+        "description":  "Ubuntu distribution for Windows Subsystem for Linux.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=ubuntu.com\u0026sz=128",
+        "accentColor":  "#E95420",
+        "essential":  false
+    },
+    {
+        "id":  "Hashicorp.Vagrant",
+        "source":  "winget",
+        "name":  "Vagrant",
+        "category":  "Virtualization",
+        "description":  "VM development environment manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=developer.hashicorp.com/vagrant\u0026sz=128",
+        "accentColor":  "#1563FF",
+        "essential":  false
+    },
+    {
+        "id":  "Oracle.VirtualBox",
+        "name":  "VirtualBox",
+        "category":  "Virtualization",
+        "description":  "Virtual machine platform for testing Windows, Linux, and labs.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=virtualbox.org\u0026sz=128",
+        "accentColor":  "#183A61",
+        "essential":  false
+    },
+    {
+        "id":  "VMPlex.VMPlex",
+        "source":  "winget",
+        "name":  "VMPlex Workstation",
+        "category":  "Virtualization",
+        "description":  "Virtual machine management workstation.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=vmplex.com\u0026sz=128",
+        "accentColor":  "#3B82F6",
+        "essential":  false
+    },
+    {
+        "id":  "9WZDNCRFHWLH",
+        "source":  "msstore",
+        "name":  "HP Smart",
+        "category":  "Printer Drivers",
+        "description":  "HP printer setup, scan, ink, and device management utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=hp.com\u0026sz=128",
+        "accentColor":  "#0096D6",
+        "detectionNames":  [
+                               "HP Smart"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "9PMK584KQVC2",
+        "source":  "msstore",
+        "name":  "Canon PRINT",
+        "category":  "Printer Drivers",
+        "description":  "Canon printer connection, print, and scan companion app.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=canon.com\u0026sz=128",
+        "accentColor":  "#CC0000",
+        "detectionNames":  [
+                               "Canon PRINT"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "9NDR70LP5W3Q",
+        "source":  "msstore",
+        "name":  "Canon Print Assistant",
+        "category":  "Printer Drivers",
+        "description":  "Canon print assistant for supported printers and setup guidance.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=canon.com\u0026sz=128",
+        "accentColor":  "#CC0000",
+        "detectionNames":  [
+                               "Canon Print Assistant"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Brother.iPrintScan",
+        "source":  "winget",
+        "name":  "Brother iPrint&Scan",
+        "category":  "Printer Drivers",
+        "description":  "Brother printer and scanner setup, print, and scan utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=brother.com\u0026sz=128",
+        "accentColor":  "#005BAC",
+        "detectionNames":  [
+                               "Brother iPrint&Scan",
+                               "Brother iPrintScan"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "EPSON.EpsonConnectPrinterSetup",
+        "source":  "winget",
+        "name":  "Epson Connect Printer Setup",
+        "category":  "Printer Drivers",
+        "description":  "Epson cloud and network printer setup utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com\u0026sz=128",
+        "accentColor":  "#003399",
+        "detectionNames":  [
+                               "Epson Connect Printer Setup"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "EPSON.EpsonScan2",
+        "source":  "winget",
+        "name":  "Epson Scan 2",
+        "category":  "Printer Drivers",
+        "description":  "Epson scanner driver and scan utility for supported devices.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com\u0026sz=128",
+        "accentColor":  "#003399",
+        "detectionNames":  [
+                               "Epson Scan 2"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "EPSON.PrinterConnectionChecker",
+        "source":  "winget",
+        "name":  "Epson Printer Connection Checker",
+        "category":  "Printer Drivers",
+        "description":  "Epson utility for diagnosing printer connection and setup issues.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com\u0026sz=128",
+        "accentColor":  "#003399",
+        "detectionNames":  [
+                               "Epson Printer Connection Checker"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "EPSON.SoftwareUpdater",
+        "source":  "winget",
+        "name":  "Epson Software Updater",
+        "category":  "Printer Drivers",
+        "description":  "Epson software and firmware updater for supported printers and scanners.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com\u0026sz=128",
+        "accentColor":  "#003399",
+        "detectionNames":  [
+                               "Epson Software Updater"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Canon.GPCL6_V4_PrinterDriver_V21.00",
+        "source":  "winget",
+        "name":  "Canon PCL6 Driver",
+        "category":  "Printer Drivers",
+        "description":  "Canon universal PCL6 printer driver package for supported office printers.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=canon.com&sz=128",
+        "accentColor":  "#CC0000",
+        "detectionNames":  [
+                               "Canon PCL6 Driver"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "EPSON.PrinterDriverSecuritySupportTool",
+        "source":  "winget",
+        "name":  "Epson Printer Driver Security Support Tool",
+        "category":  "Printer Drivers",
+        "description":  "Epson security support package for printer driver environments.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "accentColor":  "#003399",
+        "detectionNames":  [
+                               "Epson Printer Driver Security Support Tool"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "EPSON.EpsonNetConfig.Portable",
+        "source":  "winget",
+        "name":  "EpsonNet Config Portable",
+        "category":  "Printer Drivers",
+        "description":  "Epson network printer configuration utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "accentColor":  "#003399",
+        "detectionNames":  [
+                               "EpsonNet Config"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "EPSON.PhotoPlus",
+        "source":  "winget",
+        "name":  "Epson Photo+",
+        "category":  "Printer Drivers",
+        "description":  "Epson photo print layout and printer companion utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "accentColor":  "#003399",
+        "detectionNames":  [
+                               "Epson Photo+"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "EPSON.EventManager",
+        "source":  "winget",
+        "name":  "Epson Event Manager",
+        "category":  "Printer Drivers",
+        "description":  "Epson scanner button and scan event manager.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "accentColor":  "#003399",
+        "detectionNames":  [
+                               "Epson Event Manager"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "EPSON.Scan.OCRComponent",
+        "source":  "winget",
+        "name":  "Epson Scan OCR Component",
+        "category":  "Printer Drivers",
+        "description":  "Epson OCR component for scan workflows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "accentColor":  "#003399",
+        "detectionNames":  [
+                               "Epson Scan OCR Component"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "EPSON.ScanSmart",
+        "source":  "winget",
+        "name":  "Epson ScanSmart",
+        "category":  "Printer Drivers",
+        "description":  "Epson document scanning and workflow utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "accentColor":  "#003399",
+        "detectionNames":  [
+                               "Epson ScanSmart"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "HP.HPClick",
+        "source":  "winget",
+        "name":  "HP Click",
+        "category":  "Printer Drivers",
+        "description":  "HP large-format printer workflow and print submission tool.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=hp.com&sz=128",
+        "accentColor":  "#0096D6",
+        "detectionNames":  [
+                               "HP Click"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "HP.ImageAssistant",
+        "source":  "winget",
+        "name":  "HP Image Assistant",
+        "category":  "Printer Drivers",
+        "description":  "HP driver and firmware analysis utility for supported HP systems.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=hp.com&sz=128",
+        "accentColor":  "#0096D6",
+        "detectionNames":  [
+                               "HP Image Assistant"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Microsoft.PrintMetadataTroubleshooter",
+        "source":  "winget",
+        "name":  "Microsoft Printer Metadata Troubleshooter",
+        "category":  "Printer Drivers",
+        "description":  "Microsoft repair utility for Windows printer metadata issues.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com&sz=128",
+        "accentColor":  "#2563EB",
+        "detectionNames":  [
+                               "Printer Metadata Troubleshooter"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Apple.BonjourPrintServices",
+        "source":  "winget",
+        "name":  "Bonjour Print Services",
+        "category":  "Printer Drivers",
+        "description":  "Apple Bonjour printer discovery service for network printers.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=apple.com&sz=128",
+        "accentColor":  "#6B7280",
+        "detectionNames":  [
+                               "Bonjour Print Services"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "KonicaMinolta.UniversalPrinterDriverPCL6",
+        "source":  "winget",
+        "name":  "Konica Minolta Universal Printer Driver PCL6",
+        "category":  "Printer Drivers",
+        "description":  "Konica Minolta universal PCL6 printer driver package.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=konicaminolta.com&sz=128",
+        "accentColor":  "#0065B3",
+        "detectionNames":  [
+                               "Konica Minolta Universal Printer Driver PCL6"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "TP-Link.USBPrinterControllerUtility",
+        "source":  "winget",
+        "name":  "TP-Link USB Printer Controller",
+        "category":  "Printer Drivers",
+        "description":  "TP-Link utility for USB printer sharing through supported routers.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=tp-link.com&sz=128",
+        "accentColor":  "#00A0DC",
+        "detectionNames":  [
+                               "TP-LINK USB Printer Controller"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Cyanfish.NAPS2",
+        "source":  "winget",
+        "name":  "NAPS2",
+        "category":  "Printer Drivers",
+        "description":  "Document scanning utility for WIA and TWAIN scanners.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=naps2.com&sz=128",
+        "accentColor":  "#2563EB",
+        "detectionNames":  [
+                               "NAPS2"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "geeksoftwareGmbH.PDF24Creator",
+        "source":  "winget",
+        "name":  "PDF24 Creator",
+        "category":  "Printer Drivers",
+        "description":  "PDF printer and document conversion utility.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=pdf24.org&sz=128",
+        "accentColor":  "#F97316",
+        "detectionNames":  [
+                               "PDF24 Creator"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Bullzip.PDFPrinter",
+        "source":  "winget",
+        "name":  "Bullzip PDF Printer",
+        "category":  "Printer Drivers",
+        "description":  "Virtual PDF printer for Windows print workflows.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=bullzip.com&sz=128",
+        "accentColor":  "#16A34A",
+        "detectionNames":  [
+                               "Bullzip PDF Printer"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "PrintNode.PrintNode",
+        "source":  "winget",
+        "name":  "PrintNode",
+        "category":  "Printer Drivers",
+        "description":  "PrintNode cloud print client for connected printers.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=printnode.com&sz=128",
+        "accentColor":  "#0EA5E9",
+        "detectionNames":  [
+                               "PrintNode"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "WICSupport.wicreset",
+        "source":  "winget",
+        "name":  "WIC Reset Utility",
+        "category":  "Printer Drivers",
+        "description":  "Printer maintenance utility for supported inkjet printer waste counters.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=wic.support&sz=128",
+        "accentColor":  "#22C55E",
+        "detectionNames":  [
+                               "WIC Reset Utility"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "Softland.doPDF.11",
+        "source":  "winget",
+        "name":  "doPDF 11",
+        "category":  "Printer Drivers",
+        "description":  "Lightweight virtual PDF printer.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dopdf.com&sz=128",
+        "accentColor":  "#3B82F6",
+        "detectionNames":  [
+                               "doPDF 11"
+                           ],
+        "essential":  false
+    },
+    {
+        "id":  "TrackerSoftware.PDF-XChangeStandard",
+        "source":  "winget",
+        "name":  "PDF-XChange Standard",
+        "category":  "Printer Drivers",
+        "description":  "PDF-XChange virtual printer and PDF output workflow.",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=pdf-xchange.com&sz=128",
+        "accentColor":  "#F59E0B",
+        "detectionNames":  [
+                               "PDF-XChange Standard"
+                           ],
+        "essential":  false
+    }
+]
