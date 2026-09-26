@@ -13,9 +13,9 @@
         Loaded="Window_Loaded">
     <Window.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop x:Name="BgStopOne" Color="#07080D" Offset="0" />
-            <GradientStop x:Name="BgStopTwo" Color="#0D101B" Offset="0.52" />
-            <GradientStop x:Name="BgStopThree" Color="#130E24" Offset="1" />
+            <GradientStop x:Name="BgStopOne" Color="#050C1E" Offset="0" />
+            <GradientStop x:Name="BgStopTwo" Color="#0A1C3E" Offset="0.52" />
+            <GradientStop x:Name="BgStopThree" Color="#002D66" Offset="1" />
         </LinearGradientBrush>
     </Window.Background>
     <Grid>
@@ -138,7 +138,7 @@
                                         </Viewbox>
                                         <TextBlock x:Name="NavHomeText"
                                                    Grid.Column="1"
-                                                   Text="Home"
+                                                   Text="Dashboard"
                                                    Margin="8,0,0,0" />
                                     </Grid>
                                 </Button>
@@ -417,7 +417,7 @@
                                             <Setter.Value>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                                     <GradientStop Color="#00F0FF" Offset="0" />
-                                                    <GradientStop Color="#B026FF" Offset="1" />
+                                                    <GradientStop Color="#0078FF" Offset="1" />
                                                 </LinearGradientBrush>
                                             </Setter.Value>
                                         </Setter>
@@ -486,33 +486,39 @@
                                     </Style>
                                 </Grid.Resources>
                                 <Border x:Name="HomeDeckBorder"
-                                        BorderBrush="#3B2862"
+                                        BorderBrush="#1A3B6E"
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         Padding="0">
                                     <Border.Background>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                             <GradientStop x:Name="HomeDeckStopOne"
-                                                          Color="#0A0D18"
+                                                          Color="#050C1E"
                                                           Offset="0" />
                                             <GradientStop x:Name="HomeDeckStopTwo"
-                                                          Color="#121026"
+                                                          Color="#0A1C3E"
                                                           Offset="0.52" />
                                             <GradientStop x:Name="HomeDeckStopThree"
-                                                          Color="#091626"
+                                                          Color="#002D66"
                                                           Offset="1" />
                                         </LinearGradientBrush>
                                     </Border.Background>
                                     <Grid ClipToBounds="True">
+                                        <Image Source="Assets/BrandArtwork.png"
+                                               Stretch="UniformToFill"
+                                               Opacity="0.16"
+                                               IsHitTestVisible="False"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
                                         <Canvas IsHitTestVisible="False">
                                             <Border x:Name="HomeBandOne"
                                                     Width="760"
                                                     Height="86"
-                                                    Background="#B026FF"
+                                                    Background="#0078FF"
                                                     CornerRadius="8"
                                                     Canvas.Left="-120"
                                                     Canvas.Top="86"
-                                                    Opacity="0.22">
+                                                    Opacity="0.18">
                                                 <Border.RenderTransform>
                                                     <TransformGroup>
                                                         <RotateTransform Angle="-12" />
@@ -527,7 +533,7 @@
                                                     CornerRadius="8"
                                                     Canvas.Right="-130"
                                                     Canvas.Bottom="96"
-                                                    Opacity="0.18">
+                                                    Opacity="0.14">
                                                 <Border.RenderTransform>
                                                     <TransformGroup>
                                                         <RotateTransform Angle="-12" />
@@ -545,20 +551,34 @@
                                             </Grid.RowDefinitions>
 
                                             <StackPanel>
-                                                <TextBlock x:Name="HomeDeckEyebrowText"
-                                                           Text="COMMAND DECK"
-                                                           FontSize="11.5"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="{DynamicResource AccentBrush}" />
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                                    <Border Background="#163260"
+                                                            BorderBrush="#00F0FF"
+                                                            BorderThickness="1"
+                                                            CornerRadius="4"
+                                                            Padding="6,2"
+                                                            Margin="0,0,8,0">
+                                                        <TextBlock Text="⚡ 180Hz"
+                                                                   FontSize="11"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="#00F0FF" />
+                                                    </Border>
+                                                    <TextBlock x:Name="HomeDeckEyebrowText"
+                                                               Text="COMMAND DECK • PEAK GAMING OPTIMIZATION"
+                                                               FontSize="11.5"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource AccentBrush}"
+                                                               VerticalAlignment="Center" />
+                                                </StackPanel>
                                                 <TextBlock x:Name="HomeDeckTitleText"
-                                                           Text="Feature Flow"
+                                                           Text="OPTIMIZE. MONITOR. DOMINATE."
                                                            FontFamily="Segoe UI Variable Display, Bahnschrift, Segoe UI"
                                                            FontSize="30"
                                                            FontWeight="Bold"
                                                            Foreground="{DynamicResource PrimaryText}"
-                                                           Margin="0,5,0,0" />
+                                                           Margin="0,3,0,0" />
                                                 <TextBlock x:Name="HomeDeckSubtitleText"
-                                                           Text="Home cycles through every setup function in a guided rhythm."
+                                                           Text="Unlock Peak Gaming Performance with automated app setup, driver updates, and junk cleanup."
                                                            FontSize="13"
                                                            Foreground="{DynamicResource MutedText}"
                                                            Margin="0,6,0,0" />
@@ -568,8 +588,8 @@
                                                     Grid.Row="1"
                                                     Width="700"
                                                     MinHeight="300"
-                                                    Background="#D9101424"
-                                                    BorderBrush="#362C58"
+                                                    Background="#E60A162C"
+                                                    BorderBrush="#1A3B6E"
                                                     BorderThickness="1"
                                                     CornerRadius="8"
                                                     Padding="30"
@@ -587,15 +607,15 @@
                                                                 Margin="0,0,28,0"
                                                                 VerticalAlignment="Center">
                                                         <Border x:Name="HomeFeatureBadge"
-                                                                Background="#26143C"
-                                                                BorderBrush="#7C22BA"
+                                                                Background="#082042"
+                                                                BorderBrush="#00D2FF"
                                                                 BorderThickness="1"
                                                                 CornerRadius="8"
                                                                 Padding="10,6"
                                                                 HorizontalAlignment="Left">
                                                             <TextBlock x:Name="HomeFeatureBadgeText"
                                                                        Text="01 / Updates"
-                                                                       Foreground="#E879F9"
+                                                                       Foreground="#00F0FF"
                                                                        FontSize="12"
                                                                        FontWeight="SemiBold" />
                                                         </Border>
@@ -621,8 +641,8 @@
                                                     </StackPanel>
                                                     <Border x:Name="HomeFeatureNumberPanel"
                                                             Grid.Column="1"
-                                                            Background="#0C1A2E"
-                                                            BorderBrush="#0284C7"
+                                                            Background="#0A1C3E"
+                                                            BorderBrush="#0078FF"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
                                                             Padding="18"
@@ -663,8 +683,8 @@
                                                 <UniformGrid Columns="6">
                                                     <Border x:Name="HomeFeatureTile0"
                                                             Tag="0"
-                                                            Background="#0D101A"
-                                                            BorderBrush="#232A42"
+                                                            Background="#0A162C"
+                                                            BorderBrush="#1A3B6E"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
                                                             Padding="14,12"
@@ -685,8 +705,8 @@
                                                     </Border>
                                                     <Border x:Name="HomeFeatureTile1"
                                                             Tag="1"
-                                                            Background="#0D101A"
-                                                            BorderBrush="#232A42"
+                                                            Background="#0A162C"
+                                                            BorderBrush="#1A3B6E"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
                                                             Padding="14,12"
@@ -707,8 +727,8 @@
                                                     </Border>
                                                     <Border x:Name="HomeFeatureTile2"
                                                             Tag="2"
-                                                            Background="#0D101A"
-                                                            BorderBrush="#232A42"
+                                                            Background="#0A162C"
+                                                            BorderBrush="#1A3B6E"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
                                                             Padding="14,12"
@@ -729,8 +749,8 @@
                                                     </Border>
                                                     <Border x:Name="HomeFeatureTile3"
                                                             Tag="3"
-                                                            Background="#0D101A"
-                                                            BorderBrush="#232A42"
+                                                            Background="#0A162C"
+                                                            BorderBrush="#1A3B6E"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
                                                             Padding="14,12"
@@ -751,8 +771,8 @@
                                                     </Border>
                                                     <Border x:Name="HomeFeatureTile4"
                                                             Tag="4"
-                                                            Background="#0D101A"
-                                                            BorderBrush="#232A42"
+                                                            Background="#0A162C"
+                                                            BorderBrush="#1A3B6E"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
                                                             Padding="14,12"
@@ -773,8 +793,8 @@
                                                     </Border>
                                                     <Border x:Name="HomeFeatureTile5"
                                                             Tag="5"
-                                                            Background="#0D101A"
-                                                            BorderBrush="#232A42"
+                                                            Background="#0A162C"
+                                                            BorderBrush="#1A3B6E"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
                                                             Padding="14,12"
@@ -2009,13 +2029,13 @@
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop x:Name="WelcomeBgStopOne"
-                                  Color="#07080D"
+                                  Color="#050C1E"
                                   Offset="0" />
                     <GradientStop x:Name="WelcomeBgStopTwo"
-                                  Color="#0D101B"
+                                  Color="#0A1C3E"
                                   Offset="0.45" />
                     <GradientStop x:Name="WelcomeBgStopThree"
-                                  Color="#130E24"
+                                  Color="#002D66"
                                   Offset="1" />
                 </LinearGradientBrush>
             </Grid.Background>
@@ -2058,7 +2078,7 @@
                 </Style>
 
                 <Style x:Key="WelcomePremiumButton" TargetType="{x:Type Button}">
-                    <Setter Property="Width" Value="190" />
+                    <Setter Property="Width" Value="220" />
                     <Setter Property="Height" Value="48" />
                     <Setter Property="Padding" Value="20,0" />
                     <Setter Property="Foreground" Value="White" />
@@ -2070,7 +2090,7 @@
                         <Setter.Value>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                 <GradientStop Color="#00F0FF" Offset="0" />
-                                <GradientStop Color="#B026FF" Offset="1" />
+                                <GradientStop Color="#0078FF" Offset="1" />
                             </LinearGradientBrush>
                         </Setter.Value>
                     </Setter>
@@ -2079,14 +2099,14 @@
                             <ControlTemplate TargetType="{x:Type Button}">
                                 <Grid>
                                     <Border x:Name="Glow"
-                                            Background="#246BFE"
+                                            Background="#00F0FF"
                                             CornerRadius="8"
-                                            Opacity="0.22">
+                                            Opacity="0.25">
                                         <Border.Effect>
                                             <DropShadowEffect BlurRadius="22"
-                                                              ShadowDepth="3"
-                                                              Color="#246BFE"
-                                                              Opacity="0.48" />
+                                                              ShadowDepth="0"
+                                                              Color="#00F0FF"
+                                                              Opacity="0.55" />
                                         </Border.Effect>
                                     </Border>
                                     <Border x:Name="Chrome"
@@ -2115,13 +2135,12 @@
                                         <Setter TargetName="Chrome" Property="Background">
                                             <Setter.Value>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Color="#3B7CFF" Offset="0" />
-                                                    <GradientStop Color="#246BFE" Offset="0.48" />
-                                                    <GradientStop Color="#128B7A" Offset="1" />
+                                                    <GradientStop Color="#00D2FF" Offset="0" />
+                                                    <GradientStop Color="#0052CC" Offset="1" />
                                                 </LinearGradientBrush>
                                             </Setter.Value>
                                         </Setter>
-                                        <Setter TargetName="Glow" Property="Opacity" Value="0.34" />
+                                        <Setter TargetName="Glow" Property="Opacity" Value="0.45" />
                                     </Trigger>
                                     <Trigger Property="IsPressed" Value="True">
                                         <Setter TargetName="Chrome" Property="Opacity" Value="0.9" />
@@ -2129,16 +2148,16 @@
                                     </Trigger>
                                     <Trigger Property="IsEnabled" Value="False">
                                         <Setter Property="Cursor" Value="Arrow" />
-                                        <Setter Property="Foreground" Value="#E7EEF9" />
+                                        <Setter Property="Foreground" Value="#8EB0D8" />
                                         <Setter TargetName="Chrome" Property="Background">
                                             <Setter.Value>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Color="#8AA7D8" Offset="0" />
-                                                    <GradientStop Color="#7890B4" Offset="1" />
+                                                    <GradientStop Color="#1A3B6E" Offset="0" />
+                                                    <GradientStop Color="#0F2244" Offset="1" />
                                                 </LinearGradientBrush>
                                             </Setter.Value>
                                         </Setter>
-                                        <Setter TargetName="Chrome" Property="BorderBrush" Value="#A8B9D8" />
+                                        <Setter TargetName="Chrome" Property="BorderBrush" Value="#1A3B6E" />
                                         <Setter TargetName="Glow" Property="Opacity" Value="0.08" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
@@ -2475,7 +2494,7 @@
 
             <Border x:Name="WelcomeCard"
                     Width="590"
-                    BorderBrush="#B026FF"
+                    BorderBrush="#00D2FF"
                     BorderThickness="1"
                     CornerRadius="8"
                     Padding="0"
@@ -2485,21 +2504,21 @@
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                         <GradientStop x:Name="WelcomeCardStopOne"
-                                      Color="#E00E1220"
+                                      Color="#F00A162C"
                                       Offset="0" />
                         <GradientStop x:Name="WelcomeCardStopTwo"
-                                      Color="#D0140F2A"
+                                      Color="#E60F2244"
                                       Offset="0.58" />
                         <GradientStop x:Name="WelcomeCardStopThree"
-                                      Color="#C00A1422"
+                                      Color="#D9050C1E"
                                       Offset="1" />
                     </LinearGradientBrush>
                 </Border.Background>
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="34"
                                       ShadowDepth="4"
-                                      Color="#B026FF"
-                                      Opacity="0.32" />
+                                      Color="#0078FF"
+                                      Opacity="0.45" />
                 </Border.Effect>
                 <Grid>
                     <Border Height="3"
@@ -2508,13 +2527,13 @@
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                 <GradientStop Color="#00F0FF" Offset="0" />
-                                <GradientStop Color="#B026FF" Offset="0.55" />
+                                <GradientStop Color="#0078FF" Offset="0.55" />
                                 <GradientStop Color="#00FFA3" Offset="1" />
                             </LinearGradientBrush>
                         </Border.Background>
                     </Border>
                     <Border Margin="1"
-                            BorderBrush="#40B026FF"
+                            BorderBrush="#4000F0FF"
                             BorderThickness="1"
                             CornerRadius="8"
                             IsHitTestVisible="False" />
@@ -2539,14 +2558,14 @@
                                VerticalAlignment="Center" />
                     </Border>
                     <TextBlock x:Name="WelcomeTitleText"
-                               Text="Welcome to 180Hz Setup Hub"
+                               Text="180Hz Setup Hub"
                                FontFamily="Segoe UI Variable Display, Bahnschrift, Segoe UI"
                                FontSize="30"
                                FontWeight="Bold"
                                Foreground="{DynamicResource PrimaryText}"
                                Margin="0,24,0,0" />
                     <TextBlock x:Name="WelcomeSubtitleText"
-                               Text="Preparing your setup workspace."
+                               Text="Optimize. Monitor. Dominate. Preparing your setup workspace..."
                                FontSize="14"
                                Foreground="{DynamicResource MutedText}"
                                Margin="0,8,0,22" />
@@ -2563,7 +2582,7 @@
                     </Button>
                     <Border x:Name="WelcomeProgressTrack"
                             Height="8"
-                            Background="#161B2C"
+                            Background="#0A1C3E"
                             CornerRadius="4"
                             HorizontalAlignment="Stretch">
                         <Border x:Name="WelcomeBar"
@@ -2573,7 +2592,7 @@
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                     <GradientStop Color="#00F0FF" Offset="0" />
-                                    <GradientStop Color="#B026FF" Offset="1" />
+                                    <GradientStop Color="#0078FF" Offset="1" />
                                 </LinearGradientBrush>
                             </Border.Background>
                         </Border>

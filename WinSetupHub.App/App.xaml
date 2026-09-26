@@ -5,27 +5,27 @@
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-        <SolidColorBrush x:Key="AppBackground" Color="#07080D" />
-        <SolidColorBrush x:Key="PanelBackground" Color="#0D101A" />
-        <SolidColorBrush x:Key="SubtleBackground" Color="#151A2B" />
-        <SolidColorBrush x:Key="PanelBorder" Color="#232A42" />
-        <SolidColorBrush x:Key="PrimaryText" Color="#F1F5F9" />
-        <SolidColorBrush x:Key="MutedText" Color="#8A99B5" />
+        <SolidColorBrush x:Key="AppBackground" Color="#050C1E" />
+        <SolidColorBrush x:Key="PanelBackground" Color="#0A162C" />
+        <SolidColorBrush x:Key="SubtleBackground" Color="#0F2244" />
+        <SolidColorBrush x:Key="PanelBorder" Color="#1A3B6E" />
+        <SolidColorBrush x:Key="PrimaryText" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="MutedText" Color="#8EB0D8" />
         <SolidColorBrush x:Key="AccentBrush" Color="#00F0FF" />
-        <SolidColorBrush x:Key="AccentDarkBrush" Color="#B026FF" />
-        <SolidColorBrush x:Key="AccentForeground" Color="#070913" />
-        <SolidColorBrush x:Key="ButtonHover" Color="#1E253D" />
-        <SolidColorBrush x:Key="ButtonDisabled" Color="#111420" />
-        <SolidColorBrush x:Key="SuccessBackground" Color="#08281D" />
+        <SolidColorBrush x:Key="AccentDarkBrush" Color="#0078FF" />
+        <SolidColorBrush x:Key="AccentForeground" Color="#050C1E" />
+        <SolidColorBrush x:Key="ButtonHover" Color="#163260" />
+        <SolidColorBrush x:Key="ButtonDisabled" Color="#0B1528" />
+        <SolidColorBrush x:Key="SuccessBackground" Color="#042F2E" />
         <SolidColorBrush x:Key="SuccessText" Color="#00FFA3" />
-        <SolidColorBrush x:Key="WarningBackground" Color="#2D1E04" />
+        <SolidColorBrush x:Key="WarningBackground" Color="#2E2305" />
         <SolidColorBrush x:Key="WarningText" Color="#FFB800" />
-        <SolidColorBrush x:Key="DangerBackground" Color="#360A17" />
-        <SolidColorBrush x:Key="DangerText" Color="#FF2A6D" />
-        <SolidColorBrush x:Key="InfoBackground" Color="#0B2540" />
-        <SolidColorBrush x:Key="InfoText" Color="#38BDF8" />
-        <SolidColorBrush x:Key="NeutralBackground" Color="#141724" />
-        <SolidColorBrush x:Key="NeutralText" Color="#94A3B8" />
+        <SolidColorBrush x:Key="DangerBackground" Color="#380D1A" />
+        <SolidColorBrush x:Key="DangerText" Color="#FF3366" />
+        <SolidColorBrush x:Key="InfoBackground" Color="#0A2A54" />
+        <SolidColorBrush x:Key="InfoText" Color="#00D2FF" />
+        <SolidColorBrush x:Key="NeutralBackground" Color="#0E1D38" />
+        <SolidColorBrush x:Key="NeutralText" Color="#8EB0D8" />
 
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI, -apple-system, sans-serif" />
