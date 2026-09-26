@@ -25,11 +25,14 @@ namespace SetupHub180Hz.Views
             };
             _statsTimer.Tick += (_, _) => UpdateStats();
 
+            UpdateMonitorService.Instance.UpgradableApps.CollectionChanged += (_, _) => UpdateSummary();
+
             Loaded += async (_, _) =>
             {
                 UpdateStats();
                 _statsTimer.Start();
-                await LoadSummaryAsync();
+                await CheckEngineAsync();
+                UpdateSummary();
             };
 
             Unloaded += (_, _) =>
@@ -61,31 +64,36 @@ namespace SetupHub180Hz.Views
             catch { }
         }
 
-        private async System.Threading.Tasks.Task LoadSummaryAsync()
+        private void UpdateSummary()
         {
-            RefreshSummaryButton.IsEnabled = false;
-            UpdateSummaryText.Text = "Checking for updates…";
+            var count = UpdateMonitorService.Instance.UpgradableApps.Count;
+            UpdateSummaryText.Text = count == 0
+                ? "Everything is up to date."
+                : $"{count} update-ready app(s) found.";
 
+            _mainWindow.SetStatus(count == 0 ? "Up to date" : $"{count} update(s) available");
+        }
+
+        private async Task CheckEngineAsync()
+        {
             if (!await _winget.IsAvailableAsync())
             {
                 UpdateSummaryText.Text = "winget not found on this system.";
                 EngineStatusText.Text = "WINGET MISSING";
-                RefreshSummaryButton.IsEnabled = true;
                 return;
             }
 
             EngineStatusText.Text = "ENGINE READY";
-
-            var upgradable = await _winget.GetUpgradableAppsAsync();
-            UpdateSummaryText.Text = upgradable.Count == 0
-                ? "Everything is up to date."
-                : $"{upgradable.Count} update-ready app(s) found.";
-
-            _mainWindow.SetStatus(upgradable.Count == 0 ? "Up to date" : $"{upgradable.Count} update(s) available");
-            RefreshSummaryButton.IsEnabled = true;
         }
 
-        private async void RefreshSummary_Click(object sender, RoutedEventArgs e) => await LoadSummaryAsync();
+        private async void RefreshSummary_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshSummaryButton.IsEnabled = false;
+            UpdateSummaryText.Text = "Checking for updates…";
+            await UpdateMonitorService.Instance.RefreshAsync(force: true);
+            UpdateSummary();
+            RefreshSummaryButton.IsEnabled = true;
+        }
 
         private void TileSetupApps_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("SetupApps");
         private void TileUpdateCenter_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("UpdateCenter");

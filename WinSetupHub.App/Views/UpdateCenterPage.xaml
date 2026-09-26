@@ -120,13 +120,15 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- 3. Upgrade Button -->
-                    <Button Grid.Column="2"
-                            Content="Upgrade"
-                            Style="{StaticResource AccentButton}"
-                            Padding="18,7,18,7"
-                            VerticalAlignment="Center"
-                            Click="UpgradeButton_Click"/>
+                    <!-- 3. Upgrade Button & Official Link -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <ContentControl Loaded="OfficialLinkContainer_Loaded" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <Button Content="Upgrade"
+                                Style="{StaticResource AccentButton}"
+                                Padding="18,7,18,7"
+                                VerticalAlignment="Center"
+                                Click="UpgradeButton_Click"/>
+                    </StackPanel>
                 </Grid>
             </Border>
         </DataTemplate>

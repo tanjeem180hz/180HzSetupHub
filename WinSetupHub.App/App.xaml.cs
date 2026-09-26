@@ -26,6 +26,8 @@ namespace SetupHub180Hz
                 return;
             }
 
+            UpdateMonitorService.Instance.Start();
+
             var mainWindow = new MainWindow();
             mainWindow.Show();
         }

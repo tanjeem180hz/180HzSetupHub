@@ -11,69 +11,50 @@ namespace SetupHub180Hz.Views
     public partial class UpdateCenterPage : UserControl
     {
         private readonly WingetService _winget = new();
-        private readonly PackageCatalogService _catalogService = new();
-        private List<AppItem>? _catalog;
-        private List<AppItem> _upgradable = new();
 
         public UpdateCenterPage()
         {
             InitializeComponent();
+            UpdatesListBox.ItemsSource = UpdateMonitorService.Instance.UpgradableApps;
+            UpdateMonitorService.Instance.UpgradableApps.CollectionChanged += (_, _) => UpdateSummary();
+
             Loaded += async (_, _) =>
             {
-                if (_upgradable.Count == 0)
+                UpdateSummary();
+                if (UpdateMonitorService.Instance.UpgradableApps.Count == 0)
                 {
-                    await LoadAsync();
+                    await UpdateMonitorService.Instance.RefreshAsync(force: false);
+                    UpdateSummary();
                 }
             };
         }
 
-        private async Task LoadAsync()
+        private void UpdateSummary()
         {
-            UpdatesListBox.ItemsSource = null;
-            SummaryText.Text = "Checking for updates via Winget…";
-            UpgradeAllButton.IsEnabled = false;
-
-            _catalog ??= await _catalogService.GetAllAsync();
-
-            _upgradable = await _winget.GetUpgradableAppsAsync();
-
-            if (_upgradable.Count == 0)
+            var count = UpdateMonitorService.Instance.UpgradableApps.Count;
+            if (count == 0)
             {
                 SummaryText.Text = "🎉 Everything is up to date! No updates found.";
-                return;
+                UpgradeAllButton.IsEnabled = false;
             }
-
-            SummaryText.Text = $"🚀 {_upgradable.Count} application(s) have updates available.";
-            UpgradeAllButton.IsEnabled = true;
-
-            foreach (var app in _upgradable)
+            else
             {
-                AppMetadataHelper.EnrichAppItem(app, _catalog);
+                SummaryText.Text = $"🚀 {count} application(s) have updates available.";
+                UpgradeAllButton.IsEnabled = true;
             }
-
-            UpdatesListBox.ItemsSource = _upgradable;
-
-            // Background icon loading
-            _ = Task.Run(async () =>
-            {
-                foreach (var app in _upgradable)
-                {
-                    if (app.IconImageSource == null)
-                    {
-                        var img = await IconCacheService.GetImageAsync(app.IconUrl, app.LocalIconPath);
-                        if (img != null)
-                        {
-                            await Dispatcher.InvokeAsync(() => app.IconImageSource = img);
-                        }
-                    }
-                }
-            });
         }
 
-        private async void Refresh_Click(object sender, RoutedEventArgs e) => await LoadAsync();
+        private async void Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            SummaryText.Text = "Checking for updates via Winget…";
+            UpgradeAllButton.IsEnabled = false;
+            await UpdateMonitorService.Instance.RefreshAsync(force: true);
+            UpdateSummary();
+        }
 
         private async void UpgradeAll_Click(object sender, RoutedEventArgs e)
         {
+            var count = UpdateMonitorService.Instance.UpgradableApps.Count;
             UpgradeAllButton.IsEnabled = false;
             UpgradeAllButton.Content = "Upgrading All…";
 
@@ -85,10 +66,11 @@ namespace SetupHub180Hz.Views
 
             NotificationService.Notify(
                 "Upgrade Complete",
-                success ? $"{_upgradable.Count} apps upgraded successfully." : "Upgrade-all finished with some warnings.");
+                success ? $"{count} apps upgraded successfully." : "Upgrade-all finished with some warnings.");
 
             UpgradeAllButton.Content = "⚡ Upgrade All";
-            await LoadAsync();
+            await UpdateMonitorService.Instance.RefreshAsync(force: true);
+            UpdateSummary();
         }
 
         private async void UpgradeButton_Click(object sender, RoutedEventArgs e)
@@ -105,11 +87,24 @@ namespace SetupHub180Hz.Views
                     success ? $"Upgraded {app.Name} to {app.AvailableVersion}." : $"Failed to upgrade {app.Name}.",
                     success ? ActivityType.Success : ActivityType.Error);
 
-                if (!success)
+                if (success)
+                {
+                    await UpdateMonitorService.Instance.RefreshAsync(force: true);
+                    UpdateSummary();
+                }
+                else
                 {
                     btn.IsEnabled = true;
                     btn.Content = "Retry";
                 }
+            }
+        }
+
+        private void OfficialLinkContainer_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ContentControl cc && cc.DataContext is AppItem app && cc.Content == null)
+            {
+                cc.Content = RowHelpers.BuildOfficialLinkButton(_winget, app);
             }
         }
     }

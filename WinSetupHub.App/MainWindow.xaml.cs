@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
+using SetupHub180Hz.Services;
 using SetupHub180Hz.Views;
 
 namespace SetupHub180Hz
@@ -11,6 +12,13 @@ namespace SetupHub180Hz
         {
             InitializeComponent();
             StateChanged += (_, _) => MaximizeButton.Content = WindowState == WindowState.Maximized ? "\uE923" : "\uE922";
+            Activated += async (_, _) =>
+            {
+                if (!UpdateMonitorService.Instance.ShouldSkipDueToRecency())
+                {
+                    await UpdateMonitorService.Instance.RefreshAsync();
+                }
+            };
             UpdateThemeButtonText();
             NavigateTo("Dashboard");
         }

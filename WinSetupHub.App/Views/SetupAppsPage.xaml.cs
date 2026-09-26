@@ -288,6 +288,14 @@ namespace SetupHub180Hz.Views
             }
         }
 
+        private void OfficialLinkContainer_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ContentControl cc && cc.DataContext is AppItem app && cc.Content == null)
+            {
+                cc.Content = RowHelpers.BuildOfficialLinkButton(_winget, app);
+            }
+        }
+
         private void WebLink_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is AppItem app && !string.IsNullOrWhiteSpace(app.WebUrl))

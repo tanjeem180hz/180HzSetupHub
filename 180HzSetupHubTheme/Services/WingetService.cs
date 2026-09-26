@@ -46,6 +46,63 @@ namespace SetupHub180Hz.Services
             return ParseTable(output);
         }
 
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, AppMetadata?> _metadataCache =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        public async Task<AppMetadata?> GetMetadataAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return null;
+            if (_metadataCache.TryGetValue(id, out var cached)) return cached;
+
+            try
+            {
+                var output = await RunWingetAsync($"show --id \"{id}\" --exact --accept-source-agreements");
+                if (string.IsNullOrWhiteSpace(output))
+                {
+                    _metadataCache[id] = null;
+                    return null;
+                }
+
+                string? homepage = null;
+                string? publisherUrl = null;
+                string? supportUrl = null;
+
+                using var reader = new System.IO.StringReader(output);
+                string? line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var trimmed = line.Trim();
+                    if (trimmed.StartsWith("Homepage:", StringComparison.Ordinal))
+                    {
+                        var val = trimmed.Substring("Homepage:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) homepage = val;
+                    }
+                    else if (trimmed.StartsWith("Publisher Url:", StringComparison.Ordinal))
+                    {
+                        var val = trimmed.Substring("Publisher Url:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) publisherUrl = val;
+                    }
+                    else if (trimmed.StartsWith("Publisher Support Url:", StringComparison.Ordinal))
+                    {
+                        var val = trimmed.Substring("Publisher Support Url:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) supportUrl = val;
+                    }
+                }
+
+                var result = (homepage != null || publisherUrl != null || supportUrl != null)
+                    ? new AppMetadata(homepage, publisherUrl, supportUrl)
+                    : null;
+
+                _metadataCache[id] = result;
+                return result;
+            }
+            catch
+            {
+                _metadataCache[id] = null;
+                return null;
+            }
+        }
+
         public async Task<bool> InstallAsync(string id, string? source = null, Action<string>? onOutputLine = null)
         {
             if (id.Equals("Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))

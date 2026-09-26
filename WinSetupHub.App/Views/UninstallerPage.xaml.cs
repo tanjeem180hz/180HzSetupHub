@@ -16,6 +16,7 @@ namespace SetupHub180Hz.Views
     {
         private readonly WingetService _winget = new();
         private readonly PackageCatalogService _catalog = new();
+        private readonly DeepUninstallService _deepUninstall = new();
         private List<AppItem> _allApps = new();
         private AppItem? _targetApp;
         private readonly DispatcherTimer _filterDebounceTimer;
@@ -222,6 +223,24 @@ namespace SetupHub180Hz.Views
                 _allApps.Remove(appToUninstall);
                 ApplyFilter();
                 InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
+
+                // Feature C: Universal heuristic scan for leftover registry keys and folders
+                try
+                {
+                    var leftovers = await _deepUninstall.ScanAsync(appToUninstall);
+                    if (leftovers.Count > 0)
+                    {
+                        var dialog = new LeftoverCleanupDialog(appToUninstall, leftovers)
+                        {
+                            Owner = Window.GetWindow(this)
+                        };
+                        dialog.ShowDialog();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ActivityLogger.Instance.Log($"Leftover scan warning: {ex.Message}", ActivityType.Warning);
+                }
             }
             else
             {
@@ -231,6 +250,14 @@ namespace SetupHub180Hz.Views
             }
 
             _targetApp = null;
+        }
+
+        private void OfficialLinkContainer_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ContentControl cc && cc.DataContext is AppItem app && cc.Content == null)
+            {
+                cc.Content = RowHelpers.BuildOfficialLinkButton(_winget, app);
+            }
         }
     }
 }

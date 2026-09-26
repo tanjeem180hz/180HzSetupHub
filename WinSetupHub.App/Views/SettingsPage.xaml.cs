@@ -110,9 +110,10 @@ namespace SetupHub180Hz.Views
 
                 ActivityLogger.Instance.Log($"Set automated update frequency to {hours} hours.", ActivityType.Info);
 
-                // Section 9 hook: sync scheduled task if service exists
+                // Sync background update monitor and task scheduler
                 try
                 {
+                    UpdateMonitorService.Instance.UpdateInterval();
                     TaskSchedulerService.SyncScheduledTask();
                 }
                 catch { }
