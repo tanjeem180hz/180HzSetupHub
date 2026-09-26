@@ -9,27 +9,33 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/latest"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D7?style=for-the-badge&logo=windows" alt="Platform"></a>
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/latest"><img src="https://img.shields.io/badge/Installer%20Size-~2%20MB-107C10?style=for-the-badge&logo=speedtest" alt="Installer Size"></a>
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/latest"><img src="https://img.shields.io/badge/Runtime-.NET%208%20%2B%204.8-512BD4?style=for-the-badge&logo=dotnet" alt=".NET"></a>
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/latest"><img src="https://img.shields.io/badge/Architecture-x64-555555?style=for-the-badge" alt="Architecture"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D7?style=for-the-badge&logo=windows" alt="Platform"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Installer%20Size-~2%20MB-107C10?style=for-the-badge&logo=speedtest" alt="Installer Size"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Runtime-.NET%208%20%2B%204.8-512BD4?style=for-the-badge&logo=dotnet" alt=".NET"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Architecture-x64-555555?style=for-the-badge" alt="Architecture"></a>
   <a href="https://github.com/tanjeem180hz/180HzSetupHub/blob/main/SECURITY.md"><img src="https://img.shields.io/badge/Security-Hardened-0078D7?style=for-the-badge&logo=shield" alt="Security"></a>
 </p>
 
 ---
 
-## ⚡ 1-Click Direct Downloads
+## ⚡ 1-Click Direct Download
 
-Choose your preferred installation method below:
+Click the button below to download the official installer:
 
-| Package | Size | Description | Download Link |
-| :--- | :--- | :--- | :--- |
-| **🚀 Web Bootstrapper (Recommended)** | **~2 MB** | Ultra-lightweight Windows App Installer. Includes dynamic speed meter, automatic prerequisites check, and self-repair. | [**Download 180HzSetupHubSetup.exe**](https://github.com/tanjeem180hz/180HzSetupHub/releases/latest/download/180HzSetupHubSetup.exe) |
-| **📦 Standalone Full Package** | **~68 MB** | Complete self-contained single-file binary. Perfect for offline machines or portable USB drives. | [**Download 180HzSetupHub.exe**](https://github.com/tanjeem180hz/180HzSetupHub/releases/latest/download/180HzSetupHub.exe) |
+<p align="center">
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe">
+    <img src="https://img.shields.io/badge/Download-180Hz%20Setup%20Hub%20(v1.0.0)-0078D7?style=for-the-badge&logo=windows&logoColor=white" alt="Download 180Hz Setup Hub" height="48">
+  </a>
+</p>
 
-### 💻 1-Click PowerShell Terminal Install (No Browser Needed)
+<p align="center">
+  👉 <strong><a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe">Direct Download Link: 180HzSetupHubSetup.exe (~2 MB)</a></strong><br>
+  <em>(Official 1-Click Installer • Windows 10 &amp; 11 • Live Speed Meter • Automatic Prerequisites &amp; Self-Repair)</em>
+</p>
 
-Open **PowerShell** and run this single command to download and launch the installer instantly:
+### 💻 1-Click PowerShell Install (No Browser Needed)
+
+If you prefer installing directly from the terminal, open **PowerShell** and run this single command:
 
 ```powershell
 irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/install.ps1 | iex
@@ -37,47 +43,50 @@ irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/in
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Highlights
 
 ### 🎨 Windows 10/11 Native App Installer Experience
-* **100% Native Design:** Replicates the official Microsoft Store / MSIX desktop app installer dialog with clean Segoe UI typography, blue **Trusted App** badge, and standard titlebar controls.
-* **Auto-Launch:** Automatically starts the app when installation completes with the `[✓] Launch when ready` option.
-* **Zero Runtime Overhead:** Installer runs on native .NET Framework 4.8 preinstalled in Windows, guaranteeing instant startup with 0 crash risk and 0 missing dependency prompts.
+* **Native Design:** Modeled after the official Windows App Installer with a clean Segoe UI layout, verified **Trusted App** badge, and standard titlebar controls.
+* **Launch When Ready:** Automatically starts 180Hz Setup Hub once installation finishes.
+* **Instant Startup:** Runs on native .NET Framework 4.8 pre-built into Windows 10 & 11, starting in milliseconds without demanding extra runtimes or external popups.
 
 ### 📶 Real-Time Dynamic Download Speed Meter
-* Accurately tracks active network throughput during package downloads.
-* Dynamically scales unit prefixes in real-time according to speed:
+* Measures live download throughput during installation and repair.
+* Dynamically scales units based on connection speed:
   * Low / Mobile: `650.4 KB/s`
   * Broadband: `14.2 MB/s`
   * Gigabit Fiber: `1.1 GB/s`
 
 ### 🛠️ Built-in Repair & Self-Healing Diagnostics
-* The Modify / Uninstall wizard includes an active **Repair** mode.
-* **One-Click Fix:** Reinstalls corrupt executables, clears deadlocks/temporary files, resets broken package catalogs, repairs PowerShell execution policies, and restores Desktop and Start Menu shortcuts without losing custom user settings.
+* The Modify / Uninstall wizard contains a dedicated **Repair** feature.
+* **1-Click Repair:** Automatically stops frozen processes, fixes PowerShell script execution policies, verifies Windows Package Manager (`winget`), clears corrupted temp files, and restores clean package catalogs and shortcuts without touching your saved settings.
 
-### 📦 Modern Windows Package Manager (`winget`) Engine
-* Resolves software directly through Microsoft's official Windows Package Manager repository for guaranteed security, authentic hashes, and latest versions.
-* Automatic silent prerequisite installation of `winget` from Microsoft servers if absent on the system.
+### 📦 Windows Package Manager (`winget`) Integration
+* Installs apps directly from Microsoft's official verified repository manifests with automatic checksum verification.
+* Checks prerequisites silently and configures `winget` automatically if missing on the host system.
 
-### 🎯 Curated Profiles for Quick Setup
-* **Gamers & Enthusiasts:** Discord, Steam, Epic Games, OBS Studio, MSI Afterburner, GPU drivers, and performance runtimes.
-* **Developers:** VS Code, Git, Windows Terminal, Node.js, Python, Docker, DBeaver.
-* **Productivity & Office:** 7-Zip, Everything, PowerToys, Notepad++, VLC, Chrome, Firefox.
+### 🎯 Curated Setup Profiles
+* **Gamers & Enthusiasts:** Discord, Steam, Epic Games, OBS Studio, GPU drivers, and essential gaming runtimes.
+* **Developers:** Visual Studio Code, Git, Windows Terminal, Node.js, Python, Docker Desktop, DBeaver.
+* **Productivity & Utilities:** 7-Zip, Everything, Microsoft PowerToys, Notepad++, VLC, Chrome, Firefox.
 
 ---
 
 ## 🖥️ System Requirements
 
-* **Operating System:** Windows 10 (version 1903 or later) / Windows 11 (64-bit).
-* **RAM:** 2 GB minimum (4 GB recommended).
-* **Disk Space:** ~150 MB free disk space.
-* **Internet Connection:** Required for package catalog updates and app downloads.
+| Specification | Requirement |
+| :--- | :--- |
+| **Operating System** | Windows 10 (version 1903 or later) / Windows 11 (64-bit) |
+| **Processor** | 64-bit (x64) compatible processor |
+| **Memory (RAM)** | 2 GB minimum (4 GB recommended) |
+| **Storage** | ~150 MB free disk space |
+| **Network** | Active internet connection for downloading package catalogs and apps |
 
 ---
 
 ## 📁 Installation Directory & Paths
 
-By default, 180Hz Setup Hub installs in user-space without cluttering system folders:
+180Hz Setup Hub installs cleanly in user-space without cluttering system roots:
 
 ```text
 %LOCALAPPDATA%\Programs\180Hz Setup Hub\
@@ -96,13 +105,13 @@ By default, 180Hz Setup Hub installs in user-space without cluttering system fol
 
 ## 🛠️ Adding Custom Apps to the Catalog
 
-You can easily expand the catalog by adding custom apps to:
+Add any software to your catalog by editing:
 
 ```text
 %LOCALAPPDATA%\Programs\180Hz Setup Hub\Data\config\packages.json
 ```
 
-Add an entry with this structure:
+Add an object with this structure:
 
 ```json
 {
@@ -116,7 +125,7 @@ Add an entry with this structure:
 }
 ```
 
-> **Tip:** You can discover any Windows Package ID using PowerShell:
+> **Tip:** Search for any package ID via PowerShell:
 > ```powershell
 > winget search "app name"
 > ```
@@ -125,18 +134,14 @@ Add an entry with this structure:
 
 ## 🔨 Building from Source
 
-### Prerequisites
-* [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-* PowerShell 5.1+ or PowerShell 7+
-
-### 1-Click Complete Build
-Run the automated build script to compile both the application and the 2 MB installer:
+### 1-Click Automated Build
+To compile both the application package and the 2 MB bootstrapper installer:
 
 ```powershell
 powershell.exe -ExecutionPolicy Bypass -File scripts\Build-Installer.ps1
 ```
 
-The compiled binaries will be output to:
+Generated outputs:
 * **Installer:** `artifacts\installer\180HzSetupHubSetup.exe` (~1.93 MB)
 * **App Binary:** `artifacts\publish\win-x64\180HzSetupHub.exe` (~68 MB)
 
@@ -144,9 +149,8 @@ The compiled binaries will be output to:
 
 ## 🔒 Security & Integrity
 
-180Hz Setup Hub enforces strict package validation, sanitized argument parsing, and isolated process execution:
-* See [`SECURITY.md`](SECURITY.md) for full threat models and security policies.
-* See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for code structure, runtime lifecycle, and architectural details.
+* See [`SECURITY.md`](SECURITY.md) for vulnerability reporting and security policies.
+* See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for internal architecture, component interaction, and design patterns.
 
 ---
 
