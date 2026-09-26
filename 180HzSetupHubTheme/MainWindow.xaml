@@ -38,6 +38,7 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button x:Name="ThemeToggleButton" Style="{StaticResource CaptionButton}" Width="68" Margin="0,0,6,0" Click="ThemeToggle_Click"/>
                 <Button x:Name="MinimizeButton" Content="&#xE921;" Style="{StaticResource CaptionButton}" Click="Minimize_Click"/>
                 <Button x:Name="MaximizeButton" Content="&#xE922;" Style="{StaticResource CaptionButton}" Click="Maximize_Click"/>
                 <Button x:Name="CloseButton" Content="&#xE8BB;" Style="{StaticResource CloseCaptionButton}" Click="Close_Click"/>
@@ -72,6 +73,10 @@
                                      Checked="NavItem_Checked" Tag="Uninstaller" Margin="0,0,0,4">
                             <TextBlock Text="🗑️  Uninstaller"/>
                         </RadioButton>
+                        <RadioButton x:Name="NavStartup" Style="{StaticResource SidebarItem}"
+                                     Checked="NavItem_Checked" Tag="Startup" Margin="0,0,0,4">
+                            <TextBlock Text="🚀  Startup Apps"/>
+                        </RadioButton>
                         <RadioButton x:Name="NavCleanup" Style="{StaticResource SidebarItem}"
                                      Checked="NavItem_Checked" Tag="Cleanup" Margin="0,0,0,4">
                             <TextBlock Text="🧹  Cleanup"/>
@@ -83,6 +88,11 @@
                         <RadioButton x:Name="NavStorage" Style="{StaticResource SidebarItem}"
                                      Checked="NavItem_Checked" Tag="Storage" Margin="0,0,0,4">
                             <TextBlock Text="📁  Storage"/>
+                        </RadioButton>
+                        <Border BorderThickness="0,1,0,0" BorderBrush="{StaticResource BrushBorder}" Margin="0,8,0,8"/>
+                        <RadioButton x:Name="NavSettings" Style="{StaticResource SidebarItem}"
+                                     Checked="NavItem_Checked" Tag="Settings" Margin="0,0,0,4">
+                            <TextBlock Text="⚙️  Settings"/>
                         </RadioButton>
                     </StackPanel>
 

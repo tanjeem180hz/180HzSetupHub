@@ -80,6 +80,33 @@ namespace SetupHub180Hz.Views
 
         private async void Refresh_Click(object sender, RoutedEventArgs e) => await LoadAsync();
 
+        private async void ExportList_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "JSON files (*.json)|*.json",
+                FileName = $"180hz-app-list-{DateTime.Now:yyyyMMdd}.json",
+                Title = "Export Installed Applications"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                try
+                {
+                    var exporter = new AppListExportService();
+                    await exporter.ExportAsync(dlg.FileName, _allApps);
+                    ActivityLogger.Instance.Log($"Exported {_allApps.Count} applications to {dlg.FileName}", ActivityType.Success);
+                    NotificationService.Notify("Export Complete", $"Exported {_allApps.Count} installed apps to JSON.");
+                    MessageBox.Show($"Successfully exported {_allApps.Count} applications to:\n{dlg.FileName}", "Export Successful", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    ActivityLogger.Instance.Log($"Export failed: {ex.Message}", ActivityType.Error);
+                    MessageBox.Show($"Export failed: {ex.Message}", "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
         private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             ClearFilterButton.Visibility = string.IsNullOrWhiteSpace(FilterBox.Text)
@@ -191,6 +218,7 @@ namespace SetupHub180Hz.Views
             if (success)
             {
                 ActivityLogger.Instance.Log($"Successfully uninstalled {appToUninstall.Name}.", ActivityType.Success);
+                NotificationService.Notify("App Removed", $"{appToUninstall.Name} uninstalled successfully.");
                 _allApps.Remove(appToUninstall);
                 ApplyFilter();
                 InstalledCountText.Text = $"{_allApps.Count} Applications Installed";

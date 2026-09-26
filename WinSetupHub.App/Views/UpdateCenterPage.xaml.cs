@@ -83,6 +83,10 @@ namespace SetupHub180Hz.Views
                 success ? "Upgraded all available applications." : "Upgrade-all finished with some warnings.",
                 success ? ActivityType.Success : ActivityType.Warning);
 
+            NotificationService.Notify(
+                "Upgrade Complete",
+                success ? $"{_upgradable.Count} apps upgraded successfully." : "Upgrade-all finished with some warnings.");
+
             UpgradeAllButton.Content = "⚡ Upgrade All";
             await LoadAsync();
         }

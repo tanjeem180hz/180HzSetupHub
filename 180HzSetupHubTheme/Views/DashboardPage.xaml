@@ -105,12 +105,23 @@
                         </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
 
+                    <DoubleAnimation Storyboard.TargetName="SystemStatsSection"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0" To="1" BeginTime="0:0:0.09" Duration="0:0:0.22"/>
+                    <DoubleAnimation Storyboard.TargetName="StatsTransform"
+                                     Storyboard.TargetProperty="Y"
+                                     From="13" To="0" BeginTime="0:0:0.09" Duration="0:0:0.22">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+
                     <DoubleAnimation Storyboard.TargetName="ModulesSection"
                                      Storyboard.TargetProperty="Opacity"
-                                     From="0" To="1" BeginTime="0:0:0.12" Duration="0:0:0.24"/>
+                                     From="0" To="1" BeginTime="0:0:0.14" Duration="0:0:0.24"/>
                     <DoubleAnimation Storyboard.TargetName="ModulesTransform"
                                      Storyboard.TargetProperty="Y"
-                                     From="14" To="0" BeginTime="0:0:0.12" Duration="0:0:0.24">
+                                     From="14" To="0" BeginTime="0:0:0.14" Duration="0:0:0.24">
                         <DoubleAnimation.EasingFunction>
                             <CubicEase EasingMode="EaseOut"/>
                         </DoubleAnimation.EasingFunction>
@@ -123,6 +134,7 @@
     <ScrollViewer Style="{StaticResource CleanScrollViewer}" Padding="32,24,32,32">
         <Grid MaxWidth="1160" HorizontalAlignment="Center">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -212,8 +224,87 @@
                 </Grid>
             </Border>
 
+            <!-- 2b. Live System Stats -->
+            <UniformGrid x:Name="SystemStatsSection" Grid.Row="2" Columns="3" Margin="0,0,0,24">
+                <UniformGrid.RenderTransform>
+                    <TranslateTransform x:Name="StatsTransform" Y="0"/>
+                </UniformGrid.RenderTransform>
+
+                <!-- 1. CPU Usage -->
+                <Border Style="{StaticResource Card}" CornerRadius="10" Padding="18,16" Margin="0,0,8,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="⚡" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="CPU LOAD" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Bottom">
+                            <TextBlock x:Name="CpuPercentText" Text="0.0%" FontSize="24" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}"/>
+                            <TextBlock Text=" active" FontSize="12" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Bottom" Margin="4,0,0,3"/>
+                        </StackPanel>
+
+                        <ProgressBar Grid.Row="2" x:Name="CpuProgressBar" Style="{StaticResource FlatProgressBar}"
+                                     Minimum="0" Maximum="100" Value="0"/>
+                    </Grid>
+                </Border>
+
+                <!-- 2. Memory Usage -->
+                <Border Style="{StaticResource Card}" CornerRadius="10" Padding="18,16" Margin="4,0,4,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="🧠" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="MEMORY (RAM)" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Bottom">
+                            <TextBlock x:Name="RamUsageText" Text="0.0 / 0.0 GB" FontSize="20" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Bottom"/>
+                            <TextBlock x:Name="RamPercentText" Text=" (0%)" FontSize="12" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Bottom" Margin="4,0,0,2"/>
+                        </StackPanel>
+
+                        <ProgressBar Grid.Row="2" x:Name="RamProgressBar" Style="{StaticResource FlatProgressBar}"
+                                     Minimum="0" Maximum="100" Value="0"/>
+                    </Grid>
+                </Border>
+
+                <!-- 3. Disk Space (C:) -->
+                <Border Style="{StaticResource Card}" CornerRadius="10" Padding="18,16" Margin="8,0,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="💾" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="DISK (C:)" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Bottom">
+                            <TextBlock x:Name="DiskUsageText" Text="0.0 GB Free" FontSize="20" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Bottom"/>
+                            <TextBlock x:Name="DiskTotalText" Text=" of 0.0 GB" FontSize="12" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Bottom" Margin="4,0,0,2"/>
+                        </StackPanel>
+
+                        <ProgressBar Grid.Row="2" x:Name="DiskProgressBar" Style="{StaticResource FlatProgressBar}"
+                                     Minimum="0" Maximum="100" Value="0"/>
+                    </Grid>
+                </Border>
+            </UniformGrid>
+
             <!-- 3. Modules Section -->
-            <StackPanel x:Name="ModulesSection" Grid.Row="2">
+            <StackPanel x:Name="ModulesSection" Grid.Row="3">
                 <StackPanel.RenderTransform>
                     <TranslateTransform x:Name="ModulesTransform" Y="0"/>
                 </StackPanel.RenderTransform>

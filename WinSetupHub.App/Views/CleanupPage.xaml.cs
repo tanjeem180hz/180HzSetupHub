@@ -48,6 +48,7 @@ namespace SetupHub180Hz.Views
             long freed = await _cleanup.CleanAllAsync(selected);
 
             ActivityLogger.Instance.Log($"Cleanup freed {FormatSize(freed)}.", ActivityType.Success);
+            NotificationService.Notify("Cleanup Complete", $"Cleanup freed {FormatSize(freed)} of disk space.");
 
             CleanSelectedButton.Content = "Clean Selected";
             await ScanAsync();

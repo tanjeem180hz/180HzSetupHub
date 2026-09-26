@@ -1,5 +1,8 @@
+using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using SetupHub180Hz.Services;
 
 namespace SetupHub180Hz.Views
@@ -8,12 +11,54 @@ namespace SetupHub180Hz.Views
     {
         private readonly MainWindow _mainWindow;
         private readonly WingetService _winget = new();
+        private readonly SystemStatsService _stats = new();
+        private readonly DispatcherTimer _statsTimer;
 
         public DashboardPage(MainWindow mainWindow)
         {
             InitializeComponent();
             _mainWindow = mainWindow;
-            Loaded += async (_, _) => await LoadSummaryAsync();
+
+            _statsTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(2)
+            };
+            _statsTimer.Tick += (_, _) => UpdateStats();
+
+            Loaded += async (_, _) =>
+            {
+                UpdateStats();
+                _statsTimer.Start();
+                await LoadSummaryAsync();
+            };
+
+            Unloaded += (_, _) =>
+            {
+                _statsTimer.Stop();
+            };
+        }
+
+        private void UpdateStats()
+        {
+            try
+            {
+                var snap = _stats.GetSnapshot();
+
+                // CPU
+                CpuPercentText.Text = $"{snap.CpuPercent:0.0}%";
+                CpuProgressBar.Value = Math.Clamp(snap.CpuPercent, 0, 100);
+
+                // RAM
+                RamUsageText.Text = $"{snap.RamUsedGb:0.0} / {snap.RamTotalGb:0.0} GB";
+                RamPercentText.Text = $" ({snap.RamPercent:0}%)";
+                RamProgressBar.Value = Math.Clamp(snap.RamPercent, 0, 100);
+
+                // Disk (C:)
+                DiskUsageText.Text = $"{snap.DiskFreeGb:0.0} GB Free";
+                DiskTotalText.Text = $" of {snap.DiskTotalGb:0.0} GB";
+                DiskProgressBar.Value = Math.Clamp(snap.DiskPercent, 0, 100);
+            }
+            catch { }
         }
 
         private async System.Threading.Tasks.Task LoadSummaryAsync()

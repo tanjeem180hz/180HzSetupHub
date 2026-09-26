@@ -11,6 +11,7 @@ namespace SetupHub180Hz
         {
             InitializeComponent();
             StateChanged += (_, _) => MaximizeButton.Content = WindowState == WindowState.Maximized ? "\uE923" : "\uE922";
+            UpdateThemeButtonText();
             NavigateTo("Dashboard");
         }
 
@@ -32,9 +33,11 @@ namespace SetupHub180Hz
                     "SetupApps" => new SetupAppsPage(),
                     "UpdateCenter" => new UpdateCenterPage(),
                     "Uninstaller" => new UninstallerPage(),
+                    "Startup" => new StartupManagerPage(),
                     "Cleanup" => new CleanupPage(),
                     "Activity" => new ActivityPage(),
                     "Storage" => new StoragePage(),
+                    "Settings" => new SettingsPage(),
                     _ => new DashboardPage(this),
                 };
                 _pageCache[pageKey] = page;
@@ -56,9 +59,11 @@ namespace SetupHub180Hz
                 "SetupApps" => NavSetupApps,
                 "UpdateCenter" => NavUpdateCenter,
                 "Uninstaller" => NavUninstaller,
+                "Startup" => NavStartup,
                 "Cleanup" => NavCleanup,
                 "Activity" => NavActivity,
                 "Storage" => NavStorage,
+                "Settings" => NavSettings,
                 _ => null,
             };
             if (target != null) target.IsChecked = true;
@@ -73,6 +78,19 @@ namespace SetupHub180Hz
         }
 
         // ===== Custom chrome window controls =====
+        private void ThemeToggle_Click(object sender, RoutedEventArgs e)
+        {
+            var currentDark = SetupHub180Hz.Services.SettingsService.Instance.Current.DarkTheme;
+            SetupHub180Hz.Services.ThemeService.ApplyTheme(!currentDark);
+            UpdateThemeButtonText();
+        }
+
+        private void UpdateThemeButtonText()
+        {
+            var isDark = SetupHub180Hz.Services.SettingsService.Instance.Current.DarkTheme;
+            ThemeToggleButton.Content = isDark ? "☀️ Light" : "🌙 Dark";
+        }
+
         private void Minimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
         private void Maximize_Click(object sender, RoutedEventArgs e) =>

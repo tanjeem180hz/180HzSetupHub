@@ -1,0 +1,106 @@
+<UserControl x:Class="SetupHub180Hz.Views.SettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <Style x:Key="SettingCheckBox" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="SettingComboBox" TargetType="ComboBox">
+            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+            <Setter Property="Background" Value="{StaticResource BrushSurface}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock Text="Settings" Style="{StaticResource TextHeader}"/>
+            <TextBlock Text="Configure system startup, notifications, update frequency, and safety preferences."
+                       Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Settings Cards ScrollViewer -->
+        <ScrollViewer Grid.Row="1" Style="{StaticResource CleanScrollViewer}">
+            <StackPanel MaxWidth="800" HorizontalAlignment="Left">
+
+                <!-- 1. Startup Card -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Startup" Style="{StaticResource TextSubHeader}" Margin="0,0,0,4"/>
+                        <TextBlock Text="Configure how 180Hz Setup Hub integrates with Windows launch."
+                                   Style="{StaticResource TextBody}" Margin="0,0,0,14"/>
+
+                        <CheckBox x:Name="ChkAutoStart"
+                                  Style="{StaticResource SettingCheckBox}"
+                                  Content="Launch 180Hz Setup Hub when Windows starts"
+                                  Checked="ChkAutoStart_Changed"
+                                  Unchecked="ChkAutoStart_Changed"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 2. Notifications Card -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Notifications &amp; Updates" Style="{StaticResource TextSubHeader}" Margin="0,0,0,4"/>
+                        <TextBlock Text="Manage background notifications and automated update check frequency."
+                                   Style="{StaticResource TextBody}" Margin="0,0,0,14"/>
+
+                        <CheckBox x:Name="ChkNotifications"
+                                  Style="{StaticResource SettingCheckBox}"
+                                  Content="Show Windows toast notifications for completed actions"
+                                  Margin="0,0,0,16"
+                                  Checked="ChkNotifications_Changed"
+                                  Unchecked="ChkNotifications_Changed"/>
+
+                        <TextBlock Text="Automated Update Check Frequency" Style="{StaticResource TextBody}"
+                                   FontWeight="SemiBold" Foreground="{StaticResource BrushTextPrimary}" Margin="0,0,0,6"/>
+
+                        <ComboBox x:Name="CmbUpdateFrequency"
+                                  Style="{StaticResource SettingComboBox}"
+                                  Width="220"
+                                  HorizontalAlignment="Left"
+                                  SelectionChanged="CmbUpdateFrequency_SelectionChanged">
+                            <ComboBoxItem Content="Every 6 hours" Tag="6"/>
+                            <ComboBoxItem Content="Every 12 hours" Tag="12"/>
+                            <ComboBoxItem Content="Daily" Tag="24"/>
+                            <ComboBoxItem Content="Weekly" Tag="168"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Border>
+
+                <!-- 3. Safety Card -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Safety" Style="{StaticResource TextSubHeader}" Margin="0,0,0,4"/>
+                        <TextBlock Text="Safety controls for system-wide cleanup and application uninstallation."
+                                   Style="{StaticResource TextBody}" Margin="0,0,0,14"/>
+
+                        <CheckBox x:Name="ChkRequireAdmin"
+                                  Style="{StaticResource SettingCheckBox}"
+                                  Content="Require Administrator privileges for cleanup and uninstallation (re-elevates if needed)"
+                                  Checked="ChkRequireAdmin_Changed"
+                                  Unchecked="ChkRequireAdmin_Changed"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

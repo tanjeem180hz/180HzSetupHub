@@ -16,6 +16,7 @@ namespace SetupHub180Hz.Views
     {
         private readonly PackageCatalogService _catalog = new();
         private readonly WingetService _winget = new();
+        private readonly BundleService _bundleService = new();
         private List<AppItem> _allPackages = new();
         private string _activeCategory = "All";
         private readonly DispatcherTimer _searchDebounceTimer;
@@ -23,6 +24,8 @@ namespace SetupHub180Hz.Views
         public SetupAppsPage()
         {
             InitializeComponent();
+
+            BundlesItemsControl.ItemsSource = _bundleService.GetBundles();
 
             _searchDebounceTimer = new DispatcherTimer
             {
@@ -296,6 +299,108 @@ namespace SetupHub180Hz.Views
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Could not open website: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        private async void BundleInstall_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is AppBundle bundle)
+            {
+                if (bundle.IsInstalling) return;
+
+                bundle.IsInstalling = true;
+                bundle.ButtonContent = "⏳ Installing…";
+                int total = bundle.WingetIds.Count;
+                int ok = 0;
+
+                ActivityLogger.Instance.Log($"Starting bundle deployment: {bundle.Name} ({total} apps)", ActivityType.Info);
+
+                for (int i = 0; i < total; i++)
+                {
+                    var id = bundle.WingetIds[i];
+                    bundle.ProgressText = $"Installing {i + 1} of {total}: {id}…";
+
+                    ActivityLogger.Instance.Log($"Installing [{i + 1}/{total}] {id} from bundle '{bundle.Name}'…", ActivityType.Info);
+
+                    bool success = await _winget.InstallAsync(id);
+                    if (success)
+                    {
+                        ok++;
+                        ActivityLogger.Instance.Log($"Successfully installed {id}.", ActivityType.Success);
+                    }
+                    else
+                    {
+                        ActivityLogger.Instance.Log($"Failed to install {id}.", ActivityType.Error);
+                    }
+                }
+
+                bundle.ProgressText = $"Completed: {ok}/{total} installed";
+                bundle.ButtonContent = "⚡ Install All";
+                bundle.IsInstalling = false;
+
+                ActivityLogger.Instance.Log($"Bundle '{bundle.Name}' finished: {ok}/{total} succeeded.", ActivityType.Success);
+                NotificationService.Notify("Bundle installed", $"{bundle.Name}: {ok}/{total} succeeded");
+            }
+        }
+
+        private async void ImportInstall_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "JSON files (*.json)|*.json",
+                Title = "Import Software List"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                try
+                {
+                    var exporter = new AppListExportService();
+                    var importedApps = await exporter.ImportAsync(dlg.FileName);
+                    if (importedApps.Count == 0)
+                    {
+                        MessageBox.Show("No valid applications found in JSON file.", "Import Applications", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
+
+                    var confirm = MessageBox.Show($"Found {importedApps.Count} applications in list.\n\nDo you want to sequentially install missing packages now?", "Confirm Import & Install", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (confirm != MessageBoxResult.Yes) return;
+
+                    StatusText.Text = $"Installing imported packages (0/{importedApps.Count})…";
+                    StatusText.Visibility = Visibility.Visible;
+
+                    int ok = 0;
+                    int total = importedApps.Count;
+                    ActivityLogger.Instance.Log($"Starting imported list installation ({total} packages)…", ActivityType.Info);
+
+                    for (int i = 0; i < total; i++)
+                    {
+                        var app = importedApps[i];
+                        StatusText.Text = $"Installing imported app {i + 1}/{total}: {app.Name}…";
+                        ActivityLogger.Instance.Log($"Import installing [{i + 1}/{total}]: {app.Name} ({app.Id})", ActivityType.Info);
+
+                        bool success = await _winget.InstallAsync(app.Id);
+                        if (success)
+                        {
+                            ok++;
+                            ActivityLogger.Instance.Log($"Successfully installed {app.Name}.", ActivityType.Success);
+                        }
+                        else
+                        {
+                            ActivityLogger.Instance.Log($"Failed installing {app.Name}.", ActivityType.Error);
+                        }
+                    }
+
+                    StatusText.Visibility = Visibility.Collapsed;
+                    ActivityLogger.Instance.Log($"Import installation finished: {ok}/{total} succeeded.", ActivityType.Success);
+                    NotificationService.Notify("Import & Install Complete", $"{ok}/{total} packages installed successfully.");
+                    MessageBox.Show($"Import & Install completed!\n{ok} of {total} packages succeeded.", "Import Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    ActivityLogger.Instance.Log($"Import error: {ex.Message}", ActivityType.Error);
+                    MessageBox.Show($"Failed to import file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

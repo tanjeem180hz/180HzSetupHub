@@ -225,14 +225,15 @@
 
     <Grid Margin="32,24,32,28">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> <!-- Header -->
-            <RowDefinition Height="Auto"/> <!-- Search & Controls -->
-            <RowDefinition Height="Auto"/> <!-- Categories -->
-            <RowDefinition Height="*"/>    <!-- Apps List -->
+            <RowDefinition Height="Auto"/> <!-- 0: Header -->
+            <RowDefinition Height="Auto"/> <!-- 1: Quick Bundles -->
+            <RowDefinition Height="Auto"/> <!-- 2: Search & Controls -->
+            <RowDefinition Height="Auto"/> <!-- 3: Categories -->
+            <RowDefinition Height="*"/>    <!-- 4: Apps List -->
         </Grid.RowDefinitions>
 
         <!-- 1. Header Block -->
-        <Grid Grid.Row="0" Margin="0,0,0,18">
+        <Grid Grid.Row="0" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -260,10 +261,59 @@
             </StackPanel>
         </Grid>
 
-        <!-- 2. Search & Toolbar -->
-        <Grid Grid.Row="1" Margin="0,0,0,14">
+        <!-- 2. Curated Quick-Deploy Bundles -->
+        <Border Grid.Row="1" Margin="0,0,0,16">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Style="{StaticResource CleanScrollViewer}">
+                <ItemsControl x:Name="BundlesItemsControl">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource Card}" Width="280" Margin="0,0,12,0" Padding="14,12">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <!-- Bundle Title & Icon -->
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <TextBlock Text="{Binding IconEmoji}" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <!-- Bundle Description -->
+                                    <TextBlock Grid.Row="1" Text="{Binding Description}" FontSize="11" Foreground="{StaticResource BrushTextSecondary}"
+                                               TextWrapping="Wrap" Margin="0,0,0,8" LineHeight="16"/>
+
+                                    <!-- Progress indicator -->
+                                    <TextBlock Grid.Row="2" Text="{Binding ProgressText}" FontSize="11" FontWeight="SemiBold"
+                                               Foreground="{StaticResource BrushAccent}" TextTrimming="CharacterEllipsis"
+                                               Margin="0,0,0,6" Visibility="{Binding HasProgress, Converter={StaticResource BoolToVis}}"/>
+
+                                    <!-- Install All Button -->
+                                    <Button Grid.Row="3" Content="{Binding ButtonContent}" Style="{StaticResource AccentButton}"
+                                            Padding="14,6" FontSize="11" FontWeight="Bold"
+                                            IsEnabled="{Binding IsNotInstalling}"
+                                            Click="BundleInstall_Click"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 3. Search & Toolbar -->
+        <Grid Grid.Row="2" Margin="0,0,0,14">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
@@ -296,10 +346,16 @@
                     Style="{StaticResource OutlineButton}" Margin="8,0,0,0" Padding="14,10"
                     ToolTip="Search winget's full online repository for any software outside preset list"
                     Click="WingetSearch_Click"/>
+
+            <!-- Import & Install Action -->
+            <Button Grid.Column="3" Content="📥 Import &amp; Install"
+                    Style="{StaticResource OutlineButton}" Margin="8,0,0,0" Padding="14,10"
+                    ToolTip="Import software list from JSON and sequentially install missing apps"
+                    Click="ImportInstall_Click"/>
         </Grid>
 
-        <!-- 3. Novelty Category Filter Tabs (Horizontal Scrollable) -->
-        <Border Grid.Row="2" Margin="0,0,0,16">
+        <!-- 4. Novelty Category Filter Tabs (Horizontal Scrollable) -->
+        <Border Grid.Row="3" Margin="0,0,0,16">
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Style="{StaticResource CleanScrollViewer}">
                 <StackPanel x:Name="CategoryChipsPanel" Orientation="Horizontal" Margin="0,2,0,4">
                     <!-- Populated dynamically in code-behind with counts -->
@@ -307,8 +363,8 @@
             </ScrollViewer>
         </Border>
 
-        <!-- 4. Applications List with Native UI Virtualization -->
-        <Grid Grid.Row="3">
+        <!-- 5. Applications List with Native UI Virtualization -->
+        <Grid Grid.Row="4">
             <TextBlock x:Name="StatusText" Text="Loading software catalog…" Style="{StaticResource TextBody}"
                        HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0"/>
 
