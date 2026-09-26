@@ -1,2 +1,2 @@
-# WindowSetupHub
+# WindowsSetupHub
 Only for Windows Users.
