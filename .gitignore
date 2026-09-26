@@ -1,0 +1,23 @@
+# Build output and packages
+[Bb]in/
+[Oo]bj/
+artifacts/
+restore/
+
+# Compiled binaries
+*.exe
+*.dll
+*.pdb
+
+# Visual Studio / IDE cache
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs & temp files
+*.log
+*.tmp
+[Dd]ata/
