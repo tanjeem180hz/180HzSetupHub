@@ -32,6 +32,24 @@ public sealed class InstallerService
             AppName);
     }
 
+    public static string FormatDynamicSpeed(double bytesPerSec)
+    {
+        if (bytesPerSec <= 0) return "0 KB/s";
+        if (bytesPerSec >= 1024.0 * 1024.0 * 1024.0)
+        {
+            return $"{bytesPerSec / (1024.0 * 1024.0 * 1024.0):0.0} GB/s";
+        }
+        if (bytesPerSec >= 1024.0 * 1024.0)
+        {
+            return $"{bytesPerSec / (1024.0 * 1024.0):0.0} MB/s";
+        }
+        if (bytesPerSec >= 1024.0)
+        {
+            return $"{bytesPerSec / 1024.0:0.0} KB/s";
+        }
+        return $"{bytesPerSec:0} B/s";
+    }
+
     public async Task<bool> CheckAndInstallPrerequisitesAsync(Action<string, double>? progress = null, CancellationToken cancellationToken = default)
     {
         progress?.Invoke("Checking system prerequisites...", 5);
@@ -167,6 +185,91 @@ public sealed class InstallerService
         detailLog?.Invoke("Installation completed successfully.");
     }
 
+    public async Task RepairAsync(
+        string installRoot,
+        Action<string, double>? progress = null,
+        Action<string>? detailLog = null,
+        CancellationToken cancellationToken = default)
+    {
+        detailLog?.Invoke("Starting 180Hz Setup Hub comprehensive repair & diagnosis...");
+        progress?.Invoke("Stopping active instances...", 5);
+
+        var targetExe = Path.Combine(installRoot, InstalledExeName);
+        StopExistingApp(targetExe);
+
+        // 1. Verify and repair system prerequisites (winget, script policy) (10% - 25%)
+        progress?.Invoke("Repairing system prerequisites and winget...", 10);
+        await CheckAndInstallPrerequisitesAsync(progress, cancellationToken);
+
+        // 2. Prepare directories and clean corrupt temp files (28%)
+        progress?.Invoke("Cleaning temporary files & verifying directories...", 28);
+        var configDir = Path.Combine(installRoot, "Configuration");
+        Directory.CreateDirectory(installRoot);
+        Directory.CreateDirectory(configDir);
+        CleanCorruptTempFiles(installRoot);
+
+        // 3. Reinstall fresh application executable with live speed (30% - 85%)
+        detailLog?.Invoke("Re-deploying fresh application binary package...");
+        await EnsureAppPackageAsync(targetExe, progress, detailLog, cancellationToken);
+
+        // 4. Restore configuration catalog to repair any corrupt database (86% - 89%)
+        progress?.Invoke("Restoring default package catalogs...", 86);
+        ExtractResourceToFile(PayloadPackages, Path.Combine(configDir, "packages.default.json"));
+        ExtractResourceToFile(PayloadAppSettings, Path.Combine(configDir, "appsettings.default.json"));
+
+        // 5. Ensure uninstaller binary is healthy (90%)
+        var uninstallerTarget = Path.Combine(installRoot, UninstallerExeName);
+        try
+        {
+            var currentExe = Program.GetCurrentProcessPath();
+            if (!string.IsNullOrEmpty(currentExe) && File.Exists(currentExe) &&
+                !string.Equals(currentExe, uninstallerTarget, StringComparison.OrdinalIgnoreCase))
+            {
+                File.Copy(currentExe, uninstallerTarget, overwrite: true);
+            }
+        }
+        catch { }
+
+        // 6. Repair shortcuts (92%)
+        progress?.Invoke("Repairing desktop and start menu shortcuts...", 92);
+        RemoveShortcuts();
+        CreateShortcuts(targetExe, installRoot, createDesktopShortcut: true);
+
+        // 7. Refresh registry registration (96%)
+        progress?.Invoke("Refreshing Windows Registry configuration...", 96);
+        RegisterUninstall(installRoot, targetExe);
+
+        progress?.Invoke("Repair complete! Application is healthy.", 100);
+        detailLog?.Invoke("Repair process finished successfully.");
+    }
+
+    private static void CleanCorruptTempFiles(string installRoot)
+    {
+        try
+        {
+            if (Directory.Exists(installRoot))
+            {
+                foreach (var tmp in Directory.GetFiles(installRoot, "*.tmp*", SearchOption.TopDirectoryOnly))
+                {
+                    try { File.Delete(tmp); } catch { }
+                }
+
+                var dataDownloads = Path.Combine(installRoot, "Data", "downloads");
+                if (Directory.Exists(dataDownloads))
+                {
+                    foreach (var tmp in Directory.GetFiles(dataDownloads, "*.tmp", SearchOption.TopDirectoryOnly))
+                    {
+                        try { File.Delete(tmp); } catch { }
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Best effort
+        }
+    }
+
     public async Task EnsureAppPackageAsync(
         string destinationExe,
         Action<string, double>? progress = null,
@@ -190,7 +293,7 @@ public sealed class InstallerService
         }
 
         detailLog?.Invoke($"Downloading 180Hz Setup Hub from: {downloadUrl}");
-        progress?.Invoke("Connecting to download server...", 32);
+        progress?.Invoke("Connecting to download server...", 30);
 
         // Enable modern TLS protocols
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | (SecurityProtocolType)3072;
@@ -228,22 +331,40 @@ public sealed class InstallerService
                         long totalRead = 0;
                         int bytesRead;
 
+                        var stopwatch = Stopwatch.StartNew();
+                        var lastSampleMs = stopwatch.ElapsedMilliseconds;
+                        var lastSampleBytes = 0L;
+                        var currentSpeedFormatted = "0 KB/s";
+
                         while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
                         {
                             await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
                             totalRead += bytesRead;
 
+                            var elapsedMs = stopwatch.ElapsedMilliseconds;
+                            if (elapsedMs - lastSampleMs >= 200)
+                            {
+                                var deltaSec = (elapsedMs - lastSampleMs) / 1000.0;
+                                var deltaBytes = totalRead - lastSampleBytes;
+                                if (deltaSec > 0)
+                                {
+                                    var bytesPerSec = deltaBytes / deltaSec;
+                                    currentSpeedFormatted = FormatDynamicSpeed(bytesPerSec);
+                                }
+                                lastSampleMs = elapsedMs;
+                                lastSampleBytes = totalRead;
+                            }
+
                             if (totalBytes > 0)
                             {
                                 var pct = 30.0 + ((double)totalRead / totalBytes) * 55.0; // 30% to 85%
-                                progress?.Invoke($"Installing app package {(int)pct}%...", pct);
+                                progress?.Invoke($"Installing app package {(int)pct}% ({currentSpeedFormatted})...", pct);
                             }
                             else
                             {
-                                // Pseudo progress for chunked transfer without Content-Length
                                 var mbRead = totalRead / (1024.0 * 1024.0);
                                 var pseudoPct = Math.Min(84.0, 30.0 + mbRead * 0.7);
-                                progress?.Invoke($"Downloading app package ({mbRead:F1} MB)...", pseudoPct);
+                                progress?.Invoke($"Downloading app package ({mbRead:F1} MB • {currentSpeedFormatted})...", pseudoPct);
                             }
                         }
                     }
@@ -331,6 +452,11 @@ public sealed class InstallerService
         var sourceInfo = new FileInfo(sourceFile);
         var totalBytes = sourceInfo.Length;
 
+        var stopwatch = Stopwatch.StartNew();
+        var lastSampleMs = stopwatch.ElapsedMilliseconds;
+        var lastSampleBytes = 0L;
+        var currentSpeedFormatted = "0 MB/s";
+
         using (var sourceStream = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, useAsync: true))
         using (var destStream = new FileStream(tempTarget, FileMode.Create, FileAccess.Write, FileShare.None, 65536, useAsync: true))
         {
@@ -343,8 +469,22 @@ public sealed class InstallerService
                 await destStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
                 totalRead += bytesRead;
 
+                var elapsedMs = stopwatch.ElapsedMilliseconds;
+                if (elapsedMs - lastSampleMs >= 200)
+                {
+                    var deltaSec = (elapsedMs - lastSampleMs) / 1000.0;
+                    var deltaBytes = totalRead - lastSampleBytes;
+                    if (deltaSec > 0)
+                    {
+                        var bytesPerSec = deltaBytes / deltaSec;
+                        currentSpeedFormatted = FormatDynamicSpeed(bytesPerSec);
+                    }
+                    lastSampleMs = elapsedMs;
+                    lastSampleBytes = totalRead;
+                }
+
                 var pct = startPercent + ((double)totalRead / totalBytes) * (endPercent - startPercent);
-                progress?.Invoke($"Installing app package {(int)pct}%...", pct);
+                progress?.Invoke($"Installing app package {(int)pct}% ({currentSpeedFormatted})...", pct);
             }
         }
 
@@ -531,7 +671,7 @@ public sealed class InstallerService
             key.SetValue("UninstallString", $"\"{uninstallerPath}\" --uninstall");
             key.SetValue("QuietUninstallString", $"\"{uninstallerPath}\" --uninstall --silent");
             key.SetValue("NoModify", 1, RegistryValueKind.DWord);
-            key.SetValue("NoRepair", 1, RegistryValueKind.DWord);
+            key.SetValue("NoRepair", 0, RegistryValueKind.DWord); // Allow repair in Windows Settings
 
             var exeInfo = new FileInfo(targetExe);
             if (exeInfo.Exists)

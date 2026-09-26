@@ -5,13 +5,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace WinSetupHub.Setup;
 
 public partial class UninstallerWindow : Window
 {
+    private readonly InstallerService _installer = new();
     private bool _isUninstalling = false;
-    private bool _isCompleted = false;
+    private bool _isRepairing = false;
+    private bool _isUninstallCompleted = false;
+    private bool _isRepairCompleted = false;
 
     public UninstallerWindow()
     {
@@ -28,27 +32,115 @@ public partial class UninstallerWindow : Window
 
     private void BtnClose_Click(object sender, RoutedEventArgs e)
     {
-        Close();
+        ConfirmClose();
     }
 
     private void BtnCancel_Click(object sender, RoutedEventArgs e)
     {
-        Close();
+        ConfirmClose();
     }
 
-    private async void BtnUninstall_Click(object sender, RoutedEventArgs e)
+    private void ConfirmClose()
     {
-        if (_isCompleted)
+        if (_isUninstallCompleted || _isRepairCompleted)
         {
             Close();
             return;
         }
 
-        if (_isUninstalling) return;
+        if (_isUninstalling || _isRepairing)
+        {
+            var opName = _isRepairing ? "Repair" : "Uninstallation";
+            var res = MessageBox.Show(
+                $"{opName} is currently in progress. Are you sure you want to cancel?",
+                "180Hz Setup Hub",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+            if (res != MessageBoxResult.Yes) return;
+        }
 
-        _isUninstalling = true;
+        Close();
+    }
+
+    private async void BtnRepair_Click(object sender, RoutedEventArgs e)
+    {
+        if (_isRepairCompleted)
+        {
+            LaunchInstalledApp();
+            Close();
+            return;
+        }
+
+        if (_isRepairing || _isUninstalling) return;
+
+        _isRepairing = true;
+        BtnRepair.Visibility = Visibility.Collapsed;
         BtnUninstall.Visibility = Visibility.Collapsed;
         BtnCancel.IsEnabled = true;
+
+        if (FindResource("WindowsBlueBrush") is Brush blueBrush)
+        {
+            UninstallProgressBar.Foreground = blueBrush;
+        }
+
+        UninstallProgressBar.Value = 0;
+        TxtUninstallStatus.Text = "Initializing repair process 0%...";
+
+        var installRoot = InstallerService.GetDefaultInstallRoot();
+
+        try
+        {
+            await _installer.RepairAsync(
+                installRoot,
+                progress: (status, percent) =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        UninstallProgressBar.Value = percent;
+                        TxtUninstallStatus.Text = status;
+                    });
+                },
+                detailLog: null);
+
+            _isRepairCompleted = true;
+            _isRepairing = false;
+
+            TxtUninstallStatus.Text = "Repair complete! 180Hz Setup Hub is healthy.";
+            UninstallProgressBar.Value = 100;
+            BtnRepair.Content = "Launch";
+            BtnRepair.Visibility = Visibility.Visible;
+            BtnCancel.Content = "Close";
+        }
+        catch (Exception ex)
+        {
+            _isRepairing = false;
+            TxtUninstallStatus.Text = $"Repair failed: {ex.Message}";
+            BtnRepair.Content = "Retry";
+            BtnRepair.Visibility = Visibility.Visible;
+            BtnUninstall.Visibility = Visibility.Visible;
+            BtnCancel.IsEnabled = true;
+        }
+    }
+
+    private async void BtnUninstall_Click(object sender, RoutedEventArgs e)
+    {
+        if (_isUninstallCompleted)
+        {
+            Close();
+            return;
+        }
+
+        if (_isUninstalling || _isRepairing) return;
+
+        _isUninstalling = true;
+        BtnRepair.Visibility = Visibility.Collapsed;
+        BtnUninstall.Visibility = Visibility.Collapsed;
+        BtnCancel.IsEnabled = true;
+
+        if (FindResource("WindowsRedBrush") is Brush redBrush)
+        {
+            UninstallProgressBar.Foreground = redBrush;
+        }
 
         var installRoot = InstallerService.GetDefaultInstallRoot();
         var currentExe = Program.GetCurrentProcessPath();
@@ -136,7 +228,7 @@ public partial class UninstallerWindow : Window
                 }
             });
 
-            _isCompleted = true;
+            _isUninstallCompleted = true;
             _isUninstalling = false;
             TxtUninstallStatus.Text = "Uninstallation complete";
             UninstallProgressBar.Value = 100;
@@ -147,6 +239,27 @@ public partial class UninstallerWindow : Window
             _isUninstalling = false;
             TxtUninstallStatus.Text = $"Error: {ex.Message}";
             BtnCancel.IsEnabled = true;
+        }
+    }
+
+    private void LaunchInstalledApp()
+    {
+        try
+        {
+            var installRoot = InstallerService.GetDefaultInstallRoot();
+            var exePath = Path.Combine(installRoot, InstallerService.InstalledExeName);
+            if (File.Exists(exePath))
+            {
+                Process.Start(new ProcessStartInfo(exePath)
+                {
+                    UseShellExecute = true,
+                    WorkingDirectory = installRoot
+                });
+            }
+        }
+        catch
+        {
+            // Best effort
         }
     }
 }

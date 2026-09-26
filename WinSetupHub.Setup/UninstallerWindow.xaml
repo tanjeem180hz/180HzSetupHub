@@ -13,13 +13,54 @@
 
     <Window.Resources>
         <Color x:Key="WindowsBlueColor">#0078D7</Color>
+        <Color x:Key="WindowsBlueHoverColor">#1084E3</Color>
+        <Color x:Key="WindowsBluePressedColor">#006CBE</Color>
         <Color x:Key="WindowsRedColor">#D13438</Color>
         <Color x:Key="WindowsRedHoverColor">#E81123</Color>
+        <Color x:Key="WindowsRedPressedColor">#A80000</Color>
 
         <SolidColorBrush x:Key="WindowsBlueBrush" Color="{StaticResource WindowsBlueColor}" />
+        <SolidColorBrush x:Key="WindowsBlueHoverBrush" Color="{StaticResource WindowsBlueHoverColor}" />
+        <SolidColorBrush x:Key="WindowsBluePressedBrush" Color="{StaticResource WindowsBluePressedColor}" />
         <SolidColorBrush x:Key="WindowsRedBrush" Color="{StaticResource WindowsRedColor}" />
         <SolidColorBrush x:Key="WindowsRedHoverBrush" Color="{StaticResource WindowsRedHoverColor}" />
+        <SolidColorBrush x:Key="WindowsRedPressedBrush" Color="{StaticResource WindowsRedPressedColor}" />
 
+        <!-- Windows Standard Primary Button Style (Blue - for Repair / Launch) -->
+        <Style x:Key="WinPrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource WindowsBlueBrush}" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Width" Value="94" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource WindowsBlueHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource WindowsBluePressedBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.5" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Danger Button Style (Red - for Uninstall) -->
         <Style x:Key="WinDangerButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource WindowsRedBrush}" />
             <Setter Property="Foreground" Value="#FFFFFF" />
@@ -38,6 +79,9 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="{StaticResource WindowsRedHoverBrush}" />
                             </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{StaticResource WindowsRedPressedBrush}" />
+                            </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="border" Property="Opacity" Value="0.5" />
                                 <Setter Property="Cursor" Value="Arrow" />
@@ -48,6 +92,7 @@
             </Setter>
         </Style>
 
+        <!-- Secondary Button Style (Cancel / Close) -->
         <Style x:Key="WinSecondaryButton" TargetType="Button">
             <Setter Property="Background" Value="#E1E1E1" />
             <Setter Property="Foreground" Value="#1A1A1A" />
@@ -71,6 +116,9 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="#E5E5E5" />
                                 <Setter TargetName="border" Property="BorderBrush" Value="#999999" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#CCCCCC" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="border" Property="Opacity" Value="0.5" />
@@ -157,7 +205,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" VerticalAlignment="Top">
-                    <TextBlock Text="Uninstall 180Hz Setup Hub?"
+                    <TextBlock Text="Modify 180Hz Setup Hub"
                                FontSize="23"
                                FontWeight="Normal"
                                Foreground="#1A1A1A"
@@ -180,9 +228,9 @@
                     <TextBlock Text="Publisher: 180Hz" FontSize="12" Foreground="#333333" Margin="0,0,0,1" />
                     <TextBlock Text="Version: 1.0.0.0" FontSize="12" Foreground="#333333" Margin="0,0,0,12" />
 
-                    <TextBlock Text="Notice:" FontSize="12" FontWeight="SemiBold" Foreground="#222222" Margin="0,0,0,3" />
-                    <TextBlock Text="• Removes the application and its local shortcuts" FontSize="11.5" Foreground="#666666" Margin="0,0,0,2" />
-                    <TextBlock Text="• Preserves user downloaded packages if requested" FontSize="11.5" Foreground="#666666" />
+                    <TextBlock Text="Available actions:" FontSize="12" FontWeight="SemiBold" Foreground="#222222" Margin="0,0,0,3" />
+                    <TextBlock Text="• Repair: Reinstalls fresh files, repairs bugs, restores config and shortcuts" FontSize="11.5" Foreground="#666666" Margin="0,0,0,2" />
+                    <TextBlock Text="• Uninstall: Cleanly removes the application and shortcuts from your PC" FontSize="11.5" Foreground="#666666" />
                 </StackPanel>
 
                 <!-- Right Square App Tile -->
@@ -202,7 +250,7 @@
             <!-- Progress Section -->
             <StackPanel Grid.Row="2" Margin="32,0,32,10">
                 <TextBlock x:Name="TxtUninstallStatus"
-                           Text="Ready to uninstall"
+                           Text="Ready to repair or uninstall"
                            FontSize="12"
                            Foreground="#333333"
                            Margin="0,0,0,6" />
@@ -213,13 +261,19 @@
                              Maximum="100"
                              Value="0"
                              Background="#E6E6E6"
-                             Foreground="{StaticResource WindowsRedBrush}"
+                             Foreground="{StaticResource WindowsBlueBrush}"
                              BorderThickness="0" />
             </StackPanel>
 
-            <!-- Bottom Row: Buttons -->
+            <!-- Bottom Row: Buttons (Repair, Uninstall, Cancel) -->
             <Grid Grid.Row="3" Margin="32,0,32,16" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button x:Name="BtnRepair"
+                            Style="{StaticResource WinPrimaryButton}"
+                            Content="Repair"
+                            Margin="0,0,10,0"
+                            Click="BtnRepair_Click" />
+
                     <Button x:Name="BtnUninstall"
                             Style="{StaticResource WinDangerButton}"
                             Content="Uninstall"
