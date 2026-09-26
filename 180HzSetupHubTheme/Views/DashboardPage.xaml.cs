@@ -18,11 +18,18 @@ namespace SetupHub180Hz.Views
 
         private async System.Threading.Tasks.Task LoadSummaryAsync()
         {
+            RefreshSummaryButton.IsEnabled = false;
+            UpdateSummaryText.Text = "Checking for updates…";
+
             if (!await _winget.IsAvailableAsync())
             {
                 UpdateSummaryText.Text = "winget not found on this system.";
+                EngineStatusText.Text = "WINGET MISSING";
+                RefreshSummaryButton.IsEnabled = true;
                 return;
             }
+
+            EngineStatusText.Text = "ENGINE READY";
 
             var upgradable = await _winget.GetUpgradableAppsAsync();
             UpdateSummaryText.Text = upgradable.Count == 0
@@ -30,7 +37,10 @@ namespace SetupHub180Hz.Views
                 : $"{upgradable.Count} update-ready app(s) found.";
 
             _mainWindow.SetStatus(upgradable.Count == 0 ? "Up to date" : $"{upgradable.Count} update(s) available");
+            RefreshSummaryButton.IsEnabled = true;
         }
+
+        private async void RefreshSummary_Click(object sender, RoutedEventArgs e) => await LoadSummaryAsync();
 
         private void TileSetupApps_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("SetupApps");
         private void TileUpdateCenter_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("UpdateCenter");
