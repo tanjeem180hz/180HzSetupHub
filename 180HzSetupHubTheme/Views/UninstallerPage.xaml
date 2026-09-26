@@ -1,37 +1,226 @@
 <UserControl x:Class="SetupHub180Hz.Views.UninstallerPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Margin="28">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Text="Uninstaller" Style="{StaticResource TextHeader}"/>
-            <TextBlock Text="All apps currently installed on this system." Style="{StaticResource TextBody}" Margin="0,4,0,16"/>
-        </StackPanel>
+    <UserControl.Resources>
+        <!-- Danger / Uninstall Button Style -->
+        <Style x:Key="DangerOutlineButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BrushError}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{StaticResource BrushError}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#25F0556B"/>
+                                <Setter Property="Foreground" Value="#FFA4B2"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#40F0556B"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-        <Grid Grid.Row="1" Margin="0,0,0,16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}"
-                    BorderThickness="1" CornerRadius="6">
-                <TextBox x:Name="FilterBox" Background="Transparent" BorderThickness="0" Foreground="{StaticResource BrushTextPrimary}"
-                         CaretBrush="{StaticResource BrushAccent}" FontFamily="{StaticResource AppFont}" FontSize="13"
-                         Padding="10,8" VerticalContentAlignment="Center" TextChanged="FilterBox_TextChanged"/>
-            </Border>
-            <Button Grid.Column="1" Content="Refresh" Style="{StaticResource OutlineButton}" Margin="8,0,0,0" Click="Refresh_Click"/>
+        <Style x:Key="ConfirmDangerButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{StaticResource BrushError}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="18,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#FF6D82"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#D63A50"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="32,24,32,28">
+        <!-- Main Layout -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Header -->
+                <RowDefinition Height="Auto"/> <!-- Search & Controls -->
+                <RowDefinition Height="*"/>    <!-- Apps List -->
+            </Grid.RowDefinitions>
+
+            <!-- 1. Header Block -->
+            <Grid Grid.Row="0" Margin="0,0,0,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                        <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
+                            <TextBlock Text="⚡ 180Hz PRO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                        </Border>
+                        <TextBlock Text="SYSTEM UNINSTALL MANAGER" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Uninstaller" Style="{StaticResource TextHeader}" FontSize="26"/>
+                    <TextBlock Text="Inspect installed software with exact logo, disk footprint, and safe confirmed removal." Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <!-- Installed Count Badge -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="8" Padding="14,8">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="8" Height="8" Fill="{StaticResource BrushSuccess}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="InstalledCountText" Text="Scanning installed apps…" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- 2. Search & Filter -->
+            <Grid Grid.Row="1" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="🔍" FontSize="12" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource BrushTextSecondary}"/>
+                        <TextBox x:Name="FilterBox" Grid.Column="1" Background="Transparent" BorderThickness="0"
+                                 Foreground="{StaticResource BrushTextPrimary}" CaretBrush="{StaticResource BrushAccent}"
+                                 FontFamily="{StaticResource AppFont}" FontSize="13" Padding="10,10"
+                                 VerticalContentAlignment="Center" TextChanged="FilterBox_TextChanged"/>
+                        <Button x:Name="ClearFilterButton" Grid.Column="2" Content="✕"
+                                Background="Transparent" BorderThickness="0" Foreground="{StaticResource BrushTextSecondary}"
+                                Padding="10,0" Cursor="Hand" Visibility="Collapsed" Click="ClearFilter_Click"/>
+                    </Grid>
+                </Border>
+
+                <Button Grid.Column="1" Content="🔄 Rescan" Style="{StaticResource OutlineButton}" Margin="8,0,0,0" Padding="16,10" Click="Refresh_Click"/>
+            </Grid>
+
+            <!-- 3. Installed Apps List with Virtualization -->
+            <Grid Grid.Row="2">
+                <TextBlock x:Name="StatusText" Text="Loading installed applications…" Style="{StaticResource TextBody}"
+                           HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0"/>
+
+                <ScrollViewer Style="{StaticResource CleanScrollViewer}">
+                    <ItemsControl x:Name="ResultsList" VirtualizingStackPanel.IsVirtualizing="True"
+                                  VirtualizingStackPanel.VirtualizationMode="Recycling">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
         </Grid>
 
-        <Grid Grid.Row="2">
-            <TextBlock x:Name="StatusText" Text="Loading installed apps…" Style="{StaticResource TextBody}"/>
-            <ScrollViewer Style="{StaticResource CleanScrollViewer}">
-                <ItemsControl x:Name="ResultsList"/>
-            </ScrollViewer>
+        <!-- 4. Modern In-App Warning & Confirmation Dialog Overlay -->
+        <Grid x:Name="WarningOverlay" Visibility="Collapsed" Background="#D9070A10">
+            <Border Style="{StaticResource Card}" CornerRadius="12" Padding="28" MaxWidth="520"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect Color="#000000" BlurRadius="30" ShadowDepth="8" Opacity="0.7"/>
+                </Border.Effect>
+
+                <StackPanel>
+                    <!-- Warning Icon & Title -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                        <Border Width="38" Height="38" CornerRadius="19" Background="#2DF0556B" Margin="0,0,12,0" VerticalAlignment="Center">
+                            <TextBlock Text="⚠️" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="CONFIRM UNINSTALLATION" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushError}"/>
+                            <TextBlock Text="Are you sure you want to proceed?" FontSize="18" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- App Preview Card -->
+                    <Border Background="{StaticResource BrushBackground}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Dialog Logo -->
+                            <Border x:Name="DialogLogoBorder" Width="42" Height="42" CornerRadius="8" Background="{StaticResource BrushSurface}"
+                                    BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" Margin="0,0,12,0" ClipToBounds="True">
+                                <Grid x:Name="DialogLogoGrid">
+                                    <TextBlock x:Name="DialogFallbackInitial" Text="A" FontSize="18" FontWeight="Bold"
+                                               Foreground="{StaticResource BrushAccent}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Dialog Details -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock x:Name="DialogAppNameText" Text="App Name" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource BrushTextPrimary}"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                    <TextBlock x:Name="DialogVersionText" Text="🏷️ v1.0.0" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,0,10,0"/>
+                                    <TextBlock x:Name="DialogSizeText" Text="💾 120 MB" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,0,10,0"/>
+                                    <TextBlock x:Name="DialogIdText" Text="App.Id" FontSize="11" Foreground="{StaticResource BrushTextSecondary}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Warning Details -->
+                    <TextBlock Text="This action will permanently uninstall this application and may purge its associated local configs and registry settings from Windows."
+                               Style="{StaticResource TextBody}" LineHeight="18" Margin="0,0,0,24"/>
+
+                    <!-- Action Buttons -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Content="Cancel" Style="{StaticResource OutlineButton}" Grid.Column="1" Margin="0,0,10,0" Padding="18,8" Click="CancelUninstall_Click"/>
+                        <Button x:Name="ConfirmUninstallButton" Content="Yes, Uninstall" Style="{StaticResource ConfirmDangerButton}" Grid.Column="2" Click="ConfirmUninstall_Click"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </UserControl>

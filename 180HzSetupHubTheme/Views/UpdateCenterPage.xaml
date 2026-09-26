@@ -10,7 +10,8 @@
 
         <StackPanel Grid.Row="0">
             <TextBlock Text="Update Center" Style="{StaticResource TextHeader}"/>
-            <TextBlock Text="Apps with a newer version available, via winget." Style="{StaticResource TextBody}" Margin="0,4,0,16"/>
+            <TextBlock Text="Keep your applications up to date with the latest versions and security patches."
+                       Style="{StaticResource TextBody}" Margin="0,4,0,16"/>
         </StackPanel>
 
         <Grid Grid.Row="1" Margin="0,0,0,16">
@@ -20,9 +21,9 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="SummaryText" Text="Checking for updates…" VerticalAlignment="Center"
-                       Style="{StaticResource TextBody}"/>
-            <Button Grid.Column="1" Content="Refresh" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Click="Refresh_Click"/>
-            <Button x:Name="UpgradeAllButton" Grid.Column="2" Content="Upgrade All" Style="{StaticResource AccentButton}" Click="UpgradeAll_Click"/>
+                       Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
+            <Button Grid.Column="1" Content="🔄 Refresh" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Click="Refresh_Click"/>
+            <Button x:Name="UpgradeAllButton" Grid.Column="2" Content="⚡ Upgrade All" Style="{StaticResource AccentButton}" Click="UpgradeAll_Click"/>
         </Grid>
 
         <ScrollViewer Grid.Row="2" Style="{StaticResource CleanScrollViewer}">

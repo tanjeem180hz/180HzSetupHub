@@ -46,8 +46,33 @@ namespace SetupHub180Hz.Services
             return ParseTable(output);
         }
 
-        public Task<bool> InstallAsync(string id, Action<string>? onOutputLine = null) =>
-            RunActionAsync($"install --id \"{id}\" -e --silent --accept-package-agreements --accept-source-agreements", onOutputLine);
+        public async Task<bool> InstallAsync(string id, string? source = null, Action<string>? onOutputLine = null)
+        {
+            if (id.Equals("Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo("ms-windows-store://") { UseShellExecute = true });
+                    onOutputLine?.Invoke("Opened Microsoft Store.");
+                    return true;
+                }
+                catch
+                {
+                    // Fallback to winget install
+                }
+            }
+
+            var srcArg = !string.IsNullOrWhiteSpace(source) && !source.Equals("winget", StringComparison.OrdinalIgnoreCase)
+                ? $"--source \"{source}\" "
+                : "";
+
+            var success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --accept-package-agreements --accept-source-agreements", onOutputLine);
+            if (!success)
+            {
+                success = await RunActionAsync($"install \"{id}\" {srcArg}--silent --accept-package-agreements --accept-source-agreements", onOutputLine);
+            }
+            return success;
+        }
 
         public Task<bool> UpgradeAsync(string id, Action<string>? onOutputLine = null) =>
             RunActionAsync($"upgrade --id \"{id}\" -e --silent --accept-package-agreements --accept-source-agreements", onOutputLine);
@@ -55,8 +80,15 @@ namespace SetupHub180Hz.Services
         public Task<bool> UpgradeAllAsync(Action<string>? onOutputLine = null) =>
             RunActionAsync("upgrade --all --silent --accept-package-agreements --accept-source-agreements", onOutputLine);
 
-        public Task<bool> UninstallAsync(string id, Action<string>? onOutputLine = null) =>
-            RunActionAsync($"uninstall --id \"{id}\" -e --silent --accept-source-agreements", onOutputLine);
+        public async Task<bool> UninstallAsync(string id, Action<string>? onOutputLine = null)
+        {
+            var success = await RunActionAsync($"uninstall --id \"{id}\" -e --silent --accept-source-agreements", onOutputLine);
+            if (!success)
+            {
+                success = await RunActionAsync($"uninstall --id \"{id}\" --silent --accept-source-agreements", onOutputLine);
+            }
+            return success;
+        }
 
         // ---- internals ----
 
