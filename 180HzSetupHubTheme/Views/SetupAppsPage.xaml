@@ -1,37 +1,182 @@
 <UserControl x:Class="SetupHub180Hz.Views.SetupAppsPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Margin="28">
+
+    <UserControl.Resources>
+        <!-- Category Filter Chip Style -->
+        <Style x:Key="CategoryChip" TargetType="{x:Type RadioButton}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="GroupName" Value="AppCategories"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="16"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource BrushSurfaceHover}"/>
+                                <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource BrushSurface}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter Property="Foreground" Value="{StaticResource BrushAccent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Web link button style -->
+        <Style x:Key="WebLinkButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource BrushSurfaceHover}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
+                                <Setter Property="Foreground" Value="{StaticResource BrushAccent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="32,24,32,28">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="Auto"/> <!-- Search & Controls -->
+            <RowDefinition Height="Auto"/> <!-- Categories -->
+            <RowDefinition Height="*"/>    <!-- Apps List -->
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Text="Setup Apps" Style="{StaticResource TextHeader}"/>
-            <TextBlock Text="Search winget's catalog and install apps in one click." Style="{StaticResource TextBody}" Margin="0,4,0,16"/>
-        </StackPanel>
-
-        <Grid Grid.Row="1" Margin="0,0,0,16">
+        <!-- 1. Header Block -->
+        <Grid Grid.Row="0" Margin="0,0,0,18">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}"
-                    BorderThickness="1" CornerRadius="6">
-                <TextBox x:Name="SearchBox" Background="Transparent" BorderThickness="0" Foreground="{StaticResource BrushTextPrimary}"
-                         CaretBrush="{StaticResource BrushAccent}" FontFamily="{StaticResource AppFont}" FontSize="13"
-                         Padding="10,8" VerticalContentAlignment="Center" KeyDown="SearchBox_KeyDown"/>
-            </Border>
-            <Button Grid.Column="1" Content="Search" Style="{StaticResource AccentButton}" Margin="8,0,0,0" Click="Search_Click"/>
+
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                    <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
+                        <TextBlock Text="⚡ 180Hz PRO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                    </Border>
+                    <TextBlock Text="SOFTWARE DEPLOYMENT CATALOG" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="Setup Apps" Style="{StaticResource TextHeader}" FontSize="26"/>
+                <TextBlock Text="Explore 400+ curated packages or search the entire web &amp; winget ecosystem." Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <!-- Stats Badge -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="8" Padding="14,8">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="8" Height="8" Fill="{StaticResource BrushSuccess}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="CatalogCountText" Text="405 Packages Ready" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="2">
-            <TextBlock x:Name="StatusText" Text="Search for an app to get started." Style="{StaticResource TextBody}"
-                       HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <ScrollViewer Style="{StaticResource CleanScrollViewer}">
-                <ItemsControl x:Name="ResultsList"/>
+        <!-- 2. Search & Toolbar -->
+        <Grid Grid.Row="1" Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Search Input -->
+            <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="🔍" FontSize="12" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource BrushTextSecondary}"/>
+                    <TextBox x:Name="SearchBox" Grid.Column="1" Background="Transparent" BorderThickness="0"
+                             Foreground="{StaticResource BrushTextPrimary}" CaretBrush="{StaticResource BrushAccent}"
+                             FontFamily="{StaticResource AppFont}" FontSize="13" Padding="10,10"
+                             VerticalContentAlignment="Center" KeyDown="SearchBox_KeyDown"
+                             TextChanged="SearchBox_TextChanged"/>
+                    <Button x:Name="ClearSearchButton" Grid.Column="2" Content="✕"
+                            Background="Transparent" BorderThickness="0" Foreground="{StaticResource BrushTextSecondary}"
+                            Padding="10,0" Cursor="Hand" Visibility="Collapsed" Click="ClearSearch_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Search Catalog Action -->
+            <Button Grid.Column="1" Content="Filter" Style="{StaticResource AccentButton}" Margin="8,0,0,0" Padding="18,10" Click="Search_Click"/>
+
+            <!-- Winget Live Web Search Action -->
+            <Button x:Name="WingetSearchButton" Grid.Column="2" Content="🌐 Deep Web Search"
+                    Style="{StaticResource OutlineButton}" Margin="8,0,0,0" Padding="14,10"
+                    ToolTip="Search winget's full online repository for any software outside preset list"
+                    Click="WingetSearch_Click"/>
+        </Grid>
+
+        <!-- 3. Novelty Category Filter Tabs (Horizontal Scrollable) -->
+        <Border Grid.Row="2" Margin="0,0,0,16">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Style="{StaticResource CleanScrollViewer}">
+                <StackPanel x:Name="CategoryChipsPanel" Orientation="Horizontal" Margin="0,2,0,4">
+                    <!-- Populated dynamically in code-behind with counts -->
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 4. Applications List with Virtualization -->
+        <Grid Grid.Row="3">
+            <TextBlock x:Name="StatusText" Text="Loading software catalog…" Style="{StaticResource TextBody}"
+                       HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0"/>
+
+            <ScrollViewer x:Name="AppsScrollViewer" Style="{StaticResource CleanScrollViewer}">
+                <ItemsControl x:Name="ResultsList" VirtualizingStackPanel.IsVirtualizing="True"
+                              VirtualizingStackPanel.VirtualizationMode="Recycling">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
             </ScrollViewer>
         </Grid>
     </Grid>

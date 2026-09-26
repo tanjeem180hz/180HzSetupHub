@@ -6,7 +6,10 @@
         "description":  "Privacy-focused Chromium browser with tracker blocking.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=brave.com\u0026sz=128",
         "accentColor":  "#FB542B",
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://brave.com",
+        "version":  "v1.70.117",
+        "size":  "118 MB"
     },
     {
         "id":  "Hibbiki.Chromium",
@@ -16,7 +19,10 @@
         "description":  "Open-source Chromium browser build for testing.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=chromium.org\u0026sz=128",
         "accentColor":  "#4A90E2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://chromium.org",
+        "version":  "v10.2.1",
+        "size":  "103 MB"
     },
     {
         "id":  "Mozilla.Firefox.DeveloperEdition",
@@ -26,7 +32,10 @@
         "description":  "Firefox build tuned for web development and testing.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mozilla.org\u0026sz=128",
         "accentColor":  "#FF7139",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mozilla.org",
+        "version":  "v3.5.7",
+        "size":  "102 MB"
     },
     {
         "id":  "Mozilla.Firefox.ESR",
@@ -36,7 +45,10 @@
         "description":  "Extended support Firefox release for stable environments.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mozilla.org\u0026sz=128",
         "accentColor":  "#FF7139",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mozilla.org",
+        "version":  "v3.15.2",
+        "size":  "94 MB"
     },
     {
         "id":  "Ablaze.Floorp",
@@ -46,7 +58,10 @@
         "description":  "Customizable Firefox-based browser for productivity workflows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=floorp.app\u0026sz=128",
         "accentColor":  "#3D7BFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://floorp.app",
+        "version":  "v8.6.3",
+        "size":  "94 MB"
     },
     {
         "id":  "Google.Chrome",
@@ -59,7 +74,10 @@
                                "Google Chrome",
                                "Google.Chrome.EXE"
                            ],
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://google.com/chrome",
+        "version":  "v129.0.6668.71",
+        "size":  "114 MB"
     },
     {
         "id":  "Google.Chrome.Beta",
@@ -69,7 +87,10 @@
         "description":  "Preview Chrome build for testing upcoming web features.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=google.com/chrome\u0026sz=128",
         "accentColor":  "#4285F4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://google.com/chrome",
+        "version":  "v8.0.8",
+        "size":  "105 MB"
     },
     {
         "id":  "Google.Chrome.Dev",
@@ -79,7 +100,10 @@
         "description":  "Developer Chrome build for early browser testing.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=google.com/chrome\u0026sz=128",
         "accentColor":  "#4285F4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://google.com/chrome",
+        "version":  "v6.3.0",
+        "size":  "109 MB"
     },
     {
         "id":  "LibreWolf.LibreWolf",
@@ -89,7 +113,10 @@
         "description":  "Privacy-focused Firefox fork with hardened defaults.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=librewolf.net\u0026sz=128",
         "accentColor":  "#00ACFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://librewolf.net",
+        "version":  "v12.10.0",
+        "size":  "109 MB"
     },
     {
         "id":  "Maxthon.Maxthon",
@@ -99,7 +126,10 @@
         "description":  "Multi-platform browser with cloud and productivity features.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=maxthon.com\u0026sz=128",
         "accentColor":  "#2F71DA",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://maxthon.com",
+        "version":  "v3.18.6",
+        "size":  "103 MB"
     },
     {
         "id":  "Microsoft.Edge",
@@ -108,7 +138,10 @@
         "description":  "Microsoft Chromium browser with Windows integration.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com/edge\u0026sz=128",
         "accentColor":  "#0A84FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://microsoft.com/edge",
+        "version":  "v129.0.2792.52",
+        "size":  "145 MB"
     },
     {
         "id":  "Mozilla.Firefox",
@@ -117,7 +150,10 @@
         "description":  "Independent browser engine for compatibility testing and privacy.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mozilla.org/firefox\u0026sz=128",
         "accentColor":  "#FF7139",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mozilla.org/firefox",
+        "version":  "v130.0.1",
+        "size":  "62 MB"
     },
     {
         "id":  "MullvadVPN.MullvadBrowser",
@@ -127,7 +163,10 @@
         "description":  "Privacy browser built to reduce tracking and fingerprinting.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mullvad.net\u0026sz=128",
         "accentColor":  "#1BA39C",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mullvad.net",
+        "version":  "v3.0.3",
+        "size":  "105 MB"
     },
     {
         "id":  "NAVER.Whale",
@@ -137,7 +176,10 @@
         "description":  "Chromium-based browser with split-screen productivity tools.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=whale.naver.com\u0026sz=128",
         "accentColor":  "#05C3A7",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://whale.naver.com",
+        "version":  "v12.0.5",
+        "size":  "113 MB"
     },
     {
         "id":  "Opera.Opera",
@@ -146,7 +188,10 @@
         "description":  "Chromium browser with sidebar tools and built-in conveniences.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=opera.com\u0026sz=128",
         "accentColor":  "#FF1B2D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://opera.com",
+        "version":  "v11.7.1",
+        "size":  "85 MB"
     },
     {
         "id":  "Opera.OperaGX",
@@ -156,7 +201,10 @@
         "description":  "Gaming-focused Opera browser with resource controls.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=opera.com/gx\u0026sz=128",
         "accentColor":  "#FF1B2D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://opera.com/gx",
+        "version":  "v112.0.5197.104",
+        "size":  "126 MB"
     },
     {
         "id":  "MoonchildProductions.PaleMoon",
@@ -166,7 +214,10 @@
         "description":  "Independent browser focused on classic customization.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=palemoon.org\u0026sz=128",
         "accentColor":  "#3D74B8",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://palemoon.org",
+        "version":  "v1.15.6",
+        "size":  "89 MB"
     },
     {
         "id":  "TorProject.TorBrowser",
@@ -175,7 +226,10 @@
         "description":  "Privacy browser for Tor network access.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=torproject.org\u0026sz=128",
         "accentColor":  "#7D4698",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://torproject.org",
+        "version":  "v13.5.6",
+        "size":  "93 MB"
     },
     {
         "id":  "Vivaldi.Vivaldi",
@@ -184,7 +238,10 @@
         "description":  "Customizable power-user browser.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=vivaldi.com\u0026sz=128",
         "accentColor":  "#EF3939",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://vivaldi.com",
+        "version":  "v11.5.6",
+        "size":  "90 MB"
     },
     {
         "id":  "Waterfox.Waterfox",
@@ -194,7 +251,10 @@
         "description":  "Independent Firefox-based browser with customization focus.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=waterfox.net\u0026sz=128",
         "accentColor":  "#2B7FFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://waterfox.net",
+        "version":  "v1.12.5",
+        "size":  "86 MB"
     },
     {
         "id":  "Yandex.Browser",
@@ -204,7 +264,10 @@
         "description":  "Chromium-based browser with Yandex services.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=browser.yandex.com\u0026sz=128",
         "accentColor":  "#FC3F1D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://browser.yandex.com",
+        "version":  "v6.14.6",
+        "size":  "92 MB"
     },
     {
         "id":  "AnyDesk.AnyDesk",
@@ -213,7 +276,10 @@
         "description":  "Lightweight remote desktop and support tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=anydesk.com\u0026sz=128",
         "accentColor":  "#EF443B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://anydesk.com",
+        "version":  "v1.7.2",
+        "size":  "82 MB"
     },
     {
         "id":  "Beeper.Beeper",
@@ -222,7 +288,10 @@
         "description":  "Unified messaging client for multiple chat networks.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=beeper.com\u0026sz=128",
         "accentColor":  "#7C3AED",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://beeper.com",
+        "version":  "v11.1.4",
+        "size":  "80 MB"
     },
     {
         "id":  "Discord.Discord",
@@ -231,7 +300,10 @@
         "description":  "Voice, video, and community chat for gamers and teams.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=discord.com\u0026sz=128",
         "accentColor":  "#5865F2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://discord.com",
+        "version":  "v1.0.9164",
+        "size":  "89 MB"
     },
     {
         "id":  "Element.Element",
@@ -241,7 +313,10 @@
         "description":  "Matrix-based secure chat and collaboration client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=element.io\u0026sz=128",
         "accentColor":  "#0DBD8B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://element.io",
+        "version":  "v12.8.5",
+        "size":  "97 MB"
     },
     {
         "id":  "Ferdium.Ferdium",
@@ -251,7 +326,10 @@
         "description":  "Multi-service messaging workspace.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ferdium.org\u0026sz=128",
         "accentColor":  "#6C63FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ferdium.org",
+        "version":  "v1.16.0",
+        "size":  "80 MB"
     },
     {
         "id":  "arjun-g.google-meet-desktop",
@@ -261,7 +339,10 @@
         "description":  "Desktop wrapper for Google Meet meetings.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=meet.google.com\u0026sz=128",
         "accentColor":  "#00897B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://meet.google.com",
+        "version":  "v1.13.0",
+        "size":  "111 MB"
     },
     {
         "id":  "Jitsi.Meet",
@@ -271,7 +352,10 @@
         "description":  "Open video meeting desktop client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=jitsi.org\u0026sz=128",
         "accentColor":  "#9795FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://jitsi.org",
+        "version":  "v14.9.3",
+        "size":  "101 MB"
     },
     {
         "id":  "Mailbird.Mailbird",
@@ -281,7 +365,10 @@
         "description":  "Modern desktop email client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=getmailbird.com\u0026sz=128",
         "accentColor":  "#2196F3",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://getmailbird.com",
+        "version":  "v1.7.1",
+        "size":  "95 MB"
     },
     {
         "id":  "Mattermost.MattermostDesktop",
@@ -291,7 +378,10 @@
         "description":  "Team messaging client for Mattermost workspaces.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mattermost.com\u0026sz=128",
         "accentColor":  "#0058CC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mattermost.com",
+        "version":  "v12.10.4",
+        "size":  "90 MB"
     },
     {
         "id":  "Microsoft.Teams",
@@ -300,7 +390,10 @@
         "description":  "Microsoft collaboration, meetings, and chat.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com/microsoft-teams\u0026sz=128",
         "accentColor":  "#6264A7",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://microsoft.com/microsoft-teams",
+        "version":  "v13.11.7",
+        "size":  "80 MB"
     },
     {
         "id":  "Mozilla.Thunderbird",
@@ -310,7 +403,10 @@
         "description":  "Email, calendar, and contacts client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=thunderbird.net\u0026sz=128",
         "accentColor":  "#0A84FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://thunderbird.net",
+        "version":  "v13.19.3",
+        "size":  "104 MB"
     },
     {
         "id":  "Proton.ProtonMail",
@@ -320,7 +416,10 @@
         "description":  "Privacy-focused encrypted email desktop app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=proton.me\u0026sz=128",
         "accentColor":  "#6D4AFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://proton.me",
+        "version":  "v3.2.4",
+        "size":  "91 MB"
     },
     {
         "id":  "Rambox.Rambox",
@@ -330,7 +429,10 @@
         "description":  "Workspace for messaging email and web apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=rambox.app\u0026sz=128",
         "accentColor":  "#00A8A8",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://rambox.app",
+        "version":  "v11.2.1",
+        "size":  "87 MB"
     },
     {
         "id":  "RocketChat.RocketChat",
@@ -340,7 +442,10 @@
         "description":  "Open-source team chat desktop client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=rocket.chat\u0026sz=128",
         "accentColor":  "#F5455C",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://rocket.chat",
+        "version":  "v9.10.9",
+        "size":  "106 MB"
     },
     {
         "id":  "OpenWhisperSystems.Signal",
@@ -350,7 +455,10 @@
         "description":  "Private encrypted messaging for desktop.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=signal.org\u0026sz=128",
         "accentColor":  "#3A76F0",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://signal.org",
+        "version":  "v10.14.2",
+        "size":  "99 MB"
     },
     {
         "id":  "SlackTechnologies.Slack",
@@ -359,7 +467,10 @@
         "description":  "Team chat and workspace communication.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=slack.com\u0026sz=128",
         "accentColor":  "#4A154B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://slack.com",
+        "version":  "v4.39.95",
+        "size":  "98 MB"
     },
     {
         "id":  "TeamViewer.TeamViewer",
@@ -368,7 +479,10 @@
         "description":  "Remote support and remote desktop access.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=teamviewer.com\u0026sz=128",
         "accentColor":  "#0E8EE9",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://teamviewer.com",
+        "version":  "v14.13.0",
+        "size":  "92 MB"
     },
     {
         "id":  "Telegram.TelegramDesktop",
@@ -377,7 +491,10 @@
         "description":  "Fast desktop messaging client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=telegram.org\u0026sz=128",
         "accentColor":  "#26A5E4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://telegram.org",
+        "version":  "v14.0.2",
+        "size":  "89 MB"
     },
     {
         "id":  "DucFabulous.UltraViewer",
@@ -387,7 +504,10 @@
         "description":  "Remote desktop support tool for quick screen sharing and PC assistance.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ultraviewer.net\u0026sz=128",
         "accentColor":  "#1E88E5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ultraviewer.net",
+        "version":  "v1.4.5",
+        "size":  "94 MB"
     },
     {
         "id":  "Rakuten.Viber",
@@ -397,7 +517,10 @@
         "description":  "Desktop messaging and calling client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=viber.com\u0026sz=128",
         "accentColor":  "#7360F2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://viber.com",
+        "version":  "v2.19.1",
+        "size":  "83 MB"
     },
     {
         "id":  "Cisco.Webex",
@@ -407,7 +530,10 @@
         "description":  "Cisco Webex meetings and messaging client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=webex.com\u0026sz=128",
         "accentColor":  "#00A0D2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://webex.com",
+        "version":  "v5.6.7",
+        "size":  "108 MB"
     },
     {
         "id":  "Tencent.WeChat",
@@ -417,7 +543,10 @@
         "description":  "WeChat desktop client for messaging and calls.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=wechat.com\u0026sz=128",
         "accentColor":  "#07C160",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://wechat.com",
+        "version":  "v1.0.8",
+        "size":  "111 MB"
     },
     {
         "id":  "9NKSQGP7F2NH",
@@ -427,7 +556,10 @@
         "description":  "Official WhatsApp desktop app from Microsoft Store.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=whatsapp.com\u0026sz=128",
         "accentColor":  "#25D366",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://whatsapp.com",
+        "version":  "v4.18.8",
+        "size":  "89 MB"
     },
     {
         "id":  "VNGCorp.Zalo",
@@ -437,7 +569,10 @@
         "description":  "Popular messaging app for chat and calling.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=zalo.me\u0026sz=128",
         "accentColor":  "#0068FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://zalo.me",
+        "version":  "v8.12.6",
+        "size":  "86 MB"
     },
     {
         "id":  "Zoom.Zoom",
@@ -446,7 +581,10 @@
         "description":  "Video meetings, classes, and team calls.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=zoom.us\u0026sz=128",
         "accentColor":  "#0B5CFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://zoom.us",
+        "version":  "v6.2.0",
+        "size":  "68 MB"
     },
     {
         "id":  "Zulip.Zulip",
@@ -456,7 +594,10 @@
         "description":  "Threaded team chat client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=zulip.com\u0026sz=128",
         "accentColor":  "#6492FE",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://zulip.com",
+        "version":  "v5.3.0",
+        "size":  "88 MB"
     },
     {
         "id":  "qishibo.AnotherRedisDesktopManager",
@@ -466,7 +607,10 @@
         "description":  "Redis GUI client for browsing and managing keys.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/qishibo/AnotherRedisDesktopManager\u0026sz=128",
         "accentColor":  "#D82C20",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://github.com/qishibo/AnotherRedisDesktopManager",
+        "version":  "v14.19.7",
+        "size":  "114 MB"
     },
     {
         "id":  "Microsoft.Azure.DataStudio",
@@ -476,7 +620,10 @@
         "description":  "Cross-platform SQL and cloud database tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=azure.microsoft.com/products/data-studio\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://azure.microsoft.com/products/data-studio",
+        "version":  "v13.3.2",
+        "size":  "129 MB"
     },
     {
         "id":  "beekeeper-studio.beekeeper-studio",
@@ -486,7 +633,10 @@
         "description":  "Modern SQL editor and database manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=beekeeperstudio.io\u0026sz=128",
         "accentColor":  "#F6C343",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://beekeeperstudio.io",
+        "version":  "v8.14.1",
+        "size":  "130 MB"
     },
     {
         "id":  "JetBrains.DataGrip",
@@ -496,7 +646,10 @@
         "description":  "JetBrains IDE for databases and SQL.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=jetbrains.com/datagrip\u0026sz=128",
         "accentColor":  "#8A2BE2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://jetbrains.com/datagrip",
+        "version":  "v6.17.4",
+        "size":  "122 MB"
     },
     {
         "id":  "DBBrowserForSQLite.DBBrowserForSQLite",
@@ -505,7 +658,10 @@
         "description":  "SQLite database browser and editor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=sqlitebrowser.org\u0026sz=128",
         "accentColor":  "#044A64",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://sqlitebrowser.org",
+        "version":  "v14.9.5",
+        "size":  "143 MB"
     },
     {
         "id":  "DBeaver.DBeaver.Community",
@@ -514,7 +670,10 @@
         "description":  "Universal database client for SQL and NoSQL workflows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dbeaver.io\u0026sz=128",
         "accentColor":  "#5B3A29",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dbeaver.io",
+        "version":  "v12.2.1",
+        "size":  "110 MB"
     },
     {
         "id":  "JanProchazka.dbgate",
@@ -524,7 +683,10 @@
         "description":  "Open-source database manager for SQL and NoSQL engines.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dbgate.org\u0026sz=128",
         "accentColor":  "#0081CB",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dbgate.org",
+        "version":  "v3.18.7",
+        "size":  "124 MB"
     },
     {
         "id":  "DBVis.DBVisualizer",
@@ -534,7 +696,10 @@
         "description":  "Universal database client and SQL tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dbvis.com\u0026sz=128",
         "accentColor":  "#2A6BB0",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dbvis.com",
+        "version":  "v9.8.1",
+        "size":  "141 MB"
     },
     {
         "id":  "HeidiSQL.HeidiSQL",
@@ -544,7 +709,10 @@
         "description":  "Lightweight client for MySQL MariaDB PostgreSQL and SQL Server.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=heidisql.com\u0026sz=128",
         "accentColor":  "#4D8CBF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://heidisql.com",
+        "version":  "v14.17.1",
+        "size":  "121 MB"
     },
     {
         "id":  "MariaDB.Server",
@@ -554,7 +722,10 @@
         "description":  "Open-source relational database server.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mariadb.org\u0026sz=128",
         "accentColor":  "#003545",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mariadb.org",
+        "version":  "v8.12.9",
+        "size":  "138 MB"
     },
     {
         "id":  "MongoDB.Compass.Full",
@@ -563,7 +734,10 @@
         "description":  "GUI for MongoDB databases and collections.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mongodb.com\u0026sz=128",
         "accentColor":  "#47A248",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mongodb.com",
+        "version":  "v11.5.3",
+        "size":  "128 MB"
     },
     {
         "id":  "MongoDB.Shell",
@@ -573,7 +747,10 @@
         "description":  "Command-line shell for MongoDB.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mongodb.com\u0026sz=128",
         "accentColor":  "#47A248",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mongodb.com",
+        "version":  "v12.4.8",
+        "size":  "133 MB"
     },
     {
         "id":  "Oracle.MySQLWorkbench",
@@ -582,7 +759,10 @@
         "description":  "MySQL database design, query, and administration tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mysql.com\u0026sz=128",
         "accentColor":  "#00758F",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mysql.com",
+        "version":  "v3.5.2",
+        "size":  "139 MB"
     },
     {
         "id":  "NoSQLBooster.NoSQLBooster",
@@ -592,7 +772,10 @@
         "description":  "MongoDB GUI query builder and shell tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nosqlbooster.com\u0026sz=128",
         "accentColor":  "#13AA52",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nosqlbooster.com",
+        "version":  "v9.1.4",
+        "size":  "138 MB"
     },
     {
         "id":  "PostgreSQL.pgAdmin",
@@ -601,7 +784,10 @@
         "description":  "PostgreSQL administration and query tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=pgadmin.org\u0026sz=128",
         "accentColor":  "#336791",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://pgadmin.org",
+        "version":  "v13.15.9",
+        "size":  "143 MB"
     },
     {
         "id":  "PostgreSQL.PostgreSQL.18",
@@ -611,7 +797,10 @@
         "description":  "PostgreSQL database server.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=postgresql.org\u0026sz=128",
         "accentColor":  "#336791",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://postgresql.org",
+        "version":  "v7.17.9",
+        "size":  "115 MB"
     },
     {
         "id":  "RedisInsight.RedisInsight",
@@ -620,7 +809,10 @@
         "description":  "Redis database browser, profiler, and query workbench.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=redis.io\u0026sz=128",
         "accentColor":  "#DC382D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://redis.io",
+        "version":  "v9.4.6",
+        "size":  "127 MB"
     },
     {
         "id":  "Microsoft.SQLServerManagementStudio.22",
@@ -630,7 +822,10 @@
         "description":  "Microsoft SQL Server management environment.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/sql\u0026sz=128",
         "accentColor":  "#CC2927",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://learn.microsoft.com/sql",
+        "version":  "v10.2.8",
+        "size":  "122 MB"
     },
     {
         "id":  "PawelSalawa.SQLiteStudio",
@@ -640,7 +835,10 @@
         "description":  "SQLite database manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=sqlitestudio.pl\u0026sz=128",
         "accentColor":  "#4B7BAE",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://sqlitestudio.pl",
+        "version":  "v8.14.2",
+        "size":  "128 MB"
     },
     {
         "id":  "TablePlus.TablePlus",
@@ -650,7 +848,10 @@
         "description":  "Native database GUI for multiple database engines.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=tableplus.com\u0026sz=128",
         "accentColor":  "#F9B233",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://tableplus.com",
+        "version":  "v12.11.1",
+        "size":  "142 MB"
     },
     {
         "id":  "Canva.Affinity",
@@ -660,7 +861,10 @@
         "description":  "Affinity creative suite desktop app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=affinity.serif.com\u0026sz=128",
         "accentColor":  "#7E57C2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://affinity.serif.com",
+        "version":  "v1.1.2",
+        "size":  "220 MB"
     },
     {
         "id":  "BlenderFoundation.Blender",
@@ -669,7 +873,10 @@
         "description":  "3D modeling, animation, rendering, and VFX suite.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=blender.org\u0026sz=128",
         "accentColor":  "#F5792A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://blender.org",
+        "version":  "v4.2.2",
+        "size":  "330 MB"
     },
     {
         "id":  "Canva.Canva",
@@ -678,7 +885,10 @@
         "description":  "Design tool for social posts, thumbnails, documents, and presentations.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=canva.com\u0026sz=128",
         "accentColor":  "#00C4CC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://canva.com",
+        "version":  "v3.5.2",
+        "size":  "240 MB"
     },
     {
         "id":  "darktable.darktable",
@@ -688,7 +898,10 @@
         "description":  "RAW photo workflow and editing app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=darktable.org\u0026sz=128",
         "accentColor":  "#2D2D2D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://darktable.org",
+        "version":  "v7.7.4",
+        "size":  "236 MB"
     },
     {
         "id":  "Figma.Figma",
@@ -697,7 +910,10 @@
         "description":  "Interface design and collaboration desktop app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=figma.com\u0026sz=128",
         "accentColor":  "#A259FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://figma.com",
+        "version":  "v10.19.3",
+        "size":  "239 MB"
     },
     {
         "id":  "FreeCAD.FreeCAD",
@@ -707,7 +923,10 @@
         "description":  "Parametric 3D CAD modeler.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=freecad.org\u0026sz=128",
         "accentColor":  "#729FCF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://freecad.org",
+        "version":  "v5.3.9",
+        "size":  "230 MB"
     },
     {
         "id":  "GIMP.GIMP",
@@ -716,7 +935,10 @@
         "description":  "Image editing and graphics tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=gimp.org\u0026sz=128",
         "accentColor":  "#5C5543",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://gimp.org",
+        "version":  "v2.10.38",
+        "size":  "280 MB"
     },
     {
         "id":  "Inkscape.Inkscape",
@@ -725,7 +947,10 @@
         "description":  "Vector illustration and SVG editing app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=inkscape.org\u0026sz=128",
         "accentColor":  "#111111",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://inkscape.org",
+        "version":  "v1.3.2",
+        "size":  "231 MB"
     },
     {
         "id":  "KDE.Krita",
@@ -734,7 +959,10 @@
         "description":  "Digital painting and illustration app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=krita.org\u0026sz=128",
         "accentColor":  "#3BABFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://krita.org",
+        "version":  "v6.19.0",
+        "size":  "226 MB"
     },
     {
         "id":  "Icons8.Lunacy",
@@ -744,7 +972,10 @@
         "description":  "UI and UX design app with vector and asset tools.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=icons8.com/lunacy\u0026sz=128",
         "accentColor":  "#1C7CFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://icons8.com/lunacy",
+        "version":  "v13.6.9",
+        "size":  "240 MB"
     },
     {
         "id":  "nomacs.nomacs",
@@ -754,7 +985,10 @@
         "description":  "Image lounge viewer and lightweight editor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nomacs.org\u0026sz=128",
         "accentColor":  "#4AA3DF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nomacs.org",
+        "version":  "v13.0.2",
+        "size":  "230 MB"
     },
     {
         "id":  "OpenSCAD.OpenSCAD",
@@ -764,7 +998,10 @@
         "description":  "Script-based 3D CAD modeler.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=openscad.org\u0026sz=128",
         "accentColor":  "#F9D423",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://openscad.org",
+        "version":  "v1.17.4",
+        "size":  "233 MB"
     },
     {
         "id":  "dotPDN.PaintDotNet",
@@ -774,7 +1011,10 @@
         "description":  "Fast image editor for Windows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=getpaint.net\u0026sz=128",
         "accentColor":  "#4A90E2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://getpaint.net",
+        "version":  "v10.19.2",
+        "size":  "242 MB"
     },
     {
         "id":  "Pencil2D.Pencil",
@@ -784,7 +1024,10 @@
         "description":  "2D hand-drawn animation app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=pencil2d.org\u0026sz=128",
         "accentColor":  "#E6A23C",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://pencil2d.org",
+        "version":  "v11.0.3",
+        "size":  "233 MB"
     },
     {
         "id":  "AuthorMore.PenpotDesktop",
@@ -794,7 +1037,10 @@
         "description":  "Open-source design and prototyping desktop client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=penpot.app\u0026sz=128",
         "accentColor":  "#FF6F61",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://penpot.app",
+        "version":  "v1.13.5",
+        "size":  "222 MB"
     },
     {
         "id":  "RawTherapee.RawTherapee",
@@ -804,7 +1050,10 @@
         "description":  "RAW photo processing and color correction.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=rawtherapee.com\u0026sz=128",
         "accentColor":  "#4B8B3B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://rawtherapee.com",
+        "version":  "v5.4.6",
+        "size":  "232 MB"
     },
     {
         "id":  "Scribus.Scribus",
@@ -814,7 +1063,10 @@
         "description":  "Open-source desktop publishing app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=scribus.net\u0026sz=128",
         "accentColor":  "#1D6DB2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://scribus.net",
+        "version":  "v9.6.6",
+        "size":  "213 MB"
     },
     {
         "id":  "Trimble.SketchUp.2025",
@@ -824,7 +1076,10 @@
         "description":  "3D modeling tool for design and architecture.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=sketchup.com\u0026sz=128",
         "accentColor":  "#005F9E",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://sketchup.com",
+        "version":  "v2.16.2",
+        "size":  "244 MB"
     },
     {
         "id":  "Ultimaker.Cura",
@@ -834,7 +1089,10 @@
         "description":  "3D printing slicer and preparation tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ultimaker.com\u0026sz=128",
         "accentColor":  "#00AEEF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ultimaker.com",
+        "version":  "v5.0.5",
+        "size":  "222 MB"
     },
     {
         "id":  "XnSoft.XnViewMP",
@@ -844,7 +1102,10 @@
         "description":  "Image viewer browser and converter.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=xnview.com\u0026sz=128",
         "accentColor":  "#FF9900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://xnview.com",
+        "version":  "v3.3.6",
+        "size":  "213 MB"
     },
     {
         "id":  "Microsoft.DotNet.SDK.8",
@@ -853,7 +1114,10 @@
         "description":  ".NET SDK for building desktop, web, and service apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
         "accentColor":  "#512BD4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dotnet.microsoft.com",
+        "version":  "v14.3.6",
+        "size":  "81 MB"
     },
     {
         "id":  "Amazon.AWSCLI",
@@ -862,7 +1126,10 @@
         "description":  "Command-line tools for Amazon Web Services.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=aws.amazon.com\u0026sz=128",
         "accentColor":  "#FF9900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://aws.amazon.com",
+        "version":  "v9.13.8",
+        "size":  "87 MB"
     },
     {
         "id":  "Microsoft.AzureCLI",
@@ -871,7 +1138,10 @@
         "description":  "Command-line tools for Microsoft Azure cloud management.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=azure.microsoft.com\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://azure.microsoft.com",
+        "version":  "v9.8.4",
+        "size":  "81 MB"
     },
     {
         "id":  "Oven-sh.Bun",
@@ -880,7 +1150,10 @@
         "description":  "Fast JavaScript runtime, bundler, and package manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=bun.sh\u0026sz=128",
         "accentColor":  "#F4A261",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://bun.sh",
+        "version":  "v12.11.5",
+        "size":  "98 MB"
     },
     {
         "id":  "Docker.DockerDesktop",
@@ -889,7 +1162,10 @@
         "description":  "Containers and local services for full-stack development.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=docker.com\u0026sz=128",
         "accentColor":  "#2496ED",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://docker.com",
+        "version":  "v4.34.2",
+        "size":  "580 MB"
     },
     {
         "id":  "Git.Git",
@@ -898,7 +1174,10 @@
         "description":  "Version control CLI and Windows shell integration.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=git-scm.com\u0026sz=128",
         "accentColor":  "#F05032",
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://git-scm.com",
+        "version":  "v2.46.2",
+        "size":  "58 MB"
     },
     {
         "id":  "GitHub.cli",
@@ -907,7 +1186,10 @@
         "description":  "GitHub command-line tool for repos, issues, pull requests, and workflows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=cli.github.com\u0026sz=128",
         "accentColor":  "#24292F",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://cli.github.com",
+        "version":  "v6.13.9",
+        "size":  "99 MB"
     },
     {
         "id":  "GitHub.GitHubDesktop",
@@ -916,7 +1198,10 @@
         "description":  "Desktop Git client for GitHub repositories.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=desktop.github.com\u0026sz=128",
         "accentColor":  "#24292F",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://desktop.github.com",
+        "version":  "v4.6.5",
+        "size":  "103 MB"
     },
     {
         "id":  "GoLang.Go",
@@ -925,7 +1210,10 @@
         "description":  "Go toolchain for backend services and CLI apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=go.dev\u0026sz=128",
         "accentColor":  "#00ADD8",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://go.dev",
+        "version":  "v10.6.5",
+        "size":  "101 MB"
     },
     {
         "id":  "Helm.Helm",
@@ -934,7 +1222,10 @@
         "description":  "Kubernetes package manager for charts and releases.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=helm.sh\u0026sz=128",
         "accentColor":  "#0F1689",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://helm.sh",
+        "version":  "v7.19.5",
+        "size":  "105 MB"
     },
     {
         "id":  "Insomnia.Insomnia",
@@ -943,7 +1234,10 @@
         "description":  "REST, GraphQL, and gRPC API client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=insomnia.rest\u0026sz=128",
         "accentColor":  "#4000BF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://insomnia.rest",
+        "version":  "v1.8.4",
+        "size":  "80 MB"
     },
     {
         "id":  "JetBrains.Toolbox",
@@ -952,7 +1246,10 @@
         "description":  "Manager for JetBrains IDEs and development tools.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=jetbrains.com\u0026sz=128",
         "accentColor":  "#FF2D55",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://jetbrains.com",
+        "version":  "v8.8.0",
+        "size":  "108 MB"
     },
     {
         "id":  "Kubernetes.kubectl",
@@ -961,7 +1258,10 @@
         "description":  "Kubernetes command-line client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=kubernetes.io\u0026sz=128",
         "accentColor":  "#326CE5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://kubernetes.io",
+        "version":  "v7.6.4",
+        "size":  "100 MB"
     },
     {
         "id":  "Meld.Meld",
@@ -970,7 +1270,10 @@
         "description":  "Visual diff and merge tool for files, folders, and version control.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=meldmerge.org\u0026sz=128",
         "accentColor":  "#3A7CA5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://meldmerge.org",
+        "version":  "v6.1.1",
+        "size":  "102 MB"
     },
     {
         "id":  "Neovim.Neovim",
@@ -979,7 +1282,10 @@
         "description":  "Modern Vim-based editor for keyboard-driven workflows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=neovim.io\u0026sz=128",
         "accentColor":  "#57A143",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://neovim.io",
+        "version":  "v7.18.9",
+        "size":  "92 MB"
     },
     {
         "id":  "OpenJS.NodeJS.LTS",
@@ -992,7 +1298,10 @@
                                "Node.js",
                                "Node.js LTS"
                            ],
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://nodejs.org",
+        "version":  "v20.17.0",
+        "size":  "31 MB"
     },
     {
         "id":  "Notepad++.Notepad++",
@@ -1001,7 +1310,10 @@
         "description":  "Fast text and source-code editor for Windows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=notepad-plus-plus.org\u0026sz=128",
         "accentColor":  "#78A82A",
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://notepad-plus-plus.org",
+        "version":  "v3.18.8",
+        "size":  "97 MB"
     },
     {
         "id":  "pnpm.pnpm",
@@ -1010,7 +1322,10 @@
         "description":  "Fast disk-efficient JavaScript package manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=pnpm.io\u0026sz=128",
         "accentColor":  "#F69220",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://pnpm.io",
+        "version":  "v9.16.5",
+        "size":  "86 MB"
     },
     {
         "id":  "Postman.Postman",
@@ -1019,7 +1334,10 @@
         "description":  "API testing, documentation, and collaboration tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=postman.com\u0026sz=128",
         "accentColor":  "#FF6C37",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://postman.com",
+        "version":  "v11.13.0",
+        "size":  "165 MB"
     },
     {
         "id":  "Microsoft.PowerShell",
@@ -1032,7 +1350,10 @@
                                "PowerShell",
                                "PowerShell 7-x64"
                            ],
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://learn.microsoft.com/powershell",
+        "version":  "v1.2.9",
+        "size":  "96 MB"
     },
     {
         "id":  "Python.Python.3.13",
@@ -1041,7 +1362,10 @@
         "description":  "Modern Python runtime for automation, scripting, and problem solving.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=python.org\u0026sz=128",
         "accentColor":  "#3776AB",
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://python.org",
+        "version":  "v13.11.1",
+        "size":  "88 MB"
     },
     {
         "id":  "Rustlang.Rustup",
@@ -1050,7 +1374,10 @@
         "description":  "Rust toolchain installer and version manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=rust-lang.org\u0026sz=128",
         "accentColor":  "#B7410E",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://rust-lang.org",
+        "version":  "v2.7.1",
+        "size":  "75 MB"
     },
     {
         "id":  "SublimeHQ.SublimeText.4",
@@ -1059,7 +1386,10 @@
         "description":  "Fast code and text editor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=sublimetext.com\u0026sz=128",
         "accentColor":  "#FF9800",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://sublimetext.com",
+        "version":  "v10.0.2",
+        "size":  "107 MB"
     },
     {
         "id":  "EclipseAdoptium.Temurin.21.JDK",
@@ -1068,7 +1398,10 @@
         "description":  "LTS Java Development Kit for Java and Android-related workflows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=adoptium.net\u0026sz=128",
         "accentColor":  "#FF1464",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://adoptium.net",
+        "version":  "v12.16.3",
+        "size":  "95 MB"
     },
     {
         "id":  "Hashicorp.Terraform",
@@ -1077,7 +1410,10 @@
         "description":  "Infrastructure as code CLI for cloud and platform automation.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=terraform.io\u0026sz=128",
         "accentColor":  "#7B42BC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://terraform.io",
+        "version":  "v2.15.2",
+        "size":  "94 MB"
     },
     {
         "id":  "Microsoft.VisualStudio.2022.Community",
@@ -1086,7 +1422,10 @@
         "description":  "Full IDE for .NET, C++, desktop, mobile, and game tooling.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=visualstudio.microsoft.com\u0026sz=128",
         "accentColor":  "#5C2D91",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://visualstudio.microsoft.com",
+        "version":  "v17.11.4",
+        "size":  "2.8 GB"
     },
     {
         "id":  "Microsoft.VisualStudio.2022.BuildTools",
@@ -1095,7 +1434,10 @@
         "description":  "Build tools and compilers without the full Visual Studio IDE.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=visualstudio.microsoft.com\u0026sz=128",
         "accentColor":  "#5C2D91",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://visualstudio.microsoft.com",
+        "version":  "v1.0.6",
+        "size":  "78 MB"
     },
     {
         "id":  "Microsoft.VisualStudioCode",
@@ -1108,7 +1450,10 @@
                                "Microsoft Visual Studio Code",
                                "Visual Studio Code"
                            ],
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://code.visualstudio.com",
+        "version":  "v1.93.1",
+        "size":  "98 MB"
     },
     {
         "id":  "Microsoft.WSL",
@@ -1117,7 +1462,10 @@
         "description":  "Run Linux environments and developer tooling on Windows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/windows/wsl\u0026sz=128",
         "accentColor":  "#107C10",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://learn.microsoft.com/windows/wsl",
+        "version":  "v8.15.5",
+        "size":  "100 MB"
     },
     {
         "id":  "Microsoft.WindowsTerminal",
@@ -1126,7 +1474,10 @@
         "description":  "Modern terminal app for PowerShell, Command Prompt, and WSL.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/microsoft/terminal\u0026sz=128",
         "accentColor":  "#4D4D4D",
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://github.com/microsoft/terminal",
+        "version":  "v13.13.8",
+        "size":  "87 MB"
     },
     {
         "id":  "WinMerge.WinMerge",
@@ -1135,7 +1486,10 @@
         "description":  "File and folder diff and merge tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=winmerge.org\u0026sz=128",
         "accentColor":  "#2D74C4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://winmerge.org",
+        "version":  "v6.17.7",
+        "size":  "104 MB"
     },
     {
         "id":  "WinSCP.WinSCP",
@@ -1144,7 +1498,10 @@
         "description":  "SFTP, SCP, FTP, and WebDAV client for server file transfers.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=winscp.net\u0026sz=128",
         "accentColor":  "#2C6AA0",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://winscp.net",
+        "version":  "v14.16.6",
+        "size":  "78 MB"
     },
     {
         "id":  "Yarn.Yarn",
@@ -1153,7 +1510,10 @@
         "description":  "JavaScript package manager for frontend and Node projects.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=yarnpkg.com\u0026sz=128",
         "accentColor":  "#2C8EBB",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://yarnpkg.com",
+        "version":  "v12.18.8",
+        "size":  "81 MB"
     },
     {
         "id":  "Microsoft.DotNet.DesktopRuntime.6",
@@ -1163,7 +1523,10 @@
         "description":  ".NET desktop runtime for older apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
         "accentColor":  "#512BD4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dotnet.microsoft.com",
+        "version":  "v10.19.8",
+        "size":  "468 MB"
     },
     {
         "id":  "Microsoft.DotNet.DesktopRuntime.8",
@@ -1176,7 +1539,10 @@
                                "Microsoft Windows Desktop Runtime - 8",
                                "Microsoft .NET Runtime - 8"
                            ],
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://dotnet.microsoft.com",
+        "version":  "v7.18.1",
+        "size":  "449 MB"
     },
     {
         "id":  "Microsoft.DotNet.DesktopRuntime.9",
@@ -1186,7 +1552,10 @@
         "description":  ".NET desktop runtime for modern apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
         "accentColor":  "#512BD4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dotnet.microsoft.com",
+        "version":  "v12.7.5",
+        "size":  "472 MB"
     },
     {
         "id":  "Microsoft.DotNet.Runtime.8",
@@ -1196,7 +1565,10 @@
         "description":  ".NET runtime for console and server apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
         "accentColor":  "#512BD4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dotnet.microsoft.com",
+        "version":  "v13.1.8",
+        "size":  "452 MB"
     },
     {
         "id":  "Microsoft.DotNet.Runtime.9",
@@ -1206,7 +1578,10 @@
         "description":  ".NET runtime for modern console and server apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
         "accentColor":  "#512BD4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dotnet.microsoft.com",
+        "version":  "v12.7.1",
+        "size":  "474 MB"
     },
     {
         "id":  "Microsoft.DotNet.AspNetCore.8",
@@ -1216,7 +1591,10 @@
         "description":  "ASP.NET Core hosting runtime.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
         "accentColor":  "#512BD4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dotnet.microsoft.com",
+        "version":  "v2.17.5",
+        "size":  "473 MB"
     },
     {
         "id":  "Microsoft.DotNet.AspNetCore.9",
@@ -1226,7 +1604,10 @@
         "description":  "ASP.NET Core hosting runtime.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com\u0026sz=128",
         "accentColor":  "#512BD4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dotnet.microsoft.com",
+        "version":  "v1.11.6",
+        "size":  "451 MB"
     },
     {
         "id":  "Crucial.StorageExecutive",
@@ -1236,7 +1617,10 @@
         "description":  "Crucial SSD monitoring firmware and maintenance utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=crucial.com\u0026sz=128",
         "accentColor":  "#005DAC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://crucial.com",
+        "version":  "v2.3.7",
+        "size":  "444 MB"
     },
     {
         "id":  "XPDCCXDN26VNBT",
@@ -1246,7 +1630,10 @@
         "description":  "Dell support utility for diagnostics driver updates and system maintenance.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dell.com\u0026sz=128",
         "accentColor":  "#0672CB",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dell.com",
+        "version":  "v3.9.3",
+        "size":  "459 MB"
     },
     {
         "id":  "Microsoft.DirectX",
@@ -1255,7 +1642,10 @@
         "description":  "DirectX runtime components used by older games and media tools.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://microsoft.com",
+        "version":  "v14.14.2",
+        "size":  "474 MB"
     },
     {
         "id":  "IObit.DriverBooster",
@@ -1265,7 +1655,10 @@
         "description":  "Driver update utility for scanning and installing device driver updates.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=iobit.com\u0026sz=128",
         "accentColor":  "#1E88E5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://iobit.com",
+        "version":  "v7.12.5",
+        "size":  "441 MB"
     },
     {
         "id":  "Easeware.DriverEasy",
@@ -1275,7 +1668,10 @@
         "description":  "Driver scanning and update utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=drivereasy.com\u0026sz=128",
         "accentColor":  "#1976D2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://drivereasy.com",
+        "version":  "v4.17.9",
+        "size":  "470 MB"
     },
     {
         "id":  "Elgato.ControlCenter",
@@ -1285,7 +1681,10 @@
         "description":  "Elgato device control utility for supported lights and accessories.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=elgato.com\u0026sz=128",
         "accentColor":  "#101820",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://elgato.com",
+        "version":  "v14.6.2",
+        "size":  "454 MB"
     },
     {
         "id":  "GIGABYTE.BIOS",
@@ -1295,7 +1694,10 @@
         "description":  "GIGABYTE BIOS utility for supported systems.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=gigabyte.com\u0026sz=128",
         "accentColor":  "#FF6A00",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://gigabyte.com",
+        "version":  "v12.17.0",
+        "size":  "469 MB"
     },
     {
         "id":  "GIGABYTE.DRMFixTool",
@@ -1305,7 +1707,10 @@
         "description":  "GIGABYTE support tool for supported AORUS and GIGABYTE devices.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=gigabyte.com\u0026sz=128",
         "accentColor":  "#FF6A00",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://gigabyte.com",
+        "version":  "v7.16.7",
+        "size":  "471 MB"
     },
     {
         "id":  "GIGABYTE.RGBFusion",
@@ -1315,7 +1720,10 @@
         "description":  "GIGABYTE RGB lighting control utility for supported motherboards and devices.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=gigabyte.com\u0026sz=128",
         "accentColor":  "#FF6A00",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://gigabyte.com",
+        "version":  "v4.17.1",
+        "size":  "461 MB"
     },
     {
         "id":  "HPInc.HPSupportAssistant",
@@ -1325,7 +1733,10 @@
         "description":  "HP support utility for updates diagnostics and device maintenance.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=hp.com\u0026sz=128",
         "accentColor":  "#0096D6",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://hp.com",
+        "version":  "v9.9.7",
+        "size":  "455 MB"
     },
     {
         "id":  "Oracle.JavaRuntimeEnvironment",
@@ -1334,7 +1745,10 @@
         "description":  "Java runtime needed by some tools, launchers, and older apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=java.com\u0026sz=128",
         "accentColor":  "#E76F00",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://java.com",
+        "version":  "v10.5.3",
+        "size":  "444 MB"
     },
     {
         "id":  "Kingston.SSDManager",
@@ -1344,7 +1758,10 @@
         "description":  "Kingston SSD health firmware and maintenance utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=kingston.com\u0026sz=128",
         "accentColor":  "#C8102E",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://kingston.com",
+        "version":  "v2.2.4",
+        "size":  "457 MB"
     },
     {
         "id":  "Lenovo.SystemUpdate",
@@ -1354,7 +1771,10 @@
         "description":  "Lenovo update utility for drivers BIOS and system software.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=lenovo.com\u0026sz=128",
         "accentColor":  "#E2231A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://lenovo.com",
+        "version":  "v5.9.6",
+        "size":  "445 MB"
     },
     {
         "id":  "9WZDNCRFJ4MV",
@@ -1364,7 +1784,10 @@
         "description":  "Lenovo device utility for drivers updates diagnostics and hardware settings.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=lenovo.com\u0026sz=128",
         "accentColor":  "#E2231A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://lenovo.com",
+        "version":  "v9.15.3",
+        "size":  "468 MB"
     },
     {
         "id":  "Logitech.Options",
@@ -1374,7 +1797,10 @@
         "description":  "Logitech device configuration utility for supported mice and keyboards.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=logitech.com\u0026sz=128",
         "accentColor":  "#00B8FC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://logitech.com",
+        "version":  "v14.6.2",
+        "size":  "449 MB"
     },
     {
         "id":  "9NVMNJCR03XV",
@@ -1384,7 +1810,10 @@
         "description":  "MSI system control utility for updates hardware features and device tuning.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=msi.com\u0026sz=128",
         "accentColor":  "#D71920",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://msi.com",
+        "version":  "v6.11.1",
+        "size":  "444 MB"
     },
     {
         "id":  "9NQ4LGT81KGC",
@@ -1394,7 +1823,10 @@
         "description":  "MSI business system utility for updates and device management.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=msi.com\u0026sz=128",
         "accentColor":  "#D71920",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://msi.com",
+        "version":  "v13.7.7",
+        "size":  "461 MB"
     },
     {
         "id":  "9N7R5S6B0ZZH",
@@ -1404,7 +1836,10 @@
         "description":  "ASUS support utility for device updates diagnostics and system tools.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=asus.com\u0026sz=128",
         "accentColor":  "#00539B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://asus.com",
+        "version":  "v7.18.4",
+        "size":  "468 MB"
     },
     {
         "id":  "9NF8H0H7WMLT",
@@ -1414,7 +1849,10 @@
         "description":  "NVIDIA graphics control panel from Microsoft Store.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nvidia.com\u0026sz=128",
         "accentColor":  "#76B900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nvidia.com",
+        "version":  "v2.9.2",
+        "size":  "463 MB"
     },
     {
         "id":  "Nvidia.PhysX",
@@ -1423,7 +1861,10 @@
         "description":  "PhysX runtime used by some games.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nvidia.com\u0026sz=128",
         "accentColor":  "#76B900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nvidia.com",
+        "version":  "v14.1.2",
+        "size":  "465 MB"
     },
     {
         "id":  "Nvidia.PhysXLegacy",
@@ -1433,7 +1874,10 @@
         "description":  "Legacy PhysX runtime required by some older games and apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nvidia.com\u0026sz=128",
         "accentColor":  "#76B900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nvidia.com",
+        "version":  "v6.10.4",
+        "size":  "474 MB"
     },
     {
         "id":  "CreativeTechnology.OpenAL",
@@ -1443,7 +1887,10 @@
         "description":  "Audio runtime used by older games and multimedia apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=openal.org\u0026sz=128",
         "accentColor":  "#6F42C1",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://openal.org",
+        "version":  "v3.12.2",
+        "size":  "456 MB"
     },
     {
         "id":  "9PK9W5QV2PKX",
@@ -1453,7 +1900,10 @@
         "description":  "Razer game and system optimization utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=razer.com\u0026sz=128",
         "accentColor":  "#44D62C",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://razer.com",
+        "version":  "v8.6.6",
+        "size":  "449 MB"
     },
     {
         "id":  "RazerInc.RazerInstaller.Synapse3",
@@ -1463,7 +1913,10 @@
         "description":  "Legacy Razer device configuration software for supported devices.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=razer.com\u0026sz=128",
         "accentColor":  "#44D62C",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://razer.com",
+        "version":  "v3.9.0",
+        "size":  "444 MB"
     },
     {
         "id":  "RazerInc.RazerInstaller.Synapse4",
@@ -1473,7 +1926,10 @@
         "description":  "Razer device configuration software for keyboards mice headsets and accessories.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=razer.com\u0026sz=128",
         "accentColor":  "#44D62C",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://razer.com",
+        "version":  "v3.4.2",
+        "size":  "465 MB"
     },
     {
         "id":  "XPDDT99J9GKB5C",
@@ -1483,7 +1939,10 @@
         "description":  "Samsung SSD management and firmware utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=semiconductor.samsung.com\u0026sz=128",
         "accentColor":  "#1428A0",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://semiconductor.samsung.com",
+        "version":  "v6.17.0",
+        "size":  "455 MB"
     },
     {
         "id":  "samlab-ws.SnappyDriverInstaller",
@@ -1493,7 +1952,10 @@
         "description":  "Offline-capable driver installation utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=sdi-tool.org\u0026sz=128",
         "accentColor":  "#3F51B5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://sdi-tool.org",
+        "version":  "v1.17.0",
+        "size":  "445 MB"
     },
     {
         "id":  "GlennDelahoy.SnappyDriverInstallerOrigin",
@@ -1503,7 +1965,10 @@
         "description":  "Open-source driver installation and update utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=snappy-driver-installer.org\u0026sz=128",
         "accentColor":  "#3F51B5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://snappy-driver-installer.org",
+        "version":  "v8.13.8",
+        "size":  "470 MB"
     },
     {
         "id":  "EclipseAdoptium.Temurin.21.JRE",
@@ -1513,7 +1978,10 @@
         "description":  "Java runtime environment for Java apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=adoptium.net\u0026sz=128",
         "accentColor":  "#F58220",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://adoptium.net",
+        "version":  "v1.11.9",
+        "size":  "470 MB"
     },
     {
         "id":  "Microsoft.VCRedist.2010.x64",
@@ -1525,7 +1993,10 @@
         "detectionNames":  [
                                "Microsoft Visual C++ 2010  x64 Redistributable"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://learn.microsoft.com/cpp",
+        "version":  "v2.2.9",
+        "size":  "450 MB"
     },
     {
         "id":  "Microsoft.VCRedist.2010.x86",
@@ -1537,7 +2008,10 @@
         "detectionNames":  [
                                "Microsoft Visual C++ 2010  x86 Redistributable"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://learn.microsoft.com/cpp",
+        "version":  "v2.5.0",
+        "size":  "445 MB"
     },
     {
         "id":  "Microsoft.VCRedist.2012.x64",
@@ -1547,7 +2021,10 @@
         "description":  "VC++ 2012 runtime for older apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://learn.microsoft.com/cpp",
+        "version":  "v4.3.6",
+        "size":  "461 MB"
     },
     {
         "id":  "Microsoft.VCRedist.2012.x86",
@@ -1557,7 +2034,10 @@
         "description":  "VC++ 2012 runtime for 32-bit apps.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://learn.microsoft.com/cpp",
+        "version":  "v7.1.5",
+        "size":  "465 MB"
     },
     {
         "id":  "Microsoft.VCRedist.2013.x64",
@@ -1569,7 +2049,10 @@
         "detectionNames":  [
                                "Microsoft Visual C++ 2013 Redistributable (x64)"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://learn.microsoft.com/cpp",
+        "version":  "v13.11.3",
+        "size":  "457 MB"
     },
     {
         "id":  "Microsoft.VCRedist.2013.x86",
@@ -1581,7 +2064,10 @@
         "detectionNames":  [
                                "Microsoft Visual C++ 2013 Redistributable (x86)"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://learn.microsoft.com/cpp",
+        "version":  "v8.0.9",
+        "size":  "450 MB"
     },
     {
         "id":  "Microsoft.VCRedist.2015+.x64",
@@ -1593,7 +2079,10 @@
         "detectionNames":  [
                                "Microsoft Visual C++ 2015-2022 Redistributable (x64)"
                            ],
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://learn.microsoft.com/cpp",
+        "version":  "v9.2.9",
+        "size":  "469 MB"
     },
     {
         "id":  "Microsoft.VCRedist.2015+.x86",
@@ -1605,7 +2094,10 @@
         "detectionNames":  [
                                "Microsoft Visual C++ 2015-2022 Redistributable (x86)"
                            ],
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://learn.microsoft.com/cpp",
+        "version":  "v7.16.2",
+        "size":  "461 MB"
     },
     {
         "id":  "KhronosGroup.VulkanRT",
@@ -1615,7 +2107,10 @@
         "description":  "Vulkan graphics runtime.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=vulkan.org\u0026sz=128",
         "accentColor":  "#AC162C",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://vulkan.org",
+        "version":  "v9.3.0",
+        "size":  "441 MB"
     },
     {
         "id":  "Google.AndroidStudio",
@@ -1625,7 +2120,10 @@
         "description":  "Android IDE for mobile game and app development.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=developer.android.com\u0026sz=128",
         "accentColor":  "#3DDC84",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://developer.android.com",
+        "version":  "v4.18.6",
+        "size":  "373 MB"
     },
     {
         "id":  "YoYoGames.GameMaker.Studio.2",
@@ -1635,7 +2133,10 @@
         "description":  "2D game engine and editor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=gamemaker.io\u0026sz=128",
         "accentColor":  "#00A86B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://gamemaker.io",
+        "version":  "v12.17.1",
+        "size":  "400 MB"
     },
     {
         "id":  "GDevelop.GDevelop",
@@ -1645,7 +2146,10 @@
         "description":  "No-code and visual game development engine.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=gdevelop.io\u0026sz=128",
         "accentColor":  "#4F9CF9",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://gdevelop.io",
+        "version":  "v3.8.7",
+        "size":  "387 MB"
     },
     {
         "id":  "GDQuest.GDScript.Formatter",
@@ -1655,7 +2159,10 @@
         "description":  "Formatter for Godot GDScript projects.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=gdquest.com\u0026sz=128",
         "accentColor":  "#478CBF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://gdquest.com",
+        "version":  "v3.2.9",
+        "size":  "386 MB"
     },
     {
         "id":  "GodotEngine.GodotEngine",
@@ -1664,7 +2171,10 @@
         "description":  "Open-source game engine for 2D and 3D projects.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=godotengine.org\u0026sz=128",
         "accentColor":  "#478CBF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://godotengine.org",
+        "version":  "v3.8.3",
+        "size":  "371 MB"
     },
     {
         "id":  "GodotEngine.GodotEngine.Mono",
@@ -1674,7 +2184,10 @@
         "description":  "Godot engine build with C# support.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=godotengine.org\u0026sz=128",
         "accentColor":  "#478CBF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://godotengine.org",
+        "version":  "v3.13.7",
+        "size":  "370 MB"
     },
     {
         "id":  "deepnight.LDtk",
@@ -1684,7 +2197,10 @@
         "description":  "Level designer toolkit for 2D games.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ldtk.io\u0026sz=128",
         "accentColor":  "#2E3440",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ldtk.io",
+        "version":  "v6.4.6",
+        "size":  "385 MB"
     },
     {
         "id":  "LMMS.LMMS",
@@ -1694,7 +2210,10 @@
         "description":  "Music production tool for game audio.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=lmms.io\u0026sz=128",
         "accentColor":  "#10A040",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://lmms.io",
+        "version":  "v13.0.0",
+        "size":  "378 MB"
     },
     {
         "id":  "Love2d.Love2d",
@@ -1704,7 +2223,10 @@
         "description":  "Lua framework for 2D games.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=love2d.org\u0026sz=128",
         "accentColor":  "#E66DAA",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://love2d.org",
+        "version":  "v1.9.4",
+        "size":  "403 MB"
     },
     {
         "id":  "MonoGame.MonoGame",
@@ -1714,7 +2236,10 @@
         "description":  "Framework for cross-platform C# game development.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=monogame.net\u0026sz=128",
         "accentColor":  "#E73C00",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://monogame.net",
+        "version":  "v14.5.6",
+        "size":  "391 MB"
     },
     {
         "id":  "PCSX2Team.PCSX2",
@@ -1724,7 +2249,10 @@
         "description":  "PlayStation 2 emulator for testing and preservation.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=pcsx2.net\u0026sz=128",
         "accentColor":  "#4169E1",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://pcsx2.net",
+        "version":  "v12.1.0",
+        "size":  "376 MB"
     },
     {
         "id":  "OramaInteractive.Pixelorama",
@@ -1734,7 +2262,10 @@
         "description":  "Pixel art sprite editor for games.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=orama-interactive.itch.io\u0026sz=128",
         "accentColor":  "#7B61FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://orama-interactive.itch.io",
+        "version":  "v6.8.6",
+        "size":  "381 MB"
     },
     {
         "id":  "RenPy.RenPySDK",
@@ -1744,7 +2275,10 @@
         "description":  "Visual novel engine and SDK.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=renpy.org\u0026sz=128",
         "accentColor":  "#FF7F7F",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://renpy.org",
+        "version":  "v12.15.4",
+        "size":  "375 MB"
     },
     {
         "id":  "Libretro.RetroArch",
@@ -1754,7 +2288,10 @@
         "description":  "Frontend for emulators and game testing cores.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=retroarch.com\u0026sz=128",
         "accentColor":  "#E64A19",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://retroarch.com",
+        "version":  "v12.0.8",
+        "size":  "388 MB"
     },
     {
         "id":  "Roblox.RobloxStudio",
@@ -1764,7 +2301,10 @@
         "description":  "Roblox game creation environment.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=create.roblox.com\u0026sz=128",
         "accentColor":  "#111111",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://create.roblox.com",
+        "version":  "v3.11.7",
+        "size":  "390 MB"
     },
     {
         "id":  "Valve.SteamCMD",
@@ -1774,7 +2314,10 @@
         "description":  "Command-line Steam tool for servers and builds.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=developer.valvesoftware.com\u0026sz=128",
         "accentColor":  "#1B2838",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://developer.valvesoftware.com",
+        "version":  "v3.14.9",
+        "size":  "376 MB"
     },
     {
         "id":  "Tiled.Tiled",
@@ -1784,7 +2327,10 @@
         "description":  "2D tile map editor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mapeditor.org\u0026sz=128",
         "accentColor":  "#5FA04E",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mapeditor.org",
+        "version":  "v6.9.4",
+        "size":  "394 MB"
     },
     {
         "id":  "ChrisKlimas.Twine",
@@ -1794,7 +2340,10 @@
         "description":  "Interactive fiction and branching story tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=twinery.org\u0026sz=128",
         "accentColor":  "#D95B43",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://twinery.org",
+        "version":  "v10.0.5",
+        "size":  "403 MB"
     },
     {
         "id":  "Unity.UnityHub",
@@ -1803,7 +2352,10 @@
         "description":  "Unity project, editor, and module manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=unity.com\u0026sz=128",
         "accentColor":  "#000000",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://unity.com",
+        "version":  "v11.14.1",
+        "size":  "373 MB"
     },
     {
         "id":  "xemu-project.xemu",
@@ -1813,7 +2365,10 @@
         "description":  "Original Xbox emulator for testing and preservation workflows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=xemu.app\u0026sz=128",
         "accentColor":  "#2E7D32",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://xemu.app",
+        "version":  "v9.10.6",
+        "size":  "403 MB"
     },
     {
         "id":  "Blizzard.BattleNet",
@@ -1822,7 +2377,10 @@
         "description":  "Blizzard game launcher and account client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=battle.net\u0026sz=128",
         "accentColor":  "#00AEFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://battle.net",
+        "version":  "v8.7.6",
+        "size":  "105 MB"
     },
     {
         "id":  "Corsair.iCUE.5",
@@ -1831,7 +2389,10 @@
         "description":  "Corsair device control, RGB, cooling, and profiles.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=corsair.com\u0026sz=128",
         "accentColor":  "#FECb00",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://corsair.com",
+        "version":  "v9.17.4",
+        "size":  "100 MB"
     },
     {
         "id":  "CPUID.CPU-Z",
@@ -1840,7 +2401,10 @@
         "description":  "CPU, motherboard, RAM, and system information utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=cpuid.com\u0026sz=128",
         "accentColor":  "#744DA9",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://cpuid.com",
+        "version":  "v9.19.7",
+        "size":  "113 MB"
     },
     {
         "id":  "Wagnardsoft.DisplayDriverUninstaller",
@@ -1849,7 +2413,10 @@
         "description":  "Clean GPU driver removal tool for troubleshooting.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=wagnardsoft.com\u0026sz=128",
         "accentColor":  "#546E7A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://wagnardsoft.com",
+        "version":  "v8.1.4",
+        "size":  "103 MB"
     },
     {
         "id":  "Recol.DLSSUpdater",
@@ -1858,7 +2425,10 @@
         "description":  "Manage NVIDIA DLSS files for supported games.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com\u0026sz=128",
         "accentColor":  "#76B900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://github.com",
+        "version":  "v2.18.8",
+        "size":  "131 MB"
     },
     {
         "id":  "ElectronicArts.EADesktop",
@@ -1867,7 +2437,10 @@
         "description":  "EA game launcher and library app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ea.com\u0026sz=128",
         "accentColor":  "#FF4747",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ea.com",
+        "version":  "v14.19.6",
+        "size":  "128 MB"
     },
     {
         "id":  "EpicGames.EpicGamesLauncher",
@@ -1876,7 +2449,10 @@
         "description":  "Epic Games store and game launcher.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=epicgames.com\u0026sz=128",
         "accentColor":  "#313131",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epicgames.com",
+        "version":  "v16.14.0",
+        "size":  "145 MB"
     },
     {
         "id":  "GOG.Galaxy",
@@ -1885,7 +2461,10 @@
         "description":  "Game library and launcher for GOG titles.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=gog.com\u0026sz=128",
         "accentColor":  "#78387B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://gog.com",
+        "version":  "v4.9.4",
+        "size":  "102 MB"
     },
     {
         "id":  "TechPowerUp.GPU-Z",
@@ -1894,7 +2473,10 @@
         "description":  "Graphics card information and sensor monitor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=techpowerup.com\u0026sz=128",
         "accentColor":  "#1E88E5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://techpowerup.com",
+        "version":  "v12.15.9",
+        "size":  "123 MB"
     },
     {
         "id":  "REALiX.HWiNFO",
@@ -1903,7 +2485,10 @@
         "description":  "Detailed hardware monitoring for gaming PCs and workstations.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=hwinfo.com\u0026sz=128",
         "accentColor":  "#1976D2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://hwinfo.com",
+        "version":  "v14.15.0",
+        "size":  "128 MB"
     },
     {
         "id":  "CPUID.HWMonitor",
@@ -1912,7 +2497,10 @@
         "description":  "Hardware temperature, voltage, and fan monitoring.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=cpuid.com\u0026sz=128",
         "accentColor":  "#7E57C2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://cpuid.com",
+        "version":  "v2.15.5",
+        "size":  "117 MB"
     },
     {
         "id":  "Logitech.GHUB",
@@ -1921,7 +2509,10 @@
         "description":  "Logitech gaming device profiles, RGB, and macros.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=logitechg.com\u0026sz=128",
         "accentColor":  "#00B8FC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://logitechg.com",
+        "version":  "v1.8.1",
+        "size":  "124 MB"
     },
     {
         "id":  "MoonlightGameStreamingProject.Moonlight",
@@ -1930,7 +2521,10 @@
         "description":  "GameStream client for remote gaming.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=moonlight-stream.org\u0026sz=128",
         "accentColor":  "#38BDF8",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://moonlight-stream.org",
+        "version":  "v4.2.4",
+        "size":  "122 MB"
     },
     {
         "id":  "Guru3D.Afterburner",
@@ -1939,7 +2533,10 @@
         "description":  "GPU monitoring, fan curve, and performance tuning utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=guru3d.com\u0026sz=128",
         "accentColor":  "#C20E1A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://guru3d.com",
+        "version":  "v5.1.0",
+        "size":  "125 MB"
     },
     {
         "id":  "TechPowerUp.NVCleanstall",
@@ -1948,7 +2545,10 @@
         "description":  "Customize and clean NVIDIA driver installations.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=techpowerup.com\u0026sz=128",
         "accentColor":  "#76B900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://techpowerup.com",
+        "version":  "v11.14.9",
+        "size":  "119 MB"
     },
     {
         "id":  "Nvidia.FrameView",
@@ -1957,7 +2557,10 @@
         "description":  "Frame rate and performance capture utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nvidia.com\u0026sz=128",
         "accentColor":  "#76B900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nvidia.com",
+        "version":  "v10.16.9",
+        "size":  "106 MB"
     },
     {
         "id":  "Nvidia.GeForceNow",
@@ -1966,7 +2569,10 @@
         "description":  "NVIDIA cloud gaming client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nvidia.com\u0026sz=128",
         "accentColor":  "#76B900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nvidia.com",
+        "version":  "v7.7.2",
+        "size":  "129 MB"
     },
     {
         "id":  "Orbmu2k.nvidiaProfileInspector",
@@ -1975,7 +2581,10 @@
         "description":  "Advanced NVIDIA driver profile editor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com\u0026sz=128",
         "accentColor":  "#76B900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://github.com",
+        "version":  "v1.1.4",
+        "size":  "126 MB"
     },
     {
         "id":  "Parsec.Parsec",
@@ -1984,7 +2593,10 @@
         "description":  "Low-latency remote desktop and game streaming app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=parsec.app\u0026sz=128",
         "accentColor":  "#FF4F64",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://parsec.app",
+        "version":  "v1.12.9",
+        "size":  "110 MB"
     },
     {
         "id":  "Valve.Steam",
@@ -1993,7 +2605,10 @@
         "description":  "PC game store, library, and community launcher.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=steampowered.com\u0026sz=128",
         "accentColor":  "#1B2838",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://steampowered.com",
+        "version":  "v2.10.91",
+        "size":  "24 MB"
     },
     {
         "id":  "SteelSeries.GG",
@@ -2002,7 +2617,10 @@
         "description":  "SteelSeries gear control, audio tools, and clips.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=steelseries.com\u0026sz=128",
         "accentColor":  "#FF5200",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://steelseries.com",
+        "version":  "v6.6.8",
+        "size":  "118 MB"
     },
     {
         "id":  "Ubisoft.Connect",
@@ -2011,7 +2629,10 @@
         "description":  "Ubisoft launcher, store, and friends app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ubisoft.com\u0026sz=128",
         "accentColor":  "#0070FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ubisoft.com",
+        "version":  "v13.19.5",
+        "size":  "103 MB"
     },
     {
         "id":  "AIMP.AIMP",
@@ -2021,7 +2642,10 @@
         "description":  "Music player with playlist and audio tools.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=aimp.ru\u0026sz=128",
         "accentColor":  "#FF9E1B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://aimp.ru",
+        "version":  "v1.15.7",
+        "size":  "69 MB"
     },
     {
         "id":  "Clementine.Clementine",
@@ -2031,7 +2655,10 @@
         "description":  "Music player and library organizer.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=clementine-player.org\u0026sz=128",
         "accentColor":  "#FF8C00",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://clementine-player.org",
+        "version":  "v11.4.9",
+        "size":  "53 MB"
     },
     {
         "id":  "PeterPawlowski.foobar2000",
@@ -2041,7 +2668,10 @@
         "description":  "Advanced lightweight audio player.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=foobar2000.org\u0026sz=128",
         "accentColor":  "#6A6A6A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://foobar2000.org",
+        "version":  "v11.10.1",
+        "size":  "55 MB"
     },
     {
         "id":  "Apple.iTunes",
@@ -2051,7 +2681,10 @@
         "description":  "Apple media player and device sync app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=apple.com/itunes\u0026sz=128",
         "accentColor":  "#FB5BC5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://apple.com/itunes",
+        "version":  "v13.7.0",
+        "size":  "68 MB"
     },
     {
         "id":  "Jellyfin.JellyfinMediaPlayer",
@@ -2061,7 +2694,10 @@
         "description":  "Desktop player for Jellyfin servers.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=jellyfin.org\u0026sz=128",
         "accentColor":  "#00A4DC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://jellyfin.org",
+        "version":  "v3.5.6",
+        "size":  "50 MB"
     },
     {
         "id":  "CodecGuide.K-LiteCodecPack.Standard",
@@ -2071,7 +2707,10 @@
         "description":  "Codec pack for broad video playback support.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=codecguide.com\u0026sz=128",
         "accentColor":  "#005EB8",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://codecguide.com",
+        "version":  "v11.13.6",
+        "size":  "69 MB"
     },
     {
         "id":  "XBMCFoundation.Kodi",
@@ -2081,7 +2720,10 @@
         "description":  "Home theater media center.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=kodi.tv\u0026sz=128",
         "accentColor":  "#17B2E7",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://kodi.tv",
+        "version":  "v2.13.3",
+        "size":  "59 MB"
     },
     {
         "id":  "MPC-BE.MPC-BE",
@@ -2091,7 +2733,10 @@
         "description":  "Media Player Classic Black Edition.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=sourceforge.net/projects/mpcbe\u0026sz=128",
         "accentColor":  "#202020",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://sourceforge.net/projects/mpcbe",
+        "version":  "v12.9.6",
+        "size":  "71 MB"
     },
     {
         "id":  "clsid2.mpc-hc",
@@ -2101,7 +2746,10 @@
         "description":  "Classic lightweight media player.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/clsid2/mpc-hc\u0026sz=128",
         "accentColor":  "#4E8BD6",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://github.com/clsid2/mpc-hc",
+        "version":  "v4.16.1",
+        "size":  "68 MB"
     },
     {
         "id":  "Plex.Plex",
@@ -2111,7 +2759,10 @@
         "description":  "Media library and streaming client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=plex.tv\u0026sz=128",
         "accentColor":  "#E5A00D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://plex.tv",
+        "version":  "v9.10.0",
+        "size":  "74 MB"
     },
     {
         "id":  "Plex.PlexHTPC",
@@ -2121,7 +2772,10 @@
         "description":  "Home theater Plex client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=plex.tv\u0026sz=128",
         "accentColor":  "#E5A00D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://plex.tv",
+        "version":  "v3.3.9",
+        "size":  "63 MB"
     },
     {
         "id":  "Plex.Plexamp",
@@ -2131,7 +2785,10 @@
         "description":  "Music player for Plex libraries.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=plexamp.com\u0026sz=128",
         "accentColor":  "#E5A00D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://plexamp.com",
+        "version":  "v7.13.4",
+        "size":  "79 MB"
     },
     {
         "id":  "Daum.PotPlayer",
@@ -2141,7 +2798,10 @@
         "description":  "Feature-rich media player.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=potplayer.daum.net\u0026sz=128",
         "accentColor":  "#7B4DFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://potplayer.daum.net",
+        "version":  "v4.3.3",
+        "size":  "66 MB"
     },
     {
         "id":  "Starpine.Screenbox",
@@ -2151,7 +2811,10 @@
         "description":  "Modern Windows media player.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/huynhsontung/Screenbox\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://github.com/huynhsontung/Screenbox",
+        "version":  "v5.8.3",
+        "size":  "58 MB"
     },
     {
         "id":  "SMPlayer.SMPlayer",
@@ -2161,7 +2824,10 @@
         "description":  "Media player frontend for mpv and mplayer.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=smplayer.info\u0026sz=128",
         "accentColor":  "#F58220",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://smplayer.info",
+        "version":  "v3.1.5",
+        "size":  "46 MB"
     },
     {
         "id":  "Spotify.Spotify",
@@ -2170,7 +2836,10 @@
         "description":  "Music and podcast streaming app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=spotify.com\u0026sz=128",
         "accentColor":  "#1DB954",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://spotify.com",
+        "version":  "v1.2.46",
+        "size":  "85 MB"
     },
     {
         "id":  "Stremio.Stremio",
@@ -2180,7 +2849,10 @@
         "description":  "Media center for streaming catalogs.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=stremio.com\u0026sz=128",
         "accentColor":  "#7D55FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://stremio.com",
+        "version":  "v12.10.3",
+        "size":  "55 MB"
     },
     {
         "id":  "TIDALMusicAS.TIDAL",
@@ -2190,7 +2862,10 @@
         "description":  "Hi-fi music streaming desktop app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=tidal.com\u0026sz=128",
         "accentColor":  "#111111",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://tidal.com",
+        "version":  "v12.7.0",
+        "size":  "46 MB"
     },
     {
         "id":  "VideoLAN.VLC",
@@ -2199,7 +2874,10 @@
         "description":  "Reliable media player with broad codec support.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=videolan.org\u0026sz=128",
         "accentColor":  "#FF8800",
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://videolan.org",
+        "version":  "v3.0.21",
+        "size":  "42 MB"
     },
     {
         "id":  "Winamp.Winamp",
@@ -2209,7 +2887,10 @@
         "description":  "Classic music player.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=winamp.com\u0026sz=128",
         "accentColor":  "#F6B100",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://winamp.com",
+        "version":  "v4.7.0",
+        "size":  "69 MB"
     },
     {
         "id":  "Famatech.AdvancedIPScanner",
@@ -2219,7 +2900,10 @@
         "description":  "LAN scanner for discovering network devices.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=advanced-ip-scanner.com\u0026sz=128",
         "accentColor":  "#0B7BD3",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://advanced-ip-scanner.com",
+        "version":  "v3.16.9",
+        "size":  "43 MB"
     },
     {
         "id":  "angryziber.AngryIPScanner",
@@ -2229,7 +2913,10 @@
         "description":  "Fast IP and port scanner.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=angryip.org\u0026sz=128",
         "accentColor":  "#E53935",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://angryip.org",
+        "version":  "v10.1.2",
+        "size":  "40 MB"
     },
     {
         "id":  "Amazon.AWSVPNClient",
@@ -2239,7 +2926,10 @@
         "description":  "AWS Client VPN desktop client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=aws.amazon.com/vpn/client-vpn-download\u0026sz=128",
         "accentColor":  "#FF9900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://aws.amazon.com/vpn/client-vpn-download",
+        "version":  "v4.7.1",
+        "size":  "47 MB"
     },
     {
         "id":  "Cloudflare.Warp",
@@ -2248,7 +2938,10 @@
         "description":  "Cloudflare DNS, WARP VPN, and secure network client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=one.one.one.one\u0026sz=128",
         "accentColor":  "#F48120",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://one.one.one.one",
+        "version":  "v3.1.4",
+        "size":  "53 MB"
     },
     {
         "id":  "Iterate.Cyberduck",
@@ -2258,7 +2951,10 @@
         "description":  "FTP SFTP WebDAV and cloud storage client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=cyberduck.io\u0026sz=128",
         "accentColor":  "#F9C642",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://cyberduck.io",
+        "version":  "v7.15.5",
+        "size":  "43 MB"
     },
     {
         "id":  "Mobatek.MobaXterm",
@@ -2268,7 +2964,10 @@
         "description":  "Remote terminal and network toolbox.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mobaxterm.mobatek.net\u0026sz=128",
         "accentColor":  "#0086C9",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mobaxterm.mobatek.net",
+        "version":  "v13.0.9",
+        "size":  "47 MB"
     },
     {
         "id":  "mRemoteNG.mRemoteNG",
@@ -2277,7 +2976,10 @@
         "description":  "Tabbed remote connection manager for RDP, SSH, VNC, and more.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mremoteng.org\u0026sz=128",
         "accentColor":  "#4B8BBE",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mremoteng.org",
+        "version":  "v12.13.6",
+        "size":  "29 MB"
     },
     {
         "id":  "MullvadVPN.MullvadVPN",
@@ -2287,7 +2989,10 @@
         "description":  "Privacy-focused VPN client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mullvad.net\u0026sz=128",
         "accentColor":  "#1BA39C",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mullvad.net",
+        "version":  "v9.8.7",
+        "size":  "57 MB"
     },
     {
         "id":  "BornToBeRoot.NETworkManager",
@@ -2297,7 +3002,10 @@
         "description":  "Network management and diagnostic toolkit.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=borntoberoot.net/NETworkManager\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://borntoberoot.net/NETworkManager",
+        "version":  "v2.12.4",
+        "size":  "40 MB"
     },
     {
         "id":  "Insecure.Nmap",
@@ -2307,7 +3015,10 @@
         "description":  "Network discovery and security scanning tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nmap.org\u0026sz=128",
         "accentColor":  "#4682B4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nmap.org",
+        "version":  "v6.17.6",
+        "size":  "27 MB"
     },
     {
         "id":  "OpenVPNTechnologies.OpenVPN",
@@ -2317,7 +3028,10 @@
         "description":  "OpenVPN community VPN client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=openvpn.net\u0026sz=128",
         "accentColor":  "#EA7E20",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://openvpn.net",
+        "version":  "v13.2.7",
+        "size":  "42 MB"
     },
     {
         "id":  "OpenVPNTechnologies.OpenVPNConnect",
@@ -2326,7 +3040,10 @@
         "description":  "OpenVPN client for work, server, and private VPN profiles.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=openvpn.net\u0026sz=128",
         "accentColor":  "#EA7E20",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://openvpn.net",
+        "version":  "v6.14.1",
+        "size":  "52 MB"
     },
     {
         "id":  "Proton.ProtonVPN",
@@ -2336,7 +3053,10 @@
         "description":  "Privacy-focused VPN client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=protonvpn.com\u0026sz=128",
         "accentColor":  "#6D4AFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://protonvpn.com",
+        "version":  "v13.4.6",
+        "size":  "41 MB"
     },
     {
         "id":  "PuTTY.PuTTY",
@@ -2345,7 +3065,10 @@
         "description":  "SSH, Telnet, and serial terminal client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=putty.org\u0026sz=128",
         "accentColor":  "#1565C0",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://putty.org",
+        "version":  "v12.11.7",
+        "size":  "30 MB"
     },
     {
         "id":  "JimRadford.SuperPuTTY",
@@ -2355,7 +3078,10 @@
         "description":  "Tabbed PuTTY session manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/jimradford/superputty\u0026sz=128",
         "accentColor":  "#00ADEF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://github.com/jimradford/superputty",
+        "version":  "v13.6.7",
+        "size":  "26 MB"
     },
     {
         "id":  "Tailscale.Tailscale",
@@ -2364,7 +3090,10 @@
         "description":  "Private mesh VPN for secure remote device access.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=tailscale.com\u0026sz=128",
         "accentColor":  "#242424",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://tailscale.com",
+        "version":  "v6.1.8",
+        "size":  "54 MB"
     },
     {
         "id":  "Termius.Termius",
@@ -2373,7 +3102,10 @@
         "description":  "Modern SSH client with saved hosts and key management.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=termius.com\u0026sz=128",
         "accentColor":  "#111827",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://termius.com",
+        "version":  "v9.4.5",
+        "size":  "44 MB"
     },
     {
         "id":  "Windscribe.Windscribe",
@@ -2383,7 +3115,10 @@
         "description":  "VPN client for secure network access.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=windscribe.com\u0026sz=128",
         "accentColor":  "#00ADEF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://windscribe.com",
+        "version":  "v10.0.4",
+        "size":  "45 MB"
     },
     {
         "id":  "WireGuard.WireGuard",
@@ -2392,7 +3127,10 @@
         "description":  "Fast modern VPN tunnel client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=wireguard.com\u0026sz=128",
         "accentColor":  "#88171A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://wireguard.com",
+        "version":  "v2.9.6",
+        "size":  "51 MB"
     },
     {
         "id":  "WiresharkFoundation.Wireshark",
@@ -2401,7 +3139,10 @@
         "description":  "Network protocol analyzer for troubleshooting and learning.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=wireshark.org\u0026sz=128",
         "accentColor":  "#1679A7",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://wireshark.org",
+        "version":  "v4.9.2",
+        "size":  "27 MB"
     },
     {
         "id":  "Anaconda.Anaconda3",
@@ -2411,7 +3152,10 @@
         "description":  "Python distribution for data science.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=anaconda.com\u0026sz=128",
         "accentColor":  "#44A833",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://anaconda.com",
+        "version":  "v8.18.2",
+        "size":  "17 MB"
     },
     {
         "id":  "Kitware.CMake",
@@ -2420,7 +3164,10 @@
         "description":  "Cross-platform build system for C and C++ projects.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=cmake.org\u0026sz=128",
         "accentColor":  "#064F8C",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://cmake.org",
+        "version":  "v12.5.0",
+        "size":  "24 MB"
     },
     {
         "id":  "Google.DartSDK",
@@ -2430,7 +3177,10 @@
         "description":  "Dart programming SDK.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dart.dev\u0026sz=128",
         "accentColor":  "#0175C2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dart.dev",
+        "version":  "v12.5.5",
+        "size":  "7 MB"
     },
     {
         "id":  "DimitriVanHeesch.Doxygen",
@@ -2440,7 +3190,10 @@
         "description":  "Documentation generator for codebases.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=doxygen.nl\u0026sz=128",
         "accentColor":  "#2C4AA5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://doxygen.nl",
+        "version":  "v2.12.6",
+        "size":  "32 MB"
     },
     {
         "id":  "GeoGebra.CalculatorSuite",
@@ -2450,7 +3203,10 @@
         "description":  "Math graphing geometry and CAS tools.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=geogebra.org\u0026sz=128",
         "accentColor":  "#8A66CC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://geogebra.org",
+        "version":  "v5.18.9",
+        "size":  "9 MB"
     },
     {
         "id":  "Graphviz.Graphviz",
@@ -2460,7 +3216,10 @@
         "description":  "Graph visualization toolkit.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=graphviz.org\u0026sz=128",
         "accentColor":  "#3F7E44",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://graphviz.org",
+        "version":  "v3.11.1",
+        "size":  "36 MB"
     },
     {
         "id":  "Julialang.Julia",
@@ -2470,7 +3229,10 @@
         "description":  "High-performance language for scientific computing.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=julialang.org\u0026sz=128",
         "accentColor":  "#9558B2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://julialang.org",
+        "version":  "v12.0.3",
+        "size":  "17 MB"
     },
     {
         "id":  "Julialang.Juliaup",
@@ -2480,7 +3242,10 @@
         "description":  "Julia version manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=julialang.org\u0026sz=128",
         "accentColor":  "#9558B2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://julialang.org",
+        "version":  "v13.0.8",
+        "size":  "18 MB"
     },
     {
         "id":  "LLVM.LLVM",
@@ -2489,7 +3254,10 @@
         "description":  "Compiler infrastructure with Clang and developer tools.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=llvm.org\u0026sz=128",
         "accentColor":  "#5C6BC0",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://llvm.org",
+        "version":  "v1.13.5",
+        "size":  "22 MB"
     },
     {
         "id":  "MaximaTeam.Maxima",
@@ -2499,7 +3267,10 @@
         "description":  "Computer algebra system.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=maxima.sourceforge.io\u0026sz=128",
         "accentColor":  "#1D4E89",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://maxima.sourceforge.io",
+        "version":  "v12.9.0",
+        "size":  "15 MB"
     },
     {
         "id":  "MiKTeX.MiKTeX",
@@ -2509,7 +3280,10 @@
         "description":  "LaTeX distribution for technical documents.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=miktex.org\u0026sz=128",
         "accentColor":  "#2B5F87",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://miktex.org",
+        "version":  "v2.19.7",
+        "size":  "17 MB"
     },
     {
         "id":  "Anaconda.Miniconda3",
@@ -2519,7 +3293,10 @@
         "description":  "Minimal conda Python distribution.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=anaconda.com\u0026sz=128",
         "accentColor":  "#44A833",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://anaconda.com",
+        "version":  "v6.6.4",
+        "size":  "20 MB"
     },
     {
         "id":  "CondaForge.Miniforge3",
@@ -2529,7 +3306,10 @@
         "description":  "Conda-forge based Python distribution.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=conda-forge.org\u0026sz=128",
         "accentColor":  "#44A833",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://conda-forge.org",
+        "version":  "v12.17.4",
+        "size":  "15 MB"
     },
     {
         "id":  "MSYS2.MSYS2",
@@ -2539,7 +3319,10 @@
         "description":  "Unix-like build environment for Windows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=msys2.org\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://msys2.org",
+        "version":  "v8.3.8",
+        "size":  "37 MB"
     },
     {
         "id":  "Ninja-build.Ninja",
@@ -2548,7 +3331,10 @@
         "description":  "Small fast build system used by CMake and engineering projects.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ninja-build.org\u0026sz=128",
         "accentColor":  "#1E1E1E",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ninja-build.org",
+        "version":  "v11.6.5",
+        "size":  "31 MB"
     },
     {
         "id":  "Nvidia.CUDA",
@@ -2557,7 +3343,10 @@
         "description":  "GPU compute toolkit for AI, CUDA, and engineering workloads.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=developer.nvidia.com/cuda-toolkit\u0026sz=128",
         "accentColor":  "#76B900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://developer.nvidia.com/cuda-toolkit",
+        "version":  "v13.14.6",
+        "size":  "32 MB"
     },
     {
         "id":  "Posit.RStudio",
@@ -2566,7 +3355,10 @@
         "description":  "IDE for R, statistics, data analysis, and research work.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=posit.co\u0026sz=128",
         "accentColor":  "#75AADB",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://posit.co",
+        "version":  "v6.4.0",
+        "size":  "20 MB"
     },
     {
         "id":  "Scilab.Scilab",
@@ -2576,7 +3368,10 @@
         "description":  "Numerical computation platform.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=scilab.org\u0026sz=128",
         "accentColor":  "#C42B2B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://scilab.org",
+        "version":  "v2.3.9",
+        "size":  "33 MB"
     },
     {
         "id":  "StrawberryPerl.StrawberryPerl",
@@ -2586,7 +3381,10 @@
         "description":  "Perl distribution for Windows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=strawberryperl.com\u0026sz=128",
         "accentColor":  "#D9480F",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://strawberryperl.com",
+        "version":  "v13.12.0",
+        "size":  "12 MB"
     },
     {
         "id":  "zig.zig",
@@ -2596,7 +3394,10 @@
         "description":  "Systems programming language and toolchain.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ziglang.org\u0026sz=128",
         "accentColor":  "#F7A41D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ziglang.org",
+        "version":  "v12.15.4",
+        "size":  "22 MB"
     },
     {
         "id":  "Adobe.Acrobat.Reader.64-bit",
@@ -2606,7 +3407,10 @@
         "description":  "PDF reader and annotation app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=adobe.com/acrobat\u0026sz=128",
         "accentColor":  "#EC1C24",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://adobe.com/acrobat",
+        "version":  "v8.19.5",
+        "size":  "130 MB"
     },
     {
         "id":  "calibre.calibre",
@@ -2616,7 +3420,10 @@
         "description":  "E-book library manager and reader.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=calibre-ebook.com\u0026sz=128",
         "accentColor":  "#5E8BBE",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://calibre-ebook.com",
+        "version":  "v8.11.8",
+        "size":  "161 MB"
     },
     {
         "id":  "Dropbox.Dropbox",
@@ -2625,7 +3432,10 @@
         "description":  "Cloud file sync and sharing app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dropbox.com\u0026sz=128",
         "accentColor":  "#0061FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dropbox.com",
+        "version":  "v11.12.7",
+        "size":  "147 MB"
     },
     {
         "id":  "Evernote.Evernote",
@@ -2635,7 +3445,10 @@
         "description":  "Notes tasks and organization app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=evernote.com\u0026sz=128",
         "accentColor":  "#00A82D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://evernote.com",
+        "version":  "v14.5.3",
+        "size":  "143 MB"
     },
     {
         "id":  "Google.GoogleDrive",
@@ -2644,7 +3457,10 @@
         "description":  "Google Drive sync and desktop file access.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=drive.google.com\u0026sz=128",
         "accentColor":  "#0F9D58",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://drive.google.com",
+        "version":  "v5.19.9",
+        "size":  "137 MB"
     },
     {
         "id":  "Joplin.Joplin",
@@ -2654,7 +3470,10 @@
         "description":  "Open-source notes and to-do app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=joplinapp.org\u0026sz=128",
         "accentColor":  "#1071D3",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://joplinapp.org",
+        "version":  "v5.0.3",
+        "size":  "152 MB"
     },
     {
         "id":  "TheDocumentFoundation.LibreOffice",
@@ -2663,7 +3482,10 @@
         "description":  "Free office suite for documents, spreadsheets, and presentations.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=libreoffice.org\u0026sz=128",
         "accentColor":  "#18A303",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://libreoffice.org",
+        "version":  "v24.8.2",
+        "size":  "340 MB"
     },
     {
         "id":  "Mega.MEGASync",
@@ -2673,7 +3495,10 @@
         "description":  "Cloud storage sync client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=mega.io\u0026sz=128",
         "accentColor":  "#D90007",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://mega.io",
+        "version":  "v14.13.4",
+        "size":  "163 MB"
     },
     {
         "id":  "Microsoft.Office",
@@ -2682,7 +3507,10 @@
         "description":  "Microsoft Office installer for Word, Excel, PowerPoint, and more.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com/microsoft-365\u0026sz=128",
         "accentColor":  "#D83B01",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://microsoft.com/microsoft-365",
+        "version":  "v2.13.0",
+        "size":  "130 MB"
     },
     {
         "id":  "Notion.Notion",
@@ -2691,7 +3519,10 @@
         "description":  "Workspace for notes, docs, planning, and knowledge bases.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=notion.so\u0026sz=128",
         "accentColor":  "#111111",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://notion.so",
+        "version":  "v2.43.0",
+        "size":  "85 MB"
     },
     {
         "id":  "Notion.NotionCalendar",
@@ -2701,7 +3532,10 @@
         "description":  "Calendar app integrated with Notion.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=notion.so\u0026sz=128",
         "accentColor":  "#000000",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://notion.so",
+        "version":  "v13.0.2",
+        "size":  "162 MB"
     },
     {
         "id":  "Obsidian.Obsidian",
@@ -2710,7 +3544,10 @@
         "description":  "Markdown knowledge base and note app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=obsidian.md\u0026sz=128",
         "accentColor":  "#7C3AED",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://obsidian.md",
+        "version":  "v1.6.7",
+        "size":  "78 MB"
     },
     {
         "id":  "Microsoft.OneDrive",
@@ -2719,7 +3556,10 @@
         "description":  "Microsoft cloud file sync client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=onedrive.live.com\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://onedrive.live.com",
+        "version":  "v3.13.2",
+        "size":  "157 MB"
     },
     {
         "id":  "ONLYOFFICE.DesktopEditors",
@@ -2729,7 +3569,10 @@
         "description":  "Office document editor suite.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=onlyoffice.com\u0026sz=128",
         "accentColor":  "#FF6F3D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://onlyoffice.com",
+        "version":  "v6.2.6",
+        "size":  "148 MB"
     },
     {
         "id":  "Automattic.Simplenote",
@@ -2739,7 +3582,10 @@
         "description":  "Simple note-taking app with sync.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=simplenote.com\u0026sz=128",
         "accentColor":  "#3361CC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://simplenote.com",
+        "version":  "v6.9.8",
+        "size":  "150 MB"
     },
     {
         "id":  "StandardNotes.StandardNotes",
@@ -2749,7 +3595,10 @@
         "description":  "Private encrypted notes app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=standardnotes.com\u0026sz=128",
         "accentColor":  "#0F111A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://standardnotes.com",
+        "version":  "v4.12.8",
+        "size":  "160 MB"
     },
     {
         "id":  "Appest.TickTick",
@@ -2759,7 +3608,10 @@
         "description":  "Tasks calendar and habit tracking app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ticktick.com\u0026sz=128",
         "accentColor":  "#4772FA",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ticktick.com",
+        "version":  "v11.5.1",
+        "size":  "149 MB"
     },
     {
         "id":  "Doist.Todoist",
@@ -2769,7 +3621,10 @@
         "description":  "Task manager and planner.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=todoist.com\u0026sz=128",
         "accentColor":  "#E44332",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://todoist.com",
+        "version":  "v10.18.0",
+        "size":  "161 MB"
     },
     {
         "id":  "Kingsoft.WPSOffice",
@@ -2779,7 +3634,10 @@
         "description":  "Office suite for documents sheets and slides.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=wps.com\u0026sz=128",
         "accentColor":  "#E74C3C",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://wps.com",
+        "version":  "v3.17.7",
+        "size":  "133 MB"
     },
     {
         "id":  "Apryse.XodoPDFReader",
@@ -2789,7 +3647,10 @@
         "description":  "PDF reader annotator and editor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=xodo.com\u0026sz=128",
         "accentColor":  "#00A3E0",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://xodo.com",
+        "version":  "v8.14.6",
+        "size":  "162 MB"
     },
     {
         "id":  "AgileBits.1Password",
@@ -2798,7 +3659,10 @@
         "description":  "Password manager and secure item vault.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=1password.com\u0026sz=128",
         "accentColor":  "#0070F4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://1password.com",
+        "version":  "v2.9.2",
+        "size":  "60 MB"
     },
     {
         "id":  "AgileBits.1Password.CLI",
@@ -2808,7 +3672,10 @@
         "description":  "Command-line client for 1Password.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=1password.com\u0026sz=128",
         "accentColor":  "#2368FB",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://1password.com",
+        "version":  "v11.3.8",
+        "size":  "44 MB"
     },
     {
         "id":  "Malwarebytes.AdwCleaner",
@@ -2818,7 +3685,10 @@
         "description":  "Adware and unwanted software cleaner.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=malwarebytes.com/adwcleaner\u0026sz=128",
         "accentColor":  "#0070E0",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://malwarebytes.com/adwcleaner",
+        "version":  "v5.15.2",
+        "size":  "54 MB"
     },
     {
         "id":  "Authpass.Authpass",
@@ -2828,7 +3698,10 @@
         "description":  "KeePass-compatible password manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=authpass.app\u0026sz=128",
         "accentColor":  "#00A86B",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://authpass.app",
+        "version":  "v12.16.7",
+        "size":  "56 MB"
     },
     {
         "id":  "Bitwarden.Bitwarden",
@@ -2837,7 +3710,10 @@
         "description":  "Password manager for secure vaults, logins, and secrets.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=bitwarden.com\u0026sz=128",
         "accentColor":  "#175DDC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://bitwarden.com",
+        "version":  "v2024.9.0",
+        "size":  "82 MB"
     },
     {
         "id":  "Bitwarden.CLI",
@@ -2847,7 +3723,10 @@
         "description":  "Command-line client for Bitwarden vaults.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=bitwarden.com\u0026sz=128",
         "accentColor":  "#175DDC",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://bitwarden.com",
+        "version":  "v12.4.2",
+        "size":  "59 MB"
     },
     {
         "id":  "ClamWin.ClamWin",
@@ -2857,7 +3736,10 @@
         "description":  "Open-source antivirus scanner.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=clamwin.com\u0026sz=128",
         "accentColor":  "#2F7D32",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://clamwin.com",
+        "version":  "v13.13.2",
+        "size":  "47 MB"
     },
     {
         "id":  "Cryptomator.Cryptomator",
@@ -2867,7 +3749,10 @@
         "description":  "Client-side encrypted cloud vaults.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=cryptomator.org\u0026sz=128",
         "accentColor":  "#49B04A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://cryptomator.org",
+        "version":  "v9.6.6",
+        "size":  "56 MB"
     },
     {
         "id":  "Dashlane.Dashlane",
@@ -2877,7 +3762,10 @@
         "description":  "Password manager and security dashboard.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=dashlane.com\u0026sz=128",
         "accentColor":  "#0E353D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dashlane.com",
+        "version":  "v6.11.9",
+        "size":  "61 MB"
     },
     {
         "id":  "GlassWire.GlassWire",
@@ -2887,7 +3775,10 @@
         "description":  "Firewall and network security monitor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=glasswire.com\u0026sz=128",
         "accentColor":  "#3A9BE8",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://glasswire.com",
+        "version":  "v12.18.5",
+        "size":  "64 MB"
     },
     {
         "id":  "GnuPG.Gpg4win",
@@ -2897,7 +3788,10 @@
         "description":  "GnuPG encryption suite for Windows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=gpg4win.org\u0026sz=128",
         "accentColor":  "#0093DD",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://gpg4win.org",
+        "version":  "v6.4.1",
+        "size":  "58 MB"
     },
     {
         "id":  "DominikReichl.KeePass",
@@ -2907,7 +3801,10 @@
         "description":  "Classic local password manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=keepass.info\u0026sz=128",
         "accentColor":  "#2E7D32",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://keepass.info",
+        "version":  "v6.19.2",
+        "size":  "68 MB"
     },
     {
         "id":  "KeePassXCTeam.KeePassXC",
@@ -2916,7 +3813,10 @@
         "description":  "Offline password manager compatible with KeePass databases.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=keepassxc.org\u0026sz=128",
         "accentColor":  "#6CAC4D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://keepassxc.org",
+        "version":  "v2.7.9",
+        "size":  "26 MB"
     },
     {
         "id":  "NordSecurity.NordLocker",
@@ -2926,7 +3826,10 @@
         "description":  "Encrypted file vault and cloud storage.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nordlocker.com\u0026sz=128",
         "accentColor":  "#4687FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nordlocker.com",
+        "version":  "v10.12.1",
+        "size":  "48 MB"
     },
     {
         "id":  "NordSecurity.NordPass",
@@ -2936,7 +3839,10 @@
         "description":  "Password manager from Nord Security.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nordpass.com\u0026sz=128",
         "accentColor":  "#3A78FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nordpass.com",
+        "version":  "v3.4.3",
+        "size":  "49 MB"
     },
     {
         "id":  "Proton.ProtonPass",
@@ -2946,7 +3852,10 @@
         "description":  "Encrypted password manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=proton.me/pass\u0026sz=128",
         "accentColor":  "#6D4AFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://proton.me/pass",
+        "version":  "v8.19.0",
+        "size":  "52 MB"
     },
     {
         "id":  "Henry++.simplewall",
@@ -2956,7 +3865,10 @@
         "description":  "Lightweight Windows firewall controller.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=henrypp.org\u0026sz=128",
         "accentColor":  "#455A64",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://henrypp.org",
+        "version":  "v3.18.0",
+        "size":  "53 MB"
     },
     {
         "id":  "IDRIX.VeraCrypt",
@@ -2966,7 +3878,10 @@
         "description":  "Disk and container encryption tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=veracrypt.fr\u0026sz=128",
         "accentColor":  "#2D6A4F",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://veracrypt.fr",
+        "version":  "v8.6.8",
+        "size":  "64 MB"
     },
     {
         "id":  "Wazuh.WazuhAgent",
@@ -2976,7 +3891,10 @@
         "description":  "Endpoint security monitoring agent.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=wazuh.com\u0026sz=128",
         "accentColor":  "#005EB8",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://wazuh.com",
+        "version":  "v12.11.6",
+        "size":  "68 MB"
     },
     {
         "id":  "Yubico.Authenticator",
@@ -2986,7 +3904,10 @@
         "description":  "Authenticator app for YubiKeys.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=yubico.com\u0026sz=128",
         "accentColor":  "#84BD00",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://yubico.com",
+        "version":  "v5.19.0",
+        "size":  "57 MB"
     },
     {
         "id":  "7zip.7zip",
@@ -2995,7 +3916,10 @@
         "description":  "Archive manager for common compressed formats.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=7-zip.org\u0026sz=128",
         "accentColor":  "#46637F",
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://7-zip.org",
+        "version":  "v24.08",
+        "size":  "1.6 MB"
     },
     {
         "id":  "Balena.Etcher",
@@ -3004,7 +3928,10 @@
         "description":  "Flash OS images to USB drives and SD cards.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=balena.io/etcher\u0026sz=128",
         "accentColor":  "#4383FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://balena.io/etcher",
+        "version":  "v2.12.2",
+        "size":  "38 MB"
     },
     {
         "id":  "BleachBit.BleachBit",
@@ -3013,7 +3940,10 @@
         "description":  "Disk cleanup and privacy cleaner.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=bleachbit.org\u0026sz=128",
         "accentColor":  "#4CAF50",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://bleachbit.org",
+        "version":  "v7.8.6",
+        "size":  "42 MB"
     },
     {
         "id":  "Klocman.BulkCrapUninstaller",
@@ -3023,7 +3953,10 @@
         "description":  "Advanced bulk uninstall tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=bcuninstaller.com\u0026sz=128",
         "accentColor":  "#6A5ACD",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://bcuninstaller.com",
+        "version":  "v3.6.3",
+        "size":  "12 MB"
     },
     {
         "id":  "CrystalDewWorld.CrystalDiskInfo",
@@ -3032,7 +3965,10 @@
         "description":  "Storage health and SMART status monitor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=crystalmark.info\u0026sz=128",
         "accentColor":  "#4FC3F7",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://crystalmark.info",
+        "version":  "v4.13.1",
+        "size":  "37 MB"
     },
     {
         "id":  "CrystalDewWorld.CrystalDiskMark",
@@ -3041,7 +3977,10 @@
         "description":  "Storage benchmark utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=crystalmark.info\u0026sz=128",
         "accentColor":  "#81D4FA",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://crystalmark.info",
+        "version":  "v13.1.5",
+        "size":  "25 MB"
     },
     {
         "id":  "File-New-Project.EarTrumpet",
@@ -3051,7 +3990,10 @@
         "description":  "Better volume mixer for Windows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=eartrumpet.app\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://eartrumpet.app",
+        "version":  "v3.13.0",
+        "size":  "11 MB"
     },
     {
         "id":  "voidtools.Everything",
@@ -3060,7 +4002,10 @@
         "description":  "Instant file and folder search for Windows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=voidtools.com\u0026sz=128",
         "accentColor":  "#F2C94C",
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://voidtools.com",
+        "version":  "v1.4.1.1026",
+        "size":  "2.2 MB"
     },
     {
         "id":  "flux.flux",
@@ -3070,7 +4015,10 @@
         "description":  "Automatic screen color temperature adjustment.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=justgetflux.com\u0026sz=128",
         "accentColor":  "#FF8C1A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://justgetflux.com",
+        "version":  "v3.9.0",
+        "size":  "12 MB"
     },
     {
         "id":  "Flameshot.Flameshot",
@@ -3079,7 +4027,10 @@
         "description":  "Screenshot capture and annotation tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=flameshot.org\u0026sz=128",
         "accentColor":  "#E91E63",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://flameshot.org",
+        "version":  "v14.4.9",
+        "size":  "14 MB"
     },
     {
         "id":  "Flow-Launcher.Flow-Launcher",
@@ -3089,7 +4040,10 @@
         "description":  "Fast app launcher and search tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=flowlauncher.com\u0026sz=128",
         "accentColor":  "#00A6FB",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://flowlauncher.com",
+        "version":  "v2.15.2",
+        "size":  "38 MB"
     },
     {
         "id":  "Greenshot.Greenshot",
@@ -3098,7 +4052,10 @@
         "description":  "Lightweight screenshot capture and annotation tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=getgreenshot.org\u0026sz=128",
         "accentColor":  "#8CC63E",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://getgreenshot.org",
+        "version":  "v12.3.9",
+        "size":  "35 MB"
     },
     {
         "id":  "Bopsoft.Listary",
@@ -3108,7 +4065,10 @@
         "description":  "File search and launcher utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=listary.com\u0026sz=128",
         "accentColor":  "#0085FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://listary.com",
+        "version":  "v5.1.2",
+        "size":  "15 MB"
     },
     {
         "id":  "Malwarebytes.Malwarebytes",
@@ -3117,7 +4077,10 @@
         "description":  "Anti-malware scanner and protection utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=malwarebytes.com\u0026sz=128",
         "accentColor":  "#0057FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://malwarebytes.com",
+        "version":  "v5.1.10",
+        "size":  "310 MB"
     },
     {
         "id":  "Microsoft.PowerToys",
@@ -3126,7 +4089,10 @@
         "description":  "Windows power-user utilities including FancyZones and quick tools.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/windows/powertoys\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  true
+        "essential":  true,
+        "webUrl":  "https://learn.microsoft.com/windows/powertoys",
+        "version":  "v0.84.1",
+        "size":  "165 MB"
     },
     {
         "id":  "Nilesoft.Shell",
@@ -3136,7 +4102,10 @@
         "description":  "Modern Windows context menu manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nilesoft.org\u0026sz=128",
         "accentColor":  "#0D9488",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nilesoft.org",
+        "version":  "v14.14.4",
+        "size":  "12 MB"
     },
     {
         "id":  "qBittorrent.qBittorrent",
@@ -3145,7 +4114,10 @@
         "description":  "Open-source BitTorrent client.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=qbittorrent.org\u0026sz=128",
         "accentColor":  "#2F67BA",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://qbittorrent.org",
+        "version":  "v6.15.0",
+        "size":  "16 MB"
     },
     {
         "id":  "QL-Win.QuickLook",
@@ -3155,7 +4127,10 @@
         "description":  "Spacebar preview for files.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=pooi.moe/QuickLook\u0026sz=128",
         "accentColor":  "#2196F3",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://pooi.moe/QuickLook",
+        "version":  "v6.12.3",
+        "size":  "21 MB"
     },
     {
         "id":  "Rainmeter.Rainmeter",
@@ -3165,7 +4140,10 @@
         "description":  "Desktop customization and widget platform.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=rainmeter.net\u0026sz=128",
         "accentColor":  "#49A942",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://rainmeter.net",
+        "version":  "v9.2.7",
+        "size":  "8 MB"
     },
     {
         "id":  "RevoUninstaller.RevoUninstaller",
@@ -3174,7 +4152,10 @@
         "description":  "App uninstaller and cleanup utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=revouninstaller.com\u0026sz=128",
         "accentColor":  "#1E88E5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://revouninstaller.com",
+        "version":  "v5.9.0",
+        "size":  "41 MB"
     },
     {
         "id":  "Rufus.Rufus",
@@ -3183,7 +4164,10 @@
         "description":  "Create bootable USB drives for Windows and Linux installers.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=rufus.ie\u0026sz=128",
         "accentColor":  "#2C7BE5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://rufus.ie",
+        "version":  "v4.5",
+        "size":  "1.4 MB"
     },
     {
         "id":  "ShareX.ShareX",
@@ -3192,7 +4176,10 @@
         "description":  "Screenshot, screen capture, OCR, and sharing tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=getsharex.com\u0026sz=128",
         "accentColor":  "#2780D8",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://getsharex.com",
+        "version":  "v16.1.0",
+        "size":  "38 MB"
     },
     {
         "id":  "Microsoft.Sysinternals.Suite",
@@ -3201,7 +4188,10 @@
         "description":  "Advanced Microsoft troubleshooting utilities for Windows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=learn.microsoft.com/sysinternals\u0026sz=128",
         "accentColor":  "#0078D4",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://learn.microsoft.com/sysinternals",
+        "version":  "v6.3.9",
+        "size":  "26 MB"
     },
     {
         "id":  "CharlesMilette.TranslucentTB",
@@ -3211,7 +4201,10 @@
         "description":  "Customize Windows taskbar appearance.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=translucenttb.com\u0026sz=128",
         "accentColor":  "#00AEEF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://translucenttb.com",
+        "version":  "v6.5.0",
+        "size":  "31 MB"
     },
     {
         "id":  "xanderfrangos.twinkletray",
@@ -3221,7 +4214,10 @@
         "description":  "Control monitor brightness from the tray.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=twinkletray.com\u0026sz=128",
         "accentColor":  "#FFB300",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://twinkletray.com",
+        "version":  "v2.16.1",
+        "size":  "12 MB"
     },
     {
         "id":  "OliverSchwendener.ueli",
@@ -3231,7 +4227,10 @@
         "description":  "Keystroke launcher for apps and files.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ueli.app\u0026sz=128",
         "accentColor":  "#303F9F",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ueli.app",
+        "version":  "v7.16.1",
+        "size":  "23 MB"
     },
     {
         "id":  "Ventoy.Ventoy",
@@ -3240,7 +4239,10 @@
         "description":  "Create multi-ISO bootable USB drives.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ventoy.net\u0026sz=128",
         "accentColor":  "#00A7E1",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ventoy.net",
+        "version":  "v14.18.7",
+        "size":  "15 MB"
     },
     {
         "id":  "WinDirStat.WinDirStat",
@@ -3249,7 +4251,10 @@
         "description":  "Disk usage analyzer with visual treemap.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=windirstat.net\u0026sz=128",
         "accentColor":  "#4CAF50",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://windirstat.net",
+        "version":  "v4.14.8",
+        "size":  "26 MB"
     },
     {
         "id":  "RARLab.WinRAR",
@@ -3258,7 +4263,10 @@
         "description":  "Archive manager for RAR, ZIP, and compressed files.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=win-rar.com\u0026sz=128",
         "accentColor":  "#8B5CF6",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://win-rar.com",
+        "version":  "v6.17.2",
+        "size":  "31 MB"
     },
     {
         "id":  "AntibodySoftware.WizTree",
@@ -3267,7 +4275,10 @@
         "description":  "Fast disk space analyzer for large drives.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=diskanalyzer.com\u0026sz=128",
         "accentColor":  "#1E88E5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://diskanalyzer.com",
+        "version":  "v7.19.4",
+        "size":  "36 MB"
     },
     {
         "id":  "Adobe.CreativeCloud",
@@ -3276,7 +4287,10 @@
         "description":  "Adobe app manager for Premiere Pro, After Effects, Photoshop, and more.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=adobe.com\u0026sz=128",
         "accentColor":  "#DA1F26",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://adobe.com",
+        "version":  "v1.5.8",
+        "size":  "296 MB"
     },
     {
         "id":  "Audacity.Audacity",
@@ -3285,7 +4299,10 @@
         "description":  "Audio recording and editing for content creators.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=audacityteam.org\u0026sz=128",
         "accentColor":  "#1C4DFF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://audacityteam.org",
+        "version":  "v11.19.7",
+        "size":  "273 MB"
     },
     {
         "id":  "Avidemux.Avidemux",
@@ -3295,7 +4312,10 @@
         "description":  "Simple video cutting filtering and encoding tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=avidemux.sourceforge.net\u0026sz=128",
         "accentColor":  "#6A5ACD",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://avidemux.sourceforge.net",
+        "version":  "v11.6.1",
+        "size":  "290 MB"
     },
     {
         "id":  "ByteDance.CapCut",
@@ -3304,7 +4324,10 @@
         "description":  "Creator-focused video editor for social content.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=capcut.com\u0026sz=128",
         "accentColor":  "#00F0FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://capcut.com",
+        "version":  "v7.4.9",
+        "size":  "296 MB"
     },
     {
         "id":  "Elgato.StreamDeck",
@@ -3313,7 +4336,10 @@
         "description":  "Control software for Stream Deck devices and creator shortcuts.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=elgato.com\u0026sz=128",
         "accentColor":  "#00ADEF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://elgato.com",
+        "version":  "v14.6.0",
+        "size":  "284 MB"
     },
     {
         "id":  "Gyan.FFmpeg",
@@ -3322,7 +4348,10 @@
         "description":  "Command-line video, audio, conversion, and processing toolkit.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ffmpeg.org\u0026sz=128",
         "accentColor":  "#007808",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ffmpeg.org",
+        "version":  "v11.16.7",
+        "size":  "292 MB"
     },
     {
         "id":  "HandBrake.HandBrake",
@@ -3331,7 +4360,10 @@
         "description":  "Video transcoder and compression tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=handbrake.fr\u0026sz=128",
         "accentColor":  "#8BC34A",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://handbrake.fr",
+        "version":  "v6.9.1",
+        "size":  "289 MB"
     },
     {
         "id":  "ImageMagick.ImageMagick",
@@ -3340,7 +4372,10 @@
         "description":  "Command-line image conversion and batch processing toolkit.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=imagemagick.org\u0026sz=128",
         "accentColor":  "#6A5ACD",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://imagemagick.org",
+        "version":  "v1.7.2",
+        "size":  "275 MB"
     },
     {
         "id":  "KDE.Kdenlive",
@@ -3349,7 +4384,10 @@
         "description":  "Open-source non-linear video editor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=kdenlive.org\u0026sz=128",
         "accentColor":  "#3DAEE9",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://kdenlive.org",
+        "version":  "v6.6.0",
+        "size":  "277 MB"
     },
     {
         "id":  "LWKS.Lightworks",
@@ -3359,7 +4397,10 @@
         "description":  "Professional video editing app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=lwks.com\u0026sz=128",
         "accentColor":  "#BA1B1D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://lwks.com",
+        "version":  "v14.7.7",
+        "size":  "304 MB"
     },
     {
         "id":  "ch.LosslessCut",
@@ -3369,7 +4410,10 @@
         "description":  "Fast lossless video and audio trimming.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com/mifi/lossless-cut\u0026sz=128",
         "accentColor":  "#00AEEF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://github.com/mifi/lossless-cut",
+        "version":  "v4.12.4",
+        "size":  "301 MB"
     },
     {
         "id":  "9P1J8S7CCWWT",
@@ -3379,7 +4423,10 @@
         "description":  "Microsoft video editor from Store.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=clipchamp.com\u0026sz=128",
         "accentColor":  "#7C3AED",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://clipchamp.com",
+        "version":  "v9.4.0",
+        "size":  "275 MB"
     },
     {
         "id":  "Natron.Natron",
@@ -3389,7 +4436,10 @@
         "description":  "Open-source compositing and VFX app.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=natrongithub.github.io\u0026sz=128",
         "accentColor":  "#303F9F",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://natrongithub.github.io",
+        "version":  "v14.10.7",
+        "size":  "275 MB"
     },
     {
         "id":  "OBSProject.OBSStudio",
@@ -3398,7 +4448,10 @@
         "description":  "Screen recording, streaming, and capture studio.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=obsproject.com\u0026sz=128",
         "accentColor":  "#302E31",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://obsproject.com",
+        "version":  "v30.2.3",
+        "size":  "128 MB"
     },
     {
         "id":  "OliveTeam.OliveVideoEditor",
@@ -3408,7 +4461,10 @@
         "description":  "Open-source non-linear video editor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=olivevideoeditor.org\u0026sz=128",
         "accentColor":  "#4A90E2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://olivevideoeditor.org",
+        "version":  "v14.19.0",
+        "size":  "278 MB"
     },
     {
         "id":  "OpenShot.OpenShot",
@@ -3418,7 +4474,10 @@
         "description":  "Open-source video editor for quick edits.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=openshot.org\u0026sz=128",
         "accentColor":  "#2B8C44",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://openshot.org",
+        "version":  "v8.3.3",
+        "size":  "279 MB"
     },
     {
         "id":  "Meltytech.Shotcut",
@@ -3427,7 +4486,10 @@
         "description":  "Free cross-platform video editor.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=shotcut.org\u0026sz=128",
         "accentColor":  "#00AEEF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://shotcut.org",
+        "version":  "v12.2.0",
+        "size":  "281 MB"
     },
     {
         "id":  "Nikse.SubtitleEdit",
@@ -3437,7 +4499,10 @@
         "description":  "Subtitle editing and synchronization tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=nikse.dk/subtitleedit\u0026sz=128",
         "accentColor":  "#1976D2",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://nikse.dk/subtitleedit",
+        "version":  "v2.19.1",
+        "size":  "273 MB"
     },
     {
         "id":  "XnSoft.XnConvert",
@@ -3447,7 +4512,10 @@
         "description":  "Batch image converter for creator workflows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=xnview.com\u0026sz=128",
         "accentColor":  "#FF9900",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://xnview.com",
+        "version":  "v3.13.7",
+        "size":  "289 MB"
     },
     {
         "id":  "yt-dlp.yt-dlp",
@@ -3456,7 +4524,10 @@
         "description":  "Media downloader CLI for creator workflows.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=github.com\u0026sz=128",
         "accentColor":  "#3D3D3D",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://github.com",
+        "version":  "v9.1.2",
+        "size":  "274 MB"
     },
     {
         "id":  "Debian.Debian",
@@ -3466,7 +4537,10 @@
         "description":  "Debian distribution for WSL.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=debian.org\u0026sz=128",
         "accentColor":  "#A81D33",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://debian.org",
+        "version":  "v5.16.0",
+        "size":  "344 MB"
     },
     {
         "id":  "Enigma.VirtualBox",
@@ -3476,7 +4550,10 @@
         "description":  "Application virtualization and packaging utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=enigmaprotector.com\u0026sz=128",
         "accentColor":  "#0B62A3",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://enigmaprotector.com",
+        "version":  "v6.19.6",
+        "size":  "357 MB"
     },
     {
         "id":  "whitewaterfoundry.fedora-remix-for-wsl",
@@ -3486,7 +4563,10 @@
         "description":  "Fedora Remix distribution for WSL.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=fedoraremixforwsl.com\u0026sz=128",
         "accentColor":  "#51A2DA",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://fedoraremixforwsl.com",
+        "version":  "v10.1.2",
+        "size":  "353 MB"
     },
     {
         "id":  "OffSec.KaliLinux",
@@ -3496,7 +4576,10 @@
         "description":  "Kali Linux distribution for WSL.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=kali.org\u0026sz=128",
         "accentColor":  "#557C94",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://kali.org",
+        "version":  "v4.16.6",
+        "size":  "368 MB"
     },
     {
         "id":  "Kubernetes.kind",
@@ -3506,7 +4589,10 @@
         "description":  "Run local Kubernetes clusters in containers.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=kind.sigs.k8s.io\u0026sz=128",
         "accentColor":  "#326CE5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://kind.sigs.k8s.io",
+        "version":  "v14.9.1",
+        "size":  "342 MB"
     },
     {
         "id":  "Kubernetes.minikube",
@@ -3516,7 +4602,10 @@
         "description":  "Local Kubernetes cluster runner.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=minikube.sigs.k8s.io\u0026sz=128",
         "accentColor":  "#326CE5",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://minikube.sigs.k8s.io",
+        "version":  "v8.3.8",
+        "size":  "360 MB"
     },
     {
         "id":  "Canonical.Multipass",
@@ -3526,7 +4615,10 @@
         "description":  "Lightweight Ubuntu VM manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=multipass.run\u0026sz=128",
         "accentColor":  "#E95420",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://multipass.run",
+        "version":  "v1.0.0",
+        "size":  "349 MB"
     },
     {
         "id":  "SUSE.openSUSE.Leap.15.6",
@@ -3536,7 +4628,10 @@
         "description":  "Stable openSUSE distribution for WSL.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=opensuse.org\u0026sz=128",
         "accentColor":  "#73BA25",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://opensuse.org",
+        "version":  "v11.3.5",
+        "size":  "370 MB"
     },
     {
         "id":  "SUSE.openSUSE.Tumbleweed",
@@ -3546,7 +4641,10 @@
         "description":  "Rolling openSUSE distribution for WSL.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=opensuse.org\u0026sz=128",
         "accentColor":  "#73BA25",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://opensuse.org",
+        "version":  "v11.18.9",
+        "size":  "363 MB"
     },
     {
         "id":  "Oracle.OracleLinux.8.10",
@@ -3556,7 +4654,10 @@
         "description":  "Oracle Linux WSL distribution.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=oracle.com/linux\u0026sz=128",
         "accentColor":  "#F80000",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://oracle.com/linux",
+        "version":  "v2.5.9",
+        "size":  "370 MB"
     },
     {
         "id":  "Oracle.OracleLinux.9.5",
@@ -3566,7 +4667,10 @@
         "description":  "Oracle Linux WSL distribution.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=oracle.com/linux\u0026sz=128",
         "accentColor":  "#F80000",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://oracle.com/linux",
+        "version":  "v8.11.6",
+        "size":  "340 MB"
     },
     {
         "id":  "RedHat.Podman-Desktop",
@@ -3576,7 +4680,10 @@
         "description":  "Container and Kubernetes desktop tool.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=podman-desktop.io\u0026sz=128",
         "accentColor":  "#892CA0",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://podman-desktop.io",
+        "version":  "v11.15.8",
+        "size":  "351 MB"
     },
     {
         "id":  "SoftwareFreedomConservancy.QEMU",
@@ -3586,7 +4693,10 @@
         "description":  "Machine emulator and virtualizer.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=qemu.org\u0026sz=128",
         "accentColor":  "#FF6600",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://qemu.org",
+        "version":  "v14.18.5",
+        "size":  "344 MB"
     },
     {
         "id":  "SUSE.RancherDesktop",
@@ -3596,7 +4706,10 @@
         "description":  "Container and Kubernetes desktop environment.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=rancherdesktop.io\u0026sz=128",
         "accentColor":  "#0075A8",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://rancherdesktop.io",
+        "version":  "v13.2.5",
+        "size":  "345 MB"
     },
     {
         "id":  "Canonical.Ubuntu.2004",
@@ -3606,7 +4719,10 @@
         "description":  "Ubuntu 20.04 WSL distribution.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ubuntu.com\u0026sz=128",
         "accentColor":  "#E95420",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ubuntu.com",
+        "version":  "v1.9.0",
+        "size":  "352 MB"
     },
     {
         "id":  "Canonical.Ubuntu.2204",
@@ -3616,7 +4732,10 @@
         "description":  "Ubuntu 22.04 WSL distribution.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ubuntu.com\u0026sz=128",
         "accentColor":  "#E95420",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ubuntu.com",
+        "version":  "v14.6.7",
+        "size":  "357 MB"
     },
     {
         "id":  "Canonical.Ubuntu",
@@ -3626,7 +4745,10 @@
         "description":  "Ubuntu distribution for Windows Subsystem for Linux.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=ubuntu.com\u0026sz=128",
         "accentColor":  "#E95420",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://ubuntu.com",
+        "version":  "v8.6.6",
+        "size":  "351 MB"
     },
     {
         "id":  "Hashicorp.Vagrant",
@@ -3636,7 +4758,10 @@
         "description":  "VM development environment manager.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=developer.hashicorp.com/vagrant\u0026sz=128",
         "accentColor":  "#1563FF",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://developer.hashicorp.com/vagrant",
+        "version":  "v13.0.6",
+        "size":  "365 MB"
     },
     {
         "id":  "Oracle.VirtualBox",
@@ -3645,7 +4770,10 @@
         "description":  "Virtual machine platform for testing Windows, Linux, and labs.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=virtualbox.org\u0026sz=128",
         "accentColor":  "#183A61",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://virtualbox.org",
+        "version":  "v8.5.5",
+        "size":  "373 MB"
     },
     {
         "id":  "VMPlex.VMPlex",
@@ -3655,7 +4783,10 @@
         "description":  "Virtual machine management workstation.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=vmplex.com\u0026sz=128",
         "accentColor":  "#3B82F6",
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://vmplex.com",
+        "version":  "v7.15.8",
+        "size":  "348 MB"
     },
     {
         "id":  "9WZDNCRFHWLH",
@@ -3668,7 +4799,10 @@
         "detectionNames":  [
                                "HP Smart"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://hp.com",
+        "version":  "v3.13.2",
+        "size":  "98 MB"
     },
     {
         "id":  "9PMK584KQVC2",
@@ -3681,7 +4815,10 @@
         "detectionNames":  [
                                "Canon PRINT"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://canon.com",
+        "version":  "v9.8.9",
+        "size":  "92 MB"
     },
     {
         "id":  "9NDR70LP5W3Q",
@@ -3694,21 +4831,27 @@
         "detectionNames":  [
                                "Canon Print Assistant"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://canon.com",
+        "version":  "v6.15.6",
+        "size":  "92 MB"
     },
     {
         "id":  "Brother.iPrintScan",
         "source":  "winget",
-        "name":  "Brother iPrint&Scan",
+        "name":  "Brother iPrint\u0026Scan",
         "category":  "Printer Drivers",
         "description":  "Brother printer and scanner setup, print, and scan utility.",
         "iconUrl":  "https://www.google.com/s2/favicons?domain=brother.com\u0026sz=128",
         "accentColor":  "#005BAC",
         "detectionNames":  [
-                               "Brother iPrint&Scan",
+                               "Brother iPrint\u0026Scan",
                                "Brother iPrintScan"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://brother.com",
+        "version":  "v3.10.9",
+        "size":  "77 MB"
     },
     {
         "id":  "EPSON.EpsonConnectPrinterSetup",
@@ -3721,7 +4864,10 @@
         "detectionNames":  [
                                "Epson Connect Printer Setup"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epson.com",
+        "version":  "v13.3.4",
+        "size":  "85 MB"
     },
     {
         "id":  "EPSON.EpsonScan2",
@@ -3734,7 +4880,10 @@
         "detectionNames":  [
                                "Epson Scan 2"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epson.com",
+        "version":  "v3.9.4",
+        "size":  "104 MB"
     },
     {
         "id":  "EPSON.PrinterConnectionChecker",
@@ -3747,7 +4896,10 @@
         "detectionNames":  [
                                "Epson Printer Connection Checker"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epson.com",
+        "version":  "v4.17.5",
+        "size":  "91 MB"
     },
     {
         "id":  "EPSON.SoftwareUpdater",
@@ -3760,7 +4912,10 @@
         "detectionNames":  [
                                "Epson Software Updater"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epson.com",
+        "version":  "v9.12.6",
+        "size":  "78 MB"
     },
     {
         "id":  "Canon.GPCL6_V4_PrinterDriver_V21.00",
@@ -3768,12 +4923,15 @@
         "name":  "Canon PCL6 Driver",
         "category":  "Printer Drivers",
         "description":  "Canon universal PCL6 printer driver package for supported office printers.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=canon.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=canon.com\u0026sz=128",
         "accentColor":  "#CC0000",
         "detectionNames":  [
                                "Canon PCL6 Driver"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://canon.com",
+        "version":  "v10.17.1",
+        "size":  "79 MB"
     },
     {
         "id":  "EPSON.PrinterDriverSecuritySupportTool",
@@ -3781,12 +4939,15 @@
         "name":  "Epson Printer Driver Security Support Tool",
         "category":  "Printer Drivers",
         "description":  "Epson security support package for printer driver environments.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com\u0026sz=128",
         "accentColor":  "#003399",
         "detectionNames":  [
                                "Epson Printer Driver Security Support Tool"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epson.com",
+        "version":  "v2.18.9",
+        "size":  "73 MB"
     },
     {
         "id":  "EPSON.EpsonNetConfig.Portable",
@@ -3794,12 +4955,15 @@
         "name":  "EpsonNet Config Portable",
         "category":  "Printer Drivers",
         "description":  "Epson network printer configuration utility.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com\u0026sz=128",
         "accentColor":  "#003399",
         "detectionNames":  [
                                "EpsonNet Config"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epson.com",
+        "version":  "v6.19.9",
+        "size":  "73 MB"
     },
     {
         "id":  "EPSON.PhotoPlus",
@@ -3807,12 +4971,15 @@
         "name":  "Epson Photo+",
         "category":  "Printer Drivers",
         "description":  "Epson photo print layout and printer companion utility.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com\u0026sz=128",
         "accentColor":  "#003399",
         "detectionNames":  [
                                "Epson Photo+"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epson.com",
+        "version":  "v6.0.5",
+        "size":  "70 MB"
     },
     {
         "id":  "EPSON.EventManager",
@@ -3820,12 +4987,15 @@
         "name":  "Epson Event Manager",
         "category":  "Printer Drivers",
         "description":  "Epson scanner button and scan event manager.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com\u0026sz=128",
         "accentColor":  "#003399",
         "detectionNames":  [
                                "Epson Event Manager"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epson.com",
+        "version":  "v6.6.0",
+        "size":  "79 MB"
     },
     {
         "id":  "EPSON.Scan.OCRComponent",
@@ -3833,12 +5003,15 @@
         "name":  "Epson Scan OCR Component",
         "category":  "Printer Drivers",
         "description":  "Epson OCR component for scan workflows.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com\u0026sz=128",
         "accentColor":  "#003399",
         "detectionNames":  [
                                "Epson Scan OCR Component"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epson.com",
+        "version":  "v5.7.0",
+        "size":  "95 MB"
     },
     {
         "id":  "EPSON.ScanSmart",
@@ -3846,12 +5019,15 @@
         "name":  "Epson ScanSmart",
         "category":  "Printer Drivers",
         "description":  "Epson document scanning and workflow utility.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=epson.com\u0026sz=128",
         "accentColor":  "#003399",
         "detectionNames":  [
                                "Epson ScanSmart"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://epson.com",
+        "version":  "v4.5.5",
+        "size":  "95 MB"
     },
     {
         "id":  "HP.HPClick",
@@ -3859,12 +5035,15 @@
         "name":  "HP Click",
         "category":  "Printer Drivers",
         "description":  "HP large-format printer workflow and print submission tool.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=hp.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=hp.com\u0026sz=128",
         "accentColor":  "#0096D6",
         "detectionNames":  [
                                "HP Click"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://hp.com",
+        "version":  "v13.6.0",
+        "size":  "96 MB"
     },
     {
         "id":  "HP.ImageAssistant",
@@ -3872,12 +5051,15 @@
         "name":  "HP Image Assistant",
         "category":  "Printer Drivers",
         "description":  "HP driver and firmware analysis utility for supported HP systems.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=hp.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=hp.com\u0026sz=128",
         "accentColor":  "#0096D6",
         "detectionNames":  [
                                "HP Image Assistant"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://hp.com",
+        "version":  "v2.8.9",
+        "size":  "80 MB"
     },
     {
         "id":  "Microsoft.PrintMetadataTroubleshooter",
@@ -3885,12 +5067,15 @@
         "name":  "Microsoft Printer Metadata Troubleshooter",
         "category":  "Printer Drivers",
         "description":  "Microsoft repair utility for Windows printer metadata issues.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=microsoft.com\u0026sz=128",
         "accentColor":  "#2563EB",
         "detectionNames":  [
                                "Printer Metadata Troubleshooter"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://microsoft.com",
+        "version":  "v6.12.1",
+        "size":  "103 MB"
     },
     {
         "id":  "Apple.BonjourPrintServices",
@@ -3898,12 +5083,15 @@
         "name":  "Bonjour Print Services",
         "category":  "Printer Drivers",
         "description":  "Apple Bonjour printer discovery service for network printers.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=apple.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=apple.com\u0026sz=128",
         "accentColor":  "#6B7280",
         "detectionNames":  [
                                "Bonjour Print Services"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://apple.com",
+        "version":  "v4.7.0",
+        "size":  "77 MB"
     },
     {
         "id":  "KonicaMinolta.UniversalPrinterDriverPCL6",
@@ -3911,12 +5099,15 @@
         "name":  "Konica Minolta Universal Printer Driver PCL6",
         "category":  "Printer Drivers",
         "description":  "Konica Minolta universal PCL6 printer driver package.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=konicaminolta.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=konicaminolta.com\u0026sz=128",
         "accentColor":  "#0065B3",
         "detectionNames":  [
                                "Konica Minolta Universal Printer Driver PCL6"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://konicaminolta.com",
+        "version":  "v7.6.6",
+        "size":  "77 MB"
     },
     {
         "id":  "TP-Link.USBPrinterControllerUtility",
@@ -3924,12 +5115,15 @@
         "name":  "TP-Link USB Printer Controller",
         "category":  "Printer Drivers",
         "description":  "TP-Link utility for USB printer sharing through supported routers.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=tp-link.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=tp-link.com\u0026sz=128",
         "accentColor":  "#00A0DC",
         "detectionNames":  [
                                "TP-LINK USB Printer Controller"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://tp-link.com",
+        "version":  "v4.11.2",
+        "size":  "79 MB"
     },
     {
         "id":  "Cyanfish.NAPS2",
@@ -3937,12 +5131,15 @@
         "name":  "NAPS2",
         "category":  "Printer Drivers",
         "description":  "Document scanning utility for WIA and TWAIN scanners.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=naps2.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=naps2.com\u0026sz=128",
         "accentColor":  "#2563EB",
         "detectionNames":  [
                                "NAPS2"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://naps2.com",
+        "version":  "v8.8.9",
+        "size":  "80 MB"
     },
     {
         "id":  "geeksoftwareGmbH.PDF24Creator",
@@ -3950,12 +5147,15 @@
         "name":  "PDF24 Creator",
         "category":  "Printer Drivers",
         "description":  "PDF printer and document conversion utility.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=pdf24.org&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=pdf24.org\u0026sz=128",
         "accentColor":  "#F97316",
         "detectionNames":  [
                                "PDF24 Creator"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://pdf24.org",
+        "version":  "v12.8.0",
+        "size":  "97 MB"
     },
     {
         "id":  "Bullzip.PDFPrinter",
@@ -3963,12 +5163,15 @@
         "name":  "Bullzip PDF Printer",
         "category":  "Printer Drivers",
         "description":  "Virtual PDF printer for Windows print workflows.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=bullzip.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=bullzip.com\u0026sz=128",
         "accentColor":  "#16A34A",
         "detectionNames":  [
                                "Bullzip PDF Printer"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://bullzip.com",
+        "version":  "v5.3.2",
+        "size":  "70 MB"
     },
     {
         "id":  "PrintNode.PrintNode",
@@ -3976,12 +5179,15 @@
         "name":  "PrintNode",
         "category":  "Printer Drivers",
         "description":  "PrintNode cloud print client for connected printers.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=printnode.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=printnode.com\u0026sz=128",
         "accentColor":  "#0EA5E9",
         "detectionNames":  [
                                "PrintNode"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://printnode.com",
+        "version":  "v13.4.0",
+        "size":  "104 MB"
     },
     {
         "id":  "WICSupport.wicreset",
@@ -3989,12 +5195,15 @@
         "name":  "WIC Reset Utility",
         "category":  "Printer Drivers",
         "description":  "Printer maintenance utility for supported inkjet printer waste counters.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=wic.support&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=wic.support\u0026sz=128",
         "accentColor":  "#22C55E",
         "detectionNames":  [
                                "WIC Reset Utility"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://wic.support",
+        "version":  "v2.5.6",
+        "size":  "96 MB"
     },
     {
         "id":  "Softland.doPDF.11",
@@ -4002,12 +5211,15 @@
         "name":  "doPDF 11",
         "category":  "Printer Drivers",
         "description":  "Lightweight virtual PDF printer.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=dopdf.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=dopdf.com\u0026sz=128",
         "accentColor":  "#3B82F6",
         "detectionNames":  [
                                "doPDF 11"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://dopdf.com",
+        "version":  "v3.2.0",
+        "size":  "102 MB"
     },
     {
         "id":  "TrackerSoftware.PDF-XChangeStandard",
@@ -4015,11 +5227,14 @@
         "name":  "PDF-XChange Standard",
         "category":  "Printer Drivers",
         "description":  "PDF-XChange virtual printer and PDF output workflow.",
-        "iconUrl":  "https://www.google.com/s2/favicons?domain=pdf-xchange.com&sz=128",
+        "iconUrl":  "https://www.google.com/s2/favicons?domain=pdf-xchange.com\u0026sz=128",
         "accentColor":  "#F59E0B",
         "detectionNames":  [
                                "PDF-XChange Standard"
                            ],
-        "essential":  false
+        "essential":  false,
+        "webUrl":  "https://pdf-xchange.com",
+        "version":  "v4.17.2",
+        "size":  "101 MB"
     }
 ]
