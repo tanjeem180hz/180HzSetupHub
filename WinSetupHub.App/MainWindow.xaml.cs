@@ -52,7 +52,6 @@ public partial class MainWindow : Window
     private CancellationTokenSource? _operationCancellation;
     private ApplicationSettings _settings = new();
     private FrameworkElement? _activePage;
-    private Storyboard? _welcomeLoop;
     private int _homeFeatureIndex;
     private bool _isDarkTheme = true;
     private bool _isSidebarCollapsed;
@@ -89,10 +88,9 @@ public partial class MainWindow : Window
         _activePage = HomePage;
         SetActiveNavigation(HomeNavButton);
         SetHomeFeature(0, animate: false);
-        _welcomeLoop = (Storyboard)WelcomeOverlay.Resources["WelcomeLoop"];
-        _welcomeLoop.Begin(WelcomeOverlay, true);
-        WelcomeEnterButton.IsEnabled = false;
-        WelcomeEnterButton.Content = "Preparing...";
+        WelcomeOverlay.Visibility = Visibility.Collapsed;
+        ShellRoot.Opacity = 1;
+        ShellTransform.Y = 0;
 
         try
         {
@@ -279,18 +277,10 @@ public partial class MainWindow : Window
 
     private void SidebarPanel_MouseEnter(object sender, MouseEventArgs e)
     {
-        if (_isSidebarCollapsed)
-        {
-            SetSidebarCollapsed(collapsed: false, animate: true);
-        }
     }
 
     private void SidebarPanel_MouseLeave(object sender, MouseEventArgs e)
     {
-        if (!_sidebarPinnedOpen)
-        {
-            SetSidebarCollapsed(collapsed: true, animate: true);
-        }
     }
 
     private void StartSetup_Click(object sender, RoutedEventArgs e)
@@ -389,15 +379,15 @@ public partial class MainWindow : Window
     private void UpdateHomeFeatureTiles()
     {
         var tiles = new[] { HomeFeatureTile0, HomeFeatureTile1, HomeFeatureTile2, HomeFeatureTile3, HomeFeatureTile4, HomeFeatureTile5 };
-        var activeBackground = _isDarkTheme ? "#163260" : "#EDE9FE";
-        var inactiveBackground = _isDarkTheme ? "#0A162C" : "#F8FAFC";
-        var activeBorder = _isDarkTheme ? "#00F0FF" : "#0078FF";
-        var inactiveBorder = _isDarkTheme ? "#1A3B6E" : "#CBDDE8";
+        var activeBackground = _isDarkTheme ? "#162035" : "#EDE9FE";
+        var inactiveBackground = _isDarkTheme ? "#10131E" : "#F8FAFC";
+        var activeBorder = _isDarkTheme ? "#00D4FF" : "#0284C7";
+        var inactiveBorder = _isDarkTheme ? "#1F263B" : "#CBDDE8";
 
         for (var index = 0; index < tiles.Length; index++)
         {
             var isActive = index == _homeFeatureIndex;
-            tiles[index].Opacity = isActive ? 1 : 0.62;
+            tiles[index].Opacity = isActive ? 1 : 0.68;
             tiles[index].Background = BrushFromHex(isActive ? activeBackground : inactiveBackground);
             tiles[index].BorderBrush = BrushFromHex(isActive ? activeBorder : inactiveBorder);
         }
@@ -405,16 +395,6 @@ public partial class MainWindow : Window
 
     private void UpdateHomeFeatureTimer()
     {
-        if (_activePage == HomePage && WelcomeOverlay.Visibility == Visibility.Collapsed)
-        {
-            if (!_homeFeatureTimer.IsEnabled)
-            {
-                _homeFeatureTimer.Start();
-            }
-
-            return;
-        }
-
         _homeFeatureTimer.Stop();
     }
 
@@ -435,30 +415,32 @@ public partial class MainWindow : Window
 
         if (useDarkTheme)
         {
-            SetBrushColor("AppBackground", "#050C1E");
-            SetBrushColor("PanelBackground", "#0A162C");
-            SetBrushColor("SubtleBackground", "#0F2244");
-            SetBrushColor("PanelBorder", "#1A3B6E");
-            SetBrushColor("PrimaryText", "#FFFFFF");
-            SetBrushColor("MutedText", "#8EB0D8");
-            SetBrushColor("AccentBrush", "#00F0FF");
-            SetBrushColor("AccentDarkBrush", "#0078FF");
-            SetBrushColor("AccentForeground", "#050C1E");
-            SetBrushColor("ButtonHover", "#163260");
-            SetBrushColor("ButtonDisabled", "#0B1528");
-            SetBrushColor("SuccessBackground", "#042F2E");
-            SetBrushColor("SuccessText", "#00FFA3");
-            SetBrushColor("WarningBackground", "#2E2305");
-            SetBrushColor("WarningText", "#FFB800");
-            SetBrushColor("DangerBackground", "#380D1A");
-            SetBrushColor("DangerText", "#FF3366");
-            SetBrushColor("InfoBackground", "#0A2A54");
-            SetBrushColor("InfoText", "#00D2FF");
-            SetBrushColor("NeutralBackground", "#0E1D38");
-            SetBrushColor("NeutralText", "#8EB0D8");
-            BgStopOne.Color = Color.FromRgb(5, 12, 30);
-            BgStopTwo.Color = Color.FromRgb(10, 28, 62);
-            BgStopThree.Color = Color.FromRgb(0, 45, 102);
+            SetBrushColor("AppBackground", "#0A0C13");
+            SetBrushColor("PanelBackground", "#10131E");
+            SetBrushColor("SubtleBackground", "#151928");
+            SetBrushColor("PanelBorder", "#1F263B");
+            SetBrushColor("CardBorder", "#232B42");
+            SetBrushColor("PrimaryText", "#F8FAFC");
+            SetBrushColor("MutedText", "#94A3B8");
+            SetBrushColor("SecondaryText", "#64748B");
+            SetBrushColor("AccentBrush", "#00D4FF");
+            SetBrushColor("AccentDarkBrush", "#0284C7");
+            SetBrushColor("AccentForeground", "#000000");
+            SetBrushColor("ButtonHover", "#1A2134");
+            SetBrushColor("ButtonDisabled", "#0E121D");
+            SetBrushColor("SuccessBackground", "#0A231C");
+            SetBrushColor("SuccessText", "#10B981");
+            SetBrushColor("WarningBackground", "#2A1B07");
+            SetBrushColor("WarningText", "#F59E0B");
+            SetBrushColor("DangerBackground", "#2E0F17");
+            SetBrushColor("DangerText", "#F43F5E");
+            SetBrushColor("InfoBackground", "#0C233C");
+            SetBrushColor("InfoText", "#38BDF8");
+            SetBrushColor("NeutralBackground", "#151928");
+            SetBrushColor("NeutralText", "#94A3B8");
+            BgStopOne.Color = ColorFromHex("#0A0C13");
+            BgStopTwo.Color = ColorFromHex("#0E111A");
+            BgStopThree.Color = ColorFromHex("#0A0D15");
         }
         else
         {
@@ -541,30 +523,30 @@ public partial class MainWindow : Window
     {
         if (useDarkTheme)
         {
-            HomeDeckBorder.BorderBrush = BrushFromHex("#1A3B6E");
-            HomeDeckStopOne.Color = ColorFromHex("#050C1E");
-            HomeDeckStopTwo.Color = ColorFromHex("#0A1C3E");
-            HomeDeckStopThree.Color = ColorFromHex("#002D66");
-            HomeBandOne.Background = BrushFromHex("#0078FF");
-            HomeBandOne.Opacity = 0.18;
-            HomeBandTwo.Background = BrushFromHex("#00F0FF");
-            HomeBandTwo.Opacity = 0.14;
-            HomeDeckEyebrowText.Foreground = BrushFromHex("#00F0FF");
-            HomeDeckTitleText.Foreground = BrushFromHex("#FFFFFF");
-            HomeDeckSubtitleText.Foreground = BrushFromHex("#8EB0D8");
-            HomeFeatureStage.Background = BrushFromHex("#E60A162C");
-            HomeFeatureStage.BorderBrush = BrushFromHex("#1A3B6E");
-            HomeFeatureBadge.Background = BrushFromHex("#082042");
-            HomeFeatureBadge.BorderBrush = BrushFromHex("#00D2FF");
-            HomeFeatureBadgeText.Foreground = BrushFromHex("#00F0FF");
-            HomeFeatureTitleText.Foreground = BrushFromHex("#FFFFFF");
-            HomeFeatureSubtitleText.Foreground = BrushFromHex("#8EB0D8");
-            HomeFeatureNumberPanel.Background = BrushFromHex("#0A1C3E");
-            HomeFeatureNumberPanel.BorderBrush = BrushFromHex("#0078FF");
-            HomeFeatureBrandText.Foreground = BrushFromHex("#00F0FF");
-            HomeFeatureNumberText.Foreground = BrushFromHex("#FFFFFF");
-            HomeFeatureNextLabelText.Foreground = BrushFromHex("#8EB0D8");
-            HomeFeaturePositionText.Foreground = BrushFromHex("#8EB0D8");
+            HomeDeckBorder.BorderBrush = BrushFromHex("#1F263B");
+            HomeDeckStopOne.Color = ColorFromHex("#10131E");
+            HomeDeckStopTwo.Color = ColorFromHex("#141826");
+            HomeDeckStopThree.Color = ColorFromHex("#10131E");
+            HomeBandOne.Background = BrushFromHex("#00D4FF");
+            HomeBandOne.Opacity = 0.05;
+            HomeBandTwo.Background = BrushFromHex("#00D4FF");
+            HomeBandTwo.Opacity = 0.03;
+            HomeDeckEyebrowText.Foreground = BrushFromHex("#00D4FF");
+            HomeDeckTitleText.Foreground = BrushFromHex("#F8FAFC");
+            HomeDeckSubtitleText.Foreground = BrushFromHex("#94A3B8");
+            HomeFeatureStage.Background = BrushFromHex("#151928");
+            HomeFeatureStage.BorderBrush = BrushFromHex("#1F263B");
+            HomeFeatureBadge.Background = BrushFromHex("#0C233C");
+            HomeFeatureBadge.BorderBrush = BrushFromHex("#00D4FF");
+            HomeFeatureBadgeText.Foreground = BrushFromHex("#00D4FF");
+            HomeFeatureTitleText.Foreground = BrushFromHex("#F8FAFC");
+            HomeFeatureSubtitleText.Foreground = BrushFromHex("#94A3B8");
+            HomeFeatureNumberPanel.Background = BrushFromHex("#10131E");
+            HomeFeatureNumberPanel.BorderBrush = BrushFromHex("#1F263B");
+            HomeFeatureBrandText.Foreground = BrushFromHex("#00D4FF");
+            HomeFeatureNumberText.Foreground = BrushFromHex("#F8FAFC");
+            HomeFeatureNextLabelText.Foreground = BrushFromHex("#64748B");
+            HomeFeaturePositionText.Foreground = BrushFromHex("#64748B");
             UpdateHomeFeatureTiles();
             return;
         }
@@ -600,17 +582,16 @@ public partial class MainWindow : Window
     {
         if (useDarkTheme)
         {
-            WelcomeBgStopOne.Color = ColorFromHex("#050C1E");
-            WelcomeBgStopTwo.Color = ColorFromHex("#0A1C3E");
-            WelcomeBgStopThree.Color = ColorFromHex("#002D66");
-            WelcomeCard.BorderBrush = BrushFromHex("#00D2FF");
-            WelcomeCardStopOne.Color = ColorFromHex("#F00A162C");
-            WelcomeCardStopTwo.Color = ColorFromHex("#E60F2244");
-            WelcomeCardStopThree.Color = ColorFromHex("#D9050C1E");
-            WelcomeTitleText.Foreground = BrushFromHex("#FFFFFF");
-            WelcomeSubtitleText.Foreground = BrushFromHex("#8EB0D8");
-            WelcomeProgressTrack.Background = BrushFromHex("#0A1C3E");
-            return;
+            WelcomeBgStopOne.Color = ColorFromHex("#0A0C13");
+            WelcomeBgStopTwo.Color = ColorFromHex("#0E111A");
+            WelcomeBgStopThree.Color = ColorFromHex("#0A0D15");
+            WelcomeCard.BorderBrush = BrushFromHex("#1F263B");
+            WelcomeCardStopOne.Color = ColorFromHex("#F010131E");
+            WelcomeCardStopTwo.Color = ColorFromHex("#E6141826");
+            WelcomeCardStopThree.Color = ColorFromHex("#D910131E");
+            WelcomeTitleText.Foreground = BrushFromHex("#F8FAFC");
+            WelcomeSubtitleText.Foreground = BrushFromHex("#94A3B8");
+            WelcomeProgressTrack.Background = BrushFromHex("#10131E");
         }
 
         WelcomeBgStopOne.Color = ColorFromHex("#EEF7FF");
@@ -1538,10 +1519,7 @@ public partial class MainWindow : Window
         var fadeOut = BuildDoubleAnimation(0, 420);
         fadeOut.Completed += (_, _) =>
         {
-            _welcomeLoop?.Stop(WelcomeOverlay);
             WelcomeOverlay.Visibility = Visibility.Collapsed;
-            _sidebarPinnedOpen = false;
-            SetSidebarCollapsed(collapsed: true, animate: true);
             UpdateHomeFeatureTimer();
         };
         WelcomeOverlay.BeginAnimation(OpacityProperty, fadeOut);
@@ -1577,8 +1555,6 @@ public partial class MainWindow : Window
         page.BeginAnimation(OpacityProperty, BuildDoubleAnimation(1, 260));
         transform.BeginAnimation(TranslateTransform.YProperty, BuildDoubleAnimation(0, 320));
         _activePage = page;
-        _sidebarPinnedOpen = false;
-        SetSidebarCollapsed(collapsed: true, animate: true);
         UpdateHomeFeatureTimer();
     }
 
@@ -1586,19 +1562,17 @@ public partial class MainWindow : Window
     {
         foreach (var button in new[] { HomeNavButton, SetupNavButton, UpdatesNavButton, UninstallerNavButton, CleanupNavButton, ActivityNavButton, StorageNavButton })
         {
-            button.Background = BrushFromHex(_isDarkTheme ? "#0D101A" : "#FFFFFF");
-            button.BorderBrush = BrushFromHex(_isDarkTheme ? "#232A42" : "#D7E3EC");
-            button.Foreground = BrushFromHex(_isDarkTheme ? "#8A99B5" : "#172033");
+            button.Background = BrushFromHex(_isDarkTheme ? "#10131E" : "#FFFFFF");
+            button.BorderBrush = BrushFromHex(_isDarkTheme ? "#1F263B" : "#D7E3EC");
+            button.Foreground = BrushFromHex(_isDarkTheme ? "#94A3B8" : "#172033");
             button.BorderThickness = new Thickness(1);
             button.FontWeight = FontWeights.Normal;
         }
 
-        activeButton.Background = CreateGradientBrush(
-            _isDarkTheme ? "#281245" : "#EAF2FF",
-            _isDarkTheme ? "#0B263C" : "#E5F7F1");
-        activeButton.BorderBrush = BrushFromHex(_isDarkTheme ? "#00F0FF" : "#7C3AED");
-        activeButton.Foreground = BrushFromHex(_isDarkTheme ? "#00F0FF" : "#6D28D9");
-        activeButton.BorderThickness = new Thickness(1.4);
+        activeButton.Background = BrushFromHex(_isDarkTheme ? "#162035" : "#EAF2FF");
+        activeButton.BorderBrush = BrushFromHex(_isDarkTheme ? "#00D4FF" : "#0284C7");
+        activeButton.Foreground = BrushFromHex(_isDarkTheme ? "#00D4FF" : "#0284C7");
+        activeButton.BorderThickness = new Thickness(1);
         activeButton.FontWeight = FontWeights.SemiBold;
     }
 

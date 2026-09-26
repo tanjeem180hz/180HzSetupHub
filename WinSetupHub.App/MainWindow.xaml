@@ -13,17 +13,17 @@
         Loaded="Window_Loaded">
     <Window.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-            <GradientStop x:Name="BgStopOne" Color="#050C1E" Offset="0" />
-            <GradientStop x:Name="BgStopTwo" Color="#0A1C3E" Offset="0.52" />
-            <GradientStop x:Name="BgStopThree" Color="#002D66" Offset="1" />
+            <GradientStop x:Name="BgStopOne" Color="#0A0C13" Offset="0" />
+            <GradientStop x:Name="BgStopTwo" Color="#0E111A" Offset="0.5" />
+            <GradientStop x:Name="BgStopThree" Color="#0A0D15" Offset="1" />
         </LinearGradientBrush>
     </Window.Background>
     <Grid>
         <Grid x:Name="ShellRoot"
-              Margin="22"
-              Opacity="0">
+              Margin="18"
+              Opacity="1">
             <Grid.RenderTransform>
-                <TranslateTransform x:Name="ShellTransform" Y="18" />
+                <TranslateTransform x:Name="ShellTransform" Y="0" />
             </Grid.RenderTransform>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -34,7 +34,10 @@
                     Background="{DynamicResource PanelBackground}"
                     BorderBrush="{DynamicResource PanelBorder}"
                     BorderThickness="1"
-                    CornerRadius="8">
+                    CornerRadius="12">
+                <Border.Effect>
+                    <DropShadowEffect Color="#000000" BlurRadius="24" ShadowDepth="4" Opacity="0.45" />
+                </Border.Effect>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition x:Name="SidebarColumn" Width="268" />
@@ -47,10 +50,8 @@
                             Background="{DynamicResource PanelBackground}"
                             BorderBrush="{DynamicResource PanelBorder}"
                             BorderThickness="0,0,1,0"
-                            CornerRadius="8,0,0,8"
-                            Padding="16"
-                            MouseEnter="SidebarPanel_MouseEnter"
-                            MouseLeave="SidebarPanel_MouseLeave">
+                            CornerRadius="12,0,0,12"
+                            Padding="16">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -408,7 +409,7 @@
                                 <Grid.Resources>
                                     <Style x:Key="HomeActionButton" TargetType="{x:Type Button}">
                                         <Setter Property="MinWidth" Value="154" />
-                                        <Setter Property="Height" Value="42" />
+                                        <Setter Property="Height" Value="40" />
                                         <Setter Property="Padding" Value="18,0" />
                                         <Setter Property="Foreground" Value="#FFFFFF" />
                                         <Setter Property="FontWeight" Value="SemiBold" />
@@ -416,12 +417,12 @@
                                         <Setter Property="Background">
                                             <Setter.Value>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Color="#00F0FF" Offset="0" />
+                                                    <GradientStop Color="#00D4FF" Offset="0" />
                                                     <GradientStop Color="#0078FF" Offset="1" />
                                                 </LinearGradientBrush>
                                             </Setter.Value>
                                         </Setter>
-                                        <Setter Property="BorderBrush" Value="#00F0FF" />
+                                        <Setter Property="BorderBrush" Value="#00D4FF" />
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="{x:Type Button}">
@@ -452,7 +453,7 @@
 
                                     <Style x:Key="HomeGhostButton" TargetType="{x:Type Button}">
                                         <Setter Property="MinWidth" Value="72" />
-                                        <Setter Property="Height" Value="36" />
+                                        <Setter Property="Height" Value="34" />
                                         <Setter Property="Padding" Value="14,0" />
                                         <Setter Property="Background" Value="{DynamicResource NeutralBackground}" />
                                         <Setter Property="BorderBrush" Value="{DynamicResource PanelBorder}" />
@@ -486,186 +487,186 @@
                                     </Style>
                                 </Grid.Resources>
                                 <Border x:Name="HomeDeckBorder"
-                                        BorderBrush="#1A3B6E"
+                                        BorderBrush="{DynamicResource PanelBorder}"
                                         BorderThickness="1"
-                                        CornerRadius="8"
+                                        CornerRadius="12"
                                         Padding="0">
                                     <Border.Background>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                             <GradientStop x:Name="HomeDeckStopOne"
-                                                          Color="#050C1E"
+                                                          Color="#10131E"
                                                           Offset="0" />
                                             <GradientStop x:Name="HomeDeckStopTwo"
-                                                          Color="#0A1C3E"
+                                                          Color="#141826"
                                                           Offset="0.52" />
                                             <GradientStop x:Name="HomeDeckStopThree"
-                                                          Color="#002D66"
+                                                          Color="#10131E"
                                                           Offset="1" />
                                         </LinearGradientBrush>
                                     </Border.Background>
                                     <Grid ClipToBounds="True">
                                         <Image Source="Assets/BrandArtwork.png"
                                                Stretch="UniformToFill"
-                                               Opacity="0.16"
+                                               Opacity="0.08"
                                                IsHitTestVisible="False"
                                                HorizontalAlignment="Right"
                                                VerticalAlignment="Center" />
-                                        <Canvas IsHitTestVisible="False">
-                                            <Border x:Name="HomeBandOne"
-                                                    Width="760"
-                                                    Height="86"
-                                                    Background="#0078FF"
-                                                    CornerRadius="8"
-                                                    Canvas.Left="-120"
-                                                    Canvas.Top="86"
-                                                    Opacity="0.18">
-                                                <Border.RenderTransform>
-                                                    <TransformGroup>
-                                                        <RotateTransform Angle="-12" />
-                                                        <TranslateTransform x:Name="HomeBandOneTransform" />
-                                                    </TransformGroup>
-                                                </Border.RenderTransform>
-                                            </Border>
-                                            <Border x:Name="HomeBandTwo"
-                                                    Width="680"
-                                                    Height="74"
-                                                    Background="#00F0FF"
-                                                    CornerRadius="8"
-                                                    Canvas.Right="-130"
-                                                    Canvas.Bottom="96"
-                                                    Opacity="0.14">
-                                                <Border.RenderTransform>
-                                                    <TransformGroup>
-                                                        <RotateTransform Angle="-12" />
-                                                        <TranslateTransform x:Name="HomeBandTwoTransform" />
-                                                    </TransformGroup>
-                                                </Border.RenderTransform>
-                                            </Border>
+                                        <!-- Hidden legacy bands -->
+                                        <Canvas IsHitTestVisible="False" Visibility="Collapsed">
+                                            <Border x:Name="HomeBandOne" Width="10" Height="10" />
+                                            <Border x:Name="HomeBandTwo" Width="10" Height="10" />
                                         </Canvas>
 
-                                        <Grid Margin="34">
+                                        <Grid Margin="28">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="*" />
                                                 <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
 
-                                            <StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                                    <Border Background="#163260"
-                                                            BorderBrush="#00F0FF"
-                                                            BorderThickness="1"
-                                                            CornerRadius="4"
-                                                            Padding="6,2"
-                                                            Margin="0,0,8,0">
-                                                        <TextBlock Text="⚡ 180Hz"
+                                            <!-- Header Deck -->
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                                        <Border Background="#162035"
+                                                                BorderBrush="{DynamicResource AccentBrush}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="4"
+                                                                Padding="7,2"
+                                                                Margin="0,0,10,0">
+                                                            <TextBlock Text="⚡ 180Hz PRO"
+                                                                       FontSize="11"
+                                                                       FontWeight="Bold"
+                                                                       Foreground="{DynamicResource AccentBrush}" />
+                                                        </Border>
+                                                        <TextBlock x:Name="HomeDeckEyebrowText"
+                                                                   Text="SYSTEM COMMAND DECK • HIGH PERFORMANCE SUITE"
                                                                    FontSize="11"
-                                                                   FontWeight="Bold"
-                                                                   Foreground="#00F0FF" />
-                                                    </Border>
-                                                    <TextBlock x:Name="HomeDeckEyebrowText"
-                                                               Text="COMMAND DECK • PEAK GAMING OPTIMIZATION"
-                                                               FontSize="11.5"
-                                                               FontWeight="SemiBold"
-                                                               Foreground="{DynamicResource AccentBrush}"
-                                                               VerticalAlignment="Center" />
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource AccentBrush}"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <TextBlock x:Name="HomeDeckTitleText"
+                                                               Text="OPTIMIZE. MONITOR. DEPLOY."
+                                                               FontFamily="Segoe UI Variable Display, Segoe UI, sans-serif"
+                                                               FontSize="26"
+                                                               FontWeight="Bold"
+                                                               Foreground="{DynamicResource PrimaryText}"
+                                                               Margin="0,3,0,0" />
+                                                    <TextBlock x:Name="HomeDeckSubtitleText"
+                                                               Text="All-in-one automated software deployment, zero-day driver updates, and junk cleanup."
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource MutedText}"
+                                                               Margin="0,5,0,0" />
                                                 </StackPanel>
-                                                <TextBlock x:Name="HomeDeckTitleText"
-                                                           Text="OPTIMIZE. MONITOR. DOMINATE."
-                                                           FontFamily="Segoe UI Variable Display, Bahnschrift, Segoe UI"
-                                                           FontSize="30"
-                                                           FontWeight="Bold"
-                                                           Foreground="{DynamicResource PrimaryText}"
-                                                           Margin="0,3,0,0" />
-                                                <TextBlock x:Name="HomeDeckSubtitleText"
-                                                           Text="Unlock Peak Gaming Performance with automated app setup, driver updates, and junk cleanup."
-                                                           FontSize="13"
-                                                           Foreground="{DynamicResource MutedText}"
-                                                           Margin="0,6,0,0" />
-                                            </StackPanel>
+                                                <Border Grid.Column="1"
+                                                        Background="{DynamicResource SubtleBackground}"
+                                                        BorderBrush="{DynamicResource PanelBorder}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="8"
+                                                        Padding="14,10"
+                                                        VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="●" Foreground="{DynamicResource SuccessText}" Margin="0,0,8,0" FontSize="11" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="ENGINE READY • WINGET SYNCED"
+                                                                   FontSize="11"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{DynamicResource SuccessText}"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
 
+                                            <!-- Main Feature Stage -->
                                             <Border x:Name="HomeFeatureStage"
                                                     Grid.Row="1"
-                                                    Width="700"
-                                                    MinHeight="300"
-                                                    Background="#E60A162C"
-                                                    BorderBrush="#1A3B6E"
+                                                    Width="720"
+                                                    MinHeight="250"
+                                                    Background="{DynamicResource SubtleBackground}"
+                                                    BorderBrush="{DynamicResource PanelBorder}"
                                                     BorderThickness="1"
-                                                    CornerRadius="8"
-                                                    Padding="30"
+                                                    CornerRadius="12"
+                                                    Padding="28"
                                                     HorizontalAlignment="Center"
                                                     VerticalAlignment="Center">
+                                                <Border.Effect>
+                                                    <DropShadowEffect Color="#000000" BlurRadius="20" ShadowDepth="4" Opacity="0.35" />
+                                                </Border.Effect>
                                                 <Border.RenderTransform>
                                                     <TranslateTransform x:Name="HomeFeatureTransform" />
                                                 </Border.RenderTransform>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="178" />
+                                                        <ColumnDefinition Width="180" />
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel Grid.Column="0"
-                                                                Margin="0,0,28,0"
+                                                                Margin="0,0,24,0"
                                                                 VerticalAlignment="Center">
                                                         <Border x:Name="HomeFeatureBadge"
-                                                                Background="#082042"
-                                                                BorderBrush="#00D2FF"
+                                                                Background="#0C233C"
+                                                                BorderBrush="{DynamicResource AccentBrush}"
                                                                 BorderThickness="1"
-                                                                CornerRadius="8"
-                                                                Padding="10,6"
+                                                                CornerRadius="6"
+                                                                Padding="10,5"
                                                                 HorizontalAlignment="Left">
                                                             <TextBlock x:Name="HomeFeatureBadgeText"
                                                                        Text="01 / Updates"
-                                                                       Foreground="#00F0FF"
-                                                                       FontSize="12"
-                                                                       FontWeight="SemiBold" />
+                                                                       Foreground="{DynamicResource AccentBrush}"
+                                                                       FontSize="11"
+                                                                       FontWeight="Bold" />
                                                         </Border>
                                                         <TextBlock x:Name="HomeFeatureTitleText"
                                                                    Text="Update Center"
-                                                                   FontFamily="Segoe UI Variable Display, Bahnschrift, Segoe UI"
-                                                                   FontSize="34"
+                                                                   FontFamily="Segoe UI Variable Display, Segoe UI, sans-serif"
+                                                                   FontSize="28"
                                                                    FontWeight="Bold"
                                                                    Foreground="{DynamicResource PrimaryText}"
-                                                                   Margin="0,22,0,0" />
+                                                                   Margin="0,14,0,0" />
                                                         <TextBlock x:Name="HomeFeatureSubtitleText"
-                                                                   Text="Refresh sources and run known updates."
-                                                                   FontSize="14"
+                                                                   Text="Refresh winget sources, select known updates, and upgrade only what you choose."
+                                                                   FontSize="13"
                                                                    Foreground="{DynamicResource MutedText}"
                                                                    TextWrapping="Wrap"
-                                                                   Margin="0,10,0,0" />
+                                                                   Margin="0,8,0,0" />
                                                         <Button x:Name="HomeFeatureActionButton"
                                                                 Content="Open Update Center"
                                                                 Style="{StaticResource HomeActionButton}"
                                                                 HorizontalAlignment="Left"
-                                                                Margin="0,28,0,0"
+                                                                Margin="0,20,0,0"
                                                                 Click="OpenHomeFeature_Click" />
                                                     </StackPanel>
                                                     <Border x:Name="HomeFeatureNumberPanel"
                                                             Grid.Column="1"
-                                                            Background="#0A1C3E"
-                                                            BorderBrush="#0078FF"
+                                                            Background="{DynamicResource PanelBackground}"
+                                                            BorderBrush="{DynamicResource PanelBorder}"
                                                             BorderThickness="1"
-                                                            CornerRadius="8"
+                                                            CornerRadius="10"
                                                             Padding="18"
                                                             VerticalAlignment="Stretch">
                                                         <StackPanel VerticalAlignment="Center">
                                                             <TextBlock x:Name="HomeFeatureBrandText"
                                                                        Text="180Hz"
                                                                        Foreground="{DynamicResource AccentBrush}"
-                                                                       FontSize="16"
-                                                                       FontWeight="SemiBold"
+                                                                       FontSize="15"
+                                                                       FontWeight="Bold"
                                                                        HorizontalAlignment="Center" />
                                                             <TextBlock x:Name="HomeFeatureNumberText"
                                                                        Text="01"
-                                                                       FontFamily="Segoe UI Variable Display, Bahnschrift, Segoe UI"
+                                                                       FontFamily="Segoe UI Variable Display, Segoe UI, sans-serif"
                                                                        Foreground="{DynamicResource PrimaryText}"
-                                                                       FontSize="56"
+                                                                       FontSize="50"
                                                                        FontWeight="Bold"
                                                                        HorizontalAlignment="Center"
-                                                                       Margin="0,12,0,0" />
+                                                                       Margin="0,8,0,0" />
                                                             <TextBlock x:Name="HomeFeatureNextLabelText"
-                                                                       Text="Next in line"
-                                                                       Foreground="{DynamicResource MutedText}"
-                                                                       FontSize="12"
+                                                                       Text="Module Queue"
+                                                                       Foreground="{DynamicResource SecondaryText}"
+                                                                       FontSize="11"
                                                                        HorizontalAlignment="Center"
                                                                        Margin="0,4,0,0" />
                                                         </StackPanel>
@@ -673,8 +674,9 @@
                                                 </Grid>
                                             </Border>
 
+                                            <!-- Bottom Feature Tiles Navigation -->
                                             <Grid Grid.Row="2"
-                                                  Margin="0,22,0,0">
+                                                  Margin="0,18,0,0">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto" />
                                                     <RowDefinition Height="Auto" />
@@ -683,140 +685,140 @@
                                                 <UniformGrid Columns="6">
                                                     <Border x:Name="HomeFeatureTile0"
                                                             Tag="0"
-                                                            Background="#0A162C"
-                                                            BorderBrush="#1A3B6E"
+                                                            Background="{DynamicResource PanelBackground}"
+                                                            BorderBrush="{DynamicResource PanelBorder}"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
-                                                            Padding="14,12"
-                                                            Margin="0,0,8,0"
+                                                            Padding="14,10"
+                                                            Margin="0,0,6,0"
                                                             Cursor="Hand"
                                                             MouseLeftButtonDown="HomeFeatureTile_MouseLeftButtonDown">
                                                         <StackPanel>
                                                             <TextBlock Text="01"
-                                                                       Foreground="{DynamicResource SuccessText}"
-                                                                       FontSize="12"
-                                                                       FontWeight="SemiBold" />
+                                                                       Foreground="{DynamicResource AccentBrush}"
+                                                                       FontSize="11"
+                                                                       FontWeight="Bold" />
                                                             <TextBlock Text="Update"
                                                                        Foreground="{DynamicResource PrimaryText}"
-                                                                       FontSize="15"
+                                                                       FontSize="14"
                                                                        FontWeight="SemiBold"
-                                                                       Margin="0,5,0,0" />
+                                                                       Margin="0,4,0,0" />
                                                         </StackPanel>
                                                     </Border>
                                                     <Border x:Name="HomeFeatureTile1"
                                                             Tag="1"
-                                                            Background="#0A162C"
-                                                            BorderBrush="#1A3B6E"
+                                                            Background="{DynamicResource PanelBackground}"
+                                                            BorderBrush="{DynamicResource PanelBorder}"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
-                                                            Padding="14,12"
-                                                            Margin="8,0"
+                                                            Padding="14,10"
+                                                            Margin="6,0"
                                                             Cursor="Hand"
                                                             MouseLeftButtonDown="HomeFeatureTile_MouseLeftButtonDown">
                                                         <StackPanel>
                                                             <TextBlock Text="02"
-                                                                       Foreground="{DynamicResource SuccessText}"
-                                                                       FontSize="12"
-                                                                       FontWeight="SemiBold" />
+                                                                       Foreground="{DynamicResource AccentBrush}"
+                                                                       FontSize="11"
+                                                                       FontWeight="Bold" />
                                                             <TextBlock Text="Setup"
                                                                        Foreground="{DynamicResource PrimaryText}"
-                                                                       FontSize="15"
+                                                                       FontSize="14"
                                                                        FontWeight="SemiBold"
-                                                                       Margin="0,5,0,0" />
+                                                                       Margin="0,4,0,0" />
                                                         </StackPanel>
                                                     </Border>
                                                     <Border x:Name="HomeFeatureTile2"
                                                             Tag="2"
-                                                            Background="#0A162C"
-                                                            BorderBrush="#1A3B6E"
+                                                            Background="{DynamicResource PanelBackground}"
+                                                            BorderBrush="{DynamicResource PanelBorder}"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
-                                                            Padding="14,12"
-                                                            Margin="8,0"
+                                                            Padding="14,10"
+                                                            Margin="6,0"
                                                             Cursor="Hand"
                                                             MouseLeftButtonDown="HomeFeatureTile_MouseLeftButtonDown">
                                                         <StackPanel>
                                                             <TextBlock Text="03"
-                                                                       Foreground="{DynamicResource SuccessText}"
-                                                                       FontSize="12"
-                                                                       FontWeight="SemiBold" />
+                                                                       Foreground="{DynamicResource AccentBrush}"
+                                                                       FontSize="11"
+                                                                       FontWeight="Bold" />
                                                             <TextBlock Text="Uninstall"
                                                                        Foreground="{DynamicResource PrimaryText}"
-                                                                       FontSize="15"
+                                                                       FontSize="14"
                                                                        FontWeight="SemiBold"
-                                                                       Margin="0,5,0,0" />
+                                                                       Margin="0,4,0,0" />
                                                         </StackPanel>
                                                     </Border>
                                                     <Border x:Name="HomeFeatureTile3"
                                                             Tag="3"
-                                                            Background="#0A162C"
-                                                            BorderBrush="#1A3B6E"
+                                                            Background="{DynamicResource PanelBackground}"
+                                                            BorderBrush="{DynamicResource PanelBorder}"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
-                                                            Padding="14,12"
-                                                            Margin="8,0"
+                                                            Padding="14,10"
+                                                            Margin="6,0"
                                                             Cursor="Hand"
                                                             MouseLeftButtonDown="HomeFeatureTile_MouseLeftButtonDown">
                                                         <StackPanel>
                                                             <TextBlock Text="04"
-                                                                       Foreground="{DynamicResource SuccessText}"
-                                                                       FontSize="12"
-                                                                       FontWeight="SemiBold" />
+                                                                       Foreground="{DynamicResource AccentBrush}"
+                                                                       FontSize="11"
+                                                                       FontWeight="Bold" />
                                                             <TextBlock Text="Cleanup"
                                                                        Foreground="{DynamicResource PrimaryText}"
-                                                                       FontSize="15"
+                                                                       FontSize="14"
                                                                        FontWeight="SemiBold"
-                                                                       Margin="0,5,0,0" />
+                                                                       Margin="0,4,0,0" />
                                                         </StackPanel>
                                                     </Border>
                                                     <Border x:Name="HomeFeatureTile4"
                                                             Tag="4"
-                                                            Background="#0A162C"
-                                                            BorderBrush="#1A3B6E"
+                                                            Background="{DynamicResource PanelBackground}"
+                                                            BorderBrush="{DynamicResource PanelBorder}"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
-                                                            Padding="14,12"
-                                                            Margin="8,0"
+                                                            Padding="14,10"
+                                                            Margin="6,0"
                                                             Cursor="Hand"
                                                             MouseLeftButtonDown="HomeFeatureTile_MouseLeftButtonDown">
                                                         <StackPanel>
                                                             <TextBlock Text="05"
-                                                                       Foreground="{DynamicResource SuccessText}"
-                                                                       FontSize="12"
-                                                                       FontWeight="SemiBold" />
+                                                                       Foreground="{DynamicResource AccentBrush}"
+                                                                       FontSize="11"
+                                                                       FontWeight="Bold" />
                                                             <TextBlock Text="Activity"
                                                                        Foreground="{DynamicResource PrimaryText}"
-                                                                       FontSize="15"
+                                                                       FontSize="14"
                                                                        FontWeight="SemiBold"
-                                                                       Margin="0,5,0,0" />
+                                                                       Margin="0,4,0,0" />
                                                         </StackPanel>
                                                     </Border>
                                                     <Border x:Name="HomeFeatureTile5"
                                                             Tag="5"
-                                                            Background="#0A162C"
-                                                            BorderBrush="#1A3B6E"
+                                                            Background="{DynamicResource PanelBackground}"
+                                                            BorderBrush="{DynamicResource PanelBorder}"
                                                             BorderThickness="1"
                                                             CornerRadius="8"
-                                                            Padding="14,12"
-                                                            Margin="8,0,0,0"
+                                                            Padding="14,10"
+                                                            Margin="6,0,0,0"
                                                             Cursor="Hand"
                                                             MouseLeftButtonDown="HomeFeatureTile_MouseLeftButtonDown">
                                                         <StackPanel>
                                                             <TextBlock Text="06"
-                                                                       Foreground="{DynamicResource SuccessText}"
-                                                                       FontSize="12"
-                                                                       FontWeight="SemiBold" />
+                                                                       Foreground="{DynamicResource AccentBrush}"
+                                                                       FontSize="11"
+                                                                       FontWeight="Bold" />
                                                             <TextBlock Text="Storage"
                                                                        Foreground="{DynamicResource PrimaryText}"
-                                                                       FontSize="15"
+                                                                       FontSize="14"
                                                                        FontWeight="SemiBold"
-                                                                       Margin="0,5,0,0" />
+                                                                       Margin="0,4,0,0" />
                                                         </StackPanel>
                                                     </Border>
                                                 </UniformGrid>
 
                                                 <Grid Grid.Row="1"
-                                                      Margin="0,16,0,0">
+                                                      Margin="0,14,0,0">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="*" />
@@ -824,7 +826,7 @@
                                                     </Grid.ColumnDefinitions>
 
                                                     <Button x:Name="HomeBackButton"
-                                                            Content="Back"
+                                                            Content="&#x2190; Previous"
                                                             Style="{StaticResource HomeGhostButton}"
                                                             Click="PreviousHomeFeature_Click" />
                                                     <TextBlock x:Name="HomeFeaturePositionText"
@@ -836,7 +838,7 @@
                                                                Foreground="{DynamicResource MutedText}" />
                                                     <Button Grid.Column="2"
                                                             x:Name="HomeNextButton"
-                                                            Content="Next"
+                                                            Content="Next &#x2192;"
                                                             Style="{StaticResource HomeGhostButton}"
                                                             Click="NextHomeFeature_Click" />
                                                 </Grid>
@@ -2025,7 +2027,8 @@
         </Grid>
 
         <Grid x:Name="WelcomeOverlay"
-              Panel.ZIndex="20">
+              Panel.ZIndex="20"
+              Visibility="Collapsed">
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop x:Name="WelcomeBgStopOne"

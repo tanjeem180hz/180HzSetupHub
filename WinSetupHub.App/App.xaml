@@ -5,28 +5,34 @@
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-        <SolidColorBrush x:Key="AppBackground" Color="#050C1E" />
-        <SolidColorBrush x:Key="PanelBackground" Color="#0A162C" />
-        <SolidColorBrush x:Key="SubtleBackground" Color="#0F2244" />
-        <SolidColorBrush x:Key="PanelBorder" Color="#1A3B6E" />
-        <SolidColorBrush x:Key="PrimaryText" Color="#FFFFFF" />
-        <SolidColorBrush x:Key="MutedText" Color="#8EB0D8" />
-        <SolidColorBrush x:Key="AccentBrush" Color="#00F0FF" />
-        <SolidColorBrush x:Key="AccentDarkBrush" Color="#0078FF" />
-        <SolidColorBrush x:Key="AccentForeground" Color="#050C1E" />
-        <SolidColorBrush x:Key="ButtonHover" Color="#163260" />
-        <SolidColorBrush x:Key="ButtonDisabled" Color="#0B1528" />
-        <SolidColorBrush x:Key="SuccessBackground" Color="#042F2E" />
-        <SolidColorBrush x:Key="SuccessText" Color="#00FFA3" />
-        <SolidColorBrush x:Key="WarningBackground" Color="#2E2305" />
-        <SolidColorBrush x:Key="WarningText" Color="#FFB800" />
-        <SolidColorBrush x:Key="DangerBackground" Color="#380D1A" />
-        <SolidColorBrush x:Key="DangerText" Color="#FF3366" />
-        <SolidColorBrush x:Key="InfoBackground" Color="#0A2A54" />
-        <SolidColorBrush x:Key="InfoText" Color="#00D2FF" />
-        <SolidColorBrush x:Key="NeutralBackground" Color="#0E1D38" />
-        <SolidColorBrush x:Key="NeutralText" Color="#8EB0D8" />
+        <!-- ========================================================
+             180Hz MODERN OBSIDIAN & HIGH-TECH CYAN DESIGN SYSTEM
+             ======================================================== -->
+        <SolidColorBrush x:Key="AppBackground" Color="#0A0C13" />
+        <SolidColorBrush x:Key="PanelBackground" Color="#10131E" />
+        <SolidColorBrush x:Key="SubtleBackground" Color="#151928" />
+        <SolidColorBrush x:Key="PanelBorder" Color="#1F263B" />
+        <SolidColorBrush x:Key="CardBorder" Color="#232B42" />
+        <SolidColorBrush x:Key="PrimaryText" Color="#F8FAFC" />
+        <SolidColorBrush x:Key="MutedText" Color="#94A3B8" />
+        <SolidColorBrush x:Key="SecondaryText" Color="#64748B" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#00D4FF" />
+        <SolidColorBrush x:Key="AccentDarkBrush" Color="#0284C7" />
+        <SolidColorBrush x:Key="AccentForeground" Color="#000000" />
+        <SolidColorBrush x:Key="ButtonHover" Color="#1A2134" />
+        <SolidColorBrush x:Key="ButtonDisabled" Color="#0E121D" />
+        <SolidColorBrush x:Key="SuccessBackground" Color="#0A231C" />
+        <SolidColorBrush x:Key="SuccessText" Color="#10B981" />
+        <SolidColorBrush x:Key="WarningBackground" Color="#2A1B07" />
+        <SolidColorBrush x:Key="WarningText" Color="#F59E0B" />
+        <SolidColorBrush x:Key="DangerBackground" Color="#2E0F17" />
+        <SolidColorBrush x:Key="DangerText" Color="#F43F5E" />
+        <SolidColorBrush x:Key="InfoBackground" Color="#0C233C" />
+        <SolidColorBrush x:Key="InfoText" Color="#38BDF8" />
+        <SolidColorBrush x:Key="NeutralBackground" Color="#151928" />
+        <SolidColorBrush x:Key="NeutralText" Color="#94A3B8" />
 
+        <!-- TYPOGRAPHY SYSTEM -->
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI, -apple-system, sans-serif" />
             <Setter Property="Foreground" Value="{DynamicResource PrimaryText}" />
@@ -35,6 +41,35 @@
             <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled" />
         </Style>
 
+        <!-- MODERN ULTRA-THIN SCROLLBAR -->
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
+            <Setter Property="Foreground" Value="#252D45" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Width" Value="6" />
+            <Setter Property="MinWidth" Value="6" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid x:Name="Bg" SnapsToDevicePixels="true">
+                            <Track x:Name="PART_Track" IsDirectionReversed="true" IsEnabled="{TemplateBinding IsMouseOver}">
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Border Background="#252D45" CornerRadius="3" Margin="1,0,1,0" />
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- SLEEK BASE BUTTON -->
         <Style TargetType="{x:Type Button}">
             <Setter Property="MinHeight" Value="36" />
             <Setter Property="Padding" Value="14,7" />
@@ -57,7 +92,8 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="8"
-                                Padding="{TemplateBinding Padding}">
+                                Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="True">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                               RecognizesAccessKey="True" />
@@ -65,10 +101,10 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource ButtonHover}" />
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#00D4FF" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Chrome" Property="Opacity" Value="0.86" />
+                                <Setter TargetName="Chrome" Property="Opacity" Value="0.82" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource ButtonDisabled}" />
@@ -81,10 +117,18 @@
             </Setter>
         </Style>
 
+        <!-- PRIMARY BRAND BUTTON -->
         <Style x:Key="PrimaryButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
-            <Setter Property="Foreground" Value="{DynamicResource AccentForeground}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#00D4FF" Offset="0" />
+                        <GradientStop Color="#0078FF" Offset="1" />
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#00D4FF" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -94,19 +138,21 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="8"
-                                Padding="{TemplateBinding Padding}">
+                                Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="True">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#00D4FF" BlurRadius="12" ShadowDepth="0" Opacity="0.25" />
+                            </Border.Effect>
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                               RecognizesAccessKey="True" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource AccentDarkBrush}" />
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource AccentDarkBrush}" />
-                                <Setter Property="Foreground" Value="#FFFFFF" />
+                                <Setter TargetName="Chrome" Property="Opacity" Value="0.92" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Chrome" Property="Opacity" Value="0.88" />
+                                <Setter TargetName="Chrome" Property="Opacity" Value="0.80" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource ButtonDisabled}" />
@@ -119,12 +165,14 @@
             </Setter>
         </Style>
 
+        <!-- SUBTLE BUTTON -->
         <Style x:Key="SubtleButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Background" Value="{DynamicResource SubtleBackground}" />
             <Setter Property="BorderBrush" Value="{DynamicResource PanelBorder}" />
             <Setter Property="Foreground" Value="{DynamicResource PrimaryText}" />
         </Style>
 
+        <!-- DANGER BUTTON -->
         <Style x:Key="DangerButton" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Background" Value="{DynamicResource DangerBackground}" />
             <Setter Property="Foreground" Value="{DynamicResource DangerText}" />
@@ -132,9 +180,10 @@
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
 
+        <!-- MODERN TEXTBOX -->
         <Style TargetType="{x:Type TextBox}">
             <Setter Property="MinHeight" Value="38" />
-            <Setter Property="Padding" Value="10,7" />
+            <Setter Property="Padding" Value="12,8" />
             <Setter Property="Margin" Value="0,0,8,8" />
             <Setter Property="BorderBrush" Value="{DynamicResource PanelBorder}" />
             <Setter Property="BorderThickness" Value="1" />
@@ -146,16 +195,38 @@
             <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
             <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
             <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled" />
-            <Style.Triggers>
-                <Trigger Property="IsFocused" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-                </Trigger>
-            </Style.Triggers>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden"
+                                          Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#2D3748" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
+        <!-- MODERN COMBOBOX -->
         <Style TargetType="{x:Type ComboBox}">
             <Setter Property="MinHeight" Value="38" />
-            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="Padding" Value="12,7" />
             <Setter Property="Margin" Value="0,0,8,8" />
             <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI, -apple-system, sans-serif" />
             <Setter Property="FontSize" Value="13" />
@@ -183,9 +254,10 @@
                                                 Background="{TemplateBinding Background}"
                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="8">
+                                                CornerRadius="8"
+                                                SnapsToDevicePixels="True">
                                             <Grid>
-                                                <ContentPresenter Margin="10,0,32,0"
+                                                <ContentPresenter Margin="12,0,32,0"
                                                                   HorizontalAlignment="Left"
                                                                   VerticalAlignment="Center"
                                                                   RecognizesAccessKey="True"
@@ -196,12 +268,13 @@
                                                       Fill="{DynamicResource MutedText}"
                                                       HorizontalAlignment="Right"
                                                       VerticalAlignment="Center"
-                                                      Margin="0,0,12,0" />
+                                                      Margin="0,0,14,0" />
                                             </Grid>
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
                                                 <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource ButtonHover}" />
+                                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#2D3748" />
                                             </Trigger>
                                             <Trigger Property="IsChecked" Value="True">
                                                 <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
@@ -227,7 +300,11 @@
                                         CornerRadius="8"
                                         MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
                                         MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                        Padding="4">
+                                        Padding="4"
+                                        Margin="0,4,0,0">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#000000" BlurRadius="16" ShadowDepth="4" Opacity="0.4" />
+                                    </Border.Effect>
                                     <ScrollViewer CanContentScroll="True">
                                         <ItemsPresenter />
                                     </ScrollViewer>
@@ -250,14 +327,18 @@
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="{DynamicResource SubtleBackground}" />
-                    <Setter Property="Foreground" Value="{DynamicResource PrimaryText}" />
+                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
 
+        <!-- MODERN CHECKBOX -->
         <Style TargetType="{x:Type CheckBox}">
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryText}" />
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI, -apple-system, sans-serif" />
+            <Setter Property="FontSize" Value="13" />
         </Style>
     </Application.Resources>
 </Application>
