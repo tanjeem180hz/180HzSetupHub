@@ -7,8 +7,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AssemblyName>180HzSetupHub</AssemblyName>
-    <RootNamespace>WinSetupHub.App</RootNamespace>
+    <RootNamespace>SetupHub180Hz</RootNamespace>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <Product>180Hz Setup Hub</Product>
     <AssemblyTitle>180Hz Setup Hub</AssemblyTitle>
     <Company>180Hz</Company>

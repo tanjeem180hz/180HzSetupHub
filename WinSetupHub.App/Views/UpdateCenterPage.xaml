@@ -1,0 +1,32 @@
+<UserControl x:Class="SetupHub180Hz.Views.UpdateCenterPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="Update Center" Style="{StaticResource TextHeader}"/>
+            <TextBlock Text="Apps with a newer version available, via winget." Style="{StaticResource TextBody}" Margin="0,4,0,16"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="SummaryText" Text="Checking for updates…" VerticalAlignment="Center"
+                       Style="{StaticResource TextBody}"/>
+            <Button Grid.Column="1" Content="Refresh" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Click="Refresh_Click"/>
+            <Button x:Name="UpgradeAllButton" Grid.Column="2" Content="Upgrade All" Style="{StaticResource AccentButton}" Click="UpgradeAll_Click"/>
+        </Grid>
+
+        <ScrollViewer Grid.Row="2" Style="{StaticResource CleanScrollViewer}">
+            <ItemsControl x:Name="ResultsList"/>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
