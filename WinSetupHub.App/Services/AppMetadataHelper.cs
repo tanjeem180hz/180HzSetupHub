@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Win32;
 using SetupHub180Hz.Models;
@@ -8,11 +9,21 @@ namespace SetupHub180Hz.Services
 {
     public static class AppMetadataHelper
     {
-        private static Dictionary<string, (string Size, string? Path)>? _registrySizeCache;
+        private class RegistryAppInfo
+        {
+            public string DisplayName { get; set; } = "";
+            public string DisplayVersion { get; set; } = "";
+            public string Size { get; set; } = "";
+            public string? InstallLocation { get; set; }
+            public string? DisplayIcon { get; set; }
+            public string? UninstallString { get; set; }
+        }
+
+        private static Dictionary<string, RegistryAppInfo>? _registryCache;
 
         public static void EnrichAppItem(AppItem app, IEnumerable<AppItem>? catalog = null)
         {
-            // 1. If in catalog, copy official metadata
+            // 1. If in catalog, copy verified official metadata
             if (catalog != null)
             {
                 var match = catalog.FirstOrDefault(c =>
@@ -24,69 +35,121 @@ namespace SetupHub180Hz.Services
                     if (string.IsNullOrWhiteSpace(app.IconUrl)) app.IconUrl = match.IconUrl;
                     if (string.IsNullOrWhiteSpace(app.Category) || app.Category == "General") app.Category = match.Category;
                     if (string.IsNullOrWhiteSpace(app.WebUrl)) app.WebUrl = match.WebUrl;
-                    if (string.IsNullOrWhiteSpace(app.Size) || app.Size == "~50 MB") app.Size = match.Size;
+                    if (string.IsNullOrWhiteSpace(app.Size)) app.Size = match.Size;
                     if (string.IsNullOrWhiteSpace(app.Description)) app.Description = match.Description;
                     app.AccentColor = match.AccentColor;
                 }
             }
 
-            // 2. Query Windows Registry for real installed size if not set or generic
-            if (string.IsNullOrWhiteSpace(app.Size) || app.Size.StartsWith("~"))
+            // 2. Query Windows Registry for exact real installed version, size, and real icon path
+            var regInfo = GetRegistryInfo(app.Name, app.Id);
+            if (regInfo != null)
             {
-                var regSize = GetInstalledSizeFromRegistry(app.Name, app.Id);
-                if (!string.IsNullOrWhiteSpace(regSize))
+                if (!string.IsNullOrWhiteSpace(regInfo.DisplayVersion) && (string.IsNullOrWhiteSpace(app.Version) || app.Version == "Latest"))
                 {
-                    app.Size = regSize;
+                    app.Version = regInfo.DisplayVersion;
                 }
-                else
+
+                if (!string.IsNullOrWhiteSpace(regInfo.Size))
                 {
-                    app.Size = EstimateFallbackSize(app.Name, app.Category);
+                    app.Size = regInfo.Size;
+                }
+                else if (!string.IsNullOrWhiteSpace(regInfo.InstallLocation) && Directory.Exists(regInfo.InstallLocation))
+                {
+                    var dirSize = CalculateDirectorySize(regInfo.InstallLocation);
+                    if (!string.IsNullOrWhiteSpace(dirSize))
+                    {
+                        app.Size = dirSize;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(regInfo.DisplayIcon))
+                {
+                    app.LocalIconPath = CleanIconPath(regInfo.DisplayIcon);
+                }
+
+                if (!string.IsNullOrWhiteSpace(regInfo.UninstallString))
+                {
+                    app.UninstallString = regInfo.UninstallString;
                 }
             }
 
-            // 3. Fallback icon URL if missing
-            if (string.IsNullOrWhiteSpace(app.IconUrl))
+            // 3. Fallback size if truly unmeasured: "-" (strictly no fake predictions)
+            if (string.IsNullOrWhiteSpace(app.Size))
             {
-                var domainGuess = app.Id.Contains('.')
-                    ? app.Id.Split('.')[0].ToLowerInvariant() + ".com"
-                    : app.Name.Replace(" ", "").ToLowerInvariant() + ".com";
-
-                app.IconUrl = $"https://www.google.com/s2/favicons?domain={domainGuess}&sz=128";
+                app.Size = "-";
             }
 
-            // 4. Fallback version if missing
-            if (string.IsNullOrWhiteSpace(app.Version))
+            // 4. Try load local icon immediately if available
+            if (!string.IsNullOrWhiteSpace(app.LocalIconPath) && File.Exists(app.LocalIconPath))
             {
-                app.Version = "Latest";
+                var localImg = IconCacheService.GetLocalFileIcon(app.LocalIconPath);
+                if (localImg != null)
+                {
+                    app.IconImageSource = localImg;
+                }
             }
         }
 
-        private static string GetInstalledSizeFromRegistry(string name, string id)
+        private static string CleanIconPath(string raw)
+        {
+            var clean = raw.Trim().Trim('"');
+            var commaIdx = clean.IndexOf(',');
+            if (commaIdx > 0)
+            {
+                clean = clean.Substring(0, commaIdx).Trim();
+            }
+            return clean;
+        }
+
+        private static string CalculateDirectorySize(string folderPath)
+        {
+            try
+            {
+                var di = new DirectoryInfo(folderPath);
+                long totalBytes = 0;
+                int fileCount = 0;
+                foreach (var fi in di.EnumerateFiles("*", SearchOption.AllDirectories))
+                {
+                    totalBytes += fi.Length;
+                    if (++fileCount > 1500) break; // Speed-capped at 1500 files
+                }
+                if (totalBytes > 0)
+                {
+                    double mb = totalBytes / (1024.0 * 1024.0);
+                    return mb >= 1024 ? $"{mb / 1024.0:0.0} GB" : $"{mb:0.0} MB";
+                }
+            }
+            catch { }
+            return "";
+        }
+
+        private static RegistryAppInfo? GetRegistryInfo(string name, string id)
         {
             EnsureRegistryCache();
-            if (_registrySizeCache == null) return "";
+            if (_registryCache == null) return null;
 
-            if (_registrySizeCache.TryGetValue(id.ToLowerInvariant(), out var info) && !string.IsNullOrWhiteSpace(info.Size))
-                return info.Size;
+            if (_registryCache.TryGetValue(id.ToLowerInvariant(), out var info))
+                return info;
 
-            if (_registrySizeCache.TryGetValue(name.ToLowerInvariant(), out var infoName) && !string.IsNullOrWhiteSpace(infoName.Size))
-                return infoName.Size;
+            if (_registryCache.TryGetValue(name.ToLowerInvariant(), out var infoName))
+                return infoName;
 
-            foreach (var kvp in _registrySizeCache)
+            foreach (var kvp in _registryCache)
             {
                 if (kvp.Key.Contains(name.ToLowerInvariant()) || name.ToLowerInvariant().Contains(kvp.Key))
                 {
-                    if (!string.IsNullOrWhiteSpace(kvp.Value.Size)) return kvp.Value.Size;
+                    return kvp.Value;
                 }
             }
 
-            return "";
+            return null;
         }
 
         private static void EnsureRegistryCache()
         {
-            if (_registrySizeCache != null) return;
-            _registrySizeCache = new Dictionary<string, (string Size, string? Path)>(StringComparer.OrdinalIgnoreCase);
+            if (_registryCache != null) return;
+            _registryCache = new Dictionary<string, RegistryAppInfo>(StringComparer.OrdinalIgnoreCase);
 
             string[] subKeys = {
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
@@ -110,8 +173,11 @@ namespace SetupHub180Hz.Services
                                 if (appKey == null) continue;
 
                                 var dispName = appKey.GetValue("DisplayName") as string;
+                                var dispVer = appKey.GetValue("DisplayVersion") as string;
                                 var sizeObj = appKey.GetValue("EstimatedSize");
                                 var installLoc = appKey.GetValue("InstallLocation") as string;
+                                var dispIcon = appKey.GetValue("DisplayIcon") as string;
+                                var uninstStr = appKey.GetValue("UninstallString") as string;
 
                                 string sizeStr = "";
                                 if (sizeObj is int sizeKb && sizeKb > 0)
@@ -120,11 +186,21 @@ namespace SetupHub180Hz.Services
                                     sizeStr = mb >= 1024 ? $"{mb / 1024:0.0} GB" : $"{mb:0.0} MB";
                                 }
 
+                                var entry = new RegistryAppInfo
+                                {
+                                    DisplayName = dispName ?? subName,
+                                    DisplayVersion = dispVer ?? "",
+                                    Size = sizeStr,
+                                    InstallLocation = installLoc,
+                                    DisplayIcon = dispIcon,
+                                    UninstallString = uninstStr
+                                };
+
                                 if (!string.IsNullOrWhiteSpace(dispName))
                                 {
-                                    _registrySizeCache[dispName.Trim().ToLowerInvariant()] = (sizeStr, installLoc);
+                                    _registryCache[dispName.Trim().ToLowerInvariant()] = entry;
                                 }
-                                _registrySizeCache[subName.Trim().ToLowerInvariant()] = (sizeStr, installLoc);
+                                _registryCache[subName.Trim().ToLowerInvariant()] = entry;
                             }
                             catch { }
                         }
@@ -132,18 +208,6 @@ namespace SetupHub180Hz.Services
                     catch { }
                 }
             }
-        }
-
-        private static string EstimateFallbackSize(string name, string category)
-        {
-            var lower = name.ToLowerInvariant();
-            if (lower.Contains("visual studio") || lower.Contains("game") || lower.Contains("engine") || lower.Contains("cuda")) return "1.6 GB";
-            if (lower.Contains("chrome") || lower.Contains("browser") || lower.Contains("edge") || lower.Contains("firefox")) return "120 MB";
-            if (lower.Contains("driver") || lower.Contains("nvidia") || lower.Contains("amd") || lower.Contains("intel")) return "520 MB";
-            if (lower.Contains("discord") || lower.Contains("slack") || lower.Contains("teams") || lower.Contains("zoom")) return "95 MB";
-            if (lower.Contains("office") || lower.Contains("adobe") || lower.Contains("libreoffice")) return "310 MB";
-            if (lower.Contains("7-zip") || lower.Contains("rufus") || lower.Contains("everything") || lower.Contains("curl")) return "3.5 MB";
-            return "48 MB";
         }
     }
 }

@@ -102,18 +102,13 @@ public partial class InstallerWindow : Window
             _isCompleted = true;
             _isInstalling = false;
 
-            TxtStatus.Text = "Ready to launch";
+            TxtStatus.Text = "Installation complete! Click Launch to open.";
             InstallProgressBar.Value = 100;
             BtnInstall.Content = "Launch";
             BtnInstall.Visibility = Visibility.Visible;
+            BtnInstall.IsEnabled = true;
             BtnCancel.Content = "Close";
-
-            if (ChkLaunchWhenReady.IsChecked == true)
-            {
-                await Task.Delay(1000);
-                LaunchInstalledApp();
-                Close();
-            }
+            BtnCancel.IsEnabled = true;
         }
         catch (Exception ex)
         {

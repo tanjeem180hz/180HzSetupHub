@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Media;
 
 namespace SetupHub180Hz.Models
 {
@@ -9,21 +10,127 @@ namespace SetupHub180Hz.Models
         private string _status = "Install";
         private bool _isBusy;
         private bool _isInstalled;
+        private string _version = "Latest";
+        private string _availableVersion = "";
+        private string _size = "";
+        private string _iconUrl = "";
+        private ImageSource? _iconImageSource;
+        private string? _localIconPath;
+        private string? _uninstallString;
 
         public string Name { get; set; } = "";
         public string Id { get; set; } = "";
         public string Category { get; set; } = "General";
         public string Description { get; set; } = "";
-        public string Version { get; set; } = "Latest";
-        public string AvailableVersion { get; set; } = "";
-        public string Size { get; set; } = "~50 MB";
-        public string IconUrl { get; set; } = "";
+
+        public string Version
+        {
+            get => _version;
+            set
+            {
+                if (_version != value)
+                {
+                    _version = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(FormattedVersion));
+                }
+            }
+        }
+
+        public string AvailableVersion
+        {
+            get => _availableVersion;
+            set
+            {
+                if (_availableVersion != value)
+                {
+                    _availableVersion = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HasUpdate));
+                }
+            }
+        }
+
+        public string Size
+        {
+            get => _size;
+            set
+            {
+                if (_size != value)
+                {
+                    _size = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(FormattedSize));
+                }
+            }
+        }
+
+        public string IconUrl
+        {
+            get => _iconUrl;
+            set
+            {
+                if (_iconUrl != value)
+                {
+                    _iconUrl = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public ImageSource? IconImageSource
+        {
+            get => _iconImageSource;
+            set
+            {
+                if (_iconImageSource != value)
+                {
+                    _iconImageSource = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HasIconImage));
+                }
+            }
+        }
+
+        public string? LocalIconPath
+        {
+            get => _localIconPath;
+            set
+            {
+                if (_localIconPath != value)
+                {
+                    _localIconPath = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string? UninstallString
+        {
+            get => _uninstallString;
+            set
+            {
+                if (_uninstallString != value)
+                {
+                    _uninstallString = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public string WebUrl { get; set; } = "";
         public string AccentColor { get; set; } = "#2FB6FF";
         public string Source { get; set; } = "winget";
         public bool Essential { get; set; }
 
         public bool HasUpdate => !string.IsNullOrWhiteSpace(AvailableVersion);
+        public bool HasIconImage => IconImageSource != null;
+        public bool HasWebUrl => !string.IsNullOrWhiteSpace(WebUrl);
+        public bool HasSource => !string.IsNullOrWhiteSpace(Source);
+        public string SourceTag => Source?.ToUpperInvariant() ?? "WINGET";
+        public string FormattedVersion => string.IsNullOrWhiteSpace(Version) ? "-" : $"🏷️ {Version}";
+        public string FormattedSize => string.IsNullOrWhiteSpace(Size) ? "-" : $"💾 {Size}";
+        public string Initial => !string.IsNullOrWhiteSpace(Name) ? Name[0].ToString().ToUpperInvariant() : "•";
 
         public bool IsInstalled
         {

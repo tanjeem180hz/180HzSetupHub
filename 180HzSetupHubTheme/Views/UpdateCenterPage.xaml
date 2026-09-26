@@ -1,17 +1,154 @@
 <UserControl x:Class="SetupHub180Hz.Views.UpdateCenterPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Margin="28">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:SetupHub180Hz.Models">
+
+    <UserControl.Resources>
+        <!-- Clean ListBox Item Style -->
+        <Style x:Key="CleanListBoxItem" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0,0,0,6"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <ContentPresenter/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Upgradable App Card Template -->
+        <DataTemplate x:Key="UpgradableAppTemplate">
+            <Border Style="{StaticResource ListRow}" Padding="14,10,14,10" Margin="0,0,0,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="54"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 1. Logo / Monogram -->
+                    <Border Width="44" Height="44" CornerRadius="8"
+                            Background="{StaticResource BrushBackground}"
+                            BorderBrush="{StaticResource BrushBorder}"
+                            BorderThickness="1"
+                            HorizontalAlignment="Left" VerticalAlignment="Center"
+                            ClipToBounds="True">
+                        <Grid>
+                            <TextBlock Text="{Binding Initial}"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource BrushAccent}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+
+                            <Image Source="{Binding IconImageSource}"
+                                   Width="32" Height="32"
+                                   Stretch="Uniform"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 2. Details -->
+                    <StackPanel Grid.Column="1" Margin="12,0,16,0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="{Binding Name}"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushTextPrimary}"
+                                       VerticalAlignment="Center"/>
+
+                            <Border Background="{StaticResource BrushBackground}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="6,1,6,1"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="{Binding SourceTag}"
+                                           FontSize="10"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource BrushTextSecondary}"/>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Meta Row -->
+                        <StackPanel Orientation="Horizontal">
+                            <!-- Version Transition Pill -->
+                            <Border Background="{StaticResource BrushBackground}"
+                                    BorderBrush="{StaticResource BrushAccent}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="8,2,8,2"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="🏷️ " FontSize="11" Foreground="{StaticResource BrushTextSecondary}"/>
+                                    <TextBlock Text="{Binding Version}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushTextSecondary}"/>
+                                    <TextBlock Text="  ➜  " FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                                    <TextBlock Text="{Binding AvailableVersion}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Size Pill -->
+                            <Border Background="{StaticResource BrushBackground}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="8,2,8,2"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="{Binding FormattedSize}"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource BrushTextSecondary}"/>
+                            </Border>
+
+                            <!-- ID Text -->
+                            <TextBlock Text="{Binding Id}"
+                                       Style="{StaticResource TextBody}"
+                                       FontSize="11"
+                                       Foreground="{StaticResource BrushTextSecondary}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- 3. Upgrade Button -->
+                    <Button Grid.Column="2"
+                            Content="Upgrade"
+                            Style="{StaticResource AccentButton}"
+                            Padding="18,7,18,7"
+                            VerticalAlignment="Center"
+                            Click="UpgradeButton_Click"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="32,24,32,28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Text="Update Center" Style="{StaticResource TextHeader}"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,18">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
+                    <TextBlock Text="⚡ UPDATES" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                </Border>
+                <TextBlock Text="WINGET UPGRADE CENTER" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <TextBlock Text="Update Center" Style="{StaticResource TextHeader}" FontSize="26"/>
             <TextBlock Text="Keep your applications up to date with the latest versions and security patches."
-                       Style="{StaticResource TextBody}" Margin="0,4,0,16"/>
+                       Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
         </StackPanel>
 
         <Grid Grid.Row="1" Margin="0,0,0,16">
@@ -22,12 +159,21 @@
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="SummaryText" Text="Checking for updates…" VerticalAlignment="Center"
                        Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
-            <Button Grid.Column="1" Content="🔄 Refresh" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Click="Refresh_Click"/>
-            <Button x:Name="UpgradeAllButton" Grid.Column="2" Content="⚡ Upgrade All" Style="{StaticResource AccentButton}" Click="UpgradeAll_Click"/>
+            <Button Grid.Column="1" Content="🔄 Refresh" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Padding="16,9" Click="Refresh_Click"/>
+            <Button x:Name="UpgradeAllButton" Grid.Column="2" Content="⚡ Upgrade All" Style="{StaticResource AccentButton}" Padding="18,9" Click="UpgradeAll_Click"/>
         </Grid>
 
-        <ScrollViewer Grid.Row="2" Style="{StaticResource CleanScrollViewer}">
-            <ItemsControl x:Name="ResultsList"/>
-        </ScrollViewer>
+        <ListBox Grid.Row="2"
+                 x:Name="UpdatesListBox"
+                 VirtualizingPanel.IsVirtualizing="True"
+                 VirtualizingPanel.VirtualizationMode="Recycling"
+                 VirtualizingPanel.ScrollUnit="Pixel"
+                 ScrollViewer.CanContentScroll="True"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 ItemContainerStyle="{StaticResource CleanListBoxItem}"
+                 ItemTemplate="{StaticResource UpgradableAppTemplate}"/>
     </Grid>
 </UserControl>

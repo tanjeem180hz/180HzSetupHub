@@ -20,19 +20,25 @@ namespace SetupHub180Hz
                 NavigateTo(tag);
         }
 
+        private readonly System.Collections.Generic.Dictionary<string, UserControl> _pageCache = new();
+
         private void NavigateTo(string pageKey)
         {
-            UserControl page = pageKey switch
+            if (!_pageCache.TryGetValue(pageKey, out var page))
             {
-                "Dashboard" => new DashboardPage(this),
-                "SetupApps" => new SetupAppsPage(),
-                "UpdateCenter" => new UpdateCenterPage(),
-                "Uninstaller" => new UninstallerPage(),
-                "Cleanup" => new CleanupPage(),
-                "Activity" => new ActivityPage(),
-                "Storage" => new StoragePage(),
-                _ => new DashboardPage(this),
-            };
+                page = pageKey switch
+                {
+                    "Dashboard" => new DashboardPage(this),
+                    "SetupApps" => new SetupAppsPage(),
+                    "UpdateCenter" => new UpdateCenterPage(),
+                    "Uninstaller" => new UninstallerPage(),
+                    "Cleanup" => new CleanupPage(),
+                    "Activity" => new ActivityPage(),
+                    "Storage" => new StoragePage(),
+                    _ => new DashboardPage(this),
+                };
+                _pageCache[pageKey] = page;
+            }
 
             ContentHost.Content = page;
             PlayEnterAnimation(ContentHost);

@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using SetupHub180Hz.Models;
 using SetupHub180Hz.Services;
 
@@ -17,17 +18,33 @@ namespace SetupHub180Hz.Views
         private readonly PackageCatalogService _catalog = new();
         private List<AppItem> _allApps = new();
         private AppItem? _targetApp;
-        private Border? _targetRow;
+        private readonly DispatcherTimer _filterDebounceTimer;
 
         public UninstallerPage()
         {
             InitializeComponent();
-            Loaded += async (_, _) => await LoadAsync();
+
+            _filterDebounceTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(120)
+            };
+            _filterDebounceTimer.Tick += (_, _) =>
+            {
+                _filterDebounceTimer.Stop();
+                ApplyFilter();
+            };
+
+            Loaded += async (_, _) =>
+            {
+                if (_allApps.Count == 0)
+                {
+                    await LoadAsync();
+                }
+            };
         }
 
         private async Task LoadAsync()
         {
-            ResultsList.Items.Clear();
             StatusText.Text = "Scanning installed applications…";
             StatusText.Visibility = Visibility.Visible;
             InstalledCountText.Text = "Scanning…";
@@ -35,7 +52,7 @@ namespace SetupHub180Hz.Views
             _allApps = await _winget.GetInstalledAppsAsync();
             var presetCatalog = await _catalog.GetAllAsync();
 
-            // Enrich all installed apps with logo, size, and category
+            // Enrich all installed apps with exact registry details
             foreach (var app in _allApps)
             {
                 AppMetadataHelper.EnrichAppItem(app, presetCatalog);
@@ -43,6 +60,22 @@ namespace SetupHub180Hz.Views
 
             InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
             ApplyFilter();
+
+            // Background async icon extraction for local apps
+            _ = Task.Run(async () =>
+            {
+                foreach (var app in _allApps)
+                {
+                    if (app.IconImageSource == null)
+                    {
+                        var img = await IconCacheService.GetImageAsync(app.IconUrl, app.LocalIconPath);
+                        if (img != null)
+                        {
+                            await Dispatcher.InvokeAsync(() => app.IconImageSource = img);
+                        }
+                    }
+                }
+            });
         }
 
         private async void Refresh_Click(object sender, RoutedEventArgs e) => await LoadAsync();
@@ -52,7 +85,9 @@ namespace SetupHub180Hz.Views
             ClearFilterButton.Visibility = string.IsNullOrWhiteSpace(FilterBox.Text)
                 ? Visibility.Collapsed
                 : Visibility.Visible;
-            ApplyFilter();
+
+            _filterDebounceTimer.Stop();
+            _filterDebounceTimer.Start();
         }
 
         private void ClearFilter_Click(object sender, RoutedEventArgs e)
@@ -71,231 +106,65 @@ namespace SetupHub180Hz.Views
                     a.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                     a.Category.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
 
-            Render(filtered);
-        }
-
-        private void Render(List<AppItem> apps)
-        {
-            ResultsList.Items.Clear();
-
-            if (apps.Count == 0)
+            if (filtered.Count == 0)
             {
                 StatusText.Text = "No installed applications match your filter.";
                 StatusText.Visibility = Visibility.Visible;
-                return;
+            }
+            else
+            {
+                StatusText.Visibility = Visibility.Collapsed;
             }
 
-            StatusText.Visibility = Visibility.Collapsed;
-            foreach (var app in apps)
-            {
-                ResultsList.Items.Add(BuildRow(app));
-            }
+            AppsListBox.ItemsSource = filtered;
         }
 
-        private Border BuildRow(AppItem app)
+        private void UninstallButton_Click(object sender, RoutedEventArgs e)
         {
-            var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(54) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-            // 1. Logo / Monogram
-            var logoBorder = new Border
+            if (sender is Button btn && btn.DataContext is AppItem app)
             {
-                Width = 42,
-                Height = 42,
-                CornerRadius = new CornerRadius(8),
-                Background = (Brush)FindResource("BrushBackground"),
-                BorderBrush = (Brush)FindResource("BrushBorder"),
-                BorderThickness = new Thickness(1),
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment = VerticalAlignment.Center,
-                ClipToBounds = true
-            };
-
-            var logoGrid = new Grid();
-            var initial = !string.IsNullOrWhiteSpace(app.Name) ? app.Name[0].ToString().ToUpperInvariant() : "•";
-            var fallbackText = new TextBlock
-            {
-                Text = initial,
-                FontFamily = (FontFamily)FindResource("AppFont"),
-                FontSize = 16,
-                FontWeight = FontWeights.Bold,
-                Foreground = (Brush)FindResource("BrushAccent"),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            logoGrid.Children.Add(fallbackText);
-
-            if (!string.IsNullOrWhiteSpace(app.IconUrl) && Uri.TryCreate(app.IconUrl, UriKind.Absolute, out var uri))
-            {
-                try
-                {
-                    var img = new Image
-                    {
-                        Width = 30,
-                        Height = 30,
-                        Stretch = Stretch.Uniform,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                    RenderOptions.SetBitmapScalingMode(img, BitmapScalingMode.HighQuality);
-
-                    var bitmap = new BitmapImage();
-                    bitmap.BeginInit();
-                    bitmap.UriSource = uri;
-                    bitmap.DecodePixelWidth = 60;
-                    bitmap.DecodePixelHeight = 60;
-                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-                    bitmap.EndInit();
-
-                    img.Source = bitmap;
-                    logoGrid.Children.Add(img);
-                }
-                catch { }
+                ShowUninstallWarning(app);
             }
-
-            logoBorder.Child = logoGrid;
-            Grid.SetColumn(logoBorder, 0);
-            grid.Children.Add(logoBorder);
-
-            // 2. Info
-            var infoPanel = new StackPanel { Margin = new Thickness(12, 0, 16, 0), VerticalAlignment = VerticalAlignment.Center };
-
-            var titleRow = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 4) };
-            var nameText = new TextBlock
-            {
-                Text = app.Name,
-                FontFamily = (FontFamily)FindResource("AppFont"),
-                FontSize = 14,
-                FontWeight = FontWeights.SemiBold,
-                Foreground = (Brush)FindResource("BrushTextPrimary"),
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            titleRow.Children.Add(nameText);
-
-            if (!string.IsNullOrWhiteSpace(app.Source))
-            {
-                var srcBorder = new Border
-                {
-                    Background = (Brush)FindResource("BrushBackground"),
-                    BorderBrush = (Brush)FindResource("BrushBorder"),
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(4),
-                    Padding = new Thickness(6, 1, 6, 1),
-                    Margin = new Thickness(8, 0, 0, 0),
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                srcBorder.Child = new TextBlock
-                {
-                    Text = app.Source.ToUpperInvariant(),
-                    FontSize = 10,
-                    FontWeight = FontWeights.SemiBold,
-                    Foreground = (Brush)FindResource("BrushTextSecondary")
-                };
-                titleRow.Children.Add(srcBorder);
-            }
-
-            infoPanel.Children.Add(titleRow);
-
-            var metaRow = new StackPanel { Orientation = Orientation.Horizontal };
-            metaRow.Children.Add(CreateMetaPill($"🏷️ {app.Version}"));
-            metaRow.Children.Add(CreateMetaPill($"💾 {app.Size}"));
-
-            var idText = new TextBlock
-            {
-                Text = app.Id,
-                Style = (Style)FindResource("TextBody"),
-                FontSize = 11,
-                Foreground = (Brush)FindResource("BrushTextSecondary"),
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            metaRow.Children.Add(idText);
-
-            infoPanel.Children.Add(metaRow);
-
-            Grid.SetColumn(infoPanel, 1);
-            grid.Children.Add(infoPanel);
-
-            // 3. Uninstall Button
-            var uninstallButton = new Button
-            {
-                Content = "Uninstall",
-                Style = (Style)FindResource("DangerOutlineButton"),
-                Padding = new Thickness(16, 6, 16, 6),
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            var row = new Border
-            {
-                Style = (Style)FindResource("ListRow"),
-                Padding = new Thickness(14, 10, 14, 10),
-                Margin = new Thickness(0, 0, 0, 8),
-                Child = grid
-            };
-
-            uninstallButton.Click += (_, _) =>
-            {
-                ShowUninstallWarning(app, row);
-            };
-
-            Grid.SetColumn(uninstallButton, 2);
-            grid.Children.Add(uninstallButton);
-
-            return row;
         }
 
-        private void ShowUninstallWarning(AppItem app, Border row)
+        private void ShowUninstallWarning(AppItem app)
         {
             _targetApp = app;
-            _targetRow = row;
 
             DialogAppNameText.Text = app.Name;
-            DialogVersionText.Text = $"🏷️ {app.Version}";
-            DialogSizeText.Text = $"💾 {app.Size}";
+            DialogVersionText.Text = app.FormattedVersion;
+            DialogSizeText.Text = app.FormattedSize;
             DialogIdText.Text = app.Id;
 
             DialogLogoGrid.Children.Clear();
-            var initial = !string.IsNullOrWhiteSpace(app.Name) ? app.Name[0].ToString().ToUpperInvariant() : "•";
-            var fallback = new TextBlock
-            {
-                Text = initial,
-                FontSize = 18,
-                FontWeight = FontWeights.Bold,
-                Foreground = (Brush)FindResource("BrushAccent"),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            DialogLogoGrid.Children.Add(fallback);
 
-            if (!string.IsNullOrWhiteSpace(app.IconUrl) && Uri.TryCreate(app.IconUrl, UriKind.Absolute, out var uri))
+            if (app.IconImageSource != null)
             {
-                try
+                var img = new Image
                 {
-                    var img = new Image
-                    {
-                        Width = 30,
-                        Height = 30,
-                        Stretch = Stretch.Uniform,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                    var bitmap = new BitmapImage();
-                    bitmap.BeginInit();
-                    bitmap.UriSource = uri;
-                    bitmap.DecodePixelWidth = 60;
-                    bitmap.DecodePixelHeight = 60;
-                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmap.EndInit();
-                    img.Source = bitmap;
-                    DialogLogoGrid.Children.Add(img);
-                }
-                catch { }
+                    Source = app.IconImageSource,
+                    Width = 32,
+                    Height = 32,
+                    Stretch = System.Windows.Media.Stretch.Uniform,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                DialogLogoGrid.Children.Add(img);
+            }
+            else
+            {
+                var fallback = new TextBlock
+                {
+                    Text = app.Initial,
+                    FontSize = 18,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent"),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                DialogLogoGrid.Children.Add(fallback);
             }
 
-            ConfirmUninstallButton.IsEnabled = true;
-            ConfirmUninstallButton.Content = "Yes, Uninstall";
             WarningOverlay.Visibility = Visibility.Visible;
         }
 
@@ -303,7 +172,6 @@ namespace SetupHub180Hz.Views
         {
             WarningOverlay.Visibility = Visibility.Collapsed;
             _targetApp = null;
-            _targetRow = null;
         }
 
         private async void ConfirmUninstall_Click(object sender, RoutedEventArgs e)
@@ -311,23 +179,20 @@ namespace SetupHub180Hz.Views
             if (_targetApp == null) return;
 
             var appToUninstall = _targetApp;
-            var rowToRemove = _targetRow;
+            WarningOverlay.Visibility = Visibility.Collapsed;
 
             ConfirmUninstallButton.IsEnabled = false;
-            ConfirmUninstallButton.Content = "Removing…";
+
+            ActivityLogger.Instance.Log($"Initiated uninstallation for {appToUninstall.Name}…", ActivityType.Info);
 
             var success = await _winget.UninstallAsync(appToUninstall.Id);
-
-            WarningOverlay.Visibility = Visibility.Collapsed;
+            ConfirmUninstallButton.IsEnabled = true;
 
             if (success)
             {
-                ActivityLogger.Instance.Log($"Uninstalled {appToUninstall.Name}.", ActivityType.Success);
+                ActivityLogger.Instance.Log($"Successfully uninstalled {appToUninstall.Name}.", ActivityType.Success);
                 _allApps.Remove(appToUninstall);
-                if (rowToRemove != null)
-                {
-                    ResultsList.Items.Remove(rowToRemove);
-                }
+                ApplyFilter();
                 InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
             }
             else
@@ -338,29 +203,6 @@ namespace SetupHub180Hz.Views
             }
 
             _targetApp = null;
-            _targetRow = null;
-        }
-
-        private Border CreateMetaPill(string text)
-        {
-            var border = new Border
-            {
-                Background = (Brush)FindResource("BrushBackground"),
-                BorderBrush = (Brush)FindResource("BrushBorder"),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(4),
-                Padding = new Thickness(8, 2, 8, 2),
-                Margin = new Thickness(0, 0, 8, 0),
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            border.Child = new TextBlock
-            {
-                Text = text,
-                FontSize = 11,
-                FontWeight = FontWeights.SemiBold,
-                Foreground = (Brush)FindResource("BrushTextSecondary")
-            };
-            return border;
         }
     }
 }
