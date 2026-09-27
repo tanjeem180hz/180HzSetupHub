@@ -161,7 +161,7 @@ namespace SetupHub180Hz.Services
             }
         }
 
-        public async Task<bool> InstallAsync(string id, string? source = null, Action<string>? onOutputLine = null)
+        public async Task<bool> InstallAsync(string id, string? source = null, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default)
         {
             if (id.Equals("Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))
             {
@@ -181,10 +181,10 @@ namespace SetupHub180Hz.Services
                 ? $"--source \"{source}\" "
                 : "";
 
-            var success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --accept-package-agreements --accept-source-agreements", onOutputLine);
-            if (!success)
+            var success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+            if (!success && !ct.IsCancellationRequested)
             {
-                success = await RunActionAsync($"install \"{id}\" {srcArg}--silent --accept-package-agreements --accept-source-agreements", onOutputLine);
+                success = await RunActionAsync($"install \"{id}\" {srcArg}--silent --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
             }
             return success;
         }
@@ -207,17 +207,50 @@ namespace SetupHub180Hz.Services
 
         // ---- internals ----
 
-        private async Task<bool> RunActionAsync(string arguments, Action<string>? onOutputLine)
+        private async Task<bool> RunActionAsync(string arguments, Action<string>? onOutputLine, System.Threading.CancellationToken ct = default)
         {
-            var output = await RunWingetAsync(arguments, onOutputLine);
-            return !output.Contains("failed", StringComparison.OrdinalIgnoreCase)
-                && !output.Contains("No package found", StringComparison.OrdinalIgnoreCase);
+            var (exitCode, output) = await RunWingetWithCodeAsync(arguments, onOutputLine, timeoutMs: 240000, ct: ct);
+
+            // 0 = Success, 3010 = Reboot required / Success, 0x8A15002B = Already installed / up to date
+            if (exitCode == 0 || exitCode == 3010 || unchecked((uint)exitCode) == 0x8A15002B)
+            {
+                return true;
+            }
+
+            if (output.Contains("Successfully installed", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("Successfully upgraded", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("No applicable update found", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("No available upgrade found", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("already installed", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private Task<string> RunWingetAsync(string arguments, Action<string>? onOutputLine = null)
         {
+            return Task.Run(async () =>
+            {
+                var (_, output) = await RunWingetWithCodeAsync(arguments, onOutputLine, timeoutMs: 45000);
+                return output;
+            });
+        }
+
+        private Task<(int ExitCode, string Output)> RunWingetWithCodeAsync(string arguments, Action<string>? onOutputLine = null, int timeoutMs = 60000, System.Threading.CancellationToken ct = default)
+        {
             return Task.Run(() =>
             {
+                if (!arguments.Contains("--disable-interactivity", StringComparison.OrdinalIgnoreCase))
+                {
+                    arguments += " --disable-interactivity";
+                }
+                if (!arguments.Contains("--accept-source-agreements", StringComparison.OrdinalIgnoreCase))
+                {
+                    arguments += " --accept-source-agreements";
+                }
+
                 var psi = new ProcessStartInfo
                 {
                     FileName = "winget",
@@ -245,12 +278,30 @@ namespace SetupHub180Hz.Services
                     onOutputLine?.Invoke(e.Data);
                 };
 
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-                process.WaitForExit();
+                using var reg = ct.Register(() =>
+                {
+                    try { process.Kill(true); } catch { }
+                });
 
-                return sb.ToString();
+                try
+                {
+                    process.Start();
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
+
+                    bool exited = process.WaitForExit(timeoutMs);
+                    if (!exited || ct.IsCancellationRequested)
+                    {
+                        try { process.Kill(true); } catch { }
+                        return (-1, sb.ToString());
+                    }
+
+                    return (process.ExitCode, sb.ToString());
+                }
+                catch (Exception ex)
+                {
+                    return (-1, $"Error running winget: {ex.Message}");
+                }
             });
         }
 

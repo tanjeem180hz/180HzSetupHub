@@ -208,6 +208,18 @@ namespace SetupHub180Hz.Services
                 int idx = 0;
                 int total = 0;
 
+                while (_isPaused && !_isCancelled)
+                {
+                    if (_resumeTcs != null)
+                    {
+                        try { await _resumeTcs.Task; } catch { }
+                    }
+                    else
+                    {
+                        await Task.Delay(250);
+                    }
+                }
+
                 lock (_lock)
                 {
                     if (_isCancelled || _currentIndex >= _queue.Count)
@@ -224,7 +236,6 @@ namespace SetupHub180Hz.Services
                 if (item == null) break;
 
                 _isSkipping = false;
-                _isPaused = false;
 
                 try
                 {
@@ -233,6 +244,26 @@ namespace SetupHub180Hz.Services
                 catch (Exception ex)
                 {
                     ActivityLogger.Instance.Log($"Error processing {item.Name}: {ex.Message}", ActivityType.Error);
+                }
+
+                if (_isPaused)
+                {
+                    while (_isPaused && !_isCancelled)
+                    {
+                        if (_resumeTcs != null)
+                        {
+                            try { await _resumeTcs.Task; } catch { }
+                        }
+                        else
+                        {
+                            await Task.Delay(250);
+                        }
+                    }
+
+                    if (!_isSkipping && !_isCancelled)
+                    {
+                        continue;
+                    }
                 }
 
                 lock (_lock)
@@ -260,9 +291,9 @@ namespace SetupHub180Hz.Services
                 QueueIndex = queueIndex,
                 QueueTotal = queueTotal,
                 State = DownloadState.Downloading,
-                StatusMessage = $"Resolving authentic package for {app.Name}…",
-                SpeedFormatted = "0 MB/s",
-                EtaFormatted = "Connecting…"
+                StatusMessage = $"Preparing to install {app.Name}…",
+                SpeedFormatted = "Connecting…",
+                EtaFormatted = "Starting…"
             });
 
             // Handle Microsoft Store app itself
@@ -289,20 +320,7 @@ namespace SetupHub180Hz.Services
                 catch { }
             }
 
-            // Attempt to retrieve installer URL and type from winget manifest
-            var installerInfo = await _winget.GetInstallerInfoAsync(app.Id);
-
-            if (installerInfo != null && !string.IsNullOrWhiteSpace(installerInfo.Url) && installerInfo.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-            {
-                bool downloaded = await DownloadWithResumeAsync(app, installerInfo.Url, installerInfo.Type, queueIndex, queueTotal);
-                if (downloaded)
-                {
-                    await InstallDownloadedPackageAsync(app, installerInfo, queueIndex, queueTotal);
-                    return;
-                }
-            }
-
-            // Fallback to direct Winget install with live output parsing
+            // Direct Winget install with live output streaming and high-speed progress parsing
             await InstallViaWingetDirectAsync(app, queueIndex, queueTotal);
         }
 
@@ -561,34 +579,58 @@ namespace SetupHub180Hz.Services
 
         private async Task InstallViaWingetDirectAsync(AppItem app, int queueIndex, int queueTotal)
         {
-            app.Status = "Installing…";
+            _currentCts = new CancellationTokenSource();
+            var ct = _currentCts.Token;
+
+            app.Status = "Downloading…";
             Notify(new DownloadProgressInfo
             {
                 App = app,
                 QueueIndex = queueIndex,
                 QueueTotal = queueTotal,
                 State = DownloadState.Downloading,
-                StatusMessage = $"Downloading & Installing {app.Name} via Winget…",
-                SpeedFormatted = "Live",
-                EtaFormatted = "In Progress…"
+                Percentage = 15,
+                StatusMessage = $"Connecting to repository for {app.Name}…",
+                SpeedFormatted = "High-speed",
+                EtaFormatted = "In progress…"
             });
 
             var percentRegex = new Regex(@"(\d{1,3})%", RegexOptions.Compiled);
             var speedRegex = new Regex(@"([\d\.]+\s*(?:KB|MB|GB)/s)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
             var etaRegex = new Regex(@"--\s*(\d+[smh])", RegexOptions.Compiled);
+            var sizeRegex = new Regex(@"([\d\.]+\s*(?:KB|MB|GB))\s*/\s*([\d\.]+\s*(?:KB|MB|GB))", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+            double currentPct = 15;
 
             bool success = await _winget.InstallAsync(app.Id, app.Source, line =>
             {
                 if (string.IsNullOrWhiteSpace(line)) return;
 
-                double percent = 0;
+                double percent = currentPct;
                 var matchPct = percentRegex.Match(line);
                 if (matchPct.Success && double.TryParse(matchPct.Groups[1].Value, out var p))
                 {
                     percent = p;
+                    currentPct = p;
+                }
+                else if (line.Contains("Downloading", StringComparison.OrdinalIgnoreCase))
+                {
+                    percent = Math.Max(currentPct, 30);
+                    currentPct = percent;
+                }
+                else if (line.Contains("verified installer hash", StringComparison.OrdinalIgnoreCase))
+                {
+                    percent = Math.Max(currentPct, 70);
+                    currentPct = percent;
+                }
+                else if (line.Contains("Starting package install", StringComparison.OrdinalIgnoreCase) ||
+                         line.Contains("Installing", StringComparison.OrdinalIgnoreCase))
+                {
+                    percent = Math.Max(currentPct, 85);
+                    currentPct = percent;
                 }
 
-                string speed = "Active";
+                string speed = "High-speed";
                 var matchSpeed = speedRegex.Match(line);
                 if (matchSpeed.Success)
                 {
@@ -601,19 +643,48 @@ namespace SetupHub180Hz.Services
                 {
                     eta = $"{matchEta.Groups[1].Value} remaining";
                 }
+                else if (currentPct >= 85)
+                {
+                    eta = "Installing…";
+                }
+
+                string sizeStr = "";
+                var matchSize = sizeRegex.Match(line);
+                if (matchSize.Success)
+                {
+                    sizeStr = matchSize.Value;
+                }
+
+                var state = currentPct >= 85 ? DownloadState.Installing : DownloadState.Downloading;
+                string statusMsg = currentPct >= 85
+                    ? $"Installing {app.Name} quietly in background…"
+                    : $"Downloading authentic {app.Name} package…";
+
+                app.Status = $"{statusMsg} ({percent:0}%)";
 
                 Notify(new DownloadProgressInfo
                 {
                     App = app,
                     QueueIndex = queueIndex,
                     QueueTotal = queueTotal,
-                    State = DownloadState.Downloading,
-                    Percentage = percent > 0 ? percent : 50,
+                    State = state,
+                    Percentage = percent,
                     SpeedFormatted = speed,
                     EtaFormatted = eta,
-                    StatusMessage = $"Deploying {app.Name}…"
+                    SizeFormatted = sizeStr,
+                    StatusMessage = statusMsg
                 });
-            });
+            }, ct);
+
+            if (_isCancelled)
+            {
+                return;
+            }
+
+            if (_isPaused)
+            {
+                return;
+            }
 
             FinalizeAppStatus(app, success, queueIndex, queueTotal);
         }

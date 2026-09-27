@@ -68,13 +68,24 @@ namespace SetupHub180Hz.Services
         {
             try
             {
+                // 1. Instant check via Windows Registry (0-5 milliseconds, zero UI freeze)
+                foreach (var item in items)
+                {
+                    var reg = AppMetadataHelper.GetRegistryInfo(item.Name, item.Id);
+                    if (reg != null)
+                    {
+                        item.IsInstalled = true;
+                    }
+                }
+
+                // 2. Background check via winget for store packages and packages not in standard registry
                 var installed = await winget.GetInstalledAppsAsync();
                 var installedMap = new HashSet<string>(installed.Select(i => i.Id), StringComparer.OrdinalIgnoreCase);
                 var installedNames = new HashSet<string>(installed.Select(i => i.Name), StringComparer.OrdinalIgnoreCase);
 
                 foreach (var item in items)
                 {
-                    if (installedMap.Contains(item.Id) || installedNames.Contains(item.Name))
+                    if (!item.IsInstalled && (installedMap.Contains(item.Id) || installedNames.Contains(item.Name)))
                     {
                         item.IsInstalled = true;
                     }

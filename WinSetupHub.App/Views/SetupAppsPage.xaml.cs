@@ -64,7 +64,6 @@ namespace SetupHub180Hz.Views
             "RARLab.WinRAR",
             "voidtools.Everything",
             "Notepad++.Notepad++",
-            "Notepad\u002B\u002B.Notepad\u002B\u002B",
 
             // Top Media & Audio
             "VideoLAN.VLC",
@@ -93,6 +92,7 @@ namespace SetupHub180Hz.Views
 
         private static readonly Dictionary<string, int> TopBasicRankMap =
             TopBasicDailyApps
+                .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Select((id, index) => new { id, index })
                 .ToDictionary(x => x.id, x => x.index, StringComparer.OrdinalIgnoreCase);
 
@@ -111,19 +111,28 @@ namespace SetupHub180Hz.Views
 
         private async Task InitializeCatalogAsync()
         {
-            StatusText.Text = "Loading application catalog…";
-            StatusText.Visibility = Visibility.Visible;
+            try
+            {
+                StatusText.Text = "Loading application catalog…";
+                StatusText.Visibility = Visibility.Visible;
 
-            var rawPackages = await _catalog.GetAllAsync();
-            _allPackages = rawPackages
-                .OrderBy(GetAppSortRank)
-                .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
-                .ToList();
+                var rawPackages = await _catalog.GetAllAsync();
+                _allPackages = rawPackages
+                    .OrderBy(GetAppSortRank)
+                    .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
 
-            CatalogCountText.Text = $"{_allPackages.Count} Packages Ready";
+                CatalogCountText.Text = $"{_allPackages.Count} Packages Ready";
 
-            BuildCategoryChips();
-            ApplyFilter();
+                BuildCategoryChips();
+                ApplyFilter();
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = $"Error loading catalog: {ex.Message}";
+                StatusText.Visibility = Visibility.Visible;
+                return;
+            }
 
             // Background async icon fetching (immediate parallel) & installed status check (zero UI thread blocking)
             _ = Task.Run(async () =>
