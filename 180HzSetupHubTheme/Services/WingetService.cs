@@ -48,58 +48,100 @@ namespace SetupHub180Hz.Services
 
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, AppMetadata?> _metadataCache =
             new(StringComparer.OrdinalIgnoreCase);
+        private static readonly System.Threading.SemaphoreSlim _metadataSemaphore = new(2, 2);
 
         public async Task<AppMetadata?> GetMetadataAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) return null;
             if (_metadataCache.TryGetValue(id, out var cached)) return cached;
 
+            await _metadataSemaphore.WaitAsync();
             try
             {
+                if (_metadataCache.TryGetValue(id, out cached)) return cached;
+
                 var output = await RunWingetAsync($"show --id \"{id}\" --exact --accept-source-agreements");
                 if (string.IsNullOrWhiteSpace(output))
                 {
-                    _metadataCache[id] = null;
                     return null;
                 }
 
                 string? homepage = null;
                 string? publisherUrl = null;
                 string? supportUrl = null;
+                string? licenseUrl = null;
+                string? installerUrl = null;
 
                 using var reader = new System.IO.StringReader(output);
                 string? line;
                 while ((line = reader.ReadLine()) != null)
                 {
                     var trimmed = line.Trim();
-                    if (trimmed.StartsWith("Homepage:", StringComparison.Ordinal))
+                    if (trimmed.StartsWith("Homepage:", StringComparison.OrdinalIgnoreCase))
                     {
                         var val = trimmed.Substring("Homepage:".Length).Trim();
                         if (!string.IsNullOrWhiteSpace(val)) homepage = val;
                     }
-                    else if (trimmed.StartsWith("Publisher Url:", StringComparison.Ordinal))
+                    else if (trimmed.StartsWith("Publisher Url:", StringComparison.OrdinalIgnoreCase))
                     {
                         var val = trimmed.Substring("Publisher Url:".Length).Trim();
                         if (!string.IsNullOrWhiteSpace(val)) publisherUrl = val;
                     }
-                    else if (trimmed.StartsWith("Publisher Support Url:", StringComparison.Ordinal))
+                    else if (trimmed.StartsWith("Publisher Support Url:", StringComparison.OrdinalIgnoreCase))
                     {
                         var val = trimmed.Substring("Publisher Support Url:".Length).Trim();
                         if (!string.IsNullOrWhiteSpace(val)) supportUrl = val;
                     }
+                    else if (trimmed.StartsWith("License Url:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("License Url:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) licenseUrl = val;
+                    }
+                    else if (trimmed.StartsWith("Release Notes Url:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Release Notes Url:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val) && supportUrl == null) supportUrl = val;
+                    }
+                    else if (trimmed.StartsWith("Installer Url:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Installer Url:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) installerUrl = val;
+                    }
                 }
 
-                var result = (homepage != null || publisherUrl != null || supportUrl != null)
-                    ? new AppMetadata(homepage, publisherUrl, supportUrl)
+                // If no direct site found, extract root domain from Installer Url
+                string? derivedInstallerDomain = null;
+                if (homepage == null && publisherUrl == null && supportUrl == null && !string.IsNullOrWhiteSpace(installerUrl))
+                {
+                    try
+                    {
+                        var uri = new Uri(installerUrl);
+                        if (uri.Host.Contains('.'))
+                        {
+                            derivedInstallerDomain = $"{uri.Scheme}://{uri.Host}/";
+                        }
+                    }
+                    catch { }
+                }
+
+                var chosen = homepage ?? publisherUrl ?? supportUrl ?? licenseUrl ?? derivedInstallerDomain;
+                var result = chosen != null
+                    ? new AppMetadata(homepage ?? chosen, publisherUrl, supportUrl)
                     : null;
 
-                _metadataCache[id] = result;
+                if (result != null)
+                {
+                    _metadataCache[id] = result;
+                }
                 return result;
             }
             catch
             {
-                _metadataCache[id] = null;
                 return null;
+            }
+            finally
+            {
+                _metadataSemaphore.Release();
             }
         }
 
@@ -112,12 +154,14 @@ namespace SetupHub180Hz.Services
             if (string.IsNullOrWhiteSpace(id)) return null;
             if (_installerInfoCache.TryGetValue(id, out var cached)) return cached;
 
+            await _metadataSemaphore.WaitAsync();
             try
             {
+                if (_installerInfoCache.TryGetValue(id, out cached)) return cached;
+
                 var output = await RunWingetAsync($"show --id \"{id}\" --exact --accept-source-agreements");
                 if (string.IsNullOrWhiteSpace(output))
                 {
-                    _installerInfoCache[id] = null;
                     return null;
                 }
 
@@ -151,13 +195,19 @@ namespace SetupHub180Hz.Services
                     ? new WingetInstallerInfo(installerUrl, installerType, sha256)
                     : null;
 
-                _installerInfoCache[id] = result;
+                if (result != null)
+                {
+                    _installerInfoCache[id] = result;
+                }
                 return result;
             }
             catch
             {
-                _installerInfoCache[id] = null;
                 return null;
+            }
+            finally
+            {
+                _metadataSemaphore.Release();
             }
         }
 

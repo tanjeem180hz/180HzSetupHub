@@ -108,11 +108,16 @@ namespace SetupHub180Hz.Services
                 }
             }
 
-            // 4. Fallback website for Microsoft Store / Windows built-ins
+            // 4. Resolve authentic official website via catalog, registry, or comprehensive domain mapping
             if (string.IsNullOrWhiteSpace(app.WebUrl))
             {
-                if (app.Name.StartsWith("Windows ", StringComparison.OrdinalIgnoreCase) ||
-                    app.Name.StartsWith("Microsoft ", StringComparison.OrdinalIgnoreCase))
+                var resolved = ResolveOfficialUrl(app, catalog);
+                if (!string.IsNullOrWhiteSpace(resolved))
+                {
+                    app.WebUrl = resolved;
+                }
+                else if (app.Name.StartsWith("Windows ", StringComparison.OrdinalIgnoreCase) ||
+                         app.Name.StartsWith("Microsoft ", StringComparison.OrdinalIgnoreCase))
                 {
                     app.WebUrl = "https://www.microsoft.com";
                 }
@@ -193,6 +198,257 @@ namespace SetupHub180Hz.Services
                            normApp.Contains(normCat, StringComparison.OrdinalIgnoreCase);
                 });
                 if (match != null) return match;
+            }
+
+            return null;
+        }
+
+        private static readonly Dictionary<string, string> KnownDomainMap = new(StringComparer.OrdinalIgnoreCase)
+        {
+            // Browsers & Web
+            ["Google.Chrome"] = "https://www.google.com/chrome/",
+            ["Mozilla.Firefox"] = "https://www.mozilla.org/firefox/",
+            ["Brave.Brave"] = "https://brave.com/",
+            ["Microsoft.Edge"] = "https://www.microsoft.com/edge/",
+            ["Opera.Opera"] = "https://www.opera.com/",
+            ["Opera.OperaGX"] = "https://www.opera.com/gx",
+            ["Vivaldi.Vivaldi"] = "https://vivaldi.com/",
+            ["TorProject.TorBrowser"] = "https://www.torproject.org/",
+            ["Floorp.Floorp"] = "https://floorp.app/",
+            ["Waterfox.Waterfox"] = "https://www.waterfox.net/",
+            ["Arc.Arc"] = "https://arc.net/",
+
+            // Communication & Chat
+            ["Discord.Discord"] = "https://discord.com/",
+            ["Telegram.TelegramDesktop"] = "https://desktop.telegram.org/",
+            ["WhatsApp.WhatsApp"] = "https://www.whatsapp.com/",
+            ["Signal.Signal"] = "https://signal.org/",
+            ["SlackTechnologies.Slack"] = "https://slack.com/",
+            ["Microsoft.Teams"] = "https://www.microsoft.com/microsoft-teams/",
+            ["Zoom.Zoom"] = "https://zoom.us/",
+            ["Skype.Skype"] = "https://www.skype.com/",
+            ["Element.Element"] = "https://element.io/",
+            ["Viber.Viber"] = "https://www.viber.com/",
+
+            // Media & Audio / Video
+            ["VideoLAN.VLC"] = "https://www.videolan.org/vlc/",
+            ["Spotify.Spotify"] = "https://www.spotify.com/",
+            ["OBSProject.OBSStudio"] = "https://obsproject.com/",
+            ["Audacity.Audacity"] = "https://www.audacityteam.org/",
+            ["HandBrake.HandBrake"] = "https://handbrake.fr/",
+            ["mpv.mpv"] = "https://mpv.io/",
+            ["K-Lite.CodecPack"] = "https://codecguide.com/",
+            ["Plex.Plex"] = "https://www.plex.tv/",
+            ["Kodi.Kodi"] = "https://kodi.tv/",
+            ["Tidal.Tidal"] = "https://tidal.com/",
+            ["Deezer.Deezer"] = "https://www.deezer.com/",
+            ["Foobar2000.Foobar2000"] = "https://www.foobar2000.org/",
+            ["AIMP.AIMP"] = "https://www.aimp.ru/",
+            ["MusicBee.MusicBee"] = "https://getmusicbee.com/",
+            ["DaVinciResolve.DaVinciResolve"] = "https://www.blackmagicdesign.com/products/davinciresolve",
+
+            // Gaming & Launchers
+            ["Valve.Steam"] = "https://store.steampowered.com/",
+            ["EpicGames.EpicGamesLauncher"] = "https://store.epicgames.com/",
+            ["ElectronicArts.EADesktop"] = "https://www.ea.com/ea-app",
+            ["Ubisoft.Connect"] = "https://ubisoftconnect.com/",
+            ["GOG.Galaxy"] = "https://www.gog.com/galaxy",
+            ["Battle.net"] = "https://battle.net/",
+            ["PrismLauncher.PrismLauncher"] = "https://prismlauncher.org/",
+            ["MoonlightGameStreamingProject.Moonlight"] = "https://moonlight-stream.org/",
+            ["Parsec.Parsec"] = "https://parsec.app/",
+            ["Playnite.Playnite"] = "https://playnite.link/",
+            ["Razer.Synapse"] = "https://www.razer.com/synapse-3",
+            ["Logitech.GHUB"] = "https://www.logitechg.com/innovation/g-hub.html",
+            ["Corsair.iCUE"] = "https://www.corsair.com/icue",
+
+            // Utilities & Tools
+            ["7zip.7zip"] = "https://www.7-zip.org/",
+            ["RARLab.WinRAR"] = "https://www.rarlab.com/",
+            ["voidtools.Everything"] = "https://www.voidtools.com/",
+            ["Notepad++.Notepad++"] = "https://notepad-plus-plus.org/",
+            ["Microsoft.PowerToys"] = "https://github.com/microsoft/PowerToys",
+            ["ShareX.ShareX"] = "https://getsharex.com/",
+            ["Greenshot.Greenshot"] = "https://getgreenshot.org/",
+            ["Lightshot.Lightshot"] = "https://app.prntscr.com/",
+            ["Rufus.Rufus"] = "https://rufus.ie/",
+            ["Balena.Etcher"] = "https://etcher.balena.io/",
+            ["BleachBit.BleachBit"] = "https://www.bleachbit.org/",
+            ["Piriform.CCleaner"] = "https://www.ccleaner.com/",
+            ["RevoUninstaller.RevoUninstaller"] = "https://www.revouninstaller.com/",
+            ["IObit.Uninstaller"] = "https://www.iobit.com/advanceduninstaller.php",
+            ["CrystalDewWorld.CrystalDiskInfo"] = "https://crystalmark.info/",
+            ["CrystalDewWorld.CrystalDiskMark"] = "https://crystalmark.info/",
+            ["CPUID.CPU-Z"] = "https://www.cpuid.com/softwares/cpu-z.html",
+            ["TechPowerUp.GPU-Z"] = "https://www.techpowerup.com/gpuz/",
+            ["REALiX.HWiNFO"] = "https://www.hwinfo.com/",
+            ["Guru3D.RTSS"] = "https://www.guru3d.com/",
+            ["MSI.Afterburner"] = "https://www.msi.com/Landing/afterburner/graphics-cards",
+            ["AutoHotkey.AutoHotkey"] = "https://www.autohotkey.com/",
+            ["JAMSoftware.TreeSize.Free"] = "https://www.jam-software.com/treesize_free",
+            ["qBittorrent.qBittorrent"] = "https://www.qbittorrent.org/",
+            ["Transmission.Transmission"] = "https://transmissionbt.com/",
+            ["BitTorrent.uTorrent"] = "https://www.utorrent.com/",
+            ["FileZilla.FileZilla"] = "https://filezilla-project.org/",
+            ["WinSCP.WinSCP"] = "https://winscp.net/",
+            ["PuTTY.PuTTY"] = "https://www.putty.org/",
+            ["AnyDeskSoftwareGmbH.AnyDesk"] = "https://anydesk.com/",
+            ["TeamViewer.TeamViewer"] = "https://www.teamviewer.com/",
+            ["RustDesk.RustDesk"] = "https://rustdesk.com/",
+
+            // Security & Privacy
+            ["Bitwarden.Bitwarden"] = "https://bitwarden.com/",
+            ["1Password.1Password"] = "https://1password.com/",
+            ["KeePassXCTeam.KeePassXC"] = "https://keepassxc.org/",
+            ["ProtonTechnologies.ProtonVPN"] = "https://protonvpn.com/",
+            ["NordVPN.NordVPN"] = "https://nordvpn.com/",
+            ["Surfshark.Surfshark"] = "https://surfshark.com/",
+            ["Tailscale.Tailscale"] = "https://tailscale.com/",
+            ["WireGuard.WireGuard"] = "https://www.wireguard.com/",
+            ["Malwarebytes.Malwarebytes"] = "https://www.malwarebytes.com/",
+            ["Kaspersky.Kaspersky"] = "https://www.kaspersky.com/",
+            ["ESET.NOD32"] = "https://www.eset.com/",
+
+            // Developer & Design
+            ["Microsoft.VisualStudioCode"] = "https://code.visualstudio.com/",
+            ["Microsoft.VisualStudio.2022.Community"] = "https://visualstudio.microsoft.com/",
+            ["Git.Git"] = "https://git-scm.com/",
+            ["GitHub.GitHubDesktop"] = "https://desktop.github.com/",
+            ["GitHub.cli"] = "https://cli.github.com/",
+            ["Docker.DockerDesktop"] = "https://www.docker.com/products/docker-desktop/",
+            ["Postman.Postman"] = "https://www.postman.com/",
+            ["Insomnia.Insomnia"] = "https://insomnia.rest/",
+            ["DBeaver.DBeaver.Community"] = "https://dbeaver.io/",
+            ["DBeaver.DBeaver.Enterprise"] = "https://dbeaver.com/",
+            ["Alacritty.Alacritty"] = "https://alacritty.org/",
+            ["wez.wezterm"] = "https://wezfurlong.org/wezterm/",
+            ["Neovim.Neovim"] = "https://neovim.io/",
+            ["GodotEngine.GodotEngine"] = "https://godotengine.org/",
+            ["Unity.UnityHub"] = "https://unity.com/",
+            ["Google.AndroidStudio"] = "https://developer.android.com/studio",
+            ["Figma.Figma"] = "https://www.figma.com/",
+            ["BlenderFoundation.Blender"] = "https://www.blender.org/",
+            ["GIMP.GIMP"] = "https://www.gimp.org/",
+            ["Inkscape.Inkscape"] = "https://inkscape.org/",
+            ["Krita.Krita"] = "https://krita.org/",
+            ["WiresharkFoundation.Wireshark"] = "https://www.wireshark.org/",
+            ["Python.Python.3.12"] = "https://www.python.org/",
+            ["OpenJS.NodeJS"] = "https://nodejs.org/",
+            ["Rustlang.Rustup"] = "https://www.rust-lang.org/",
+            ["Golang.Go"] = "https://go.dev/",
+            ["Oracle.JDK.21"] = "https://www.oracle.com/java/",
+            ["JetBrains.IntelliJIDEA.Community"] = "https://www.jetbrains.com/idea/",
+            ["JetBrains.PyCharm.Community"] = "https://www.jetbrains.com/pycharm/",
+            ["SublimeHQ.SublimeText.4"] = "https://www.sublimetext.com/",
+            ["Termius.Termius"] = "https://termius.com/",
+            ["Oracle.VirtualBox"] = "https://www.virtualbox.org/",
+            ["JanDeDobbeleer.OhMyPosh"] = "https://ohmyposh.dev/",
+            ["Starship.Starship"] = "https://starship.rs/",
+            ["Eugeny.Tabby"] = "https://tabby.sh/",
+
+            // Documents & Office
+            ["TheDocumentFoundation.LibreOffice"] = "https://www.libreoffice.org/",
+            ["Adobe.Acrobat.Reader.64-bit"] = "https://get.adobe.com/reader/",
+            ["Foxit.FoxitReader"] = "https://www.foxit.com/pdf-reader/",
+            ["Calibre.Calibre"] = "https://calibre-ebook.com/",
+            ["Obsidian.Obsidian"] = "https://obsidian.md/",
+            ["Notion.Notion"] = "https://www.notion.so/",
+            ["SumatraPDF.SumatraPDF"] = "https://www.sumatrapdfreader.org/",
+            ["Anki.Anki"] = "https://apps.ankiweb.net/",
+            ["Zotero.Zotero"] = "https://www.zotero.org/"
+        };
+
+        public static string? ResolveOfficialUrl(AppItem app, IEnumerable<AppItem>? catalog = null)
+        {
+            if (!string.IsNullOrWhiteSpace(app.WebUrl) && app.WebUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            {
+                return app.WebUrl;
+            }
+
+            // 1. Direct ID match in KnownDomainMap
+            if (!string.IsNullOrWhiteSpace(app.Id) && KnownDomainMap.TryGetValue(app.Id, out var directUrl))
+            {
+                return directUrl;
+            }
+
+            // 2. Prefix / Contains match in KnownDomainMap
+            if (!string.IsNullOrWhiteSpace(app.Id))
+            {
+                var clean = CleanPackageId(app.Id);
+                foreach (var (key, val) in KnownDomainMap)
+                {
+                    if (key.Equals(clean, StringComparison.OrdinalIgnoreCase) ||
+                        clean.StartsWith(key, StringComparison.OrdinalIgnoreCase) ||
+                        key.StartsWith(clean, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return val;
+                    }
+                }
+            }
+
+            // 3. By App Name in KnownDomainMap
+            if (!string.IsNullOrWhiteSpace(app.Name))
+            {
+                var norm = NormalizeAppName(app.Name);
+                foreach (var (key, val) in KnownDomainMap)
+                {
+                    var lastPart = key.Contains('.') ? key.Split('.').Last() : key;
+                    if (norm.Contains(lastPart, StringComparison.OrdinalIgnoreCase) ||
+                        lastPart.Contains(norm, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return val;
+                    }
+                }
+            }
+
+            // 4. Catalog match
+            if (catalog != null)
+            {
+                var match = FindCatalogMatch(app, catalog);
+                if (!string.IsNullOrWhiteSpace(match?.WebUrl))
+                {
+                    return match.WebUrl;
+                }
+            }
+
+            // 5. Registry URLInfoAbout
+            var reg = GetRegistryInfo(app.Name, app.Id);
+            if (!string.IsNullOrWhiteSpace(reg?.WebUrl) && reg.WebUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            {
+                return reg.WebUrl;
+            }
+
+            // 6. Derive smart domain from Id or Name
+            return DeriveDomainFromId(app.Id, app.Name);
+        }
+
+        public static string? DeriveDomainFromId(string id, string name)
+        {
+            if (string.IsNullOrWhiteSpace(id) && string.IsNullOrWhiteSpace(name)) return null;
+
+            var cleanId = CleanPackageId(id);
+            var parts = cleanId.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length >= 2)
+            {
+                var pub = parts[0].ToLowerInvariant();
+                var prod = parts[1].ToLowerInvariant();
+
+                // Specific publisher shortcuts
+                if (pub.Contains("github")) return "https://github.com";
+                if (pub.Contains("microsoft")) return "https://www.microsoft.com";
+                if (pub.Contains("google")) return "https://www.google.com";
+
+                // Heuristic domain
+                if (prod.Length > 2 && !prod.Contains("installer") && !prod.Contains("portable"))
+                {
+                    return $"https://{prod}.org";
+                }
+
+                if (pub.Length > 2)
+                {
+                    return $"https://{pub}.com";
+                }
             }
 
             return null;

@@ -23,6 +23,9 @@ namespace SetupHub180Hz.Views
         private readonly DispatcherTimer _searchDebounceTimer;
         private string _currentGhostSuggestion = "";
         private bool _isSelectingFromPopup = false;
+        private System.Threading.CancellationTokenSource? _onlineSearchCts;
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, List<AppItem>> _onlineSuggestCache =
+            new(StringComparer.OrdinalIgnoreCase);
 
         public SetupAppsPage()
         {
@@ -278,10 +281,18 @@ namespace SetupHub180Hz.Views
                 SearchGhostText.Text = "";
                 TabHintBadge.Visibility = Visibility.Collapsed;
                 SearchSuggestionsPopup.IsOpen = false;
+                _onlineSearchCts?.Cancel();
             }
             else
             {
-                UpdateSuggestionsAndGhost(text.Trim());
+                var query = text.Trim();
+                UpdateSuggestionsAndGhost(query);
+
+                // Cancel prior online suggestion search and trigger new debounced Winget repository search
+                _onlineSearchCts?.Cancel();
+                _onlineSearchCts?.Dispose();
+                _onlineSearchCts = new System.Threading.CancellationTokenSource();
+                _ = SearchOnlineSuggestionsDebouncedAsync(query, _onlineSearchCts.Token);
             }
 
             _searchDebounceTimer.Stop();
@@ -299,7 +310,7 @@ namespace SetupHub180Hz.Views
                 return;
             }
 
-            // Find matching apps from _allPackages
+            // Find matching apps from _allPackages (preset catalog, 0ms instant)
             var matches = _allPackages
                 .Where(p =>
                     p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
@@ -348,6 +359,98 @@ namespace SetupHub180Hz.Views
             SearchSuggestionsPopup.IsOpen = matches.Count > 0 || !string.IsNullOrWhiteSpace(query);
         }
 
+        private async Task SearchOnlineSuggestionsDebouncedAsync(string query, System.Threading.CancellationToken ct)
+        {
+            if (string.IsNullOrWhiteSpace(query) || query.Length < 2) return;
+
+            try
+            {
+                // 250ms debounce before invoking winget CLI
+                await Task.Delay(250, ct);
+                if (ct.IsCancellationRequested) return;
+
+                List<AppItem>? onlineList;
+                if (!_onlineSuggestCache.TryGetValue(query, out onlineList))
+                {
+                    onlineList = await _winget.SearchAsync(query);
+                    if (onlineList != null)
+                    {
+                        _onlineSuggestCache[query] = onlineList;
+                    }
+                }
+
+                if (ct.IsCancellationRequested || onlineList == null || onlineList.Count == 0) return;
+
+                // Take top 6 online packages and enrich them
+                var topOnline = onlineList.Take(6).ToList();
+                foreach (var app in topOnline)
+                {
+                    AppMetadataHelper.EnrichAppItem(app, _allPackages);
+                    if (string.IsNullOrWhiteSpace(app.Category) || app.Category == "General")
+                    {
+                        app.Category = "🌐 Winget Repository";
+                    }
+                }
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    if (ct.IsCancellationRequested) return;
+                    if (!string.Equals(SearchBox.Text.Trim(), query, StringComparison.OrdinalIgnoreCase)) return;
+
+                    var currentList = (SuggestionsListBox.ItemsSource as IEnumerable<AppItem>)?.ToList() ?? new List<AppItem>();
+
+                    // Merge online packages that aren't already present in currentList
+                    bool added = false;
+                    foreach (var onlineApp in topOnline)
+                    {
+                        if (!currentList.Any(m => string.Equals(m.Id, onlineApp.Id, StringComparison.OrdinalIgnoreCase) ||
+                                                 string.Equals(m.Name, onlineApp.Name, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            currentList.Add(onlineApp);
+                            added = true;
+                        }
+                    }
+
+                    if (added || currentList.Count > 0)
+                    {
+                        // If ghost text was empty (i.e. not in preset catalog), adopt top online package!
+                        if (string.IsNullOrWhiteSpace(_currentGhostSuggestion) && currentList.Count > 0)
+                        {
+                            var top = currentList[0];
+                            _currentGhostSuggestion = top.Name;
+                            if (top.Name.StartsWith(query, StringComparison.OrdinalIgnoreCase))
+                            {
+                                SearchGhostText.Text = query + top.Name.Substring(query.Length);
+                            }
+                            TabHintBadge.Visibility = Visibility.Visible;
+                        }
+
+                        SuggestionsListBox.ItemsSource = null;
+                        SuggestionsListBox.ItemsSource = currentList;
+                        SearchSuggestionsPopup.IsOpen = true;
+
+                        // Load icons for online items
+                        _ = Task.Run(async () =>
+                        {
+                            foreach (var item in topOnline)
+                            {
+                                if (item.IconImageSource == null && (!string.IsNullOrWhiteSpace(item.IconUrl) || !string.IsNullOrWhiteSpace(item.LocalIconPath)))
+                                {
+                                    var img = await IconCacheService.GetImageAsync(item.IconUrl, item.LocalIconPath);
+                                    if (img != null)
+                                    {
+                                        await Dispatcher.InvokeAsync(() => item.IconImageSource = img);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            catch (OperationCanceledException) { }
+            catch { /* Ignore background suggest errors */ }
+        }
+
         private void SearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Tab && !string.IsNullOrWhiteSpace(_currentGhostSuggestion))
@@ -381,6 +484,13 @@ namespace SetupHub180Hz.Views
                 TabHintBadge.Visibility = Visibility.Collapsed;
                 _searchDebounceTimer.Stop();
                 ApplyFilter();
+
+                // If no local packages found for the typed query, automatically run Deep Web Search!
+                var currentItems = AppsListBox.ItemsSource as IEnumerable<AppItem>;
+                if (currentItems == null || !currentItems.Any())
+                {
+                    WingetSearch_Click(sender, e);
+                }
                 e.Handled = true;
                 return;
             }
@@ -400,7 +510,21 @@ namespace SetupHub180Hz.Views
                 TabHintBadge.Visibility = Visibility.Collapsed;
                 SearchSuggestionsPopup.IsOpen = false;
                 _searchDebounceTimer.Stop();
-                ApplyFilter();
+
+                // Check if matching in local catalog
+                var match = _allPackages.FirstOrDefault(p =>
+                    string.Equals(p.Name, SearchBox.Text, StringComparison.OrdinalIgnoreCase) ||
+                    p.Name.StartsWith(SearchBox.Text, StringComparison.OrdinalIgnoreCase));
+
+                if (match != null)
+                {
+                    ApplyFilter();
+                }
+                else
+                {
+                    // It's an online package from Winget! Auto-trigger online search/display
+                    WingetSearch_Click(this, new RoutedEventArgs());
+                }
             }
             finally
             {
@@ -449,9 +573,53 @@ namespace SetupHub180Hz.Views
         {
             if (SuggestionsListBox.SelectedItem is AppItem selected)
             {
-                _currentGhostSuggestion = selected.Name;
-                ApplyGhostSuggestion();
-                SearchBox.Focus();
+                _isSelectingFromPopup = true;
+                try
+                {
+                    SearchBox.Text = selected.Name;
+                    SearchBox.CaretIndex = SearchBox.Text.Length;
+                    _currentGhostSuggestion = "";
+                    SearchGhostText.Text = "";
+                    TabHintBadge.Visibility = Visibility.Collapsed;
+                    SearchSuggestionsPopup.IsOpen = false;
+                    _searchDebounceTimer.Stop();
+
+                    // If selected is already in _allPackages:
+                    if (_allPackages.Any(p => string.Equals(p.Id, selected.Id, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        ApplyFilter();
+                    }
+                    else
+                    {
+                        // It's an online Winget package! Display it directly in the main list ready to install!
+                        DisplaySingleOrOnlinePackage(selected);
+                    }
+                }
+                finally
+                {
+                    _isSelectingFromPopup = false;
+                }
+            }
+        }
+
+        private async void DisplaySingleOrOnlinePackage(AppItem app)
+        {
+            AppMetadataHelper.EnrichAppItem(app, _allPackages);
+            var list = new List<AppItem> { app };
+            await _catalog.CheckInstalledStatusAsync(_winget, list);
+
+            CatalogCountText.Text = $"1 Online Package Ready for '{app.Name}'";
+            StatusText.Visibility = Visibility.Collapsed;
+            AppsListBox.ItemsSource = list;
+
+            // Load icon
+            if (app.IconImageSource == null && (!string.IsNullOrWhiteSpace(app.IconUrl) || !string.IsNullOrWhiteSpace(app.LocalIconPath)))
+            {
+                var img = await IconCacheService.GetImageAsync(app.IconUrl, app.LocalIconPath);
+                if (img != null)
+                {
+                    app.IconImageSource = img;
+                }
             }
         }
 
@@ -478,8 +646,19 @@ namespace SetupHub180Hz.Views
             if (e.Key == Key.Enter)
             {
                 SearchSuggestionsPopup.IsOpen = false;
+                SearchGhostText.Text = "";
+                TabHintBadge.Visibility = Visibility.Collapsed;
                 _searchDebounceTimer.Stop();
                 ApplyFilter();
+
+                // If no local packages found for the typed query, automatically run Deep Web Search!
+                var currentItems = AppsListBox.ItemsSource as IEnumerable<AppItem>;
+                if (currentItems == null || !currentItems.Any())
+                {
+                    WingetSearch_Click(sender, e);
+                }
+                e.Handled = true;
+                return;
             }
         }
 
@@ -537,7 +716,7 @@ namespace SetupHub180Hz.Views
                     // 4. Background parallel icon extraction & website discovery
                     _ = Task.Run(async () =>
                     {
-                        await Parallel.ForEachAsync(onlineResults, new ParallelOptions { MaxDegreeOfParallelism = 10 }, async (app, ct) =>
+                        await Parallel.ForEachAsync(onlineResults, new ParallelOptions { MaxDegreeOfParallelism = 2 }, async (app, ct) =>
                         {
                             if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id))
                             {
