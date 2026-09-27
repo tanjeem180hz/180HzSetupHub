@@ -17,6 +17,7 @@ namespace SetupHub180Hz.Services
             public string? InstallLocation { get; set; }
             public string? DisplayIcon { get; set; }
             public string? UninstallString { get; set; }
+            public string? WebUrl { get; set; }
         }
 
         private static Dictionary<string, RegistryAppInfo>? _registryCache;
@@ -65,12 +66,37 @@ namespace SetupHub180Hz.Services
 
                 if (!string.IsNullOrWhiteSpace(regInfo.DisplayIcon))
                 {
-                    app.LocalIconPath = CleanIconPath(regInfo.DisplayIcon);
+                    var cleanIcon = CleanIconPath(regInfo.DisplayIcon);
+                    if (File.Exists(cleanIcon))
+                    {
+                        app.LocalIconPath = cleanIcon;
+                    }
+                }
+
+                // If no DisplayIcon found, search InstallLocation for primary executable
+                if (string.IsNullOrWhiteSpace(app.LocalIconPath) && !string.IsNullOrWhiteSpace(regInfo.InstallLocation) && Directory.Exists(regInfo.InstallLocation))
+                {
+                    try
+                    {
+                        var exes = Directory.GetFiles(regInfo.InstallLocation, "*.exe", SearchOption.TopDirectoryOnly);
+                        var matchExe = exes.FirstOrDefault(e => Path.GetFileNameWithoutExtension(e).Equals(app.Name, StringComparison.OrdinalIgnoreCase))
+                                       ?? exes.FirstOrDefault(e => !Path.GetFileName(e).StartsWith("unins", StringComparison.OrdinalIgnoreCase));
+                        if (matchExe != null && File.Exists(matchExe))
+                        {
+                            app.LocalIconPath = matchExe;
+                        }
+                    }
+                    catch { }
                 }
 
                 if (!string.IsNullOrWhiteSpace(regInfo.UninstallString))
                 {
                     app.UninstallString = regInfo.UninstallString;
+                }
+
+                if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(regInfo.WebUrl))
+                {
+                    app.WebUrl = regInfo.WebUrl;
                 }
             }
 
@@ -80,7 +106,17 @@ namespace SetupHub180Hz.Services
                 app.Size = "-";
             }
 
-            // 4. Try load local icon immediately if available
+            // 4. Derive authentic IconUrl from WebUrl if IconUrl is missing
+            if (string.IsNullOrWhiteSpace(app.IconUrl) && !string.IsNullOrWhiteSpace(app.WebUrl))
+            {
+                var favicon = IconCacheService.DeriveFaviconUrl(app.WebUrl);
+                if (!string.IsNullOrWhiteSpace(favicon))
+                {
+                    app.IconUrl = favicon;
+                }
+            }
+
+            // 5. Try load local icon immediately if available
             if (!string.IsNullOrWhiteSpace(app.LocalIconPath) && File.Exists(app.LocalIconPath))
             {
                 var localImg = IconCacheService.GetLocalFileIcon(app.LocalIconPath);
@@ -91,15 +127,42 @@ namespace SetupHub180Hz.Services
             }
         }
 
+        public static string? FindLocalIconPath(string appName)
+        {
+            var regInfo = GetRegistryInfo(appName, "");
+            if (regInfo != null)
+            {
+                if (!string.IsNullOrWhiteSpace(regInfo.DisplayIcon))
+                {
+                    var cleaned = CleanIconPath(regInfo.DisplayIcon);
+                    if (File.Exists(cleaned)) return cleaned;
+                }
+
+                if (!string.IsNullOrWhiteSpace(regInfo.InstallLocation) && Directory.Exists(regInfo.InstallLocation))
+                {
+                    try
+                    {
+                        var exes = Directory.GetFiles(regInfo.InstallLocation, "*.exe", SearchOption.TopDirectoryOnly);
+                        var matchExe = exes.FirstOrDefault(e => Path.GetFileNameWithoutExtension(e).Equals(appName, StringComparison.OrdinalIgnoreCase))
+                                       ?? exes.FirstOrDefault(e => !Path.GetFileName(e).StartsWith("unins", StringComparison.OrdinalIgnoreCase));
+                        if (matchExe != null && File.Exists(matchExe)) return matchExe;
+                    }
+                    catch { }
+                }
+            }
+            return null;
+        }
+
         private static string CleanIconPath(string raw)
         {
-            var clean = raw.Trim().Trim('"');
+            if (string.IsNullOrWhiteSpace(raw)) return "";
+            var clean = raw.Trim();
             var commaIdx = clean.IndexOf(',');
             if (commaIdx > 0)
             {
                 clean = clean.Substring(0, commaIdx).Trim();
             }
-            return clean;
+            return clean.Trim('\"', ' ');
         }
 
         private static string CalculateDirectorySize(string folderPath)
@@ -178,6 +241,9 @@ namespace SetupHub180Hz.Services
                                 var installLoc = appKey.GetValue("InstallLocation") as string;
                                 var dispIcon = appKey.GetValue("DisplayIcon") as string;
                                 var uninstStr = appKey.GetValue("UninstallString") as string;
+                                var webUrl = (appKey.GetValue("URLInfoAbout") as string)
+                                             ?? (appKey.GetValue("HelpLink") as string)
+                                             ?? (appKey.GetValue("URLUpdateInfo") as string);
 
                                 string sizeStr = "";
                                 if (sizeObj is int sizeKb && sizeKb > 0)
@@ -193,7 +259,8 @@ namespace SetupHub180Hz.Services
                                     Size = sizeStr,
                                     InstallLocation = installLoc,
                                     DisplayIcon = dispIcon,
-                                    UninstallString = uninstStr
+                                    UninstallString = uninstStr,
+                                    WebUrl = webUrl
                                 };
 
                                 if (!string.IsNullOrWhiteSpace(dispName))

@@ -66,12 +66,20 @@ namespace SetupHub180Hz.Views
                 // 2. Fetch high-res icons in background
                 foreach (var pkg in _allPackages)
                 {
-                    if (pkg.IconImageSource == null && !string.IsNullOrWhiteSpace(pkg.IconUrl))
+                    if (pkg.IconImageSource == null)
                     {
-                        var img = await IconCacheService.GetImageAsync(pkg.IconUrl);
-                        if (img != null)
+                        if (string.IsNullOrWhiteSpace(pkg.IconUrl) && !string.IsNullOrWhiteSpace(pkg.WebUrl))
                         {
-                            await Dispatcher.InvokeAsync(() => pkg.IconImageSource = img);
+                            pkg.IconUrl = IconCacheService.DeriveFaviconUrl(pkg.WebUrl) ?? "";
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(pkg.IconUrl) || !string.IsNullOrWhiteSpace(pkg.LocalIconPath))
+                        {
+                            var img = await IconCacheService.GetImageAsync(pkg.IconUrl, pkg.LocalIconPath);
+                            if (img != null)
+                            {
+                                await Dispatcher.InvokeAsync(() => pkg.IconImageSource = img);
+                            }
                         }
                     }
                 }

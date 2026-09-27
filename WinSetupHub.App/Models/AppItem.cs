@@ -117,8 +117,20 @@ namespace SetupHub180Hz.Models
                 }
             }
         }
-
-        public string WebUrl { get; set; } = "";
+        private string _webUrl = "";
+        public string WebUrl
+        {
+            get => _webUrl;
+            set
+            {
+                if (_webUrl != value)
+                {
+                    _webUrl = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HasWebUrl));
+                }
+            }
+        }
         public string AccentColor { get; set; } = "#2FB6FF";
         public string Source { get; set; } = "winget";
         public bool Essential { get; set; }

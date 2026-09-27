@@ -45,7 +45,36 @@ namespace SetupHub180Hz.Services
 
         static IconCacheService()
         {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36");
+            }
+            catch { }
+
             try { Directory.CreateDirectory(CacheDir); } catch { }
+        }
+
+        public static string? DeriveFaviconUrl(string? webUrl)
+        {
+            if (string.IsNullOrWhiteSpace(webUrl)) return null;
+            try
+            {
+                var url = webUrl.Trim();
+                if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                    !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    url = "https://" + url;
+                }
+                var uri = new Uri(url);
+                var host = uri.Host;
+                if (string.IsNullOrWhiteSpace(host) || host.Length < 3) return null;
+                return $"https://www.google.com/s2/favicons?domain={host}&sz=128";
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public static ImageSource? GetLocalFileIcon(string filePath)
@@ -54,6 +83,25 @@ namespace SetupHub180Hz.Services
 
             var cacheKey = "local:" + filePath;
             if (_memoryCache.TryGetValue(cacheKey, out var cached)) return cached;
+
+            try
+            {
+                var ext = Path.GetExtension(filePath)?.ToLowerInvariant();
+                if (ext is ".ico" or ".png" or ".jpg" or ".jpeg")
+                {
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.UriSource = new Uri(filePath, UriKind.Absolute);
+                    bitmap.DecodePixelWidth = 64;
+                    bitmap.DecodePixelHeight = 64;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+                    _memoryCache[cacheKey] = bitmap;
+                    return bitmap;
+                }
+            }
+            catch { }
 
             try
             {

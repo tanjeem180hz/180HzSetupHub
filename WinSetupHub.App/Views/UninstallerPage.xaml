@@ -105,14 +105,24 @@
                             HorizontalAlignment="Left" VerticalAlignment="Center"
                             ClipToBounds="True">
                         <Grid>
-                            <!-- Monogram Fallback -->
-                            <TextBlock Text="{Binding Initial}"
-                                       FontFamily="{StaticResource AppFont}"
-                                       FontSize="18"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource BrushAccent}"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
+                            <!-- Neutral Loading/Fallback Placeholder: ONLY visible when HasIconImage is False -->
+                            <Border Background="{StaticResource BrushSurface}" CornerRadius="7">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasIconImage}" Value="False">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="📦"
+                                           FontSize="16"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Opacity="0.4"/>
+                            </Border>
 
                             <!-- Real Image Source (Local .exe icon or cached remote icon) -->
                             <Image Source="{Binding IconImageSource}"
@@ -322,8 +332,8 @@
                             <Border x:Name="DialogLogoBorder" Width="42" Height="42" CornerRadius="8" Background="{StaticResource BrushSurface}"
                                     BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" Margin="0,0,12,0" ClipToBounds="True">
                                 <Grid x:Name="DialogLogoGrid">
-                                    <TextBlock x:Name="DialogFallbackInitial" Text="A" FontSize="18" FontWeight="Bold"
-                                               Foreground="{StaticResource BrushAccent}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="DialogFallbackInitial" Text="📦" FontSize="18"
+                                               Foreground="{StaticResource BrushTextSecondary}" Opacity="0.5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Grid>
                             </Border>
 

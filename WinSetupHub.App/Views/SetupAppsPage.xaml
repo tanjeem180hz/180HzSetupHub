@@ -112,16 +112,26 @@
                             HorizontalAlignment="Left" VerticalAlignment="Center"
                             ClipToBounds="True">
                         <Grid>
-                            <!-- Monogram Fallback -->
-                            <TextBlock Text="{Binding Initial}"
-                                       FontFamily="{StaticResource AppFont}"
-                                       FontSize="18"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource BrushAccent}"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
+                            <!-- Neutral Loading/Fallback Placeholder: ONLY visible when HasIconImage is False -->
+                            <Border Background="{StaticResource BrushSurface}" CornerRadius="7">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasIconImage}" Value="False">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="📦"
+                                           FontSize="16"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Opacity="0.4"/>
+                            </Border>
 
-                            <!-- Real Image if loaded -->
+                            <!-- Authentic Software Logo: Displayed cleanly with NO text behind it -->
                             <Image Source="{Binding IconImageSource}"
                                    Width="32" Height="32"
                                    Stretch="Uniform"
@@ -203,11 +213,6 @@
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource BrushTextSecondary}"/>
                             </Border>
-
-                            <!-- Web Link Button -->
-                            <Button Style="{StaticResource WebLinkButton}"
-                                    Content="🌐 Official Website"
-                                    Click="WebLink_Click"/>
                         </StackPanel>
                     </StackPanel>
 

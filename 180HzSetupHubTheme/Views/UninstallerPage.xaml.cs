@@ -183,10 +183,10 @@ namespace SetupHub180Hz.Views
             {
                 var fallback = new TextBlock
                 {
-                    Text = app.Initial,
+                    Text = "📦",
                     FontSize = 18,
-                    FontWeight = FontWeights.Bold,
-                    Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent"),
+                    Foreground = (System.Windows.Media.Brush)FindResource("BrushTextSecondary"),
+                    Opacity = 0.5,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
                 };

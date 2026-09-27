@@ -30,19 +30,14 @@ namespace SetupHub180Hz.Views
 
             _ = Task.Run(async () =>
             {
-                string? url = null;
+                // 1. Check if WebUrl is already known (preset catalog or registry)
+                string? url = app.WebUrl;
 
-                // 1. Try winget show manifest
-                if (!string.IsNullOrWhiteSpace(app.Id))
+                // 2. If missing, query winget show manifest asynchronously
+                if (string.IsNullOrWhiteSpace(url) && !string.IsNullOrWhiteSpace(app.Id))
                 {
                     var meta = await winget.GetMetadataAsync(app.Id);
                     url = meta?.BestLink;
-                }
-
-                // 2. Fall back to preset WebUrl if winget had no metadata
-                if (string.IsNullOrWhiteSpace(url) && !string.IsNullOrWhiteSpace(app.WebUrl))
-                {
-                    url = app.WebUrl;
                 }
 
                 await btn.Dispatcher.InvokeAsync(() =>

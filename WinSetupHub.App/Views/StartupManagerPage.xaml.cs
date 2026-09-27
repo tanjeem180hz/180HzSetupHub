@@ -56,6 +56,12 @@ namespace SetupHub180Hz.Views
                         exePath = ResolveFromAppPaths(item.Name) ?? ResolveFromAppPaths(item.Command);
                     }
 
+                    // 1.5 Try resolving from Windows Registry installed applications
+                    if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
+                    {
+                        exePath = AppMetadataHelper.FindLocalIconPath(item.Name);
+                    }
+
                     if (!string.IsNullOrWhiteSpace(exePath) && File.Exists(exePath))
                     {
                         item.LocalIconPath = exePath;
@@ -71,10 +77,19 @@ namespace SetupHub180Hz.Views
                             p.Name.Contains(item.Name, StringComparison.OrdinalIgnoreCase) ||
                             (!string.IsNullOrWhiteSpace(p.Id) && item.Name.Contains(p.Id.Split('.').Last(), StringComparison.OrdinalIgnoreCase)));
 
-                        if (matchedPkg != null && !string.IsNullOrWhiteSpace(matchedPkg.IconUrl))
+                        if (matchedPkg != null)
                         {
-                            item.IconUrl = matchedPkg.IconUrl;
-                            icon = await IconCacheService.GetImageAsync(matchedPkg.IconUrl, matchedPkg.LocalIconPath);
+                            var targetUrl = matchedPkg.IconUrl;
+                            if (string.IsNullOrWhiteSpace(targetUrl) && !string.IsNullOrWhiteSpace(matchedPkg.WebUrl))
+                            {
+                                targetUrl = IconCacheService.DeriveFaviconUrl(matchedPkg.WebUrl);
+                            }
+
+                            if (!string.IsNullOrWhiteSpace(targetUrl) || !string.IsNullOrWhiteSpace(matchedPkg.LocalIconPath))
+                            {
+                                item.IconUrl = targetUrl;
+                                icon = await IconCacheService.GetImageAsync(targetUrl, matchedPkg.LocalIconPath);
+                            }
                         }
                     }
 
