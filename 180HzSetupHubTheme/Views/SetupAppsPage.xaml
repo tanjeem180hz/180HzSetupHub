@@ -99,13 +99,23 @@
             <Border Style="{StaticResource ListRow}" Padding="14,10,14,10" Margin="0,0,0,6">
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="54"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
+                    <!-- 0. Multi-Select CheckBox -->
+                    <CheckBox Grid.Column="0"
+                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                              Style="{StaticResource AppCheckBox}"
+                              VerticalAlignment="Center"
+                              Margin="0,0,12,0"
+                              Cursor="Hand"
+                              Click="AppCheckBox_Click"/>
+
                     <!-- 1. Logo / Monogram -->
-                    <Border Width="44" Height="44" CornerRadius="8"
+                    <Border Grid.Column="1" Width="44" Height="44" CornerRadius="8"
                             Background="{StaticResource BrushBackground}"
                             BorderBrush="{StaticResource BrushBorder}"
                             BorderThickness="1"
@@ -142,7 +152,7 @@
                     </Border>
 
                     <!-- 2. Details StackPanel -->
-                    <StackPanel Grid.Column="1" Margin="12,0,16,0" VerticalAlignment="Center">
+                    <StackPanel Grid.Column="2" Margin="12,0,16,0" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
                             <TextBlock Text="{Binding Name}"
                                        FontFamily="{StaticResource AppFont}"
@@ -217,7 +227,7 @@
                     </StackPanel>
 
                     <!-- 3. Actions Button -->
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                         <ContentControl Loaded="OfficialLinkContainer_Loaded" Margin="0,0,8,0" VerticalAlignment="Center"/>
                         <Button Content="{Binding Status}"
                                 Click="InstallButton_Click"
@@ -234,11 +244,12 @@
             <RowDefinition Height="Auto"/> <!-- 0: Header -->
             <RowDefinition Height="Auto"/> <!-- 1: Quick Bundles -->
             <RowDefinition Height="Auto"/> <!-- 2: Search & Controls -->
-            <RowDefinition Height="Auto"/> <!-- 3: Categories -->
-            <RowDefinition Height="*"/>    <!-- 4: Apps List -->
+            <RowDefinition Height="Auto"/> <!-- 3: Batch Selection Bar -->
+            <RowDefinition Height="Auto"/> <!-- 4: Categories -->
+            <RowDefinition Height="*"/>    <!-- 5: Apps List & Download Popup -->
         </Grid.RowDefinitions>
 
-        <!-- 1. Header Block -->
+        <!-- 1. Header Block (No badge text) -->
         <Grid Grid.Row="0" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -246,12 +257,6 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                    <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
-                        <TextBlock Text="⚡ 180Hz ULTRA" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
-                    </Border>
-                    <TextBlock Text="AUTHENTIC SOFTWARE CATALOG" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
-                </StackPanel>
                 <TextBlock Text="Setup Apps" Style="{StaticResource TextHeader}" FontSize="26"/>
                 <TextBlock Text="Explore 420+ curated packages with exact verified versions, genuine sizes, and instant deployment." Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
             </StackPanel>
@@ -267,9 +272,13 @@
             </StackPanel>
         </Grid>
 
-        <!-- 2. Curated Quick-Deploy Bundles -->
+        <!-- 2. Curated Quick-Deploy Bundles (No scroll line, mouse wheel scrollable) -->
         <Border Grid.Row="1" Margin="0,0,0,16">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Style="{StaticResource CleanScrollViewer}">
+            <ScrollViewer x:Name="BundlesScrollViewer"
+                          HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollBarVisibility="Disabled"
+                          Style="{StaticResource CleanScrollViewer}"
+                          PreviewMouseWheel="BundlesScrollViewer_PreviewMouseWheel">
                 <ItemsControl x:Name="BundlesItemsControl">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -316,7 +325,7 @@
         </Border>
 
         <!-- 3. Search & Toolbar -->
-        <Grid Grid.Row="2" Margin="0,0,0,14">
+        <Grid Grid.Row="2" Margin="0,0,0,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -360,17 +369,52 @@
                     Click="ImportInstall_Click"/>
         </Grid>
 
-        <!-- 4. Novelty Category Filter Tabs (Horizontal Scrollable) -->
-        <Border Grid.Row="3" Margin="0,0,0,16">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Style="{StaticResource CleanScrollViewer}">
+        <!-- 4. Batch Selection Action Bar (Shown when 1+ apps selected) -->
+        <Border x:Name="BatchActionBar"
+                Grid.Row="3"
+                Background="{StaticResource BrushSurface}"
+                BorderBrush="{StaticResource BrushAccent}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="14,8"
+                Margin="0,0,0,12"
+                Visibility="Collapsed">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock x:Name="SelectedAppsCountText" Text="0 apps selected" FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                    <Button Content="Select All Visible" Style="{StaticResource OutlineButton}" Padding="10,4" Margin="14,0,0,0" FontSize="11" Click="SelectAll_Click"/>
+                    <Button Content="Clear Selection" Style="{StaticResource OutlineButton}" Padding="10,4" Margin="8,0,0,0" FontSize="11" Click="ClearSelection_Click"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="InstallSelectedButton" Content="⚡ Install Selected" Style="{StaticResource AccentButton}" Padding="16,6" FontSize="12" Click="InstallSelected_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 5. Novelty Category Filter Tabs (Horizontal Scrollable with NO line, supports mouse wheel & drag) -->
+        <Border Grid.Row="4" Margin="0,0,0,16">
+            <ScrollViewer x:Name="CategoryScrollViewer"
+                          HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollBarVisibility="Disabled"
+                          Style="{StaticResource CleanScrollViewer}"
+                          PreviewMouseWheel="CategoryScrollViewer_PreviewMouseWheel"
+                          PreviewMouseDown="CategoryScrollViewer_PreviewMouseDown"
+                          PreviewMouseMove="CategoryScrollViewer_PreviewMouseMove"
+                          PreviewMouseUp="CategoryScrollViewer_PreviewMouseUp">
                 <StackPanel x:Name="CategoryChipsPanel" Orientation="Horizontal" Margin="0,2,0,4">
                     <!-- Populated dynamically in code-behind with counts -->
                 </StackPanel>
             </ScrollViewer>
         </Border>
 
-        <!-- 5. Applications List with Native UI Virtualization -->
-        <Grid Grid.Row="4">
+        <!-- 6. Applications List & Bottom Floating Download Popup -->
+        <Grid Grid.Row="5">
             <TextBlock x:Name="StatusText" Text="Loading software catalog…" Style="{StaticResource TextBody}"
                        HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0"/>
 
@@ -385,6 +429,113 @@
                      BorderThickness="0"
                      ItemContainerStyle="{StaticResource CleanListBoxItem}"
                      ItemTemplate="{StaticResource AppCardTemplate}"/>
+
+            <!-- Bottom Floating / Docked Download Popup Panel -->
+            <Border x:Name="DownloadPopupPanel"
+                    VerticalAlignment="Bottom"
+                    Margin="0,0,0,8"
+                    Background="{StaticResource BrushSurface}"
+                    BorderBrush="{StaticResource BrushAccent}"
+                    BorderThickness="1.5"
+                    CornerRadius="10"
+                    Padding="16,12"
+                    Panel.ZIndex="100"
+                    Visibility="Collapsed">
+                <Border.Effect>
+                    <DropShadowEffect Color="#000000" BlurRadius="20" ShadowDepth="4" Opacity="0.65"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Row 0: App info, Status Badge, Queue info, Close button -->
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- App Icon -->
+                        <Border Width="34" Height="34" CornerRadius="6"
+                                Background="{StaticResource BrushBackground}"
+                                BorderBrush="{StaticResource BrushBorder}"
+                                BorderThickness="1" Margin="0,0,10,0" ClipToBounds="True">
+                            <Grid>
+                                <TextBlock Text="📦" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.4"/>
+                                <Image x:Name="PopupAppIcon" Width="26" Height="26" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- App Name & Live Status Details -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="PopupAppName" Text="Application" FontWeight="Bold" FontSize="13" Foreground="{StaticResource BrushTextPrimary}"/>
+                                <Border x:Name="PopupStateBadge" Background="#162D42" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock x:Name="PopupStateText" Text="DOWNLOADING" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                                </Border>
+                            </StackPanel>
+                            <TextBlock x:Name="PopupStatusDetail" Text="Initializing…" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+
+                        <!-- Queue Counter Badge -->
+                        <Border Grid.Column="2" Background="{StaticResource BrushBackground}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="8,3" Margin="8,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="PopupQueueText" Text="App 1 of 1" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushTextSecondary}"/>
+                        </Border>
+
+                        <!-- Dismiss Button -->
+                        <Button x:Name="PopupDismissButton" Grid.Column="3" Content="✕"
+                                Style="{StaticResource CaptionButton}" Width="26" Height="26"
+                                Margin="6,0,0,0" ToolTip="Dismiss"
+                                Click="PopupDismiss_Click" Visibility="Collapsed"/>
+                    </Grid>
+
+                    <!-- Row 1: Flat Accent Progress Bar -->
+                    <ProgressBar x:Name="PopupProgressBar" Grid.Row="1"
+                                 Style="{StaticResource FlatProgressBar}"
+                                 Height="6" Margin="0,0,0,8"
+                                 Minimum="0" Maximum="100" Value="0"/>
+
+                    <!-- Row 2: Live Metrics & Controls -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Download Metrics: Percentage, Speed, ETA, Size -->
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock x:Name="PopupPercentageText" Text="0%" FontWeight="Bold" FontSize="12" Foreground="{StaticResource BrushAccent}" Margin="0,0,12,0"/>
+                            <TextBlock x:Name="PopupSpeedText" Text="0 MB/s" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,0,12,0"/>
+                            <TextBlock x:Name="PopupEtaText" Text="ETA: Calculating…" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,0,12,0"/>
+                            <TextBlock x:Name="PopupSizeText" Text="" FontSize="11" Foreground="{StaticResource BrushTextSecondary}"/>
+                        </StackPanel>
+
+                        <!-- Action Buttons: Pause/Resume, Skip, Cancel All -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button x:Name="PopupPauseResumeButton" Content="⏸ Pause"
+                                    Style="{StaticResource AccentButton}"
+                                    Padding="12,5" FontSize="11"
+                                    Click="PopupPauseResume_Click"/>
+
+                            <Button x:Name="PopupSkipButton" Content="⏭ Skip"
+                                    Style="{StaticResource OutlineButton}"
+                                    Padding="10,5" FontSize="11" Margin="6,0,0,0"
+                                    Click="PopupSkip_Click"/>
+
+                            <Button x:Name="PopupCancelButton" Content="✕ Cancel All"
+                                    Style="{StaticResource OutlineButton}"
+                                    Padding="10,5" FontSize="11" Margin="6,0,0,0"
+                                    Foreground="{StaticResource BrushError}"
+                                    Click="PopupCancel_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </UserControl>

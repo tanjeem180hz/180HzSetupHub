@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using SetupHub180Hz.Models;
 using SetupHub180Hz.Services;
@@ -36,6 +37,9 @@ namespace SetupHub180Hz.Views
                 _searchDebounceTimer.Stop();
                 ApplyFilter();
             };
+
+            DownloadManagerService.Instance.ProgressChanged += OnDownloadProgressChanged;
+            DownloadManagerService.Instance.QueueCompleted += OnDownloadQueueCompleted;
 
             Loaded += async (_, _) =>
             {
@@ -250,49 +254,258 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private async void InstallButton_Click(object sender, RoutedEventArgs e)
+        private void InstallButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is AppItem app)
             {
                 if (app.IsBusy || app.IsInstalled) return;
 
-                app.IsBusy = true;
-                app.Status = "Installing…";
+                StartSequentialQueue(new[] { app });
+            }
+        }
 
-                // Special handling for Microsoft Store app itself
-                if (app.Id.Equals("Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))
+        private void AppCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateSelectionUI();
+        }
+
+        private void UpdateSelectionUI()
+        {
+            var selected = _allPackages.Where(p => p.IsSelected).ToList();
+            int count = selected.Count;
+
+            if (count > 0)
+            {
+                BatchActionBar.Visibility = Visibility.Visible;
+                SelectedAppsCountText.Text = $"{count} app{(count > 1 ? "s" : "")} selected";
+                InstallSelectedButton.Content = $"⚡ Install Selected ({count})";
+            }
+            else
+            {
+                BatchActionBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void SelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            if (AppsListBox.ItemsSource is IEnumerable<AppItem> currentItems)
+            {
+                foreach (var item in currentItems)
                 {
-                    try
-                    {
-                        Process.Start(new ProcessStartInfo("ms-windows-store://") { UseShellExecute = true });
-                        app.Status = "Opened";
-                        app.IsInstalled = true;
-                        ActivityLogger.Instance.Log("Launched Microsoft Store.", ActivityType.Success);
-                        return;
-                    }
-                    catch { }
+                    if (!item.IsInstalled) item.IsSelected = true;
+                }
+                UpdateSelectionUI();
+            }
+        }
+
+        private void ClearSelection_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in _allPackages)
+            {
+                item.IsSelected = false;
+            }
+            UpdateSelectionUI();
+        }
+
+        private void InstallSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = _allPackages.Where(p => p.IsSelected && !p.IsInstalled).ToList();
+            if (selected.Count == 0)
+            {
+                MessageBox.Show("Please select at least one uninstalled app to install.", "No Apps Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            StartSequentialQueue(selected);
+        }
+
+        private void StartSequentialQueue(IEnumerable<AppItem> apps)
+        {
+            var list = apps.ToList();
+            if (list.Count == 0) return;
+
+            DownloadPopupPanel.Visibility = Visibility.Visible;
+            AppsListBox.Margin = new Thickness(0, 0, 0, 110);
+
+            PopupPauseResumeButton.Visibility = Visibility.Visible;
+            PopupPauseResumeButton.Content = "⏸ Pause";
+            PopupPauseResumeButton.IsEnabled = true;
+            PopupSkipButton.Visibility = Visibility.Visible;
+            PopupCancelButton.Visibility = Visibility.Visible;
+            PopupDismissButton.Visibility = Visibility.Collapsed;
+
+            DownloadManagerService.Instance.EnqueueRange(list);
+            UpdateSelectionUI();
+        }
+
+        private void OnDownloadProgressChanged(DownloadProgressInfo info)
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                DownloadPopupPanel.Visibility = Visibility.Visible;
+                AppsListBox.Margin = new Thickness(0, 0, 0, 110);
+
+                PopupAppName.Text = info.App.Name;
+                PopupAppIcon.Source = info.App.IconImageSource;
+                PopupQueueText.Text = $"App {info.QueueIndex} of {info.QueueTotal}";
+                PopupProgressBar.Value = info.Percentage;
+
+                PopupPercentageText.Text = $"{info.Percentage:0}%";
+                PopupSpeedText.Text = info.SpeedFormatted;
+                PopupEtaText.Text = info.EtaFormatted;
+                PopupSizeText.Text = info.SizeFormatted;
+                PopupStatusDetail.Text = info.StatusMessage;
+
+                switch (info.State)
+                {
+                    case DownloadState.Downloading:
+                        PopupStateText.Text = "DOWNLOADING";
+                        PopupStateBadge.Background = (SolidColorBrush)FindResource("BrushSurface");
+                        PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushAccent");
+                        PopupPauseResumeButton.Content = "⏸ Pause";
+                        PopupPauseResumeButton.IsEnabled = true;
+                        break;
+
+                    case DownloadState.Paused:
+                        PopupStateText.Text = "PAUSED";
+                        PopupStateBadge.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(55, 40, 10));
+                        PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushWarning");
+                        PopupPauseResumeButton.Content = "▶ Resume";
+                        PopupPauseResumeButton.IsEnabled = true;
+                        break;
+
+                    case DownloadState.Installing:
+                        PopupStateText.Text = "INSTALLING";
+                        PopupStateBadge.Background = (SolidColorBrush)FindResource("BrushSurface");
+                        PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushAccent");
+                        PopupPauseResumeButton.IsEnabled = false;
+                        break;
+
+                    case DownloadState.Error:
+                        PopupStateText.Text = "CONNECTION ERROR";
+                        PopupStateBadge.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(65, 18, 25));
+                        PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushError");
+                        PopupPauseResumeButton.Content = "🔄 Resume";
+                        PopupPauseResumeButton.IsEnabled = true;
+                        break;
+
+                    case DownloadState.Completed:
+                        PopupStateText.Text = "INSTALLED";
+                        PopupStateBadge.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(18, 55, 25));
+                        PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushSuccess");
+                        break;
                 }
 
-                var success = await _winget.InstallAsync(app.Id, app.Source, line =>
-                {
-                    if (line.Contains('%'))
-                    {
-                        Dispatcher.Invoke(() => app.Status = "Installing…");
-                    }
-                });
+                UpdateSelectionUI();
+            });
+        }
 
-                app.IsBusy = false;
-                if (success)
+        private void OnDownloadQueueCompleted()
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                PopupStateText.Text = "COMPLETED";
+                PopupStateBadge.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(18, 55, 25));
+                PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushSuccess");
+                PopupStatusDetail.Text = "All operations completed successfully! 🎉";
+                PopupProgressBar.Value = 100;
+                PopupPercentageText.Text = "100%";
+                PopupSpeedText.Text = "Done";
+                PopupEtaText.Text = "Complete";
+
+                PopupPauseResumeButton.Visibility = Visibility.Collapsed;
+                PopupSkipButton.Visibility = Visibility.Collapsed;
+                PopupCancelButton.Visibility = Visibility.Collapsed;
+                PopupDismissButton.Visibility = Visibility.Visible;
+
+                NotificationService.Notify("Setup Complete", "All queued software deployments have finished.");
+                UpdateSelectionUI();
+            });
+        }
+
+        private void PopupPauseResume_Click(object sender, RoutedEventArgs e)
+        {
+            if (DownloadManagerService.Instance.IsPaused)
+            {
+                DownloadManagerService.Instance.Resume();
+            }
+            else
+            {
+                DownloadManagerService.Instance.Pause();
+            }
+        }
+
+        private void PopupSkip_Click(object sender, RoutedEventArgs e)
+        {
+            DownloadManagerService.Instance.SkipCurrent();
+        }
+
+        private void PopupCancel_Click(object sender, RoutedEventArgs e)
+        {
+            DownloadManagerService.Instance.CancelAll();
+            DownloadPopupPanel.Visibility = Visibility.Collapsed;
+            AppsListBox.Margin = new Thickness(0);
+            UpdateSelectionUI();
+        }
+
+        private void PopupDismiss_Click(object sender, RoutedEventArgs e)
+        {
+            DownloadPopupPanel.Visibility = Visibility.Collapsed;
+            AppsListBox.Margin = new Thickness(0);
+        }
+
+        private void CategoryScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (sender is ScrollViewer sv)
+            {
+                sv.ScrollToHorizontalOffset(sv.HorizontalOffset - e.Delta);
+                e.Handled = true;
+            }
+        }
+
+        private void BundlesScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (sender is ScrollViewer sv)
+            {
+                sv.ScrollToHorizontalOffset(sv.HorizontalOffset - e.Delta);
+                e.Handled = true;
+            }
+        }
+
+        private Point _categoryDragStartPoint;
+        private double _categoryDragStartOffset;
+        private bool _isCategoryDragging;
+
+        private void CategoryScrollViewer_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ScrollViewer sv && (e.LeftButton == MouseButtonState.Pressed || e.MiddleButton == MouseButtonState.Pressed))
+            {
+                _categoryDragStartPoint = e.GetPosition(sv);
+                _categoryDragStartOffset = sv.HorizontalOffset;
+                _isCategoryDragging = true;
+            }
+        }
+
+        private void CategoryScrollViewer_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isCategoryDragging && sender is ScrollViewer sv)
+            {
+                var current = e.GetPosition(sv);
+                var delta = _categoryDragStartPoint.X - current.X;
+                if (Math.Abs(delta) > 3)
                 {
-                    app.IsInstalled = true;
-                    app.Status = "Installed";
-                    ActivityLogger.Instance.Log($"Successfully installed {app.Name}.", ActivityType.Success);
+                    sv.CaptureMouse();
+                    sv.ScrollToHorizontalOffset(_categoryDragStartOffset + delta);
                 }
-                else
-                {
-                    app.Status = "Failed";
-                    ActivityLogger.Instance.Log($"Installation failed for {app.Name}.", ActivityType.Error);
-                }
+            }
+        }
+
+        private void CategoryScrollViewer_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_isCategoryDragging && sender is ScrollViewer sv)
+            {
+                _isCategoryDragging = false;
+                sv.ReleaseMouseCapture();
             }
         }
 
@@ -319,44 +532,32 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private async void BundleInstall_Click(object sender, RoutedEventArgs e)
+        private void BundleInstall_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is AppBundle bundle)
             {
-                if (bundle.IsInstalling) return;
-
-                bundle.IsInstalling = true;
-                bundle.ButtonContent = "⏳ Installing…";
-                int total = bundle.WingetIds.Count;
-                int ok = 0;
-
-                ActivityLogger.Instance.Log($"Starting bundle deployment: {bundle.Name} ({total} apps)", ActivityType.Info);
-
-                for (int i = 0; i < total; i++)
+                var targetApps = new List<AppItem>();
+                foreach (var id in bundle.WingetIds)
                 {
-                    var id = bundle.WingetIds[i];
-                    bundle.ProgressText = $"Installing {i + 1} of {total}: {id}…";
-
-                    ActivityLogger.Instance.Log($"Installing [{i + 1}/{total}] {id} from bundle '{bundle.Name}'…", ActivityType.Info);
-
-                    bool success = await _winget.InstallAsync(id);
-                    if (success)
+                    var app = _allPackages.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
+                    if (app == null)
                     {
-                        ok++;
-                        ActivityLogger.Instance.Log($"Successfully installed {id}.", ActivityType.Success);
+                        app = new AppItem { Id = id, Name = id };
                     }
-                    else
+                    if (!app.IsInstalled)
                     {
-                        ActivityLogger.Instance.Log($"Failed to install {id}.", ActivityType.Error);
+                        targetApps.Add(app);
                     }
                 }
 
-                bundle.ProgressText = $"Completed: {ok}/{total} installed";
-                bundle.ButtonContent = "⚡ Install All";
-                bundle.IsInstalling = false;
+                if (targetApps.Count == 0)
+                {
+                    MessageBox.Show($"All applications in '{bundle.Name}' are already installed!", "Bundle Ready", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
 
-                ActivityLogger.Instance.Log($"Bundle '{bundle.Name}' finished: {ok}/{total} succeeded.", ActivityType.Success);
-                NotificationService.Notify("Bundle installed", $"{bundle.Name}: {ok}/{total} succeeded");
+                ActivityLogger.Instance.Log($"Enqueuing bundle deployment: {bundle.Name} ({targetApps.Count} apps)", ActivityType.Info);
+                StartSequentialQueue(targetApps);
             }
         }
 

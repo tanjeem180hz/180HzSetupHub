@@ -103,6 +103,64 @@ namespace SetupHub180Hz.Services
             }
         }
 
+        public record WingetInstallerInfo(string? Url, string? Type, string? Sha256);
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, WingetInstallerInfo?> _installerInfoCache =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        public async Task<WingetInstallerInfo?> GetInstallerInfoAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return null;
+            if (_installerInfoCache.TryGetValue(id, out var cached)) return cached;
+
+            try
+            {
+                var output = await RunWingetAsync($"show --id \"{id}\" --exact --accept-source-agreements");
+                if (string.IsNullOrWhiteSpace(output))
+                {
+                    _installerInfoCache[id] = null;
+                    return null;
+                }
+
+                string? installerUrl = null;
+                string? installerType = null;
+                string? sha256 = null;
+
+                using var reader = new System.IO.StringReader(output);
+                string? line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    var trimmed = line.Trim();
+                    if (trimmed.StartsWith("Installer Url:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Installer Url:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) installerUrl = val;
+                    }
+                    else if (trimmed.StartsWith("Installer Type:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Installer Type:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) installerType = val;
+                    }
+                    else if (trimmed.StartsWith("Installer SHA256:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Installer SHA256:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) sha256 = val;
+                    }
+                }
+
+                var result = !string.IsNullOrWhiteSpace(installerUrl)
+                    ? new WingetInstallerInfo(installerUrl, installerType, sha256)
+                    : null;
+
+                _installerInfoCache[id] = result;
+                return result;
+            }
+            catch
+            {
+                _installerInfoCache[id] = null;
+                return null;
+            }
+        }
+
         public async Task<bool> InstallAsync(string id, string? source = null, Action<string>? onOutputLine = null)
         {
             if (id.Equals("Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))
