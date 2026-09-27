@@ -50,12 +50,76 @@ namespace SetupHub180Hz.Views
             };
         }
 
+        private static readonly string[] TopBasicDailyApps = new[]
+        {
+            // Top Browsers
+            "Google.Chrome",
+            "Mozilla.Firefox",
+            "Brave.Brave",
+            "Microsoft.Edge",
+            "Opera.Opera",
+
+            // Top Daily Utilities & Archivers
+            "7zip.7zip",
+            "RARLab.WinRAR",
+            "voidtools.Everything",
+            "Notepad++.Notepad++",
+            "Notepad\u002B\u002B.Notepad\u002B\u002B",
+
+            // Top Media & Audio
+            "VideoLAN.VLC",
+            "Spotify.Spotify",
+
+            // Top Communication
+            "Discord.Discord",
+            "Telegram.TelegramDesktop",
+            "9NKSQGP7F2NH", // WhatsApp Desktop (Microsoft Store)
+            "WhatsApp.WhatsApp",
+            "Zoom.Zoom",
+
+            // Top Developer Tools
+            "Microsoft.VisualStudioCode",
+            "Git.Git",
+            "OpenJS.NodeJS",
+            "Python.Python.3.13",
+
+            // Top Gaming & System Launchers
+            "Valve.Steam",
+            "EpicGames.EpicGamesLauncher",
+            "Microsoft.PowerToys",
+            "Microsoft.WindowsTerminal",
+            "Microsoft.WindowsStore"
+        };
+
+        private static readonly Dictionary<string, int> TopBasicRankMap =
+            TopBasicDailyApps
+                .Select((id, index) => new { id, index })
+                .ToDictionary(x => x.id, x => x.index, StringComparer.OrdinalIgnoreCase);
+
+        private static int GetAppSortRank(AppItem app)
+        {
+            if (TopBasicRankMap.TryGetValue(app.Id, out int rank))
+            {
+                return rank;
+            }
+            if (app.Essential)
+            {
+                return 100;
+            }
+            return 1000;
+        }
+
         private async Task InitializeCatalogAsync()
         {
             StatusText.Text = "Loading application catalog…";
             StatusText.Visibility = Visibility.Visible;
 
-            _allPackages = await _catalog.GetAllAsync();
+            var rawPackages = await _catalog.GetAllAsync();
+            _allPackages = rawPackages
+                .OrderBy(GetAppSortRank)
+                .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
             CatalogCountText.Text = $"{_allPackages.Count} Packages Ready";
 
             BuildCategoryChips();
@@ -166,7 +230,10 @@ namespace SetupHub180Hz.Views
                     p.Description.Contains(query, StringComparison.OrdinalIgnoreCase));
             }
 
-            var results = filtered.ToList();
+            var results = filtered
+                .OrderBy(GetAppSortRank)
+                .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
 
             if (results.Count == 0)
             {
