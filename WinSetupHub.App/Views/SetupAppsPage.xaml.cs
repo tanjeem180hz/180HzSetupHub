@@ -21,6 +21,8 @@ namespace SetupHub180Hz.Views
         private List<AppItem> _allPackages = new();
         private string _activeCategory = "All";
         private readonly DispatcherTimer _searchDebounceTimer;
+        private string _currentGhostSuggestion = "";
+        private bool _isSelectingFromPopup = false;
 
         public SetupAppsPage()
         {
@@ -244,9 +246,13 @@ namespace SetupHub180Hz.Views
                 .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
+            CatalogCountText.Text = $"{results.Count} Packages Ready";
+
             if (results.Count == 0)
             {
-                StatusText.Text = "No packages match your search or category filter.";
+                StatusText.Text = string.IsNullOrWhiteSpace(query)
+                    ? "No packages match your category filter."
+                    : $"No local packages found for '{query}'. Click '🌐 Deep Web Search' to find it online.";
                 StatusText.Visibility = Visibility.Visible;
             }
             else
@@ -259,17 +265,211 @@ namespace SetupHub180Hz.Views
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ClearSearchButton.Visibility = string.IsNullOrWhiteSpace(SearchBox.Text)
-                ? Visibility.Collapsed
-                : Visibility.Visible;
+            if (_isSelectingFromPopup) return;
+
+            var text = SearchBox.Text;
+            bool hasText = !string.IsNullOrWhiteSpace(text);
+
+            ClearSearchButton.Visibility = hasText ? Visibility.Visible : Visibility.Collapsed;
+
+            if (!hasText)
+            {
+                _currentGhostSuggestion = "";
+                SearchGhostText.Text = "";
+                TabHintBadge.Visibility = Visibility.Collapsed;
+                SearchSuggestionsPopup.IsOpen = false;
+            }
+            else
+            {
+                UpdateSuggestionsAndGhost(text.Trim());
+            }
 
             _searchDebounceTimer.Stop();
             _searchDebounceTimer.Start();
         }
 
+        private void UpdateSuggestionsAndGhost(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                _currentGhostSuggestion = "";
+                SearchGhostText.Text = "";
+                TabHintBadge.Visibility = Visibility.Collapsed;
+                SearchSuggestionsPopup.IsOpen = false;
+                return;
+            }
+
+            // Find matching apps from _allPackages
+            var matches = _allPackages
+                .Where(p =>
+                    p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    p.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    (p.DetectionNames != null && p.DetectionNames.Any(d => d.Contains(query, StringComparison.OrdinalIgnoreCase))))
+                .OrderBy(p =>
+                {
+                    // Exact prefix of app name gets highest priority
+                    if (p.Name.StartsWith(query, StringComparison.OrdinalIgnoreCase)) return 0;
+                    // Any word starting with prefix
+                    var words = p.Name.Split(new[] { ' ', '.', '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (words.Any(w => w.StartsWith(query, StringComparison.OrdinalIgnoreCase))) return 1;
+                    // Id prefix
+                    if (p.Id.StartsWith(query, StringComparison.OrdinalIgnoreCase)) return 2;
+                    return 3;
+                })
+                .ThenBy(GetAppSortRank)
+                .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                .Take(7)
+                .ToList();
+
+            var topMatch = matches.FirstOrDefault();
+            if (topMatch != null)
+            {
+                _currentGhostSuggestion = topMatch.Name;
+
+                if (topMatch.Name.StartsWith(query, StringComparison.OrdinalIgnoreCase))
+                {
+                    SearchGhostText.Text = query + topMatch.Name.Substring(query.Length);
+                }
+                else
+                {
+                    SearchGhostText.Text = "";
+                }
+                TabHintBadge.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                _currentGhostSuggestion = "";
+                SearchGhostText.Text = "";
+                TabHintBadge.Visibility = Visibility.Collapsed;
+            }
+
+            SuggestionsListBox.ItemsSource = matches;
+            PopupDeepSearchText.Text = $"Deep Web Search for '{query}'";
+            SearchSuggestionsPopup.IsOpen = matches.Count > 0 || !string.IsNullOrWhiteSpace(query);
+        }
+
+        private void SearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Tab && !string.IsNullOrWhiteSpace(_currentGhostSuggestion))
+            {
+                ApplyGhostSuggestion();
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == Key.Down && SearchSuggestionsPopup.IsOpen && SuggestionsListBox.Items.Count > 0)
+            {
+                SuggestionsListBox.Focus();
+                SuggestionsListBox.SelectedIndex = 0;
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == Key.Escape)
+            {
+                SearchSuggestionsPopup.IsOpen = false;
+                SearchGhostText.Text = "";
+                TabHintBadge.Visibility = Visibility.Collapsed;
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == Key.Enter)
+            {
+                SearchSuggestionsPopup.IsOpen = false;
+                SearchGhostText.Text = "";
+                TabHintBadge.Visibility = Visibility.Collapsed;
+                _searchDebounceTimer.Stop();
+                ApplyFilter();
+                e.Handled = true;
+                return;
+            }
+        }
+
+        private void ApplyGhostSuggestion()
+        {
+            if (string.IsNullOrWhiteSpace(_currentGhostSuggestion)) return;
+
+            _isSelectingFromPopup = true;
+            try
+            {
+                SearchBox.Text = _currentGhostSuggestion;
+                SearchBox.CaretIndex = SearchBox.Text.Length;
+                _currentGhostSuggestion = "";
+                SearchGhostText.Text = "";
+                TabHintBadge.Visibility = Visibility.Collapsed;
+                SearchSuggestionsPopup.IsOpen = false;
+                _searchDebounceTimer.Stop();
+                ApplyFilter();
+            }
+            finally
+            {
+                _isSelectingFromPopup = false;
+            }
+        }
+
+        private void TabHintBadge_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ApplyGhostSuggestion();
+            SearchBox.Focus();
+        }
+
+        private void SuggestionsListBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Tab || e.Key == Key.Enter)
+            {
+                if (SuggestionsListBox.SelectedItem is AppItem selected)
+                {
+                    _currentGhostSuggestion = selected.Name;
+                    ApplyGhostSuggestion();
+                    SearchBox.Focus();
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            if (e.Key == Key.Up && SuggestionsListBox.SelectedIndex <= 0)
+            {
+                SearchBox.Focus();
+                SearchBox.CaretIndex = SearchBox.Text.Length;
+                e.Handled = true;
+                return;
+            }
+
+            if (e.Key == Key.Escape)
+            {
+                SearchSuggestionsPopup.IsOpen = false;
+                SearchBox.Focus();
+                e.Handled = true;
+                return;
+            }
+        }
+
+        private void SuggestionsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (SuggestionsListBox.SelectedItem is AppItem selected)
+            {
+                _currentGhostSuggestion = selected.Name;
+                ApplyGhostSuggestion();
+                SearchBox.Focus();
+            }
+        }
+
+        private void PopupDeepWebSearch_Click(object sender, MouseButtonEventArgs e)
+        {
+            SearchSuggestionsPopup.IsOpen = false;
+            SearchGhostText.Text = "";
+            TabHintBadge.Visibility = Visibility.Collapsed;
+            WingetSearch_Click(sender, e);
+        }
+
         private void ClearSearch_Click(object sender, RoutedEventArgs e)
         {
             SearchBox.Text = string.Empty;
+            _currentGhostSuggestion = "";
+            SearchGhostText.Text = "";
+            TabHintBadge.Visibility = Visibility.Collapsed;
+            SearchSuggestionsPopup.IsOpen = false;
             ApplyFilter();
         }
 
@@ -277,6 +477,7 @@ namespace SetupHub180Hz.Views
         {
             if (e.Key == Key.Enter)
             {
+                SearchSuggestionsPopup.IsOpen = false;
                 _searchDebounceTimer.Stop();
                 ApplyFilter();
             }
@@ -284,6 +485,7 @@ namespace SetupHub180Hz.Views
 
         private void Search_Click(object sender, RoutedEventArgs e)
         {
+            SearchSuggestionsPopup.IsOpen = false;
             _searchDebounceTimer.Stop();
             ApplyFilter();
         }
@@ -299,6 +501,10 @@ namespace SetupHub180Hz.Views
                 return;
             }
 
+            SearchSuggestionsPopup.IsOpen = false;
+            SearchGhostText.Text = "";
+            TabHintBadge.Visibility = Visibility.Collapsed;
+
             StatusText.Text = $"Searching online Winget repository for '{query}'…";
             StatusText.Visibility = Visibility.Visible;
             WingetSearchButton.IsEnabled = false;
@@ -309,20 +515,59 @@ namespace SetupHub180Hz.Views
                 if (onlineResults.Count == 0)
                 {
                     StatusText.Text = $"No online packages found matching '{query}'.";
+                    StatusText.Visibility = Visibility.Visible;
                 }
                 else
                 {
                     StatusText.Visibility = Visibility.Collapsed;
+
+                    // 1. Enrich metadata & match with local catalog
                     foreach (var app in onlineResults)
                     {
                         AppMetadataHelper.EnrichAppItem(app, _allPackages);
                     }
+
+                    // 2. Check installed status
+                    await _catalog.CheckInstalledStatusAsync(_winget, onlineResults);
+
+                    // 3. Update count & list view
+                    CatalogCountText.Text = $"{onlineResults.Count} Online Packages Found for '{query}'";
                     AppsListBox.ItemsSource = onlineResults;
+
+                    // 4. Background parallel icon extraction & website discovery
+                    _ = Task.Run(async () =>
+                    {
+                        await Parallel.ForEachAsync(onlineResults, new ParallelOptions { MaxDegreeOfParallelism = 10 }, async (app, ct) =>
+                        {
+                            if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id))
+                            {
+                                var meta = await _winget.GetMetadataAsync(app.Id);
+                                if (meta?.BestLink != null)
+                                {
+                                    app.WebUrl = meta.BestLink;
+                                    if (string.IsNullOrWhiteSpace(app.IconUrl))
+                                    {
+                                        app.IconUrl = IconCacheService.DeriveFaviconUrl(app.WebUrl) ?? "";
+                                    }
+                                }
+                            }
+
+                            if (app.IconImageSource == null && (!string.IsNullOrWhiteSpace(app.IconUrl) || !string.IsNullOrWhiteSpace(app.LocalIconPath)))
+                            {
+                                var img = await IconCacheService.GetImageAsync(app.IconUrl, app.LocalIconPath);
+                                if (img != null)
+                                {
+                                    await Dispatcher.InvokeAsync(() => app.IconImageSource = img);
+                                }
+                            }
+                        });
+                    });
                 }
             }
             catch (Exception ex)
             {
                 StatusText.Text = $"Online search error: {ex.Message}";
+                StatusText.Visibility = Visibility.Visible;
             }
             finally
             {

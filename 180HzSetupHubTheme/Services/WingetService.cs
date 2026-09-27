@@ -332,6 +332,7 @@ namespace SetupHub180Hz.Services
             int nameCol = header.IndexOf("Name", StringComparison.Ordinal);
             int idCol = header.IndexOf("Id", StringComparison.Ordinal);
             int versionCol = header.IndexOf("Version", StringComparison.Ordinal);
+            int matchCol = header.IndexOf("Match", StringComparison.Ordinal);
             int availCol = header.IndexOf("Available", StringComparison.Ordinal);
             int sourceCol = header.IndexOf("Source", StringComparison.Ordinal);
 
@@ -342,24 +343,35 @@ namespace SetupHub180Hz.Services
                 return safeEnd <= start ? "" : line[start..safeEnd].Trim();
             }
 
+            int versionEnd = sourceCol > 0 ? sourceCol : -1;
+            if (availCol > 0 && (versionEnd <= 0 || availCol < versionEnd)) versionEnd = availCol;
+            if (matchCol > 0 && (versionEnd <= 0 || matchCol < versionEnd)) versionEnd = matchCol;
+
             // headerIndex + 1 is the "----" separator line, so data starts at + 2.
             for (int i = headerIndex + 2; i < lines.Length; i++)
             {
                 var line = lines[i];
                 if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("-")) continue;
 
-                int versionEnd = availCol > 0 ? availCol : sourceCol;
+                var rawVer = Slice(line, versionCol, versionEnd);
+                if (rawVer.Contains("Tag:", StringComparison.OrdinalIgnoreCase))
+                {
+                    rawVer = rawVer.Split("Tag:")[0].Trim();
+                }
 
                 var item = new AppItem
                 {
                     Name = Slice(line, nameCol, idCol),
                     Id = Slice(line, idCol, versionCol),
-                    Version = Slice(line, versionCol, versionEnd),
+                    Version = rawVer,
                     AvailableVersion = availCol > 0 ? Slice(line, availCol, sourceCol) : "",
-                    Source = Slice(line, sourceCol, -1),
+                    Source = sourceCol > 0 ? Slice(line, sourceCol, -1) : "winget",
+                    Category = "Online"
                 };
 
-                if (!string.IsNullOrWhiteSpace(item.Name))
+                if (string.IsNullOrWhiteSpace(item.Source)) item.Source = "winget";
+
+                if (!string.IsNullOrWhiteSpace(item.Name) && !string.IsNullOrWhiteSpace(item.Id))
                     items.Add(item);
             }
 
