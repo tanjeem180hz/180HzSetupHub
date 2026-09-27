@@ -62,12 +62,26 @@ namespace SetupHub180Hz.Views
             InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
             ApplyFilter();
 
-            // Background async icon extraction for local apps
+            // Background async icon extraction & website discovery in parallel
             _ = Task.Run(async () =>
             {
-                foreach (var app in _allApps)
+                await Parallel.ForEachAsync(_allApps, new ParallelOptions { MaxDegreeOfParallelism = 10 }, async (app, ct) =>
                 {
-                    if (app.IconImageSource == null)
+                    // If WebUrl is still missing, query winget metadata manifest in background
+                    if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id) && !app.Id.StartsWith("ARP\\", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var meta = await _winget.GetMetadataAsync(app.Id);
+                        if (meta?.BestLink != null)
+                        {
+                            app.WebUrl = meta.BestLink;
+                            if (string.IsNullOrWhiteSpace(app.IconUrl))
+                            {
+                                app.IconUrl = IconCacheService.DeriveFaviconUrl(app.WebUrl) ?? "";
+                            }
+                        }
+                    }
+
+                    if (app.IconImageSource == null && (!string.IsNullOrWhiteSpace(app.IconUrl) || !string.IsNullOrWhiteSpace(app.LocalIconPath)))
                     {
                         var img = await IconCacheService.GetImageAsync(app.IconUrl, app.LocalIconPath);
                         if (img != null)
@@ -75,7 +89,7 @@ namespace SetupHub180Hz.Views
                             await Dispatcher.InvokeAsync(() => app.IconImageSource = img);
                         }
                     }
-                }
+                });
             });
         }
 

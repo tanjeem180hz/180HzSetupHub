@@ -37,22 +37,19 @@ namespace SetupHub180Hz.Views
             StartupList.ItemsSource = null;
             StartupList.ItemsSource = _items;
 
-            // Background async icon extraction
+            // Background async icon extraction & website discovery in parallel
             _ = Task.Run(async () =>
             {
                 _catalogCache ??= await _catalogService.GetAllAsync();
 
-                foreach (var item in _items)
+                await Parallel.ForEachAsync(_items, new ParallelOptions { MaxDegreeOfParallelism = 8 }, async (item, ct) =>
                 {
-                    if (item.IconImageSource != null) continue;
-
                     ImageSource? icon = null;
 
                     // 1. Try extracting local .exe icon from command line
                     var exePath = ExtractExecutablePath(item.Command);
                     if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
                     {
-                        // Try resolving from App Paths registry (e.g. "spotify.exe", "discord.exe")
                         exePath = ResolveFromAppPaths(item.Name) ?? ResolveFromAppPaths(item.Command);
                     }
 
@@ -68,24 +65,28 @@ namespace SetupHub180Hz.Views
                         icon = IconCacheService.GetLocalFileIcon(exePath);
                     }
 
-                    // 2. If no local icon extracted, match against catalog
-                    if (icon == null && _catalogCache != null)
+                    // 2. Query registry for official website
+                    var regInfo = AppMetadataHelper.GetRegistryInfo(item.Name);
+                    if (regInfo != null && !string.IsNullOrWhiteSpace(regInfo.WebUrl))
                     {
-                        var matchedPkg = _catalogCache.FirstOrDefault(p =>
-                            string.Equals(p.Name, item.Name, StringComparison.OrdinalIgnoreCase) ||
-                            item.Name.Contains(p.Name, StringComparison.OrdinalIgnoreCase) ||
-                            p.Name.Contains(item.Name, StringComparison.OrdinalIgnoreCase) ||
-                            (!string.IsNullOrWhiteSpace(p.Id) && item.Name.Contains(p.Id.Split('.').Last(), StringComparison.OrdinalIgnoreCase)));
+                        item.WebUrl = regInfo.WebUrl;
+                    }
 
+                    // 3. Match against catalog for authentic logo & website
+                    if (_catalogCache != null)
+                    {
+                        var matchedPkg = AppMetadataHelper.FindCatalogMatchForName(item.Name, _catalogCache);
                         if (matchedPkg != null)
                         {
+                            if (string.IsNullOrWhiteSpace(item.WebUrl)) item.WebUrl = matchedPkg.WebUrl;
+
                             var targetUrl = matchedPkg.IconUrl;
                             if (string.IsNullOrWhiteSpace(targetUrl) && !string.IsNullOrWhiteSpace(matchedPkg.WebUrl))
                             {
                                 targetUrl = IconCacheService.DeriveFaviconUrl(matchedPkg.WebUrl);
                             }
 
-                            if (!string.IsNullOrWhiteSpace(targetUrl) || !string.IsNullOrWhiteSpace(matchedPkg.LocalIconPath))
+                            if (icon == null && (!string.IsNullOrWhiteSpace(targetUrl) || !string.IsNullOrWhiteSpace(matchedPkg.LocalIconPath)))
                             {
                                 item.IconUrl = targetUrl;
                                 icon = await IconCacheService.GetImageAsync(targetUrl, matchedPkg.LocalIconPath);
@@ -93,11 +94,21 @@ namespace SetupHub180Hz.Views
                         }
                     }
 
+                    // 4. Derive icon from WebUrl if still missing
+                    if (icon == null && !string.IsNullOrWhiteSpace(item.WebUrl))
+                    {
+                        var favUrl = IconCacheService.DeriveFaviconUrl(item.WebUrl);
+                        if (!string.IsNullOrWhiteSpace(favUrl))
+                        {
+                            icon = await IconCacheService.GetImageAsync(favUrl);
+                        }
+                    }
+
                     if (icon != null)
                     {
                         await Dispatcher.InvokeAsync(() => item.IconImageSource = icon);
                     }
-                }
+                });
             });
         }
 
@@ -224,6 +235,14 @@ namespace SetupHub180Hz.Views
                     MessageBox.Show($"Could not update startup item: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     ActivityLogger.Instance.Log($"Failed to toggle {item.Name}: {ex.Message}", ActivityType.Error);
                 }
+            }
+        }
+
+        private void OfficialLinkContainer_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ContentControl cc && cc.DataContext is StartupItem item && cc.Content == null)
+            {
+                cc.Content = RowHelpers.BuildStartupLinkButton(item);
             }
         }
     }

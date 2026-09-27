@@ -135,11 +135,24 @@ namespace SetupHub180Hz.Services
 
                 _lastRefresh = DateTime.UtcNow;
 
-                // Asynchronously fetch missing icons
+                // Asynchronously fetch missing icons and websites in parallel
                 _ = Task.Run(async () =>
                 {
-                    foreach (var app in latestUpgradable)
+                    await Parallel.ForEachAsync(latestUpgradable, new ParallelOptions { MaxDegreeOfParallelism = 8 }, async (app, ct) =>
                     {
+                        if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id))
+                        {
+                            var meta = await _winget.GetMetadataAsync(app.Id);
+                            if (meta?.BestLink != null)
+                            {
+                                app.WebUrl = meta.BestLink;
+                                if (string.IsNullOrWhiteSpace(app.IconUrl))
+                                {
+                                    app.IconUrl = IconCacheService.DeriveFaviconUrl(app.WebUrl) ?? "";
+                                }
+                            }
+                        }
+
                         if (app.IconImageSource == null && (!string.IsNullOrWhiteSpace(app.IconUrl) || !string.IsNullOrWhiteSpace(app.LocalIconPath)))
                         {
                             var img = await IconCacheService.GetImageAsync(app.IconUrl, app.LocalIconPath);
@@ -148,7 +161,7 @@ namespace SetupHub180Hz.Services
                                 await dispatcher.InvokeAsync(() => app.IconImageSource = img);
                             }
                         }
-                    }
+                    });
                 });
             }
             catch (Exception ex)

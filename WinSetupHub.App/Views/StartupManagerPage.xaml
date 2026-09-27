@@ -117,12 +117,14 @@
                                                TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
 
-                                <!-- 3. Toggle Switch -->
-                                <ToggleButton Grid.Column="2"
-                                              Style="{StaticResource ToggleSwitch}"
-                                              IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                                              VerticalAlignment="Center"
-                                              Click="Toggle_Click"/>
+                                <!-- 3. Actions: Official Site & Toggle Switch -->
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <ContentControl Loaded="OfficialLinkContainer_Loaded" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                                    <ToggleButton Style="{StaticResource ToggleSwitch}"
+                                                  IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                                  VerticalAlignment="Center"
+                                                  Click="Toggle_Click"/>
+                                </StackPanel>
                             </Grid>
                         </Border>
                     </DataTemplate>

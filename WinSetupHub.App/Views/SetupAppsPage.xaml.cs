@@ -57,14 +57,11 @@ namespace SetupHub180Hz.Views
             BuildCategoryChips();
             ApplyFilter();
 
-            // Background async icon fetching & installed status check (zero UI thread blocking)
+            // Background async icon fetching (immediate parallel) & installed status check (zero UI thread blocking)
             _ = Task.Run(async () =>
             {
-                // 1. Check installed status
-                await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
-
-                // 2. Fetch high-res icons in background
-                foreach (var pkg in _allPackages)
+                // 1. Fetch high-res icons in parallel immediately
+                _ = Parallel.ForEachAsync(_allPackages, new ParallelOptions { MaxDegreeOfParallelism = 12 }, async (pkg, ct) =>
                 {
                     if (pkg.IconImageSource == null)
                     {
@@ -82,7 +79,10 @@ namespace SetupHub180Hz.Views
                             }
                         }
                     }
-                }
+                });
+
+                // 2. Concurrently check installed status
+                await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
             });
         }
 

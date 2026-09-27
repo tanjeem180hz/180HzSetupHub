@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
@@ -22,6 +23,7 @@ namespace SetupHub180Hz.Models
         public string Id { get; set; } = "";
         public string Category { get; set; } = "General";
         public string Description { get; set; } = "";
+        public List<string>? DetectionNames { get; set; }
 
         public string Version
         {

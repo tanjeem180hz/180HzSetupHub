@@ -13,6 +13,7 @@ namespace SetupHub180Hz.Models
         private ImageSource? _iconImageSource;
         private string? _localIconPath;
         private string? _iconUrl;
+        private string _webUrl = "";
 
         public string Name
         {
@@ -99,6 +100,22 @@ namespace SetupHub180Hz.Models
                 }
             }
         }
+
+        public string WebUrl
+        {
+            get => _webUrl;
+            set
+            {
+                if (_webUrl != value)
+                {
+                    _webUrl = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HasWebUrl));
+                }
+            }
+        }
+
+        public bool HasWebUrl => !string.IsNullOrWhiteSpace(WebUrl);
 
         public bool IsEnabled
         {
