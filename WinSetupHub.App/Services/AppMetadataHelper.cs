@@ -345,6 +345,21 @@ namespace SetupHub180Hz.Services
             ["JanDeDobbeleer.OhMyPosh"] = "https://ohmyposh.dev/",
             ["Starship.Starship"] = "https://starship.rs/",
             ["Eugeny.Tabby"] = "https://tabby.sh/",
+            ["Anysphere.Cursor"] = "https://www.cursor.com/",
+            ["DenoLand.Deno"] = "https://deno.com/",
+            ["BurntSushi.ripgrep.MSVC"] = "https://github.com/BurntSushi/ripgrep",
+            ["NickeManarin.ScreenToGif"] = "https://www.screentogif.com/",
+            ["Upscayl.Upscayl"] = "https://upscayl.org/",
+            ["Toinane.Colorpicker"] = "https://github.com/toinane/colorpicker",
+            ["HeroicGamesLauncher.HeroicGamesLauncher"] = "https://heroicgameslauncher.com/",
+            ["shinchiro.mpv"] = "https://mpv.io/",
+            ["Cockos.REAPER"] = "https://www.reaper.fm/",
+            ["Safing.Portmaster"] = "https://safing.io/",
+            ["OO-Software.ShutUp10"] = "https://www.oo-software.com/en/shutup10",
+            ["zhongyang219.TrafficMonitor.Full"] = "https://github.com/zhongyang219/TrafficMonitor",
+            ["WinsiderSS.SystemInformer"] = "https://systeminformer.sourceforge.io/",
+            ["Open-Shell.Open-Shell-Menu"] = "https://open-shell.github.io/Open-Shell-Menu/",
+            ["GNU.Octave"] = "https://octave.org/",
 
             // Documents & Office
             ["TheDocumentFoundation.LibreOffice"] = "https://www.libreoffice.org/",
@@ -355,7 +370,12 @@ namespace SetupHub180Hz.Services
             ["Notion.Notion"] = "https://www.notion.so/",
             ["SumatraPDF.SumatraPDF"] = "https://www.sumatrapdfreader.org/",
             ["Anki.Anki"] = "https://apps.ankiweb.net/",
-            ["Zotero.Zotero"] = "https://www.zotero.org/"
+            ["Zotero.Zotero"] = "https://www.zotero.org/",
+            ["DigitalScholar.Zotero"] = "https://www.zotero.org/",
+            ["Miro.Miro"] = "https://miro.com/",
+            ["Logseq.Logseq"] = "https://logseq.com/",
+            ["Freeplane.Freeplane"] = "https://www.freeplane.org/",
+            ["geeksoftwareGmbH.PDF24Creator"] = "https://tools.pdf24.org/"
         };
 
         public static string? ResolveOfficialUrl(AppItem app, IEnumerable<AppItem>? catalog = null)
