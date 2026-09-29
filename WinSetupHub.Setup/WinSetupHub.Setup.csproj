@@ -9,6 +9,7 @@
     <AssemblyName>180HzSetupHubSetup</AssemblyName>
     <RootNamespace>WinSetupHub.Setup</RootNamespace>
     <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <Product>180Hz Setup Hub Setup</Product>
     <AssemblyTitle>180Hz Setup Hub Setup</AssemblyTitle>
     <Company>180Hz</Company>

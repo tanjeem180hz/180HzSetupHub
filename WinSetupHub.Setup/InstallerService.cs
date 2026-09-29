@@ -621,11 +621,40 @@ public sealed class InstallerService
             {
                 p?.WaitForExit(10000);
             }
+
+            // Set "Run as Administrator" flag (SLDF_RUNAS_USER at offset 0x15) on created shortcuts
+            var startDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs");
+            var startMenuLnk = Path.Combine(startDir, $"{AppName}.lnk");
+            SetShortcutRunAsAdmin(startMenuLnk);
+
+            if (createDesktopShortcut)
+            {
+                var desktopDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                var desktopLnk = Path.Combine(desktopDir, $"{AppName}.lnk");
+                SetShortcutRunAsAdmin(desktopLnk);
+            }
         }
         catch
         {
             // Non-critical fallback
         }
+    }
+
+    private static void SetShortcutRunAsAdmin(string shortcutPath)
+    {
+        try
+        {
+            if (File.Exists(shortcutPath))
+            {
+                var bytes = File.ReadAllBytes(shortcutPath);
+                if (bytes.Length > 0x15)
+                {
+                    bytes[0x15] = (byte)(bytes[0x15] | 0x20); // SLDF_RUNAS_USER flag
+                    File.WriteAllBytes(shortcutPath, bytes);
+                }
+            }
+        }
+        catch { }
     }
 
     public static void RemoveShortcuts()
@@ -679,6 +708,14 @@ public sealed class InstallerService
                 key.SetValue("EstimatedSize", (int)(exeInfo.Length / 1024), RegistryValueKind.DWord);
             }
             key.Flush();
+
+            // Register AppCompatFlags so Windows automatically runs the application and uninstaller as Administrator
+            using var compatKey = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
+            if (compatKey != null)
+            {
+                compatKey.SetValue(targetExe, "~ RUNASADMIN");
+                compatKey.SetValue(uninstallerPath, "~ RUNASADMIN");
+            }
         }
         catch
         {

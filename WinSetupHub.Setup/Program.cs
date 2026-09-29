@@ -36,6 +36,14 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (!IsRunningAsAdministrator())
+        {
+            if (TryRestartAsAdministrator(args))
+            {
+                return 0;
+            }
+        }
+
         var isSilent = args.Any(a => a.Equals("--silent", StringComparison.OrdinalIgnoreCase) ||
                                      a.Equals("-silent", StringComparison.OrdinalIgnoreCase) ||
                                      a.Equals("/S", StringComparison.OrdinalIgnoreCase) ||
@@ -88,6 +96,7 @@ internal static class Program
                 Process.Start(new ProcessStartInfo(installedExe)
                 {
                     UseShellExecute = true,
+                    Verb = "runas",
                     WorkingDirectory = installRoot
                 });
             }
@@ -203,4 +212,51 @@ internal static class Program
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
+
+    private static bool IsRunningAsAdministrator()
+    {
+        try
+        {
+            using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
+            {
+                var principal = new System.Security.Principal.WindowsPrincipal(identity);
+                return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+            }
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static bool TryRestartAsAdministrator(string[]? args = null)
+    {
+        try
+        {
+            var exePath = GetCurrentProcessPath();
+            if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath))
+            {
+                return false;
+            }
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = exePath,
+                UseShellExecute = true,
+                Verb = "runas"
+            };
+
+            if (args != null && args.Length > 0)
+            {
+                psi.Arguments = string.Join(" ", args.Select(a => $"\"{a}\""));
+            }
+
+            var proc = Process.Start(psi);
+            return proc != null;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }

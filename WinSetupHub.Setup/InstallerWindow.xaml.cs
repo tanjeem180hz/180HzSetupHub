@@ -131,6 +131,7 @@ public partial class InstallerWindow : Window
                 Process.Start(new ProcessStartInfo(exePath)
                 {
                     UseShellExecute = true,
+                    Verb = "runas",
                     WorkingDirectory = installRoot
                 });
             }

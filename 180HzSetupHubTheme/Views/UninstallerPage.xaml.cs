@@ -228,6 +228,14 @@ namespace SetupHub180Hz.Views
             ActivityLogger.Instance.Log($"Initiated uninstallation for {appToUninstall.Name}…", ActivityType.Info);
 
             var success = await _winget.UninstallAsync(appToUninstall.Id);
+
+            // Fallback: If winget failed and we have a native registry UninstallString, execute it!
+            if (!success && !string.IsNullOrWhiteSpace(appToUninstall.UninstallString))
+            {
+                ActivityLogger.Instance.Log($"Winget uninstallation did not succeed. Attempting native uninstaller for {appToUninstall.Name}…", ActivityType.Info);
+                success = await RunNativeUninstallStringAsync(appToUninstall.UninstallString);
+            }
+
             ConfirmUninstallButton.IsEnabled = true;
 
             if (success)
@@ -259,11 +267,106 @@ namespace SetupHub180Hz.Views
             else
             {
                 ActivityLogger.Instance.Log($"Failed to uninstall {appToUninstall.Name}.", ActivityType.Error);
-                MessageBox.Show($"Failed to uninstall {appToUninstall.Name}. Please try running as Administrator.",
-                    "Uninstall Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                if (!App.IsRunningAsAdministrator())
+                {
+                    var result = MessageBox.Show(
+                        $"Failed to uninstall {appToUninstall.Name}. Administrator privileges are required.\n\nWould you like to restart 180Hz Setup Hub as Administrator now?",
+                        "Administrator Required",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        if (App.TryRestartAsAdministrator())
+                        {
+                            Application.Current.Shutdown();
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show(
+                        $"Failed to uninstall {appToUninstall.Name}.\n\nThe application may be currently running or requires its own uninstaller window.",
+                        "Uninstall Failed",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
             }
 
             _targetApp = null;
+        }
+
+        private static async Task<bool> RunNativeUninstallStringAsync(string uninstallString)
+        {
+            try
+            {
+                string raw = uninstallString.Trim();
+                string fileName;
+                string arguments = "";
+
+                if (raw.StartsWith("\""))
+                {
+                    int closingQuote = raw.IndexOf('\"', 1);
+                    if (closingQuote > 0)
+                    {
+                        fileName = raw.Substring(1, closingQuote - 1);
+                        arguments = raw.Substring(closingQuote + 1).Trim();
+                    }
+                    else
+                    {
+                        fileName = raw.Trim('\"');
+                    }
+                }
+                else
+                {
+                    int spaceIdx = raw.IndexOf(' ');
+                    if (spaceIdx > 0)
+                    {
+                        fileName = raw.Substring(0, spaceIdx);
+                        arguments = raw.Substring(spaceIdx + 1).Trim();
+                    }
+                    else
+                    {
+                        fileName = raw;
+                    }
+                }
+
+                // If MsiExec, make sure quiet or silent is handled
+                if (fileName.Contains("msiexec", StringComparison.OrdinalIgnoreCase))
+                {
+                    arguments = arguments.Replace("/I", "/X", StringComparison.OrdinalIgnoreCase);
+                    if (!arguments.Contains("/X", StringComparison.OrdinalIgnoreCase))
+                    {
+                        arguments = $"/X {arguments}";
+                    }
+                    if (!arguments.Contains("/qn", StringComparison.OrdinalIgnoreCase) && !arguments.Contains("/quiet", StringComparison.OrdinalIgnoreCase))
+                    {
+                        arguments += " /quiet /norestart";
+                    }
+                }
+
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = fileName,
+                    Arguments = arguments,
+                    UseShellExecute = true,
+                    Verb = "runas"
+                };
+
+                using var proc = System.Diagnostics.Process.Start(psi);
+                if (proc != null)
+                {
+                    await proc.WaitForExitAsync();
+                    return proc.ExitCode == 0 || proc.ExitCode == 3010;
+                }
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Native uninstaller execution error: {ex.Message}", ActivityType.Warning);
+            }
+            return false;
         }
 
         private void OfficialLinkContainer_Loaded(object sender, RoutedEventArgs e)
