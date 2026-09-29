@@ -173,8 +173,8 @@
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="SummaryText" Text="Checking for updates…" VerticalAlignment="Center"
                        Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
-            <Button Grid.Column="1" Content="🔄 Refresh" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Padding="16,9" Click="Refresh_Click"/>
-            <Button x:Name="UpgradeAllButton" Grid.Column="2" Content="⚡ Upgrade All" Style="{StaticResource AccentButton}" Padding="18,9" Click="UpgradeAll_Click"/>
+            <Button Grid.Column="1" Content="🔄" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}" Margin="0,0,8,0" Click="Refresh_Click"/>
+            <Button x:Name="UpgradeAllButton" Grid.Column="2" Content="⚡" Tag="Upgrade All" Style="{StaticResource ExpandableAccentButton}" Click="UpgradeAll_Click"/>
         </Grid>
 
         <ListBox Grid.Row="2"

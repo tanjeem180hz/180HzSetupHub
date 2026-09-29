@@ -17,8 +17,8 @@
                            FontSize="22" FontWeight="Bold" Margin="0,4,0,20"/>
 
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Open Storage" Style="{StaticResource AccentButton}" Click="OpenStorage_Click" Margin="0,0,8,0"/>
-                    <Button Content="Refresh Size" Style="{StaticResource OutlineButton}" Click="Refresh_Click"/>
+                    <Button Content="📁" Tag="Open Storage" Style="{StaticResource ExpandableAccentButton}" Click="OpenStorage_Click" Margin="0,0,8,0"/>
+                    <Button Content="🔄" Tag="Refresh Size" Style="{StaticResource ExpandableOutlineButton}" Click="Refresh_Click"/>
                 </StackPanel>
             </StackPanel>
         </Border>

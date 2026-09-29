@@ -33,8 +33,8 @@
             <TextBlock x:Name="SummaryText" Text="Scanning startup entries…"
                        VerticalAlignment="Center" Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
 
-            <Button Grid.Column="1" Content="🔄 Refresh" Style="{StaticResource OutlineButton}"
-                    Padding="16,8" Click="Refresh_Click"/>
+            <Button Grid.Column="1" Content="🔄" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}"
+                    Click="Refresh_Click"/>
         </Grid>
 
         <!-- Startup Items List -->

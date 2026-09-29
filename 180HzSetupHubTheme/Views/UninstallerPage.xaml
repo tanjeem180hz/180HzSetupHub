@@ -277,8 +277,8 @@
                     </Grid>
                 </Border>
 
-                <Button Grid.Column="1" Content="🔄 Rescan" Style="{StaticResource OutlineButton}" Margin="8,0,0,0" Padding="16,10" Click="Refresh_Click"/>
-                <Button Grid.Column="2" Content="📤 Export List" Style="{StaticResource OutlineButton}" Margin="8,0,0,0" Padding="16,10" ToolTip="Export installed apps list to JSON" Click="ExportList_Click"/>
+                <Button Grid.Column="1" Content="🔄" Tag="Rescan" Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0" Click="Refresh_Click"/>
+                <Button Grid.Column="2" Content="📤" Tag="Export List" Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0" ToolTip="Export installed apps list to JSON" Click="ExportList_Click"/>
             </Grid>
 
             <!-- 3. Installed Apps List with UI Virtualization -->
