@@ -134,7 +134,7 @@
     </UserControl.Triggers>
 
     <ScrollViewer Style="{StaticResource CleanScrollViewer}" Padding="32,24,32,32">
-        <Grid MaxWidth="1160" HorizontalAlignment="Center">
+        <Grid HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -165,13 +165,11 @@
 
                 <!-- Engine Status and Refresh Action -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="8" Padding="12,8">
-                        <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="8" Height="8" Fill="{DynamicResource BrushSuccess}" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="EngineStatusText" Text="ENGINE READY" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushSuccess}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
-                    <Button x:Name="RefreshSummaryButton" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0" Click="RefreshSummary_Click">
+                    <Button x:Name="BtnEngineStatus" Tag="ENGINE READY" Style="{StaticResource ExpandableSuccessButton}"
+                            ToolTip="Winget Core Engine Status (Click to re-check)" Click="EngineStatus_Click" Margin="0,0,8,0">
+                        <Ellipse x:Name="EngineStatusDot" Width="9" Height="9" Fill="{DynamicResource BrushSuccess}" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button x:Name="RefreshSummaryButton" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}" Margin="0,0,0,0" Click="RefreshSummary_Click">
                         <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
                                                     services:LottieHelper.AssetName="loading_disc.json"/>
                     </Button>
@@ -193,7 +191,7 @@
                         <TextBlock Text="OPTIMIZE. MONITOR. DEPLOY." FontSize="22" FontWeight="Bold"
                                    Foreground="{DynamicResource BrushTextPrimary}" FontFamily="{StaticResource AppFont}"/>
                         <TextBlock Text="Automated app setup, update tracking, and junk cleanup — all in one place."
-                                   Style="{StaticResource TextBody}" FontSize="13" Margin="0,8,0,18" MaxWidth="620" HorizontalAlignment="Left"/>
+                                   Style="{StaticResource TextBody}" FontSize="13" Margin="0,8,0,18" HorizontalAlignment="Left"/>
 
                         <StackPanel Orientation="Horizontal">
                             <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="12,7" Margin="0,0,10,0">
@@ -230,13 +228,13 @@
             </Border>
 
             <!-- 2b. Live System Stats -->
-            <UniformGrid x:Name="SystemStatsSection" Grid.Row="2" Columns="3" Margin="0,0,0,24">
+            <UniformGrid x:Name="SystemStatsSection" Grid.Row="2" Columns="3" Margin="-6,0,-6,24">
                 <UniformGrid.RenderTransform>
                     <TranslateTransform x:Name="StatsTransform" Y="0"/>
                 </UniformGrid.RenderTransform>
 
                 <!-- 1. CPU Usage -->
-                <Border Style="{StaticResource Card}" CornerRadius="10" Padding="18,16" Margin="0,0,8,0">
+                <Border Style="{StaticResource Card}" CornerRadius="10" Padding="18,16" Margin="6,0,6,0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -262,7 +260,7 @@
                 </Border>
 
                 <!-- 2. Memory Usage -->
-                <Border Style="{StaticResource Card}" CornerRadius="10" Padding="18,16" Margin="4,0,4,0">
+                <Border Style="{StaticResource Card}" CornerRadius="10" Padding="18,16" Margin="6,0,6,0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -288,7 +286,7 @@
                 </Border>
 
                 <!-- 3. Disk Space (C:) -->
-                <Border Style="{StaticResource Card}" CornerRadius="10" Padding="18,16" Margin="8,0,0,0">
+                <Border Style="{StaticResource Card}" CornerRadius="10" Padding="18,16" Margin="6,0,6,0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -326,9 +324,9 @@
                 </Grid>
 
                 <!-- 6 Responsive Module Tiles in Dynamic Grid -->
-                <UniformGrid x:Name="ModulesGrid" Columns="3" Rows="2">
+                <UniformGrid x:Name="ModulesGrid" Columns="3" Rows="2" Margin="-6,0,-6,0">
                     <!-- 01 Setup Apps -->
-                    <Button x:Name="TileSetupApps" Style="{StaticResource DashboardTile}" Margin="0,0,8,12" Click="TileSetupApps_Click">
+                    <Button x:Name="TileSetupApps" Style="{StaticResource DashboardTile}" Margin="6" Click="TileSetupApps_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -354,7 +352,7 @@
                     </Button>
 
                     <!-- 02 Update Center -->
-                    <Button x:Name="TileUpdateCenter" Style="{StaticResource DashboardTile}" Margin="4,0,4,12" Click="TileUpdateCenter_Click">
+                    <Button x:Name="TileUpdateCenter" Style="{StaticResource DashboardTile}" Margin="6" Click="TileUpdateCenter_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -380,7 +378,7 @@
                     </Button>
 
                     <!-- 03 Uninstaller -->
-                    <Button x:Name="TileUninstaller" Style="{StaticResource DashboardTile}" Margin="8,0,0,12" Click="TileUninstaller_Click">
+                    <Button x:Name="TileUninstaller" Style="{StaticResource DashboardTile}" Margin="6" Click="TileUninstaller_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -406,7 +404,7 @@
                     </Button>
 
                     <!-- 04 Cleanup -->
-                    <Button x:Name="TileCleanup" Style="{StaticResource DashboardTile}" Margin="0,0,8,0" Click="TileCleanup_Click">
+                    <Button x:Name="TileCleanup" Style="{StaticResource DashboardTile}" Margin="6" Click="TileCleanup_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -432,7 +430,7 @@
                     </Button>
 
                     <!-- 05 Activity -->
-                    <Button x:Name="TileActivity" Style="{StaticResource DashboardTile}" Margin="4,0,4,0" Click="TileActivity_Click">
+                    <Button x:Name="TileActivity" Style="{StaticResource DashboardTile}" Margin="6" Click="TileActivity_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -458,7 +456,7 @@
                     </Button>
 
                     <!-- 06 Storage -->
-                    <Button x:Name="TileStorage" Style="{StaticResource DashboardTile}" Margin="8,0,0,0" Click="TileStorage_Click">
+                    <Button x:Name="TileStorage" Style="{StaticResource DashboardTile}" Margin="6" Click="TileStorage_Click">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>

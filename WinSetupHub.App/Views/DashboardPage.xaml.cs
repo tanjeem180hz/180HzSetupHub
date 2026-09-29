@@ -56,7 +56,12 @@ namespace SetupHub180Hz.Views
 
             if (ModulesGrid != null)
             {
-                if (width < 960)
+                if (width < 800)
+                {
+                    ModulesGrid.Columns = 1;
+                    ModulesGrid.Rows = 6;
+                }
+                else if (width < 1120)
                 {
                     ModulesGrid.Columns = 2;
                     ModulesGrid.Rows = 3;
@@ -107,11 +112,32 @@ namespace SetupHub180Hz.Views
             if (!await _winget.IsAvailableAsync())
             {
                 UpdateSummaryText.Text = "winget not found on this system.";
-                EngineStatusText.Text = "WINGET MISSING";
+                if (BtnEngineStatus != null)
+                {
+                    BtnEngineStatus.Tag = "WINGET MISSING";
+                    BtnEngineStatus.ToolTip = "Winget core engine not detected on system (Click to re-check)";
+                }
+                if (EngineStatusDot != null)
+                {
+                    EngineStatusDot.Fill = (System.Windows.Media.Brush)FindResource("BrushError");
+                }
                 return;
             }
 
-            EngineStatusText.Text = "ENGINE READY";
+            if (BtnEngineStatus != null)
+            {
+                BtnEngineStatus.Tag = "ENGINE READY";
+                BtnEngineStatus.ToolTip = "Winget Core Engine Active (180Hz Ready)";
+            }
+            if (EngineStatusDot != null)
+            {
+                EngineStatusDot.Fill = (System.Windows.Media.Brush)FindResource("BrushSuccess");
+            }
+        }
+
+        private async void EngineStatus_Click(object sender, RoutedEventArgs e)
+        {
+            await CheckEngineAsync();
         }
 
         private async void RefreshSummary_Click(object sender, RoutedEventArgs e)

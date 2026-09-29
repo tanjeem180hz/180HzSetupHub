@@ -279,8 +279,7 @@
             <ScrollViewer x:Name="BundlesScrollViewer"
                           HorizontalScrollBarVisibility="Hidden"
                           VerticalScrollBarVisibility="Disabled"
-                          Style="{StaticResource CleanScrollViewer}"
-                          PreviewMouseWheel="BundlesScrollViewer_PreviewMouseWheel">
+                          Style="{StaticResource CleanScrollViewer}">
                 <ItemsControl x:Name="BundlesItemsControl">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -562,7 +561,6 @@
                           HorizontalScrollBarVisibility="Hidden"
                           VerticalScrollBarVisibility="Disabled"
                           Style="{StaticResource CleanScrollViewer}"
-                          PreviewMouseWheel="CategoryScrollViewer_PreviewMouseWheel"
                           PreviewMouseDown="CategoryScrollViewer_PreviewMouseDown"
                           PreviewMouseMove="CategoryScrollViewer_PreviewMouseMove"
                           PreviewMouseUp="CategoryScrollViewer_PreviewMouseUp">
