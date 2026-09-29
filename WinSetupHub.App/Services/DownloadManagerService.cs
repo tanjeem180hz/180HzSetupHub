@@ -199,34 +199,40 @@ namespace SetupHub180Hz.Services
             _speedSampleTimer = new System.Timers.Timer(1000);
             _speedSampleTimer.Elapsed += (_, _) =>
             {
-                double sysBps = GetSystemNetworkInboundBps();
                 double sampleBps;
 
                 lock (_lock)
                 {
                     if (_isQueueRunning && !_isPaused)
                     {
+                        double sysBps = GetSystemNetworkInboundBps();
                         // While downloading in SetupHub, prioritize active download rate or blended system rate
                         sampleBps = Math.Max(_currentSpeedBps, sysBps);
                         _currentSpeedBps = sampleBps;
+
+                        if (sampleBps > 0)
+                        {
+                            _peakSpeedBps = Math.Max(_peakSpeedBps, sampleBps);
+                        }
+
+                        if (_speedHistory.Count >= 60)
+                        {
+                            _speedHistory.RemoveAt(0);
+                        }
+                        _speedHistory.Add(sampleBps);
                     }
                     else
                     {
-                        // Continuous lifetime network monitoring even when setup queue is idle
-                        sampleBps = sysBps;
-                        _currentSpeedBps = sysBps;
-                    }
+                        // When queue is idle, paused, or cancelled, live throughput is zero
+                        sampleBps = 0;
+                        _currentSpeedBps = 0;
 
-                    if (sampleBps > 0)
-                    {
-                        _peakSpeedBps = Math.Max(_peakSpeedBps, sampleBps);
+                        if (_speedHistory.Count >= 60)
+                        {
+                            _speedHistory.RemoveAt(0);
+                        }
+                        _speedHistory.Add(0);
                     }
-
-                    if (_speedHistory.Count >= 60)
-                    {
-                        _speedHistory.RemoveAt(0);
-                    }
-                    _speedHistory.Add(sampleBps);
                 }
 
                 SpeedSampled?.Invoke(sampleBps);
@@ -400,6 +406,23 @@ namespace SetupHub180Hz.Services
             _currentCts?.Cancel();
         }
 
+        public void ResetBandwidthMonitor()
+        {
+            lock (_lock)
+            {
+                _currentSpeedBps = 0;
+                _peakSpeedBps = 0;
+                _totalDownloadedBytes = 0;
+                _speedHistory.Clear();
+                for (int i = 0; i < 60; i++)
+                {
+                    _speedHistory.Add(0);
+                }
+            }
+
+            SpeedSampled?.Invoke(0);
+        }
+
         public void CancelAll()
         {
             lock (_lock)
@@ -409,7 +432,17 @@ namespace SetupHub180Hz.Services
                 _resumeTcs?.TrySetResult(false);
                 _currentCts?.Cancel();
 
+                // Explicitly wipe bandwidth metrics, peak speed, session data, and speed history
                 _currentSpeedBps = 0;
+                _peakSpeedBps = 0;
+                _totalDownloadedBytes = 0;
+                _speedHistory.Clear();
+                for (int i = 0; i < 60; i++)
+                {
+                    _speedHistory.Add(0);
+                }
+                CurrentProgressInfo = null;
+
                 foreach (var item in _queue)
                 {
                     if (!item.IsInstalled)
@@ -428,6 +461,7 @@ namespace SetupHub180Hz.Services
 
             QueueChanged?.Invoke();
             QueueCompleted?.Invoke();
+            SpeedSampled?.Invoke(0);
         }
 
         private async Task ProcessQueueAsync()
@@ -505,6 +539,7 @@ namespace SetupHub180Hz.Services
             lock (_lock)
             {
                 _isQueueRunning = false;
+                _currentSpeedBps = 0;
             }
 
             QueueCompleted?.Invoke();
