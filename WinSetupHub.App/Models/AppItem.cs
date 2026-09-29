@@ -18,7 +18,21 @@ namespace SetupHub180Hz.Models
         private ImageSource? _iconImageSource;
         private string? _localIconPath;
         private string? _uninstallString;
+        private string? _installLocation;
         private bool _isSelected;
+
+        public string? InstallLocation
+        {
+            get => _installLocation;
+            set
+            {
+                if (_installLocation != value)
+                {
+                    _installLocation = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public bool IsSelected
         {

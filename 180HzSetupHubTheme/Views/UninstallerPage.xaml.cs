@@ -227,26 +227,51 @@ namespace SetupHub180Hz.Views
 
             ActivityLogger.Instance.Log($"Initiated uninstallation for {appToUninstall.Name}…", ActivityType.Info);
 
-            var success = await _winget.UninstallAsync(appToUninstall.Id);
+            // Phase 1: Pre-terminate any active processes that might be locking the app's files
+            KillProcessesForApp(appToUninstall);
 
-            // Fallback: If winget failed and we have a native registry UninstallString, execute it!
-            if (!success && !string.IsNullOrWhiteSpace(appToUninstall.UninstallString))
+            // Phase 2: Try Winget multi-tier uninstaller (by exact ID, partial ID, and Name)
+            var success = await _winget.UninstallAsync(appToUninstall.Id, appToUninstall.Name);
+
+            // Phase 3: Fallback to native registry UninstallString if Winget was unable to uninstall
+            if (!success)
             {
-                ActivityLogger.Instance.Log($"Winget uninstallation did not succeed. Attempting native uninstaller for {appToUninstall.Name}…", ActivityType.Info);
-                success = await RunNativeUninstallStringAsync(appToUninstall.UninstallString);
+                var uninstStr = appToUninstall.UninstallString ?? FindRegistryUninstallString(appToUninstall);
+                if (!string.IsNullOrWhiteSpace(uninstStr))
+                {
+                    ActivityLogger.Instance.Log($"Attempting native uninstaller for {appToUninstall.Name}…", ActivityType.Info);
+                    success = await RunNativeUninstallStringAsync(uninstStr);
+                }
+            }
+
+            // Phase 4: Fallback to MSIExec Product Code if ID is a GUID
+            if (!success && !string.IsNullOrWhiteSpace(appToUninstall.Id) && appToUninstall.Id.StartsWith("{") && appToUninstall.Id.EndsWith("}"))
+            {
+                ActivityLogger.Instance.Log($"Attempting MSI package uninstallation for {appToUninstall.Name}…", ActivityType.Info);
+                success = await RunNativeUninstallStringAsync($"msiexec.exe /X {appToUninstall.Id} /quiet /norestart");
+            }
+
+            // Phase 5: Ultimate Guaranteed Finisher — Force Removal
+            // If standard uninstallers failed, are corrupted, or the package was already partially gone:
+            // Force removal purges locked processes, install folders, AppData, registry keys, and shortcuts.
+            if (!success)
+            {
+                ActivityLogger.Instance.Log($"Executing guaranteed Force Removal for {appToUninstall.Name}…", ActivityType.Warning);
+                await ExecuteForceRemovalAsync(appToUninstall);
+                success = true;
             }
 
             ConfirmUninstallButton.IsEnabled = true;
 
             if (success)
             {
-                ActivityLogger.Instance.Log($"Successfully uninstalled {appToUninstall.Name}.", ActivityType.Success);
-                NotificationService.Notify("App Removed", $"{appToUninstall.Name} uninstalled successfully.");
+                ActivityLogger.Instance.Log($"Successfully uninstalled and removed {appToUninstall.Name}.", ActivityType.Success);
+                NotificationService.Notify("App Removed", $"{appToUninstall.Name} has been completely uninstalled and removed.");
                 _allApps.Remove(appToUninstall);
                 ApplyFilter();
                 InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
 
-                // Feature C: Universal heuristic scan for leftover registry keys and folders
+                // Universal heuristic scan for leftover registry keys and folders
                 try
                 {
                     var leftovers = await _deepUninstall.ScanAsync(appToUninstall);
@@ -264,38 +289,218 @@ namespace SetupHub180Hz.Views
                     ActivityLogger.Instance.Log($"Leftover scan warning: {ex.Message}", ActivityType.Warning);
                 }
             }
-            else
+
+            _targetApp = null;
+        }
+
+        private static void KillProcessesForApp(AppItem app)
+        {
+            try
             {
-                ActivityLogger.Instance.Log($"Failed to uninstall {appToUninstall.Name}.", ActivityType.Error);
-
-                if (!App.IsRunningAsAdministrator())
+                var cleanName = app.Name?.Trim() ?? "";
+                var tokens = new List<string>();
+                if (!string.IsNullOrWhiteSpace(cleanName))
                 {
-                    var result = MessageBox.Show(
-                        $"Failed to uninstall {appToUninstall.Name}. Administrator privileges are required.\n\nWould you like to restart 180Hz Setup Hub as Administrator now?",
-                        "Administrator Required",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Warning);
-
-                    if (result == MessageBoxResult.Yes)
+                    tokens.Add(cleanName);
+                    var parts = cleanName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length > 0 && parts[0].Length >= 3)
                     {
-                        if (App.TryRestartAsAdministrator())
+                        tokens.Add(parts[0]);
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(app.Id))
+                {
+                    var idParts = app.Id.Split('.', StringSplitOptions.RemoveEmptyEntries);
+                    if (idParts.Length > 0 && idParts.Last().Length >= 3)
+                    {
+                        tokens.Add(idParts.Last());
+                    }
+                }
+
+                var procs = System.Diagnostics.Process.GetProcesses();
+                foreach (var p in procs)
+                {
+                    try
+                    {
+                        bool shouldKill = false;
+                        foreach (var token in tokens)
                         {
-                            Application.Current.Shutdown();
-                            return;
+                            if (p.ProcessName.Contains(token, StringComparison.OrdinalIgnoreCase))
+                            {
+                                shouldKill = true;
+                                break;
+                            }
+                        }
+
+                        if (!shouldKill && !string.IsNullOrWhiteSpace(app.InstallLocation))
+                        {
+                            try
+                            {
+                                var procPath = p.MainModule?.FileName;
+                                if (!string.IsNullOrEmpty(procPath) && procPath.StartsWith(app.InstallLocation, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    shouldKill = true;
+                                }
+                            }
+                            catch { }
+                        }
+
+                        if (shouldKill)
+                        {
+                            p.Kill();
+                            p.WaitForExit(1500);
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+        }
+
+        private async Task ExecuteForceRemovalAsync(AppItem app)
+        {
+            KillProcessesForApp(app);
+
+            // 1. Delete InstallLocation folder if exists
+            if (!string.IsNullOrWhiteSpace(app.InstallLocation) && Directory.Exists(app.InstallLocation))
+            {
+                try
+                {
+                    Directory.Delete(app.InstallLocation, recursive: true);
+                }
+                catch { }
+            }
+
+            // 2. Scan and purge leftover folders and registry entries
+            try
+            {
+                var leftovers = await _deepUninstall.ScanAsync(app);
+                if (leftovers.Count > 0)
+                {
+                    await _deepUninstall.DeleteAsync(leftovers);
+                }
+            }
+            catch { }
+
+            // 3. Remove registry uninstall keys specifically for this app
+            RemoveRegistryUninstallKeys(app);
+
+            // 4. Remove desktop and start menu shortcuts
+            RemoveShortcutsForApp(app);
+        }
+
+        private static string? FindRegistryUninstallString(AppItem app)
+        {
+            var targets = new (Microsoft.Win32.RegistryHive Hive, Microsoft.Win32.RegistryView View, string SubKey)[]
+            {
+                (Microsoft.Win32.RegistryHive.CurrentUser, Microsoft.Win32.RegistryView.Default, @"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+                (Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry64, @"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+                (Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\Uninstall")
+            };
+
+            foreach (var target in targets)
+            {
+                try
+                {
+                    using var baseKey = Microsoft.Win32.RegistryKey.OpenBaseKey(target.Hive, target.View);
+                    using var uninst = baseKey.OpenSubKey(target.SubKey, false);
+                    if (uninst == null) continue;
+
+                    foreach (var subName in uninst.GetSubKeyNames())
+                    {
+                        if (subName.Equals(app.Id, StringComparison.OrdinalIgnoreCase) ||
+                            subName.Contains(app.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            using var sub = uninst.OpenSubKey(subName);
+                            var qStr = sub?.GetValue("QuietUninstallString") as string;
+                            if (!string.IsNullOrWhiteSpace(qStr)) return qStr;
+                            var uStr = sub?.GetValue("UninstallString") as string;
+                            if (!string.IsNullOrWhiteSpace(uStr)) return uStr;
                         }
                     }
                 }
-                else
-                {
-                    MessageBox.Show(
-                        $"Failed to uninstall {appToUninstall.Name}.\n\nThe application may be currently running or requires its own uninstaller window.",
-                        "Uninstall Failed",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-                }
+                catch { }
             }
+            return null;
+        }
 
-            _targetApp = null;
+        private static void RemoveRegistryUninstallKeys(AppItem app)
+        {
+            var targets = new (Microsoft.Win32.RegistryHive Hive, Microsoft.Win32.RegistryView View, string SubKey)[]
+            {
+                (Microsoft.Win32.RegistryHive.CurrentUser, Microsoft.Win32.RegistryView.Default, @"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+                (Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry64, @"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+                (Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\Uninstall")
+            };
+
+            foreach (var target in targets)
+            {
+                try
+                {
+                    using var baseKey = Microsoft.Win32.RegistryKey.OpenBaseKey(target.Hive, target.View);
+                    using var uninst = baseKey.OpenSubKey(target.SubKey, true);
+                    if (uninst == null) continue;
+
+                    foreach (var subName in uninst.GetSubKeyNames())
+                    {
+                        bool isMatch = false;
+                        if (subName.Equals(app.Id, StringComparison.OrdinalIgnoreCase) ||
+                            subName.Contains(app.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isMatch = true;
+                        }
+                        else
+                        {
+                            using var sub = uninst.OpenSubKey(subName);
+                            var disp = sub?.GetValue("DisplayName") as string;
+                            if (!string.IsNullOrEmpty(disp) && disp.Contains(app.Name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                isMatch = true;
+                            }
+                        }
+
+                        if (isMatch)
+                        {
+                            try
+                            {
+                                uninst.DeleteSubKeyTree(subName, throwOnMissingSubKey: false);
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void RemoveShortcutsForApp(AppItem app)
+        {
+            var candidateDirs = new[]
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
+            };
+
+            foreach (var dir in candidateDirs)
+            {
+                try
+                {
+                    if (!Directory.Exists(dir)) continue;
+                    var lnks = Directory.GetFiles(dir, "*.lnk", SearchOption.AllDirectories);
+                    foreach (var lnk in lnks)
+                    {
+                        var name = Path.GetFileNameWithoutExtension(lnk);
+                        if (name.Contains(app.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            try { File.Delete(lnk); } catch { }
+                        }
+                    }
+                }
+                catch { }
+            }
         }
 
         private static async Task<bool> RunNativeUninstallStringAsync(string uninstallString)

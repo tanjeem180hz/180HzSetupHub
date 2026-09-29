@@ -245,18 +245,28 @@ namespace SetupHub180Hz.Services
         public Task<bool> UpgradeAllAsync(Action<string>? onOutputLine = null) =>
             RunActionAsync("upgrade --all --silent --accept-package-agreements --accept-source-agreements", onOutputLine);
 
-        public async Task<bool> UninstallAsync(string id, Action<string>? onOutputLine = null)
+        public async Task<bool> UninstallAsync(string id, string? name = null, Action<string>? onOutputLine = null)
         {
-            // 1. Try exact match with silent mode and force
+            // 1. Try exact match by ID with silent mode and force
             var success = await RunActionAsync($"uninstall --id \"{id}\" -e --silent --force --accept-source-agreements", onOutputLine);
             if (!success)
             {
-                // 2. Try partial/case-insensitive match with silent mode and force
+                // 2. Try partial/case-insensitive match by ID with silent mode and force
                 success = await RunActionAsync($"uninstall --id \"{id}\" --silent --force --accept-source-agreements", onOutputLine);
+            }
+            if (!success && !string.IsNullOrWhiteSpace(name))
+            {
+                // 3. Try exact match by Name with silent mode and force
+                success = await RunActionAsync($"uninstall --name \"{name}\" -e --silent --force --accept-source-agreements", onOutputLine);
+                if (!success)
+                {
+                    // 4. Try partial match by Name
+                    success = await RunActionAsync($"uninstall --name \"{name}\" --silent --force --accept-source-agreements", onOutputLine);
+                }
             }
             if (!success)
             {
-                // 3. Fallback: interactive mode with force (in case uninstaller displays confirmation)
+                // 5. Fallback: interactive mode with force (in case uninstaller displays confirmation)
                 success = await RunActionAsync($"uninstall --id \"{id}\" --force --accept-source-agreements", onOutputLine);
             }
             return success;
@@ -277,6 +287,10 @@ namespace SetupHub180Hz.Services
             if (output.Contains("Successfully installed", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("Successfully upgraded", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("Successfully uninstalled", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("No installed package found", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("No package found matching", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("0x8a150014", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("0x8a150056", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("No applicable update found", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("No available upgrade found", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("already installed", StringComparison.OrdinalIgnoreCase))

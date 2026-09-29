@@ -49,6 +49,11 @@ namespace SetupHub180Hz.Services
                     app.Version = regInfo.DisplayVersion;
                 }
 
+                if (!string.IsNullOrWhiteSpace(regInfo.InstallLocation))
+                {
+                    app.InstallLocation = regInfo.InstallLocation;
+                }
+
                 if (!string.IsNullOrWhiteSpace(regInfo.Size))
                 {
                     app.Size = regInfo.Size;
