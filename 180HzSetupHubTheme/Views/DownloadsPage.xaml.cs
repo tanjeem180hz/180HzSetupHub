@@ -105,8 +105,9 @@ namespace SetupHub180Hz.Views
                 ActiveContentGrid.Visibility = Visibility.Collapsed;
                 IdlePlaceholderGrid.Visibility = Visibility.Visible;
                 ActiveDownloadCard.BorderBrush = (SolidColorBrush)FindResource("BrushBorder");
-                SetStatusBadge("IDLE", "#8B95A8", "#1C2538");
-                BtnPauseAll.Content = "⏸ Pause All";
+                SetStatusBadge("IDLE", "BrushTextSecondary");
+                BtnPauseAll.Content = "⏸";
+                BtnPauseAll.Tag = "Pause All";
                 BtnPauseAll.IsEnabled = false;
             }
         }
@@ -131,31 +132,38 @@ namespace SetupHub180Hz.Views
                 BtnPauseAll.IsEnabled = true;
                 if (dm.IsPaused)
                 {
-                    SetStatusBadge("PAUSED", "#F5B84C", "#2E2413");
-                    BtnPauseAll.Content = "▶ Resume All";
+                    SetStatusBadge("PAUSED", "BrushWarning");
+                    BtnPauseAll.Content = "▶";
+                    BtnPauseAll.Tag = "Resume All";
                 }
                 else
                 {
-                    SetStatusBadge("DOWNLOADING", "#3FCB7E", "#132E22");
-                    BtnPauseAll.Content = "⏸ Pause All";
+                    SetStatusBadge("DOWNLOADING", "BrushSuccess");
+                    BtnPauseAll.Content = "⏸";
+                    BtnPauseAll.Tag = "Pause All";
                 }
             }
             else
             {
-                SetStatusBadge("IDLE", "#8B95A8", "#1C2538");
-                BtnPauseAll.Content = "⏸ Pause All";
+                SetStatusBadge("IDLE", "BrushTextSecondary");
+                BtnPauseAll.Content = "⏸";
+                BtnPauseAll.Tag = "Pause All";
                 BtnPauseAll.IsEnabled = false;
             }
         }
 
-        private void SetStatusBadge(string text, string colorHex, string bgHex)
+        private void SetStatusBadge(string text, string brushKey)
         {
             LiveStatusText.Text = text;
-            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colorHex));
-            var bgBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(bgHex));
-            LiveStatusText.Foreground = brush;
-            LiveStatusDot.Fill = brush;
-            LiveStatusBadge.Background = bgBrush;
+            if (TryFindResource(brushKey) is Brush b)
+            {
+                LiveStatusText.Foreground = b;
+                LiveStatusDot.Fill = b;
+            }
+            if (TryFindResource("BrushSurfaceHover") is Brush bg)
+            {
+                LiveStatusBadge.Background = bg;
+            }
         }
 
         private void UpdateActiveHeroCard(DownloadProgressInfo info)
@@ -190,38 +198,41 @@ namespace SetupHub180Hz.Views
             {
                 case DownloadState.Downloading:
                     ActiveStateText.Text = "DOWNLOADING";
-                    ActiveStateBadge.Background = new SolidColorBrush(Color.FromRgb(18, 45, 66));
+                    ActiveStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                     ActiveStateText.Foreground = (SolidColorBrush)FindResource("BrushAccent");
-                    BtnActivePauseResume.Content = "⏸ Pause";
+                    BtnActivePauseResume.Content = "⏸";
+                    BtnActivePauseResume.Tag = "Pause";
                     BtnActivePauseResume.IsEnabled = true;
                     break;
 
                 case DownloadState.Paused:
                     ActiveStateText.Text = "PAUSED";
-                    ActiveStateBadge.Background = new SolidColorBrush(Color.FromRgb(55, 40, 10));
+                    ActiveStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                     ActiveStateText.Foreground = (SolidColorBrush)FindResource("BrushWarning");
-                    BtnActivePauseResume.Content = "▶ Resume";
+                    BtnActivePauseResume.Content = "▶";
+                    BtnActivePauseResume.Tag = "Resume";
                     BtnActivePauseResume.IsEnabled = true;
                     break;
 
                 case DownloadState.Installing:
                     ActiveStateText.Text = "INSTALLING";
-                    ActiveStateBadge.Background = new SolidColorBrush(Color.FromRgb(35, 25, 60));
-                    ActiveStateText.Foreground = new SolidColorBrush(Color.FromRgb(180, 140, 255));
+                    ActiveStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
+                    ActiveStateText.Foreground = (Brush)FindResource("BrushAccent");
                     BtnActivePauseResume.IsEnabled = false;
                     break;
 
                 case DownloadState.Error:
                     ActiveStateText.Text = "CONNECTION ERROR";
-                    ActiveStateBadge.Background = new SolidColorBrush(Color.FromRgb(65, 18, 25));
+                    ActiveStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                     ActiveStateText.Foreground = (SolidColorBrush)FindResource("BrushError");
-                    BtnActivePauseResume.Content = "🔄 Retry";
+                    BtnActivePauseResume.Content = "🔄";
+                    BtnActivePauseResume.Tag = "Retry";
                     BtnActivePauseResume.IsEnabled = true;
                     break;
 
                 case DownloadState.Completed:
                     ActiveStateText.Text = "INSTALLED";
-                    ActiveStateBadge.Background = new SolidColorBrush(Color.FromRgb(18, 55, 25));
+                    ActiveStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                     ActiveStateText.Foreground = (SolidColorBrush)FindResource("BrushSuccess");
                     break;
             }

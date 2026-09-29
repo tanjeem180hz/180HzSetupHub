@@ -22,10 +22,10 @@
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="DOWNLOADS &amp; BANDWIDTH" Style="{StaticResource TextHeader}" FontSize="22" FontWeight="Bold"/>
                             <!-- Live Status Indicator Pill -->
-                            <Border x:Name="LiveStatusBadge" Background="#162D42" CornerRadius="12" Padding="10,4" Margin="14,0,0,0" VerticalAlignment="Center">
+                            <Border x:Name="LiveStatusBadge" Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="14,0,0,0" VerticalAlignment="Center">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Ellipse x:Name="LiveStatusDot" Width="8" Height="8" Fill="{StaticResource BrushAccent}" Margin="0,0,6,0"/>
-                                    <TextBlock x:Name="LiveStatusText" Text="IDLE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                                    <Ellipse x:Name="LiveStatusDot" Width="8" Height="8" Fill="{DynamicResource BrushAccent}" Margin="0,0,6,0"/>
+                                    <TextBlock x:Name="LiveStatusText" Text="IDLE" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -35,14 +35,14 @@
 
                     <!-- Top Action Controls -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button x:Name="BtnPauseAll" Content="⏸ Pause All" Style="{StaticResource OutlineButton}"
-                                Padding="14,7" Margin="0,0,8,0" Click="BtnPauseAll_Click"/>
-                        <Button x:Name="BtnClearCompleted" Content="🧹 Clear Completed" Style="{StaticResource OutlineButton}"
-                                Padding="14,7" Margin="0,0,8,0" Click="BtnClearCompleted_Click"/>
-                        <Button x:Name="BtnCancelAll" Content="✕ Cancel Queue" Style="{StaticResource OutlineButton}"
-                                Foreground="{StaticResource BrushError}" Padding="14,7" Margin="0,0,8,0" Click="BtnCancelAll_Click"/>
-                        <Button x:Name="BtnBrowseApps" Content="⚡ Browse Apps" Style="{StaticResource AccentButton}"
-                                Padding="16,7" Click="BtnBrowseApps_Click"/>
+                        <Button x:Name="BtnPauseAll" Content="⏸" Tag="Pause All" Style="{StaticResource ExpandableOutlineButton}"
+                                Margin="0,0,8,0" Click="BtnPauseAll_Click"/>
+                        <Button x:Name="BtnClearCompleted" Content="🧹" Tag="Clear Completed" Style="{StaticResource ExpandableOutlineButton}"
+                                Margin="0,0,8,0" Click="BtnClearCompleted_Click"/>
+                        <Button x:Name="BtnCancelAll" Content="✕" Tag="Cancel Queue" Style="{StaticResource ExpandableDangerButton}"
+                                Margin="0,0,8,0" Click="BtnCancelAll_Click"/>
+                        <Button x:Name="BtnBrowseApps" Content="⚡" Tag="Browse Apps" Style="{StaticResource ExpandableAccentButton}"
+                                Click="BtnBrowseApps_Click"/>
                     </StackPanel>
                 </Grid>
 
@@ -127,32 +127,32 @@
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                <TextBlock x:Name="GraphPeakLabel" Text="Peak: 0.0 MB/s" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,0,16,0" VerticalAlignment="Center"/>
-                                <Border Background="#102538" BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="8,2" Margin="0,0,10,0" VerticalAlignment="Center">
-                                    <TextBlock x:Name="GraphCurrentLabel" Text="Now: 0.0 MB/s" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
-                                </Border>
-                                <Button x:Name="BtnResetBandwidth" Content="🔄 Reset" Style="{StaticResource OutlineButton}" Padding="10,3" FontSize="10" ToolTip="Reset bandwidth history and peak metrics" VerticalAlignment="Center" Click="BtnResetBandwidth_Click"/>
+                                <TextBlock x:Name="GraphPeakLabel" Text="Peak: 0.0 MB/s" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                                <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="8,2" Margin="0,0,10,0" VerticalAlignment="Center">
+                                     <TextBlock x:Name="GraphCurrentLabel" Text="Now: 0.0 MB/s" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                                 </Border>
+                                 <Button x:Name="BtnResetBandwidth" Content="🔄" Tag="Reset" Style="{StaticResource ExpandableOutlineButton}" ToolTip="Reset bandwidth history and peak metrics" VerticalAlignment="Center" Click="BtnResetBandwidth_Click"/>
                             </StackPanel>
                         </Grid>
 
                         <!-- Graph Canvas Area with Grid Lines -->
-                        <Border Grid.Row="1" Background="#0C111B" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="6" ClipToBounds="True">
+                        <Border Grid.Row="1" Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" ClipToBounds="True">
                             <Grid>
                                 <!-- Horizontal Background Gridlines & Speed Markers -->
                                 <Canvas x:Name="GridCanvas" IsHitTestVisible="False">
                                     <!-- 75% Line -->
-                                    <Line x:Name="GridLine75" X1="0" Y1="40" X2="2000" Y2="40" Stroke="#1B2536" StrokeDashArray="4,4" StrokeThickness="1"/>
+                                    <Line x:Name="GridLine75" X1="0" Y1="40" X2="2000" Y2="40" Stroke="{DynamicResource BrushBorder}" StrokeDashArray="4,4" StrokeThickness="1"/>
                                     <!-- 50% Line -->
-                                    <Line x:Name="GridLine50" X1="0" Y1="80" X2="2000" Y2="80" Stroke="#1B2536" StrokeDashArray="4,4" StrokeThickness="1"/>
+                                    <Line x:Name="GridLine50" X1="0" Y1="80" X2="2000" Y2="80" Stroke="{DynamicResource BrushBorder}" StrokeDashArray="4,4" StrokeThickness="1"/>
                                     <!-- 25% Line -->
-                                    <Line x:Name="GridLine25" X1="0" Y1="120" X2="2000" Y2="120" Stroke="#1B2536" StrokeDashArray="4,4" StrokeThickness="1"/>
+                                    <Line x:Name="GridLine25" X1="0" Y1="120" X2="2000" Y2="120" Stroke="{DynamicResource BrushBorder}" StrokeDashArray="4,4" StrokeThickness="1"/>
                                 </Canvas>
 
                                 <!-- Y-Axis Speed Labels on right margin -->
                                 <Grid HorizontalAlignment="Right" Margin="0,4,10,4" IsHitTestVisible="False">
-                                    <TextBlock x:Name="YAxisMaxLabel" Text="30 MB/s" VerticalAlignment="Top" FontSize="9" Foreground="#4A566E"/>
-                                    <TextBlock x:Name="YAxisHalfLabel" Text="15 MB/s" VerticalAlignment="Center" FontSize="9" Foreground="#4A566E"/>
-                                    <TextBlock Text="0 B/s" VerticalAlignment="Bottom" FontSize="9" Foreground="#4A566E"/>
+                                    <TextBlock x:Name="YAxisMaxLabel" Text="30 MB/s" VerticalAlignment="Top" FontSize="9" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                    <TextBlock x:Name="YAxisHalfLabel" Text="15 MB/s" VerticalAlignment="Center" FontSize="9" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                    <TextBlock Text="0 B/s" VerticalAlignment="Bottom" FontSize="9" Foreground="{DynamicResource BrushTextSecondary}"/>
                                 </Grid>
 
                                 <!-- Dynamic Graph Area and Polyline -->
@@ -250,14 +250,14 @@
 
                                 <!-- Hero Controls -->
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button x:Name="BtnActivePauseResume" Content="⏸ Pause" Style="{StaticResource AccentButton}"
-                                            Padding="14,6" Margin="0,0,6,0" Click="BtnActivePauseResume_Click"/>
-                                    <Button x:Name="BtnActiveSkip" Content="⏭ Skip" Style="{StaticResource OutlineButton}"
-                                            Padding="12,6" Margin="0,0,6,0" Click="BtnActiveSkip_Click"/>
-                                    <Button x:Name="BtnActiveCancel" Content="✕ Cancel" Style="{StaticResource OutlineButton}"
-                                            Foreground="{StaticResource BrushError}" Padding="12,6" Margin="0,0,6,0" Click="BtnActiveCancel_Click"/>
-                                    <Button x:Name="BtnActiveWebsite" Content="🌐 Website" Style="{StaticResource OutlineButton}"
-                                            Padding="12,6" Click="BtnActiveWebsite_Click"/>
+                                    <Button x:Name="BtnActivePauseResume" Content="⏸" Tag="Pause" Style="{StaticResource ExpandableAccentButton}"
+                                            Margin="0,0,6,0" Click="BtnActivePauseResume_Click"/>
+                                    <Button x:Name="BtnActiveSkip" Content="⏭" Tag="Skip" Style="{StaticResource ExpandableOutlineButton}"
+                                            Margin="0,0,6,0" Click="BtnActiveSkip_Click"/>
+                                    <Button x:Name="BtnActiveCancel" Content="✕" Tag="Cancel" Style="{StaticResource ExpandableDangerButton}"
+                                            Margin="0,0,6,0" Click="BtnActiveCancel_Click"/>
+                                    <Button x:Name="BtnActiveWebsite" Content="🌐" Tag="Website" Style="{StaticResource ExpandableOutlineButton}"
+                                            Click="BtnActiveWebsite_Click"/>
                                 </StackPanel>
                             </Grid>
 
@@ -270,14 +270,14 @@
                             <!-- Row 2: Live Download Metrics Details -->
                             <Grid Grid.Row="2">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock x:Name="ActiveProgressPercent" Text="0%" FontSize="14" FontWeight="Bold" Foreground="{StaticResource BrushAccent}" Margin="0,0,16,0"/>
-                                    <TextBlock x:Name="ActiveTransferredText" Text="0 MB / 0 MB" FontSize="12" Foreground="{StaticResource BrushTextPrimary}" Margin="0,0,16,0"/>
-                                    <TextBlock x:Name="ActiveSpeedText" Text="0.0 MB/s" FontSize="12" Foreground="{StaticResource BrushTextSecondary}" Margin="0,0,16,0"/>
-                                    <TextBlock x:Name="ActiveEtaText" Text="ETA: Calculating…" FontSize="12" Foreground="{StaticResource BrushTextSecondary}"/>
+                                    <TextBlock x:Name="ActiveProgressPercent" Text="0%" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,0,16,0"/>
+                                    <TextBlock x:Name="ActiveTransferredText" Text="0 MB / 0 MB" FontSize="12" Foreground="{DynamicResource BrushTextPrimary}" Margin="0,0,16,0"/>
+                                    <TextBlock x:Name="ActiveSpeedText" Text="0.0 MB/s" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,16,0"/>
+                                    <TextBlock x:Name="ActiveEtaText" Text="ETA: Calculating…" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}"/>
                                 </StackPanel>
 
                                 <TextBlock x:Name="ActiveQueueCountText" Text="Item 1 of 1" HorizontalAlignment="Right"
-                                           FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                                           FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
                             </Grid>
                         </Grid>
 
@@ -286,11 +286,11 @@
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <TextBlock Text="📥" FontSize="36" HorizontalAlignment="Center" Opacity="0.5" Margin="0,0,0,8"/>
                                 <TextBlock Text="No active downloads in progress" FontSize="15" FontWeight="SemiBold"
-                                           Foreground="{StaticResource BrushTextPrimary}" HorizontalAlignment="Center"/>
+                                           Foreground="{DynamicResource BrushTextPrimary}" HorizontalAlignment="Center"/>
                                 <TextBlock Text="Head over to Setup Apps or search software to install packages with one-click deployment."
-                                           FontSize="12" Foreground="{StaticResource BrushTextSecondary}" HorizontalAlignment="Center" Margin="0,4,0,14"/>
-                                <Button Content="⚡ Open Setup Apps" Style="{StaticResource AccentButton}" HorizontalAlignment="Center"
-                                        Padding="20,8" Click="BtnBrowseApps_Click"/>
+                                           FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Center" Margin="0,4,0,14"/>
+                                <Button Content="⚡" Tag="Open Setup Apps" Style="{StaticResource ExpandableAccentButton}" HorizontalAlignment="Center"
+                                        Click="BtnBrowseApps_Click"/>
                             </StackPanel>
                         </Grid>
                     </Grid>
@@ -365,11 +365,10 @@
 
                                     <!-- Actions: Move To Top / Priority, Remove -->
                                     <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button Content="⬆ Priority" Style="{StaticResource OutlineButton}"
-                                                Padding="10,4" FontSize="11" Margin="0,0,6,0"
+                                        <Button Content="⬆" Tag="Priority" Style="{StaticResource ExpandableOutlineButton}"
+                                                Margin="0,0,6,0" ToolTip="Move to top of queue"
                                                 Click="QueueItemMoveToTop_Click"/>
-                                        <Button Content="✕" Style="{StaticResource OutlineButton}"
-                                                Padding="8,4" FontSize="11" Foreground="{StaticResource BrushError}"
+                                        <Button Content="✕" Tag="Remove" Style="{StaticResource ExpandableDangerButton}"
                                                 ToolTip="Remove from queue"
                                                 Click="QueueItemRemove_Click"/>
                                     </StackPanel>
@@ -387,16 +386,16 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="COMPLETED THIS SESSION" FontSize="12" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}"/>
-                        <Border Background="{StaticResource BrushBorder}" CornerRadius="10" Padding="8,2" Margin="8,0,0,0">
-                            <TextBlock x:Name="HistoryCountBadge" Text="0" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}"/>
+                        <TextBlock Text="COMPLETED THIS SESSION" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                        <Border Background="{DynamicResource BrushBorder}" CornerRadius="10" Padding="8,2" Margin="8,0,0,0">
+                            <TextBlock x:Name="HistoryCountBadge" Text="0" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}"/>
                         </Border>
                     </StackPanel>
                 </Grid>
 
                 <!-- Empty History Message -->
                 <Border x:Name="EmptyHistoryBorder" Style="{StaticResource Card}" Padding="16" Margin="0,0,0,24" Visibility="Collapsed">
-                    <TextBlock Text="No software installed in this session yet." FontSize="12" Foreground="{StaticResource BrushTextSecondary}" HorizontalAlignment="Center"/>
+                    <TextBlock Text="No software installed in this session yet." FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Center"/>
                 </Border>
 
                 <!-- History Items List -->
@@ -414,17 +413,17 @@
                                     </Grid.ColumnDefinitions>
 
                                     <!-- Status Icon Pill -->
-                                    <Border Width="26" Height="26" CornerRadius="13" Background="{StaticResource BrushBackground}"
-                                            BorderBrush="{StaticResource BrushBorder}" BorderThickness="1"
+                                    <Border Width="26" Height="26" CornerRadius="13" Background="{DynamicResource BrushBackground}"
+                                            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
                                             VerticalAlignment="Center" Margin="0,0,12,0">
-                                        <TextBlock Text="✓" FontSize="12" FontWeight="Bold" Foreground="{StaticResource BrushSuccess}"
+                                        <TextBlock Text="✓" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}"
                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
 
                                     <!-- App Icon -->
                                     <Border Grid.Column="1" Width="36" Height="36" CornerRadius="6"
-                                            Background="{StaticResource BrushBackground}"
-                                            BorderBrush="{StaticResource BrushBorder}" BorderThickness="1"
+                                            Background="{DynamicResource BrushBackground}"
+                                            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
                                             Margin="0,0,12,0" ClipToBounds="True">
                                         <Grid>
                                             <TextBlock Text="📦" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.4"/>
@@ -435,26 +434,24 @@
                                     <!-- App Details -->
                                     <StackPanel Grid.Column="2" VerticalAlignment="Center">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding App.Name}" FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource BrushTextPrimary}"/>
-                                            <Border Background="#1C2538" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding App.Category}" FontSize="10" Foreground="{StaticResource BrushAccent}"/>
+                                            <TextBlock Text="{Binding App.Name}" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource BrushTextPrimary}"/>
+                                            <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding App.Category}" FontSize="10" Foreground="{DynamicResource BrushAccent}"/>
                                             </Border>
                                         </StackPanel>
-                                        <TextBlock Text="{Binding FormattedTime, StringFormat='Completed at {0}'}" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,2,0,0"/>
+                                        <TextBlock Text="{Binding FormattedTime, StringFormat='Completed at {0}'}" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
                                     </StackPanel>
 
                                     <!-- Result Badge -->
-                                    <Border Grid.Column="3" Background="#12351E" CornerRadius="4" Padding="8,3" Margin="0,0,12,0" VerticalAlignment="Center">
-                                        <TextBlock Text="✓ Installed" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushSuccess}"/>
+                                    <Border Grid.Column="3" Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushSuccess}" BorderThickness="1" CornerRadius="4" Padding="8,3" Margin="0,0,12,0" VerticalAlignment="Center">
+                                        <TextBlock Text="✓ Installed" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}"/>
                                     </Border>
 
                                     <!-- Actions: Official Site, Remove -->
                                     <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button Content="🌐 Website" Style="{StaticResource OutlineButton}"
-                                                Padding="10,4" FontSize="11" Margin="0,0,6,0"
-                                                Click="HistoryItemWebsite_Click"/>
-                                        <Button Content="✕" Style="{StaticResource OutlineButton}"
-                                                Padding="8,4" FontSize="11" Foreground="{StaticResource BrushTextSecondary}"
+                                        <Button Content="🌐" Tag="Website" Style="{StaticResource ExpandableOutlineButton}"
+                                                Margin="0,0,6,0" Click="HistoryItemWebsite_Click"/>
+                                        <Button Content="✕" Tag="Dismiss" Style="{StaticResource ExpandableOutlineButton}"
                                                 ToolTip="Dismiss from history"
                                                 Click="HistoryItemRemove_Click"/>
                                     </StackPanel>
