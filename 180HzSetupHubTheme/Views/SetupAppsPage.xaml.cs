@@ -851,7 +851,8 @@ namespace SetupHub180Hz.Views
             AppsListBox.Margin = new Thickness(0, 0, 0, 110);
 
             PopupPauseResumeButton.Visibility = Visibility.Visible;
-            PopupPauseResumeButton.Content = "⏸ Pause";
+            PopupPauseResumeButton.Content = "⏸";
+            PopupPauseResumeButton.Tag = "Pause";
             PopupPauseResumeButton.IsEnabled = true;
             PopupSkipButton.Visibility = Visibility.Visible;
             PopupCancelButton.Visibility = Visibility.Visible;
@@ -890,38 +891,41 @@ namespace SetupHub180Hz.Views
                 {
                     case DownloadState.Downloading:
                         PopupStateText.Text = "DOWNLOADING";
-                        PopupStateBadge.Background = (SolidColorBrush)FindResource("BrushSurface");
+                        PopupStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                         PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushAccent");
-                        PopupPauseResumeButton.Content = "⏸ Pause";
+                        PopupPauseResumeButton.Content = "⏸";
+                        PopupPauseResumeButton.Tag = "Pause";
                         PopupPauseResumeButton.IsEnabled = true;
                         break;
 
                     case DownloadState.Paused:
                         PopupStateText.Text = "PAUSED";
-                        PopupStateBadge.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(55, 40, 10));
+                        PopupStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                         PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushWarning");
-                        PopupPauseResumeButton.Content = "▶ Resume";
+                        PopupPauseResumeButton.Content = "▶";
+                        PopupPauseResumeButton.Tag = "Resume";
                         PopupPauseResumeButton.IsEnabled = true;
                         break;
 
                     case DownloadState.Installing:
                         PopupStateText.Text = "INSTALLING";
-                        PopupStateBadge.Background = (SolidColorBrush)FindResource("BrushSurface");
-                        PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushAccent");
+                        PopupStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
+                        PopupStateText.Foreground = (Brush)FindResource("BrushAccent");
                         PopupPauseResumeButton.IsEnabled = false;
                         break;
 
                     case DownloadState.Error:
                         PopupStateText.Text = "CONNECTION ERROR";
-                        PopupStateBadge.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(65, 18, 25));
+                        PopupStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                         PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushError");
-                        PopupPauseResumeButton.Content = "🔄 Resume";
+                        PopupPauseResumeButton.Content = "🔄";
+                        PopupPauseResumeButton.Tag = "Resume";
                         PopupPauseResumeButton.IsEnabled = true;
                         break;
 
                     case DownloadState.Completed:
                         PopupStateText.Text = "INSTALLED";
-                        PopupStateBadge.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(18, 55, 25));
+                        PopupStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                         PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushSuccess");
                         break;
                 }

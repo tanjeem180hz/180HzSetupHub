@@ -369,7 +369,7 @@
 
                         <!-- Tab Completion Hint Pill -->
                         <Border x:Name="TabHintBadge" Grid.Column="2"
-                                Background="#14263B" BorderBrush="{StaticResource BrushAccent}"
+                                Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}"
                                 BorderThickness="1" CornerRadius="4"
                                 Padding="6,2" Margin="0,0,6,0"
                                 VerticalAlignment="Center"
@@ -377,11 +377,11 @@
                                 Cursor="Hand"
                                 MouseLeftButtonDown="TabHintBadge_MouseLeftButtonDown"
                                 ToolTip="Press Tab key to auto-complete">
-                            <TextBlock Text="⇥ Tab" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}"/>
+                            <TextBlock Text="⇥ Tab" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushAccent}"/>
                         </Border>
 
                         <Button x:Name="ClearSearchButton" Grid.Column="3" Content="✕"
-                                Background="Transparent" BorderThickness="0" Foreground="{StaticResource BrushTextSecondary}"
+                                Background="Transparent" BorderThickness="0" Foreground="{DynamicResource BrushTextSecondary}"
                                 Padding="10,0" Cursor="Hand" Visibility="Collapsed" Click="ClearSearch_Click"/>
                     </Grid>
                 </Border>
@@ -395,8 +395,8 @@
                        StaysOpen="False"
                        AllowsTransparency="True">
                     <Border Width="{Binding ElementName=SearchBorder, Path=ActualWidth}"
-                            Background="#0E1520"
-                            BorderBrush="{StaticResource BrushBorder}"
+                            Background="{DynamicResource BrushSurface}"
+                            BorderBrush="{DynamicResource BrushBorder}"
                             BorderThickness="1"
                             CornerRadius="8"
                             Padding="6"
@@ -502,17 +502,17 @@
             </Grid>
 
             <!-- Search Catalog Action -->
-            <Button Grid.Column="1" Content="Filter" Style="{StaticResource AccentButton}" Margin="8,0,0,0" Padding="18,10" Click="Search_Click"/>
+            <Button Grid.Column="1" Content="🔍" Tag="Filter" Style="{StaticResource ExpandableAccentButton}" Margin="8,0,0,0" Click="Search_Click"/>
 
             <!-- Winget Live Web Search Action -->
-            <Button x:Name="WingetSearchButton" Grid.Column="2" Content="🌐 Deep Web Search"
-                    Style="{StaticResource OutlineButton}" Margin="8,0,0,0" Padding="14,10"
+            <Button x:Name="WingetSearchButton" Grid.Column="2" Content="🌐" Tag="Deep Web Search"
+                    Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0"
                     ToolTip="Search winget's full online repository for any software outside preset list"
                     Click="WingetSearch_Click"/>
 
             <!-- Import & Install Action -->
-            <Button Grid.Column="3" Content="📥 Import &amp; Install"
-                    Style="{StaticResource OutlineButton}" Margin="8,0,0,0" Padding="14,10"
+            <Button Grid.Column="3" Content="📥" Tag="Import &amp; Install"
+                    Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0"
                     ToolTip="Import software list from JSON and sequentially install missing apps"
                     Click="ImportInstall_Click"/>
         </Grid>
@@ -520,8 +520,8 @@
         <!-- 4. Batch Selection Action Bar (Shown when 1+ apps selected) -->
         <Border x:Name="BatchActionBar"
                 Grid.Row="3"
-                Background="{StaticResource BrushSurface}"
-                BorderBrush="{StaticResource BrushAccent}"
+                Background="{DynamicResource BrushSurface}"
+                BorderBrush="{DynamicResource BrushAccent}"
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="14,8"
@@ -534,13 +534,13 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock x:Name="SelectedAppsCountText" Text="0 apps selected" FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center"/>
-                    <Button Content="Select All Visible" Style="{StaticResource OutlineButton}" Padding="10,4" Margin="14,0,0,0" FontSize="11" Click="SelectAll_Click"/>
-                    <Button Content="Clear Selection" Style="{StaticResource OutlineButton}" Padding="10,4" Margin="8,0,0,0" FontSize="11" Click="ClearSelection_Click"/>
+                    <TextBlock x:Name="SelectedAppsCountText" Text="0 apps selected" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                    <Button Content="✔" Tag="Select All" Style="{StaticResource ExpandableOutlineButton}" Margin="14,0,0,0" Click="SelectAll_Click"/>
+                    <Button Content="✕" Tag="Clear Selection" Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0" Click="ClearSelection_Click"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button x:Name="InstallSelectedButton" Content="⚡ Install Selected" Style="{StaticResource AccentButton}" Padding="16,6" FontSize="12" Click="InstallSelected_Click"/>
+                    <Button x:Name="InstallSelectedButton" Content="⚡" Tag="Install Selected" Style="{StaticResource ExpandableAccentButton}" Click="InstallSelected_Click"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -624,17 +624,17 @@
                         <!-- App Name & Live Status Details -->
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock x:Name="PopupAppName" Text="Application" FontWeight="Bold" FontSize="13" Foreground="{StaticResource BrushTextPrimary}"/>
-                                <Border x:Name="PopupStateBadge" Background="#162D42" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
-                                    <TextBlock x:Name="PopupStateText" Text="DOWNLOADING" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                                <TextBlock x:Name="PopupAppName" Text="Application" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource BrushTextPrimary}"/>
+                                <Border x:Name="PopupStateBadge" Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock x:Name="PopupStateText" Text="DOWNLOADING" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
                                 </Border>
                             </StackPanel>
-                            <TextBlock x:Name="PopupStatusDetail" Text="Initializing…" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock x:Name="PopupStatusDetail" Text="Initializing…" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
                         </StackPanel>
 
                         <!-- Queue Counter Badge -->
-                        <Border Grid.Column="2" Background="{StaticResource BrushBackground}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="8,3" Margin="8,0,0,0" VerticalAlignment="Center">
-                            <TextBlock x:Name="PopupQueueText" Text="App 1 of 1" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushTextSecondary}"/>
+                        <Border Grid.Column="2" Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="8,3" Margin="8,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="PopupQueueText" Text="App 1 of 1" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
                         </Border>
 
                         <!-- Dismiss Button -->
@@ -659,39 +659,37 @@
 
                         <!-- Download Metrics: Percentage, Speed, ETA, Size -->
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock x:Name="PopupPercentageText" Text="0%" FontWeight="Bold" FontSize="12" Foreground="{StaticResource BrushAccent}" Margin="0,0,12,0"/>
-                            <TextBlock x:Name="PopupSpeedText" Text="0 MB/s" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,0,12,0"/>
-                            <TextBlock x:Name="PopupEtaText" Text="ETA: Calculating…" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,0,12,0"/>
-                            <TextBlock x:Name="PopupSizeText" Text="" FontSize="11" Foreground="{StaticResource BrushTextSecondary}"/>
+                            <TextBlock x:Name="PopupPercentageText" Text="0%" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource BrushAccent}" Margin="0,0,12,0"/>
+                            <TextBlock x:Name="PopupSpeedText" Text="0 MB/s" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,12,0"/>
+                            <TextBlock x:Name="PopupEtaText" Text="ETA: Calculating…" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,12,0"/>
+                            <TextBlock x:Name="PopupSizeText" Text="" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"/>
                         </StackPanel>
 
                         <!-- Action Buttons: Pause/Resume, Skip, Cancel All, Queue List Toggle, Open Downloads -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button x:Name="PopupPauseResumeButton" Content="⏸ Pause"
-                                    Style="{StaticResource AccentButton}"
-                                    Padding="12,5" FontSize="11"
+                            <Button x:Name="PopupPauseResumeButton" Content="⏸" Tag="Pause"
+                                    Style="{StaticResource ExpandableAccentButton}"
                                     Click="PopupPauseResume_Click"/>
 
-                            <Button x:Name="PopupSkipButton" Content="⏭ Skip"
-                                    Style="{StaticResource OutlineButton}"
-                                    Padding="10,5" FontSize="11" Margin="6,0,0,0"
+                            <Button x:Name="PopupSkipButton" Content="⏭" Tag="Skip"
+                                    Style="{StaticResource ExpandableOutlineButton}"
+                                    Margin="6,0,0,0"
                                     Click="PopupSkip_Click"/>
 
-                            <Button x:Name="PopupToggleQueueButton" Content="📋 Queue (0) ▾"
-                                    Style="{StaticResource OutlineButton}"
-                                    Padding="10,5" FontSize="11" Margin="6,0,0,0"
+                            <Button x:Name="PopupToggleQueueButton" Content="📋" Tag="Queue List"
+                                    Style="{StaticResource ExpandableOutlineButton}"
+                                    Margin="6,0,0,0"
                                     Click="PopupToggleQueue_Click"/>
 
-                            <Button x:Name="PopupViewDownloadsButton" Content="📊 Downloads &amp; Graph ↗"
-                                    Style="{StaticResource OutlineButton}"
-                                    Foreground="{StaticResource BrushAccent}"
-                                    Padding="10,5" FontSize="11" Margin="6,0,0,0"
+                            <Button x:Name="PopupViewDownloadsButton" Content="📊" Tag="Downloads &amp; Graph"
+                                    Style="{StaticResource ExpandableOutlineButton}"
+                                    Foreground="{DynamicResource BrushAccent}"
+                                    Margin="6,0,0,0"
                                     Click="PopupViewDownloads_Click"/>
 
-                            <Button x:Name="PopupCancelButton" Content="✕ Cancel All"
-                                    Style="{StaticResource OutlineButton}"
-                                    Padding="10,5" FontSize="11" Margin="6,0,0,0"
-                                    Foreground="{StaticResource BrushError}"
+                            <Button x:Name="PopupCancelButton" Content="✕" Tag="Cancel All"
+                                    Style="{StaticResource ExpandableDangerButton}"
+                                    Margin="6,0,0,0"
                                     Click="PopupCancel_Click"/>
                         </StackPanel>
                     </Grid>

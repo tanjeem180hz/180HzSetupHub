@@ -152,10 +152,10 @@
 
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                        <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
-                            <TextBlock Text="⚡ 180Hz PRO" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                        <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
+                            <TextBlock Text="⚡ 180Hz PRO" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
                         </Border>
-                        <TextBlock Text="COMMAND CENTER" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
+                        <TextBlock Text="COMMAND CENTER" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
                     </StackPanel>
                     <TextBlock Text="Dashboard" Style="{StaticResource TextHeader}" FontSize="26"/>
                     <TextBlock Text="System status, feature flow, and quick actions." Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
@@ -163,13 +163,13 @@
 
                 <!-- Engine Status and Refresh Action -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="8" Padding="12,8">
+                    <Border Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="8" Padding="12,8">
                         <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="8" Height="8" Fill="{StaticResource BrushSuccess}" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="EngineStatusText" Text="ENGINE READY" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushSuccess}" VerticalAlignment="Center"/>
+                            <Ellipse Width="8" Height="8" Fill="{DynamicResource BrushSuccess}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="EngineStatusText" Text="ENGINE READY" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushSuccess}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
-                    <Button x:Name="RefreshSummaryButton" Content="🔄 Refresh" Style="{StaticResource OutlineButton}" Padding="12,8" Margin="8,0,0,0" Click="RefreshSummary_Click"/>
+                    <Button x:Name="RefreshSummaryButton" Content="🔄" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0" Click="RefreshSummary_Click"/>
                 </StackPanel>
             </Grid>
 
@@ -186,39 +186,39 @@
 
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="OPTIMIZE. MONITOR. DEPLOY." FontSize="22" FontWeight="Bold"
-                                   Foreground="{StaticResource BrushTextPrimary}" FontFamily="{StaticResource AppFont}"/>
+                                   Foreground="{DynamicResource BrushTextPrimary}" FontFamily="{StaticResource AppFont}"/>
                         <TextBlock Text="Automated app setup, update tracking, and junk cleanup — all in one place."
                                    Style="{StaticResource TextBody}" FontSize="13" Margin="0,8,0,18" MaxWidth="620" HorizontalAlignment="Left"/>
 
                         <StackPanel Orientation="Horizontal">
-                            <Border Background="{StaticResource BrushBackground}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="12,7" Margin="0,0,10,0">
+                            <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="12,7" Margin="0,0,10,0">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="🔔" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                     <TextBlock x:Name="UpdateSummaryText" Text="Checking for updates…" Style="{StaticResource TextBody}"
-                                               Foreground="{StaticResource BrushAccent}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center"/>
+                                               Foreground="{DynamicResource BrushAccent}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Background="{StaticResource BrushBackground}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="12,7">
+                            <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="12,7">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="🛡️" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                     <TextBlock Text="Windows 64-bit Ready" Style="{StaticResource TextBody}"
-                                               Foreground="{StaticResource BrushTextSecondary}" FontSize="12" VerticalAlignment="Center"/>
+                                               Foreground="{DynamicResource BrushTextSecondary}" FontSize="12" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
                     </StackPanel>
 
                     <!-- Right Module Counter Card -->
-                    <Border Grid.Column="1" Background="{StaticResource BrushBackground}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="10" Padding="18" VerticalAlignment="Center">
+                    <Border Grid.Column="1" Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="10" Padding="18" VerticalAlignment="Center">
                         <StackPanel HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
-                                <Border Width="10" Height="10" CornerRadius="2" Background="{StaticResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="180Hz HUB" Foreground="{StaticResource BrushAccent}" FontSize="11" FontWeight="Bold" FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
+                                <Border Width="10" Height="10" CornerRadius="2" Background="{DynamicResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="180Hz HUB" Foreground="{DynamicResource BrushAccent}" FontSize="11" FontWeight="Bold" FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
                             </StackPanel>
                             <TextBlock x:Name="ModuleCountText" Text="7" FontSize="36" FontWeight="Bold"
-                                       Foreground="{StaticResource BrushTextPrimary}" HorizontalAlignment="Center" Margin="0,-2,0,0"/>
-                            <TextBlock Text="MODULES ACTIVE" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource BrushTextSecondary}" HorizontalAlignment="Center"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" HorizontalAlignment="Center" Margin="0,-2,0,0"/>
+                            <TextBlock Text="MODULES ACTIVE" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </Grid>
