@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-void: #050811;
+    --bg-surface: #0b132b;
+    --bg-surface-raised: #111d42;
+    --border-subtle: #1e293b;
+    --accent-mint: #00d26a;
+    --accent-cyan: #38bdf8;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--bg-void);
+    color: #f8fafc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Roboto, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Custom Cyber Glass & Neon Utilities */
+.glass-panel {
+  background: rgba(11, 19, 43, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-elevated {
+  background: rgba(17, 29, 66, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.neon-border-mint {
+  box-shadow: 0 0 20px -3px rgba(0, 210, 106, 0.35);
+  border-color: rgba(0, 210, 106, 0.6);
+}
+
+.neon-border-cyan {
+  box-shadow: 0 0 20px -3px rgba(56, 189, 248, 0.35);
+  border-color: rgba(56, 189, 248, 0.6);
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #050811;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #38bdf8;
+}

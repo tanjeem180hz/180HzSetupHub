@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "google-stitch": {
+      "command": "npx",
+      "args": ["-y", "@google/stitch-mcp"]
+    },
+    "typeui": {
+      "command": "npx",
+      "args": ["-y", "@typeui/mcp-server"]
+    }
+  }
+}
