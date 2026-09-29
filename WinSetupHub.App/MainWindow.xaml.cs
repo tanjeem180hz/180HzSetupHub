@@ -20,7 +20,29 @@ namespace SetupHub180Hz
                 }
             };
             UpdateThemeButtonText();
+            DownloadManagerService.Instance.QueueChanged += UpdateDownloadsBadge;
+            DownloadManagerService.Instance.ProgressChanged += _ => UpdateDownloadsBadge();
+            DownloadManagerService.Instance.QueueCompleted += UpdateDownloadsBadge;
+            UpdateDownloadsBadge();
             NavigateTo("Dashboard");
+        }
+
+        private void UpdateDownloadsBadge()
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                var dm = DownloadManagerService.Instance;
+                int activeAndQueued = dm.QueueRemaining + (dm.IsRunning ? 1 : 0);
+                if (activeAndQueued > 0)
+                {
+                    DownloadsNavBadge.Visibility = Visibility.Visible;
+                    DownloadsNavBadgeText.Text = activeAndQueued.ToString();
+                }
+                else
+                {
+                    DownloadsNavBadge.Visibility = Visibility.Collapsed;
+                }
+            });
         }
 
         private void NavItem_Checked(object sender, RoutedEventArgs e)
@@ -39,6 +61,7 @@ namespace SetupHub180Hz
                 {
                     "Dashboard" => new DashboardPage(this),
                     "SetupApps" => new SetupAppsPage(),
+                    "Downloads" => new DownloadsPage(this),
                     "UpdateCenter" => new UpdateCenterPage(),
                     "Uninstaller" => new UninstallerPage(),
                     "Startup" => new StartupManagerPage(),
@@ -65,6 +88,7 @@ namespace SetupHub180Hz
             {
                 "Dashboard" => NavDashboard,
                 "SetupApps" => NavSetupApps,
+                "Downloads" => NavDownloads,
                 "UpdateCenter" => NavUpdateCenter,
                 "Uninstaller" => NavUninstaller,
                 "Startup" => NavStartup,

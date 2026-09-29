@@ -24,6 +24,16 @@ namespace SetupHub180Hz.Services
         Cancelled
     }
 
+    public class DownloadHistoryItem
+    {
+        public AppItem App { get; set; } = null!;
+        public DateTime CompletedAt { get; set; } = DateTime.Now;
+        public bool Success { get; set; } = true;
+        public string Message { get; set; } = "";
+        public string FormattedTime => CompletedAt.ToString("hh:mm tt");
+        public string FormattedDate => CompletedAt.ToString("MMM dd, yyyy");
+    }
+
     public class DownloadProgressInfo
     {
         public AppItem App { get; set; } = null!;
@@ -50,6 +60,9 @@ namespace SetupHub180Hz.Services
         private readonly string _downloadDir;
 
         private readonly List<AppItem> _queue = new();
+        private readonly List<DownloadHistoryItem> _completedHistory = new();
+        private readonly List<double> _speedHistory = new();
+        private readonly System.Timers.Timer _speedSampleTimer;
         private readonly object _lock = new();
 
         private CancellationTokenSource? _currentCts;
@@ -60,11 +73,82 @@ namespace SetupHub180Hz.Services
         private volatile bool _isQueueRunning;
         private int _currentIndex;
 
+        private double _currentSpeedBps;
+        private double _peakSpeedBps;
+        private long _totalDownloadedBytes;
+
         public event Action<DownloadProgressInfo>? ProgressChanged;
+        public event Action? QueueChanged;
         public event Action? QueueCompleted;
+        public event Action<double>? SpeedSampled;
 
         public bool IsRunning => _isQueueRunning;
         public bool IsPaused => _isPaused;
+        public double CurrentSpeedBps => _currentSpeedBps;
+        public double PeakSpeedBps => _peakSpeedBps;
+        public long TotalDownloadedBytes => _totalDownloadedBytes;
+        public string CurrentSpeedFormatted => FormatSpeed(_currentSpeedBps);
+        public string PeakSpeedFormatted => FormatSpeed(_peakSpeedBps);
+        public string TotalDownloadedFormatted => FormatBytes(_totalDownloadedBytes);
+        public DownloadProgressInfo? CurrentProgressInfo { get; private set; }
+
+        public IReadOnlyList<double> SpeedHistory
+        {
+            get
+            {
+                lock (_lock) return _speedHistory.ToList();
+            }
+        }
+
+        public IReadOnlyList<AppItem> Queue
+        {
+            get
+            {
+                lock (_lock) return _queue.ToList();
+            }
+        }
+
+        public IReadOnlyList<AppItem> RemainingQueue
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    if (_currentIndex + 1 < _queue.Count)
+                    {
+                        return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Skip(_queue, _currentIndex + 1));
+                    }
+                    return new List<AppItem>();
+                }
+            }
+        }
+
+        public IReadOnlyList<DownloadHistoryItem> CompletedHistory
+        {
+            get
+            {
+                lock (_lock) return _completedHistory.ToList();
+            }
+        }
+
+        public int QueueTotal
+        {
+            get
+            {
+                lock (_lock) return _queue.Count;
+            }
+        }
+
+        public int QueueRemaining
+        {
+            get
+            {
+                lock (_lock) return Math.Max(0, _queue.Count - (_currentIndex + 1));
+            }
+        }
+
+        public int CurrentIndex => _currentIndex;
+
         public AppItem? CurrentApp
         {
             get
@@ -102,6 +186,37 @@ namespace SetupHub180Hz.Services
                 }
             }
             catch { }
+
+            for (int i = 0; i < 60; i++)
+            {
+                _speedHistory.Add(0);
+            }
+
+            _speedSampleTimer = new System.Timers.Timer(1000);
+            _speedSampleTimer.Elapsed += (_, _) =>
+            {
+                double mbps = 0;
+                lock (_lock)
+                {
+                    if (_isQueueRunning && !_isPaused)
+                    {
+                        mbps = _currentSpeedBps / (1024.0 * 1024.0);
+                    }
+                    else
+                    {
+                        _currentSpeedBps = 0;
+                    }
+
+                    if (_speedHistory.Count >= 60)
+                    {
+                        _speedHistory.RemoveAt(0);
+                    }
+                    _speedHistory.Add(mbps);
+                }
+
+                SpeedSampled?.Invoke(mbps);
+            };
+            _speedSampleTimer.Start();
         }
 
         public void Enqueue(AppItem item)
@@ -117,7 +232,7 @@ namespace SetupHub180Hz.Services
                 {
                     if (!_queue.Contains(item) && !item.IsInstalled)
                     {
-                        item.Status = "Queued";
+                        item.Status = "⏳ Queued";
                         item.IsBusy = true;
                         _queue.Add(item);
                     }
@@ -131,6 +246,58 @@ namespace SetupHub180Hz.Services
                     Task.Run(ProcessQueueAsync);
                 }
             }
+            QueueChanged?.Invoke();
+        }
+
+        public void RemoveFromQueue(AppItem item)
+        {
+            lock (_lock)
+            {
+                int idx = _queue.IndexOf(item);
+                if (idx > _currentIndex)
+                {
+                    _queue.RemoveAt(idx);
+                    item.IsBusy = false;
+                    item.Status = "Install";
+                }
+                else if (idx == _currentIndex && _isQueueRunning)
+                {
+                    SkipCurrent();
+                }
+            }
+            QueueChanged?.Invoke();
+        }
+
+        public void MoveToTop(AppItem item)
+        {
+            lock (_lock)
+            {
+                int idx = _queue.IndexOf(item);
+                if (idx > _currentIndex + 1)
+                {
+                    _queue.RemoveAt(idx);
+                    _queue.Insert(_currentIndex + 1, item);
+                }
+            }
+            QueueChanged?.Invoke();
+        }
+
+        public void ClearCompletedHistory()
+        {
+            lock (_lock)
+            {
+                _completedHistory.Clear();
+            }
+            QueueChanged?.Invoke();
+        }
+
+        public void RemoveFromHistory(DownloadHistoryItem item)
+        {
+            lock (_lock)
+            {
+                _completedHistory.Remove(item);
+            }
+            QueueChanged?.Invoke();
         }
 
         public void Pause()
@@ -185,18 +352,24 @@ namespace SetupHub180Hz.Services
                 _resumeTcs?.TrySetResult(false);
                 _currentCts?.Cancel();
 
+                _currentSpeedBps = 0;
                 foreach (var item in _queue)
                 {
                     if (!item.IsInstalled)
                     {
                         item.Status = "Install";
                         item.IsBusy = false;
+                        item.DownloadProgress = 0;
+                        item.DownloadSpeed = "";
+                        item.DownloadEta = "";
+                        item.IsPaused = false;
                     }
                 }
                 _queue.Clear();
                 _isQueueRunning = false;
             }
 
+            QueueChanged?.Invoke();
             QueueCompleted?.Invoke();
         }
 
@@ -410,6 +583,10 @@ namespace SetupHub180Hz.Services
                                 double speedBytesPerSec = sampleDuration > 0
                                     ? (downloadedTotal - lastBytesSample) / sampleDuration
                                     : 0;
+
+                                _currentSpeedBps = speedBytesPerSec;
+                                _peakSpeedBps = Math.Max(_peakSpeedBps, speedBytesPerSec);
+                                _totalDownloadedBytes += Math.Max(0, downloadedTotal - lastBytesSample);
 
                                 lastBytesSample = downloadedTotal;
                                 lastSampleTime = elapsed;
@@ -635,6 +812,8 @@ namespace SetupHub180Hz.Services
                 if (matchSpeed.Success)
                 {
                     speed = matchSpeed.Groups[1].Value;
+                    _currentSpeedBps = ParseSpeedStringToBps(speed);
+                    _peakSpeedBps = Math.Max(_peakSpeedBps, _currentSpeedBps);
                 }
 
                 string eta = "Working…";
@@ -692,6 +871,10 @@ namespace SetupHub180Hz.Services
         private void FinalizeAppStatus(AppItem app, bool success, int queueIndex, int queueTotal)
         {
             app.IsBusy = false;
+            app.DownloadSpeed = "";
+            app.DownloadEta = "";
+            app.IsPaused = false;
+            _currentSpeedBps = 0;
             if (success)
             {
                 app.IsInstalled = true;
@@ -722,11 +905,63 @@ namespace SetupHub180Hz.Services
                     StatusMessage = $"Installation failed for {app.Name}."
                 });
             }
+
+            lock (_lock)
+            {
+                _completedHistory.Insert(0, new DownloadHistoryItem
+                {
+                    App = app,
+                    CompletedAt = DateTime.Now,
+                    Success = success,
+                    Message = success ? "Installed successfully" : "Installation failed"
+                });
+            }
+            QueueChanged?.Invoke();
         }
 
         private void Notify(DownloadProgressInfo info)
         {
+            CurrentProgressInfo = info;
+            if (info.App != null)
+            {
+                info.App.DownloadProgress = info.Percentage;
+                info.App.DownloadSpeed = info.SpeedFormatted;
+                info.App.DownloadEta = info.EtaFormatted;
+                info.App.IsPaused = (info.State == DownloadState.Paused);
+
+                if (info.State == DownloadState.Downloading)
+                {
+                    info.App.Status = info.Percentage > 0 ? $"⏸ {info.Percentage:0}%" : "⏸ Pause";
+                }
+                else if (info.State == DownloadState.Paused)
+                {
+                    info.App.Status = "▶ Resume";
+                }
+                else if (info.State == DownloadState.Installing)
+                {
+                    info.App.Status = "Installing…";
+                }
+            }
             ProgressChanged?.Invoke(info);
+        }
+
+        private static double ParseSpeedStringToBps(string speedStr)
+        {
+            if (string.IsNullOrWhiteSpace(speedStr)) return 0;
+            try
+            {
+                var parts = speedStr.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 2 && double.TryParse(parts[0], out double val))
+                {
+                    string unit = parts[1].ToUpperInvariant();
+                    if (unit.StartsWith("GB")) return val * 1024 * 1024 * 1024;
+                    if (unit.StartsWith("MB")) return val * 1024 * 1024;
+                    if (unit.StartsWith("KB")) return val * 1024;
+                    return val;
+                }
+            }
+            catch { }
+            return 0;
         }
 
         private static string GetExtensionForType(string? type, string url)

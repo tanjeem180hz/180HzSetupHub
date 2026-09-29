@@ -65,6 +65,20 @@
                                      Checked="NavItem_Checked" Tag="SetupApps" Margin="0,0,0,4">
                             <TextBlock Text="⚙️  Setup Apps"/>
                         </RadioButton>
+                        <RadioButton x:Name="NavDownloads" Style="{StaticResource SidebarItem}"
+                                     Checked="NavItem_Checked" Tag="Downloads" Margin="0,0,0,4">
+                            <Grid Width="176">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="📥  Downloads" VerticalAlignment="Center"/>
+                                <Border x:Name="DownloadsNavBadge" Grid.Column="1" Background="{StaticResource BrushAccent}"
+                                        CornerRadius="8" Padding="6,1" Margin="6,0,0,0" Visibility="Collapsed" VerticalAlignment="Center">
+                                    <TextBlock x:Name="DownloadsNavBadgeText" Text="0" FontSize="10" FontWeight="Bold" Foreground="#0A0E17"/>
+                                </Border>
+                            </Grid>
+                        </RadioButton>
                         <RadioButton x:Name="NavUpdateCenter" Style="{StaticResource SidebarItem}"
                                      Checked="NavItem_Checked" Tag="UpdateCenter" Margin="0,0,0,4">
                             <TextBlock Text="🔄  Update Center"/>

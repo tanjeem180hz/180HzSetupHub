@@ -190,6 +190,62 @@ namespace SetupHub180Hz.Models
             }
         }
 
+        private double _downloadProgress;
+        public double DownloadProgress
+        {
+            get => _downloadProgress;
+            set
+            {
+                if (Math.Abs(_downloadProgress - value) > 0.01)
+                {
+                    _downloadProgress = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _downloadSpeed = "";
+        public string DownloadSpeed
+        {
+            get => _downloadSpeed;
+            set
+            {
+                if (_downloadSpeed != value)
+                {
+                    _downloadSpeed = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _downloadEta = "";
+        public string DownloadEta
+        {
+            get => _downloadEta;
+            set
+            {
+                if (_downloadEta != value)
+                {
+                    _downloadEta = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _isPaused;
+        public bool IsPaused
+        {
+            get => _isPaused;
+            set
+            {
+                if (_isPaused != value)
+                {
+                    _isPaused = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public bool IsBusy
         {
             get => _isBusy;

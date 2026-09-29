@@ -216,7 +216,7 @@
                                 <Border Width="10" Height="10" CornerRadius="2" Background="{StaticResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="180Hz HUB" Foreground="{StaticResource BrushAccent}" FontSize="11" FontWeight="Bold" FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <TextBlock x:Name="ModuleCountText" Text="6" FontSize="36" FontWeight="Bold"
+                            <TextBlock x:Name="ModuleCountText" Text="7" FontSize="36" FontWeight="Bold"
                                        Foreground="{StaticResource BrushTextPrimary}" HorizontalAlignment="Center" Margin="0,-2,0,0"/>
                             <TextBlock Text="MODULES ACTIVE" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource BrushTextSecondary}" HorizontalAlignment="Center"/>
                         </StackPanel>

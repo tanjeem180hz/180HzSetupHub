@@ -44,6 +44,7 @@ namespace SetupHub180Hz.Views
             };
 
             DownloadManagerService.Instance.ProgressChanged += OnDownloadProgressChanged;
+            DownloadManagerService.Instance.QueueChanged += OnDownloadQueueChanged;
             DownloadManagerService.Instance.QueueCompleted += OnDownloadQueueCompleted;
 
             Loaded += async (_, _) =>
@@ -758,7 +759,29 @@ namespace SetupHub180Hz.Views
         {
             if (sender is Button btn && btn.DataContext is AppItem app)
             {
-                if (app.IsBusy || app.IsInstalled) return;
+                if (app.IsInstalled) return;
+
+                var dm = DownloadManagerService.Instance;
+                if (dm.CurrentApp == app)
+                {
+                    if (dm.IsPaused)
+                    {
+                        dm.Resume();
+                    }
+                    else
+                    {
+                        dm.Pause();
+                    }
+                    return;
+                }
+
+                if (dm.RemainingQueue.Contains(app))
+                {
+                    dm.MoveToTop(app);
+                    return;
+                }
+
+                if (app.IsBusy) return;
 
                 StartSequentialQueue(new[] { app });
             }
@@ -919,8 +942,63 @@ namespace SetupHub180Hz.Views
                 PopupDismissButton.Visibility = Visibility.Visible;
 
                 NotificationService.Notify("Setup Complete", "All queued software deployments have finished.");
+                PopupToggleQueueButton.Visibility = Visibility.Collapsed;
+                PopupQueueDrawer.Visibility = Visibility.Collapsed;
                 UpdateSelectionUI();
             });
+        }
+
+        private void OnDownloadQueueChanged()
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                var dm = DownloadManagerService.Instance;
+                var remaining = dm.RemainingQueue;
+                PopupToggleQueueButton.Content = $"📋 Queue ({remaining.Count}) {(PopupQueueDrawer.Visibility == Visibility.Visible ? "▴" : "▾")}";
+                PopupQueueItemsControl.ItemsSource = remaining;
+                PopupNoRemainingQueueText.Visibility = remaining.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+                UpdateSelectionUI();
+            });
+        }
+
+        private void PopupToggleQueue_Click(object sender, RoutedEventArgs e)
+        {
+            var dm = DownloadManagerService.Instance;
+            var remaining = dm.RemainingQueue;
+            if (PopupQueueDrawer.Visibility == Visibility.Visible)
+            {
+                PopupQueueDrawer.Visibility = Visibility.Collapsed;
+                PopupToggleQueueButton.Content = $"📋 Queue ({remaining.Count}) ▾";
+            }
+            else
+            {
+                PopupQueueDrawer.Visibility = Visibility.Visible;
+                PopupToggleQueueButton.Content = $"📋 Queue ({remaining.Count}) ▴";
+                PopupQueueItemsControl.ItemsSource = remaining;
+                PopupNoRemainingQueueText.Visibility = remaining.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        private void PopupViewDownloads_Click(object sender, RoutedEventArgs e)
+        {
+            var mw = Window.GetWindow(this) as MainWindow;
+            mw?.GoToPage("Downloads");
+        }
+
+        private void PopupQueueMoveToTop_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is AppItem app)
+            {
+                DownloadManagerService.Instance.MoveToTop(app);
+            }
+        }
+
+        private void PopupQueueRemove_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is AppItem app)
+            {
+                DownloadManagerService.Instance.RemoveFromQueue(app);
+            }
         }
 
         private void PopupPauseResume_Click(object sender, RoutedEventArgs e)
