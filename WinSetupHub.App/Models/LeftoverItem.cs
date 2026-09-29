@@ -122,7 +122,11 @@ namespace SetupHub180Hz.Models
             }
         }
 
-        public bool StatusBadgeVisibility => IsProcessing || IsDeleted || IsFailed;
+        public System.Windows.Visibility StatusBadgeVisibility =>
+            (IsProcessing || IsDeleted || IsFailed) ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+
+        public System.Windows.Visibility CheckBoxVisibility =>
+            (IsProcessing || IsDeleted || IsFailed) ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
 
         public string StatusBadgeText =>
             IsProcessing ? "⚡ PURGING" :
