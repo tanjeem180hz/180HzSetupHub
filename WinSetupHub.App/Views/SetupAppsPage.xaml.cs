@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.IO;
 using SetupHub180Hz.Models;
 using SetupHub180Hz.Services;
 
@@ -62,6 +63,15 @@ namespace SetupHub180Hz.Views
                 if ((bool)e.NewValue)
                 {
                     SyncDownloadPopupState();
+                }
+            };
+
+            PreviewKeyDown += (s, e) =>
+            {
+                if (e.Key == Key.Escape && AlreadyInstalledOverlay.Visibility == Visibility.Visible)
+                {
+                    AlreadyInstalledOverlay.Visibility = Visibility.Collapsed;
+                    e.Handled = true;
                 }
             };
         }
@@ -769,8 +779,6 @@ namespace SetupHub180Hz.Views
         {
             if (sender is Button btn && btn.DataContext is AppItem app)
             {
-                if (app.IsInstalled) return;
-
                 var dm = DownloadManagerService.Instance;
                 if (dm.CurrentApp == app)
                 {
@@ -793,6 +801,16 @@ namespace SetupHub180Hz.Views
 
                 if (app.IsBusy) return;
 
+                // 1. Check if already installed on system or status is Installed
+                if (app.IsInstalled || app.Status == "Installed" || CheckIfAppAlreadyInstalled(app))
+                {
+                    app.IsInstalled = true;
+                    app.Status = "Installed";
+                    ShowAlreadyInstalledModal(app);
+                    return;
+                }
+
+                // 2. Not installed -> proceed with download and installation
                 StartSequentialQueue(new[] { app });
             }
         }
@@ -842,14 +860,46 @@ namespace SetupHub180Hz.Views
 
         private void InstallSelected_Click(object sender, RoutedEventArgs e)
         {
-            var selected = _allPackages.Where(p => p.IsSelected && !p.IsInstalled).ToList();
+            var selected = _allPackages.Where(p => p.IsSelected).ToList();
             if (selected.Count == 0)
             {
-                MessageBox.Show("Please select at least one uninstalled app to install.", "No Apps Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Please select at least one app to install.", "No Apps Selected", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            StartSequentialQueue(selected);
+            var uninstalled = new List<AppItem>();
+            var alreadyInstalled = new List<AppItem>();
+
+            foreach (var app in selected)
+            {
+                if (app.IsInstalled || app.Status == "Installed" || CheckIfAppAlreadyInstalled(app))
+                {
+                    app.IsInstalled = true;
+                    app.Status = "Installed";
+                    alreadyInstalled.Add(app);
+                }
+                else
+                {
+                    uninstalled.Add(app);
+                }
+            }
+
+            if (selected.Count == 1 && alreadyInstalled.Count == 1)
+            {
+                ShowAlreadyInstalledModal(alreadyInstalled[0]);
+                return;
+            }
+
+            if (uninstalled.Count == 0)
+            {
+                if (alreadyInstalled.Count > 0)
+                {
+                    ShowAlreadyInstalledModal(alreadyInstalled[0]);
+                }
+                return;
+            }
+
+            StartSequentialQueue(uninstalled);
         }
 
         private DispatcherTimer? _popupAutoDismissTimer;
@@ -1226,6 +1276,8 @@ namespace SetupHub180Hz.Views
             if (sender is Button btn && btn.DataContext is AppBundle bundle)
             {
                 var targetApps = new List<AppItem>();
+                var installedApps = new List<AppItem>();
+
                 foreach (var id in bundle.WingetIds)
                 {
                     var app = _allPackages.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
@@ -1233,7 +1285,13 @@ namespace SetupHub180Hz.Views
                     {
                         app = new AppItem { Id = id, Name = id };
                     }
-                    if (!app.IsInstalled)
+                    if (app.IsInstalled || app.Status == "Installed" || CheckIfAppAlreadyInstalled(app))
+                    {
+                        app.IsInstalled = true;
+                        app.Status = "Installed";
+                        installedApps.Add(app);
+                    }
+                    else
                     {
                         targetApps.Add(app);
                     }
@@ -1241,7 +1299,10 @@ namespace SetupHub180Hz.Views
 
                 if (targetApps.Count == 0)
                 {
-                    MessageBox.Show($"All applications in '{bundle.Name}' are already installed!", "Bundle Ready", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (installedApps.Count > 0)
+                    {
+                        ShowAlreadyInstalledModal(installedApps[0]);
+                    }
                     return;
                 }
 
@@ -1310,5 +1371,220 @@ namespace SetupHub180Hz.Views
                 }
             }
         }
+
+        #region Already Installed Modal & App Launcher
+
+        private AppItem? _currentModalApp;
+
+        private bool CheckIfAppAlreadyInstalled(AppItem app)
+        {
+            if (app.IsInstalled) return true;
+
+            // 1. Windows Registry uninstall check (covers 99% of win32/x64 software)
+            var reg = AppMetadataHelper.GetRegistryInfo(app.Name, app.Id);
+            if (reg != null)
+            {
+                if (!string.IsNullOrWhiteSpace(reg.DisplayVersion))
+                {
+                    app.Version = reg.DisplayVersion;
+                }
+                if (!string.IsNullOrWhiteSpace(reg.InstallLocation) && Directory.Exists(reg.InstallLocation))
+                {
+                    app.InstallLocation = reg.InstallLocation;
+                }
+                return true;
+            }
+
+            // 2. Check local icon path if it points to an installed executable
+            if (!string.IsNullOrWhiteSpace(app.LocalIconPath) && app.LocalIconPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && File.Exists(app.LocalIconPath))
+            {
+                return true;
+            }
+
+            // 3. Check App InstallLocation if present
+            if (!string.IsNullOrWhiteSpace(app.InstallLocation) && Directory.Exists(app.InstallLocation))
+            {
+                return true;
+            }
+
+            // 4. Check standard program directories and Start Menu shortcuts
+            string normName = AppMetadataHelper.NormalizeAppName(app.Name);
+            string[] baseDirs = {
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs"),
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+            };
+
+            foreach (var b in baseDirs)
+            {
+                if (string.IsNullOrWhiteSpace(b) || !Directory.Exists(b)) continue;
+                if (Directory.Exists(Path.Combine(b, app.Name)) || Directory.Exists(Path.Combine(b, normName)))
+                {
+                    return true;
+                }
+            }
+
+            // 5. Start Menu shortcuts
+            string[] startDirs = {
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
+            };
+            foreach (var dir in startDirs)
+            {
+                if (Directory.Exists(dir))
+                {
+                    var lnks = Directory.GetFiles(dir, $"*{normName}*.lnk", SearchOption.AllDirectories);
+                    if (lnks.Length > 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private void ShowAlreadyInstalledModal(AppItem app)
+        {
+            _currentModalApp = app;
+
+            ModalAppName.Text = app.Name;
+            ModalAppIcon.Source = app.IconImageSource;
+            ModalAppVersion.Text = !string.IsNullOrWhiteSpace(app.FormattedVersion) ? app.FormattedVersion : "vLatest";
+            ModalAppSize.Text = !string.IsNullOrWhiteSpace(app.FormattedSize) ? app.FormattedSize : "Installed";
+            ModalPackageId.Text = !string.IsNullOrWhiteSpace(app.Id) ? app.Id : app.Name;
+            ModalCategory.Text = !string.IsNullOrWhiteSpace(app.Category) ? app.Category : "General";
+
+            var reg = AppMetadataHelper.GetRegistryInfo(app.Name, app.Id);
+            if (reg != null && !string.IsNullOrWhiteSpace(reg.DisplayVersion))
+            {
+                ModalStatusMessage.Text = $"{app.Name} (v{reg.DisplayVersion}) is verified and ready to use on this PC.";
+            }
+            else
+            {
+                ModalStatusMessage.Text = $"{app.Name} is verified and ready to use on this PC.";
+            }
+
+            AlreadyInstalledOverlay.Visibility = Visibility.Visible;
+        }
+
+        private void ModalClose_Click(object sender, RoutedEventArgs e)
+        {
+            AlreadyInstalledOverlay.Visibility = Visibility.Collapsed;
+        }
+
+        private void AlreadyInstalledOverlay_BackdropClick(object sender, MouseButtonEventArgs e)
+        {
+            AlreadyInstalledOverlay.Visibility = Visibility.Collapsed;
+        }
+
+        private void AlreadyInstalledCard_Click(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true; // Prevent backdrop click from dismissing
+        }
+
+        private void ModalLaunch_Click(object sender, RoutedEventArgs e)
+        {
+            AlreadyInstalledOverlay.Visibility = Visibility.Collapsed;
+            if (_currentModalApp != null)
+            {
+                LaunchInstalledApp(_currentModalApp);
+            }
+        }
+
+        private void ModalReinstall_Click(object sender, RoutedEventArgs e)
+        {
+            AlreadyInstalledOverlay.Visibility = Visibility.Collapsed;
+            if (_currentModalApp != null)
+            {
+                _currentModalApp.IsInstalled = false;
+                _currentModalApp.Status = "Install";
+                StartSequentialQueue(new[] { _currentModalApp });
+            }
+        }
+
+        private void LaunchInstalledApp(AppItem app)
+        {
+            try
+            {
+                // 1. Direct local executable from icon path
+                if (!string.IsNullOrWhiteSpace(app.LocalIconPath) && app.LocalIconPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && File.Exists(app.LocalIconPath))
+                {
+                    Process.Start(new ProcessStartInfo(app.LocalIconPath) { UseShellExecute = true });
+                    return;
+                }
+
+                // 2. Query registry install location for main executable
+                var reg = AppMetadataHelper.GetRegistryInfo(app.Name, app.Id);
+                if (reg != null && !string.IsNullOrWhiteSpace(reg.InstallLocation) && Directory.Exists(reg.InstallLocation))
+                {
+                    var exes = Directory.GetFiles(reg.InstallLocation, "*.exe", SearchOption.TopDirectoryOnly);
+                    var mainExe = exes.FirstOrDefault(f => !Path.GetFileName(f).Contains("uninstall", StringComparison.OrdinalIgnoreCase) &&
+                                                           !Path.GetFileName(f).Contains("update", StringComparison.OrdinalIgnoreCase) &&
+                                                           !Path.GetFileName(f).Contains("helper", StringComparison.OrdinalIgnoreCase)) ?? exes.FirstOrDefault();
+                    if (mainExe != null && File.Exists(mainExe))
+                    {
+                        Process.Start(new ProcessStartInfo(mainExe) { UseShellExecute = true });
+                        return;
+                    }
+                }
+
+                // 3. Search Start Menu shortcuts
+                string[] startDirs = {
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
+                };
+                string normName = AppMetadataHelper.NormalizeAppName(app.Name);
+                foreach (var dir in startDirs)
+                {
+                    if (Directory.Exists(dir))
+                    {
+                        var lnks = Directory.GetFiles(dir, $"*{normName}*.lnk", SearchOption.AllDirectories);
+                        if (lnks.Length > 0)
+                        {
+                            Process.Start(new ProcessStartInfo(lnks[0]) { UseShellExecute = true });
+                            return;
+                        }
+                    }
+                }
+
+                // 4. Try App Paths registry
+                using var appPathsKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths");
+                if (appPathsKey != null)
+                {
+                    foreach (var sub in appPathsKey.GetSubKeyNames())
+                    {
+                        if (sub.Contains(app.Name, StringComparison.OrdinalIgnoreCase) || (!string.IsNullOrWhiteSpace(app.Id) && sub.Contains(app.Id, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            using var k = appPathsKey.OpenSubKey(sub);
+                            string? exe = k?.GetValue("") as string;
+                            if (!string.IsNullOrWhiteSpace(exe) && File.Exists(exe))
+                            {
+                                Process.Start(new ProcessStartInfo(exe) { UseShellExecute = true });
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                // 5. Fallback to official web URL
+                string? url = app.WebUrl;
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    url = AppMetadataHelper.ResolveOfficialUrl(app);
+                }
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                }
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Could not launch {app.Name}: {ex.Message}", ActivityType.Warning);
+            }
+        }
+
+        #endregion
     }
 }

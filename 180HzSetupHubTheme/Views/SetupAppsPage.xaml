@@ -233,8 +233,20 @@
                         <ContentControl Loaded="OfficialLinkContainer_Loaded" Margin="0,0,8,0" VerticalAlignment="Center"/>
                         <Button Content="{Binding Status}"
                                 Click="InstallButton_Click"
-                                Style="{StaticResource AccentButton}"
-                                Padding="18,7,18,7"/>
+                                Padding="18,7,18,7">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource AccentButton}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsInstalled}" Value="True">
+                                            <Setter Property="Background" Value="#163A29"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource BrushSuccess}"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BrushSuccess}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -738,6 +750,134 @@
                             </StackPanel>
                         </ScrollViewer>
                     </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ==================== ALREADY INSTALLED POPUP MODAL ==================== -->
+        <Grid x:Name="AlreadyInstalledOverlay"
+              Grid.Row="0" Grid.RowSpan="6"
+              Margin="-32,-24,-32,-28"
+              Panel.ZIndex="300"
+              Visibility="Collapsed"
+              Background="#99000000"
+              MouseLeftButtonDown="AlreadyInstalledOverlay_BackdropClick">
+            <Border Width="480"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource BrushSurface}"
+                    BorderBrush="{DynamicResource BrushSuccess}"
+                    BorderThickness="1.5"
+                    CornerRadius="14"
+                    Padding="24"
+                    MouseLeftButtonDown="AlreadyInstalledCard_Click">
+                <Border.Effect>
+                    <DropShadowEffect Color="#000000" BlurRadius="30" ShadowDepth="6" Opacity="0.75"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Header: Icon, Name, Close -->
+                        <RowDefinition Height="Auto"/> <!-- Status Banner: Already Installed -->
+                        <RowDefinition Height="Auto"/> <!-- Metadata details: Version, Location, Size -->
+                        <RowDefinition Height="Auto"/> <!-- Action Buttons -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Row 0: App Info & Dismiss '✕' -->
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- App Icon -->
+                        <Border Width="52" Height="52" CornerRadius="10"
+                                Background="{DynamicResource BrushBackground}"
+                                BorderBrush="{DynamicResource BrushBorder}"
+                                BorderThickness="1" Margin="0,0,14,0" ClipToBounds="True">
+                            <Grid>
+                                <TextBlock Text="📦" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.4"/>
+                                <Image x:Name="ModalAppIcon" Width="40" Height="40" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Name, Badge & Version -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock x:Name="ModalAppName" Text="Application Name" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" TextTrimming="CharacterEllipsis"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
+                                <Border Background="#163A29" BorderBrush="{DynamicResource BrushSuccess}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <TextBlock Text="INSTALLED" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}"/>
+                                </Border>
+                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <TextBlock x:Name="ModalAppVersion" Text="v1.0.0" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                </Border>
+                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="6,2">
+                                    <TextBlock x:Name="ModalAppSize" Text="120 MB" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Close Button -->
+                        <Button Grid.Column="2" Content="✕"
+                                Style="{StaticResource CaptionButton}" Width="28" Height="28"
+                                ToolTip="Close" Click="ModalClose_Click" VerticalAlignment="Top"/>
+                    </Grid>
+
+                    <!-- Row 1: Status Alert Banner -->
+                    <Border Grid.Row="1" Background="#142C20" BorderBrush="{DynamicResource BrushSuccess}" BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,0,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="✅" FontSize="18" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Application Already Installed" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource BrushTextPrimary}"/>
+                                <TextBlock x:Name="ModalStatusMessage" Text="This software is verified and active on your system." FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Row 2: Metadata / Path Information -->
+                    <Border Grid.Row="2" Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,20">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="Package ID:" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,8,4"/>
+                            <TextBlock x:Name="ModalPackageId" Grid.Column="1" Text="Publisher.App" FontSize="11" Foreground="{DynamicResource BrushTextPrimary}" Margin="0,0,0,4" TextTrimming="CharacterEllipsis"/>
+
+                            <TextBlock Grid.Row="1" Text="Category:" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,8,0"/>
+                            <TextBlock x:Name="ModalCategory" Grid.Row="1" Grid.Column="1" Text="Browsers &amp; Web" FontSize="11" Foreground="{DynamicResource BrushTextPrimary}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Row 3: Action Buttons (Launch App, Reinstall, Close) -->
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="ModalLaunchButton" Grid.Column="0" Content="🚀 Open Application"
+                                Style="{StaticResource AccentButton}" Padding="16,8" Margin="0,0,8,0"
+                                Click="ModalLaunch_Click"/>
+
+                        <Button x:Name="ModalReinstallButton" Grid.Column="1" Content="🔄 Reinstall Anyway"
+                                Style="{StaticResource OutlineButton}" Padding="14,8" Margin="0,0,8,0"
+                                Click="ModalReinstall_Click" ToolTip="Force download and clean reinstallation"/>
+
+                        <Button Grid.Column="2" Content="Close"
+                                Style="{StaticResource OutlineButton}" Padding="14,8"
+                                Click="ModalClose_Click"/>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>
