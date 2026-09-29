@@ -13,6 +13,9 @@ namespace SetupHub180Hz.Services
             { "BrushSurface", ("ColorSurface", "ColorSurfaceLight") },
             { "BrushSurfaceHover", ("ColorSurfaceHover", "ColorSurfaceHoverLight") },
             { "BrushBorder", ("ColorBorder", "ColorBorderLight") },
+            { "BrushAccent", ("ColorAccent", "ColorAccentLight") },
+            { "BrushAccentHover", ("ColorAccentHover", "ColorAccentHoverLight") },
+            { "BrushAccentPressed", ("ColorAccentPressed", "ColorAccentPressedLight") },
             { "BrushTextPrimary", ("ColorTextPrimary", "ColorTextPrimaryLight") },
             { "BrushTextSecondary", ("ColorTextSecondary", "ColorTextSecondaryLight") }
         };
@@ -31,6 +34,14 @@ namespace SetupHub180Hz.Services
                     var newBrush = new SolidColorBrush(targetColor);
                     newBrush.Freeze();
                     Application.Current.Resources[brushKey] = newBrush;
+
+                    foreach (var dict in Application.Current.Resources.MergedDictionaries)
+                    {
+                        if (dict.Contains(brushKey))
+                        {
+                            dict[brushKey] = newBrush;
+                        }
+                    }
                 }
             }
 
