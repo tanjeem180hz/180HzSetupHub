@@ -291,14 +291,7 @@ namespace SetupHub180Hz
         {
             var isDark = SettingsService.Instance.Current.DarkTheme;
 
-            // TitleBar Theme Button
-            if (ThemeToggleIcon != null)
-                ThemeToggleIcon.Text = isDark ? "☀️" : "🌙";
-            if (ThemeToggleText != null)
-                ThemeToggleText.Text = isDark ? "Light" : "Dark";
-            ThemeToggleButton.ToolTip = isDark ? "Switch to Light Theme" : "Switch to Dark Theme";
-
-            // Sidebar Theme Button
+            // Sidebar Theme Button in bottom-left corner
             if (SidebarThemeIcon != null)
                 SidebarThemeIcon.Text = isDark ? "☀️" : "🌙";
             if (SidebarThemeLabel != null)

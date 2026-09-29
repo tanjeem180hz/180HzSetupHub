@@ -45,16 +45,8 @@
                 </Border>
             </StackPanel>
 
-            <!-- Chrome Controls: Theme Pill & Vector Window Buttons -->
+            <!-- Chrome Controls: Vector Window Buttons -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                <!-- Theme Toggle Button in Titlebar -->
-                <Button x:Name="ThemeToggleButton" Style="{StaticResource ThemeToggleButtonStyle}" Margin="0,0,10,0" Click="ThemeToggle_Click" ToolTip="Toggle Dark / Light Theme">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock x:Name="ThemeToggleIcon" Text="☀️" FontSize="11" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="ThemeToggleText" Text="Light" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-
                 <!-- Minimize -->
                 <Button x:Name="MinimizeButton" Style="{StaticResource TitleBarButton}" ToolTip="Minimize" Click="Minimize_Click">
                     <Path Data="M 0,0 L 10,0" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -246,15 +238,16 @@
 
                     <!-- Bottom Section: Dark/Light Theme Button (Sidebar Footer) -->
                     <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
-                        <!-- Theme Toggle Button inside Sidebar -->
-                        <Button x:Name="SidebarThemeButton" Style="{StaticResource SidebarButton}" Margin="0,0,0,0"
-                                Click="ThemeToggle_Click" ToolTip="Toggle Dark / Light Theme">
+                        <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource BrushBorder}" Margin="0,0,0,8"/>
+                        <!-- Theme Toggle Button inside Sidebar Bottom-Left -->
+                        <Button x:Name="SidebarThemeButton" Style="{StaticResource SidebarThemeButtonStyle}"
+                                Click="ThemeToggle_Click" ToolTip="Switch Theme">
                             <Grid Width="180">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="36"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock x:Name="SidebarThemeIcon" Text="☀️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="SidebarThemeIcon" Text="☀️" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="SidebarThemeLabel" Grid.Column="1" Text="Light Theme" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>
                         </Button>
