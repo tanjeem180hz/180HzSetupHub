@@ -27,6 +27,13 @@ namespace SetupHub180Hz.Views
 
             Loaded += DownloadsPage_Loaded;
             Unloaded += DownloadsPage_Unloaded;
+            IsVisibleChanged += (_, e) =>
+            {
+                if ((bool)e.NewValue)
+                {
+                    RefreshAllUI();
+                }
+            };
         }
 
         private void DownloadsPage_Loaded(object sender, RoutedEventArgs e)
@@ -35,6 +42,7 @@ namespace SetupHub180Hz.Views
             DownloadManagerService.Instance.ProgressChanged += OnProgressChanged;
             DownloadManagerService.Instance.QueueChanged += OnQueueChanged;
             DownloadManagerService.Instance.QueueCompleted += OnQueueCompleted;
+            DownloadManagerService.Instance.QueueCancelled += OnQueueCompleted;
 
             RefreshAllUI();
         }
@@ -45,6 +53,7 @@ namespace SetupHub180Hz.Views
             DownloadManagerService.Instance.ProgressChanged -= OnProgressChanged;
             DownloadManagerService.Instance.QueueChanged -= OnQueueChanged;
             DownloadManagerService.Instance.QueueCompleted -= OnQueueCompleted;
+            DownloadManagerService.Instance.QueueCancelled -= OnQueueCompleted;
         }
 
         private void OnSpeedSampled(double bps)

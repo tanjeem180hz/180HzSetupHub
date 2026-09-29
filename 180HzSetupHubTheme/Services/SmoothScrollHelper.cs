@@ -50,6 +50,8 @@ namespace SetupHub180Hz.Services
         {
             public double TargetVerticalOffset;
             public double TargetHorizontalOffset;
+            public int VerticalAnimId;
+            public int HorizontalAnimId;
             public bool IsVerticalAnimating;
             public bool IsHorizontalAnimating;
             public long LastWheelTimestamp;
@@ -150,10 +152,10 @@ namespace SetupHub180Hz.Services
             long deltaT = now - state.LastWheelTimestamp;
             state.LastWheelTimestamp = now;
 
-            // Momentum acceleration: rapid continuous scrolling boosts speed up to 2.2x
-            if (deltaT < 160 && deltaT > 0)
+            // Momentum acceleration: rapid continuous scrolling boosts speed up to 3.2x
+            if (deltaT < 220 && deltaT > 0)
             {
-                state.VelocityMultiplier = Math.Min(2.2, state.VelocityMultiplier + 0.35);
+                state.VelocityMultiplier = Math.Min(3.2, state.VelocityMultiplier + 0.55);
             }
             else
             {
@@ -165,21 +167,29 @@ namespace SetupHub180Hz.Services
                 if (sv.ScrollableWidth <= 0) return;
 
                 double current = state.IsHorizontalAnimating ? state.TargetHorizontalOffset : sv.HorizontalOffset;
-                // Responsive 160px base travel per notch
-                double delta = (e.Delta / 120.0) * 160.0 * state.VelocityMultiplier;
+                // Responsive 220px base travel per notch
+                double delta = (e.Delta / 120.0) * 220.0 * state.VelocityMultiplier;
                 double target = Math.Clamp(current - delta, 0, sv.ScrollableWidth);
                 state.TargetHorizontalOffset = target;
+
+                int animId = ++state.HorizontalAnimId;
+                state.IsHorizontalAnimating = true;
 
                 var anim = new DoubleAnimation
                 {
                     From = sv.HorizontalOffset,
                     To = target,
-                    Duration = TimeSpan.FromMilliseconds(140),
-                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    Duration = TimeSpan.FromMilliseconds(70),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
 
-                state.IsHorizontalAnimating = true;
-                anim.Completed += (_, _) => { state.IsHorizontalAnimating = false; };
+                anim.Completed += (_, _) =>
+                {
+                    if (state.HorizontalAnimId == animId)
+                    {
+                        state.IsHorizontalAnimating = false;
+                    }
+                };
 
                 sv.BeginAnimation(AnimatedHorizontalOffsetProperty, anim);
                 e.Handled = true;
@@ -197,37 +207,53 @@ namespace SetupHub180Hz.Services
                     double targetItem = Math.Clamp(current + itemStep, 0, sv.ScrollableHeight);
                     state.TargetVerticalOffset = targetItem;
 
+                    int animIdItem = ++state.VerticalAnimId;
+                    state.IsVerticalAnimating = true;
+
                     var animItem = new DoubleAnimation
                     {
                         From = sv.VerticalOffset,
                         To = targetItem,
-                        Duration = TimeSpan.FromMilliseconds(130),
-                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                        Duration = TimeSpan.FromMilliseconds(65),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
 
-                    state.IsVerticalAnimating = true;
-                    animItem.Completed += (_, _) => { state.IsVerticalAnimating = false; };
+                    animItem.Completed += (_, _) =>
+                    {
+                        if (state.VerticalAnimId == animIdItem)
+                        {
+                            state.IsVerticalAnimating = false;
+                        }
+                    };
 
                     sv.BeginAnimation(AnimatedVerticalOffsetProperty, animItem);
                     e.Handled = true;
                     return;
                 }
 
-                // Highly responsive 160px travel distance per notch with CubicEase for fast, natural feel
-                double delta = (e.Delta / 120.0) * 160.0 * state.VelocityMultiplier;
+                // Blazing fast 220px travel distance per notch with 70ms QuadraticEase for immediate, buttery 180Hz feel
+                double delta = (e.Delta / 120.0) * 220.0 * state.VelocityMultiplier;
                 double target = Math.Clamp(current - delta, 0, sv.ScrollableHeight);
                 state.TargetVerticalOffset = target;
+
+                int animId = ++state.VerticalAnimId;
+                state.IsVerticalAnimating = true;
 
                 var anim = new DoubleAnimation
                 {
                     From = sv.VerticalOffset,
                     To = target,
-                    Duration = TimeSpan.FromMilliseconds(140),
-                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    Duration = TimeSpan.FromMilliseconds(70),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
 
-                state.IsVerticalAnimating = true;
-                anim.Completed += (_, _) => { state.IsVerticalAnimating = false; };
+                anim.Completed += (_, _) =>
+                {
+                    if (state.VerticalAnimId == animId)
+                    {
+                        state.IsVerticalAnimating = false;
+                    }
+                };
 
                 sv.BeginAnimation(AnimatedVerticalOffsetProperty, anim);
                 e.Handled = true;

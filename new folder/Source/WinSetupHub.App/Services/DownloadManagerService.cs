@@ -85,10 +85,12 @@ namespace SetupHub180Hz.Services
         public event Action<DownloadProgressInfo>? ProgressChanged;
         public event Action? QueueChanged;
         public event Action? QueueCompleted;
+        public event Action? QueueCancelled;
         public event Action<double>? SpeedSampled;
 
         public bool IsRunning => _isQueueRunning;
         public bool IsPaused => _isPaused;
+        public bool IsCancelled => _isCancelled;
         public double CurrentSpeedBps => _currentSpeedBps;
         public double PeakSpeedBps => _peakSpeedBps;
         public long TotalDownloadedBytes => _totalDownloadedBytes;
@@ -461,7 +463,7 @@ namespace SetupHub180Hz.Services
             }
 
             QueueChanged?.Invoke();
-            QueueCompleted?.Invoke();
+            QueueCancelled?.Invoke();
             SpeedSampled?.Invoke(0);
         }
 
@@ -537,13 +539,22 @@ namespace SetupHub180Hz.Services
                 }
             }
 
+            bool wasCancelled;
             lock (_lock)
             {
+                wasCancelled = _isCancelled;
                 _isQueueRunning = false;
                 _currentSpeedBps = 0;
             }
 
-            QueueCompleted?.Invoke();
+            if (wasCancelled)
+            {
+                QueueCancelled?.Invoke();
+            }
+            else
+            {
+                QueueCompleted?.Invoke();
+            }
         }
 
         private async Task ProcessSingleAppAsync(AppItem app, int queueIndex, int queueTotal)

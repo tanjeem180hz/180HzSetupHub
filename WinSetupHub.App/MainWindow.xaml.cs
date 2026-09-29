@@ -52,6 +52,7 @@ namespace SetupHub180Hz
             DownloadManagerService.Instance.QueueChanged += UpdateDownloadsBadge;
             DownloadManagerService.Instance.ProgressChanged += _ => UpdateDownloadsBadge();
             DownloadManagerService.Instance.QueueCompleted += UpdateDownloadsBadge;
+            DownloadManagerService.Instance.QueueCancelled += UpdateDownloadsBadge;
             UpdateDownloadsBadge();
 
             // Initialize sidebar in collapsed compact mode

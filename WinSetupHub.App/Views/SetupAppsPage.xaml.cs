@@ -46,12 +46,22 @@ namespace SetupHub180Hz.Views
             DownloadManagerService.Instance.ProgressChanged += OnDownloadProgressChanged;
             DownloadManagerService.Instance.QueueChanged += OnDownloadQueueChanged;
             DownloadManagerService.Instance.QueueCompleted += OnDownloadQueueCompleted;
+            DownloadManagerService.Instance.QueueCancelled += OnDownloadQueueCancelled;
 
             Loaded += async (_, _) =>
             {
+                SyncDownloadPopupState();
                 if (_allPackages.Count == 0)
                 {
                     await InitializeCatalogAsync();
+                }
+            };
+
+            IsVisibleChanged += (_, e) =>
+            {
+                if ((bool)e.NewValue)
+                {
+                    SyncDownloadPopupState();
                 }
             };
         }
@@ -842,11 +852,49 @@ namespace SetupHub180Hz.Views
             StartSequentialQueue(selected);
         }
 
+        private DispatcherTimer? _popupAutoDismissTimer;
+
+        private void StartPopupAutoDismissTimer()
+        {
+            _popupAutoDismissTimer?.Stop();
+            _popupAutoDismissTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(6)
+            };
+            _popupAutoDismissTimer.Tick += (_, _) =>
+            {
+                _popupAutoDismissTimer.Stop();
+                DownloadPopupPanel.Visibility = Visibility.Collapsed;
+                AppsListBox.Margin = new Thickness(0);
+            };
+            _popupAutoDismissTimer.Start();
+        }
+
+        private void SyncDownloadPopupState()
+        {
+            var dm = DownloadManagerService.Instance;
+            if (dm.IsCancelled || (!dm.IsRunning && !dm.IsPaused))
+            {
+                _popupAutoDismissTimer?.Stop();
+                DownloadPopupPanel.Visibility = Visibility.Collapsed;
+                AppsListBox.Margin = new Thickness(0);
+                PopupQueueDrawer.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            var info = dm.CurrentProgressInfo;
+            if (info != null)
+            {
+                OnDownloadProgressChanged(info);
+            }
+        }
+
         private void StartSequentialQueue(IEnumerable<AppItem> apps)
         {
             var list = apps.ToList();
             if (list.Count == 0) return;
 
+            _popupAutoDismissTimer?.Stop();
             DownloadPopupPanel.Visibility = Visibility.Visible;
             AppsListBox.Margin = new Thickness(0, 0, 0, 110);
 
@@ -866,8 +914,22 @@ namespace SetupHub180Hz.Views
         {
             Dispatcher.InvokeAsync(() =>
             {
+                var dm = DownloadManagerService.Instance;
+                if (dm.IsCancelled || (!dm.IsRunning && !dm.IsPaused))
+                {
+                    _popupAutoDismissTimer?.Stop();
+                    DownloadPopupPanel.Visibility = Visibility.Collapsed;
+                    AppsListBox.Margin = new Thickness(0);
+                    return;
+                }
+
+                _popupAutoDismissTimer?.Stop();
                 DownloadPopupPanel.Visibility = Visibility.Visible;
                 AppsListBox.Margin = new Thickness(0, 0, 0, 110);
+                PopupDismissButton.Visibility = Visibility.Collapsed;
+                PopupCancelButton.Visibility = Visibility.Visible;
+                PopupSkipButton.Visibility = Visibility.Visible;
+                PopupPauseResumeButton.Visibility = Visibility.Visible;
 
                 PopupAppName.Text = info.App.Name;
                 PopupAppIcon.Source = info.App.IconImageSource;
@@ -934,10 +996,31 @@ namespace SetupHub180Hz.Views
             });
         }
 
+        private void OnDownloadQueueCancelled()
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                _popupAutoDismissTimer?.Stop();
+                DownloadPopupPanel.Visibility = Visibility.Collapsed;
+                AppsListBox.Margin = new Thickness(0);
+                PopupQueueDrawer.Visibility = Visibility.Collapsed;
+                UpdateSelectionUI();
+            });
+        }
+
         private void OnDownloadQueueCompleted()
         {
             Dispatcher.InvokeAsync(() =>
             {
+                var dm = DownloadManagerService.Instance;
+                if (dm.IsCancelled || (!dm.IsRunning && !dm.IsPaused && dm.RemainingQueue.Count == 0 && dm.CurrentApp == null && dm.CurrentProgressInfo == null))
+                {
+                    _popupAutoDismissTimer?.Stop();
+                    DownloadPopupPanel.Visibility = Visibility.Collapsed;
+                    AppsListBox.Margin = new Thickness(0);
+                    return;
+                }
+
                 PopupStateText.Text = "COMPLETED";
                 PopupStateBadge.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(18, 55, 25));
                 PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushSuccess");
@@ -956,6 +1039,8 @@ namespace SetupHub180Hz.Views
                 PopupToggleQueueButton.Visibility = Visibility.Collapsed;
                 PopupQueueDrawer.Visibility = Visibility.Collapsed;
                 UpdateSelectionUI();
+
+                StartPopupAutoDismissTimer();
             });
         }
 
@@ -965,6 +1050,17 @@ namespace SetupHub180Hz.Views
             {
                 var dm = DownloadManagerService.Instance;
                 var remaining = dm.RemainingQueue;
+
+                if (dm.IsCancelled || (!dm.IsRunning && !dm.IsPaused && remaining.Count == 0 && PopupStateText.Text != "COMPLETED"))
+                {
+                    _popupAutoDismissTimer?.Stop();
+                    DownloadPopupPanel.Visibility = Visibility.Collapsed;
+                    AppsListBox.Margin = new Thickness(0);
+                    PopupQueueDrawer.Visibility = Visibility.Collapsed;
+                    UpdateSelectionUI();
+                    return;
+                }
+
                 PopupToggleQueueButton.Content = $"📋 Queue ({remaining.Count}) {(PopupQueueDrawer.Visibility == Visibility.Visible ? "▴" : "▾")}";
                 PopupQueueItemsControl.ItemsSource = remaining;
                 PopupNoRemainingQueueText.Visibility = remaining.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -1031,16 +1127,20 @@ namespace SetupHub180Hz.Views
 
         private void PopupCancel_Click(object sender, RoutedEventArgs e)
         {
+            _popupAutoDismissTimer?.Stop();
             DownloadManagerService.Instance.CancelAll();
             DownloadPopupPanel.Visibility = Visibility.Collapsed;
             AppsListBox.Margin = new Thickness(0);
+            PopupQueueDrawer.Visibility = Visibility.Collapsed;
             UpdateSelectionUI();
         }
 
         private void PopupDismiss_Click(object sender, RoutedEventArgs e)
         {
+            _popupAutoDismissTimer?.Stop();
             DownloadPopupPanel.Visibility = Visibility.Collapsed;
             AppsListBox.Margin = new Thickness(0);
+            PopupQueueDrawer.Visibility = Visibility.Collapsed;
         }
 
         private void CategoryScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
