@@ -29,19 +29,51 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
+            <!-- Brand Logo & Title -->
             <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center"
                         shell:WindowChrome.IsHitTestVisibleInChrome="False">
-                <Border Width="18" Height="18" CornerRadius="4" Background="{StaticResource BrushAccent}"/>
-                <TextBlock Text="180Hz Setup Hub" Margin="8,0,0,0" VerticalAlignment="Center"
+                <Border Width="22" Height="22" CornerRadius="5" Background="#16253B"
+                        BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" ClipToBounds="True" Margin="0,0,8,0">
+                    <Image Source="pack://application:,,,/Assets/AppIcon-1024.png" Width="18" Height="18"
+                           Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Border>
+                <TextBlock Text="180Hz Setup Hub" VerticalAlignment="Center"
                            Foreground="{StaticResource BrushTextPrimary}" FontFamily="{StaticResource AppFont}"
                            FontSize="12" FontWeight="SemiBold"/>
+                <Border Background="#1C2E44" CornerRadius="4" Padding="5,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="PRO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                </Border>
             </StackPanel>
 
+            <!-- Chrome Controls: Theme Pill & Vector Window Buttons -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                <Button x:Name="ThemeToggleButton" Style="{StaticResource CaptionButton}" Width="68" Margin="0,0,6,0" Click="ThemeToggle_Click"/>
-                <Button x:Name="MinimizeButton" Content="&#xE921;" Style="{StaticResource CaptionButton}" Click="Minimize_Click"/>
-                <Button x:Name="MaximizeButton" Content="&#xE922;" Style="{StaticResource CaptionButton}" Click="Maximize_Click"/>
-                <Button x:Name="CloseButton" Content="&#xE8BB;" Style="{StaticResource CloseCaptionButton}" Click="Close_Click"/>
+                <!-- Theme Toggle Button -->
+                <Button x:Name="ThemeToggleButton" Style="{StaticResource ThemeToggleButtonStyle}" Margin="0,0,8,0" Click="ThemeToggle_Click" ToolTip="Toggle Dark / Light Theme">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock x:Name="ThemeToggleIcon" Text="☀️" FontSize="11" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="ThemeToggleText" Text="Light" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Minimize -->
+                <Button x:Name="MinimizeButton" Style="{StaticResource TitleBarButton}" ToolTip="Minimize" Click="Minimize_Click">
+                    <Path Data="M 0,0 L 10,0" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                          StrokeThickness="1.2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Button>
+
+                <!-- Maximize / Restore -->
+                <Button x:Name="MaximizeButton" Style="{StaticResource TitleBarButton}" ToolTip="Maximize" Click="Maximize_Click">
+                    <Path x:Name="MaximizeIconPath" Data="M 0.5,0.5 H 9.5 V 9.5 H 0.5 Z"
+                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                          StrokeThickness="1.2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Button>
+
+                <!-- Close -->
+                <Button x:Name="CloseButton" Style="{StaticResource TitleBarCloseButton}" ToolTip="Close" Click="Close_Click">
+                    <Path Data="M 0.5,0.5 L 9.5,9.5 M 9.5,0.5 L 0.5,9.5"
+                          Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                          StrokeThickness="1.2" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Button>
             </StackPanel>
         </Grid>
 

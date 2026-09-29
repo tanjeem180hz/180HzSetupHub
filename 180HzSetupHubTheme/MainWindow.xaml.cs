@@ -11,7 +11,14 @@ namespace SetupHub180Hz
         public MainWindow()
         {
             InitializeComponent();
-            StateChanged += (_, _) => MaximizeButton.Content = WindowState == WindowState.Maximized ? "\uE923" : "\uE922";
+            StateChanged += (_, _) =>
+            {
+                bool isMax = WindowState == WindowState.Maximized;
+                MaximizeIconPath.Data = System.Windows.Media.Geometry.Parse(
+                    isMax ? "M 2.5,0.5 H 9.5 V 7.5 H 2.5 Z M 0.5,2.5 H 7.5 V 9.5 H 0.5 Z"
+                          : "M 0.5,0.5 H 9.5 V 9.5 H 0.5 Z");
+                MaximizeButton.ToolTip = isMax ? "Restore Down" : "Maximize";
+            };
             Activated += async (_, _) =>
             {
                 if (!UpdateMonitorService.Instance.ShouldSkipDueToRecency())
@@ -120,7 +127,11 @@ namespace SetupHub180Hz
         private void UpdateThemeButtonText()
         {
             var isDark = SetupHub180Hz.Services.SettingsService.Instance.Current.DarkTheme;
-            ThemeToggleButton.Content = isDark ? "☀️ Light" : "🌙 Dark";
+            if (ThemeToggleIcon != null)
+                ThemeToggleIcon.Text = isDark ? "☀️" : "🌙";
+            if (ThemeToggleText != null)
+                ThemeToggleText.Text = isDark ? "Light" : "Dark";
+            ThemeToggleButton.ToolTip = isDark ? "Switch to Light Theme" : "Switch to Dark Theme";
         }
 
         private void Minimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;

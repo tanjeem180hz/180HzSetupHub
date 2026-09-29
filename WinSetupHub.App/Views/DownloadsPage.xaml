@@ -151,7 +151,7 @@
                                 <Grid HorizontalAlignment="Right" Margin="0,4,10,4" IsHitTestVisible="False">
                                     <TextBlock x:Name="YAxisMaxLabel" Text="30 MB/s" VerticalAlignment="Top" FontSize="9" Foreground="#4A566E"/>
                                     <TextBlock x:Name="YAxisHalfLabel" Text="15 MB/s" VerticalAlignment="Center" FontSize="9" Foreground="#4A566E"/>
-                                    <TextBlock Text="0 MB/s" VerticalAlignment="Bottom" FontSize="9" Foreground="#4A566E"/>
+                                    <TextBlock Text="0 B/s" VerticalAlignment="Bottom" FontSize="9" Foreground="#4A566E"/>
                                 </Grid>
 
                                 <!-- Dynamic Graph Area and Polyline -->

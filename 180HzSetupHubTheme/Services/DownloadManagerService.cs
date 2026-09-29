@@ -3,9 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,6 +78,8 @@ namespace SetupHub180Hz.Services
         private double _currentSpeedBps;
         private double _peakSpeedBps;
         private long _totalDownloadedBytes;
+        private long _lastSystemInboundBytes = -1;
+        private DateTime _lastSystemSampleTime = DateTime.UtcNow;
 
         public event Action<DownloadProgressInfo>? ProgressChanged;
         public event Action? QueueChanged;
@@ -195,28 +199,81 @@ namespace SetupHub180Hz.Services
             _speedSampleTimer = new System.Timers.Timer(1000);
             _speedSampleTimer.Elapsed += (_, _) =>
             {
-                double mbps = 0;
+                double sysBps = GetSystemNetworkInboundBps();
+                double sampleBps;
+
                 lock (_lock)
                 {
                     if (_isQueueRunning && !_isPaused)
                     {
-                        mbps = _currentSpeedBps / (1024.0 * 1024.0);
+                        // While downloading in SetupHub, prioritize active download rate or blended system rate
+                        sampleBps = Math.Max(_currentSpeedBps, sysBps);
+                        _currentSpeedBps = sampleBps;
                     }
                     else
                     {
-                        _currentSpeedBps = 0;
+                        // Continuous lifetime network monitoring even when setup queue is idle
+                        sampleBps = sysBps;
+                        _currentSpeedBps = sysBps;
+                    }
+
+                    if (sampleBps > 0)
+                    {
+                        _peakSpeedBps = Math.Max(_peakSpeedBps, sampleBps);
                     }
 
                     if (_speedHistory.Count >= 60)
                     {
                         _speedHistory.RemoveAt(0);
                     }
-                    _speedHistory.Add(mbps);
+                    _speedHistory.Add(sampleBps);
                 }
 
-                SpeedSampled?.Invoke(mbps);
+                SpeedSampled?.Invoke(sampleBps);
             };
             _speedSampleTimer.Start();
+        }
+
+        private double GetSystemNetworkInboundBps()
+        {
+            try
+            {
+                long totalInbound = 0;
+                var interfaces = NetworkInterface.GetAllNetworkInterfaces();
+                foreach (var ni in interfaces)
+                {
+                    if (ni.OperationalStatus == OperationalStatus.Up &&
+                        ni.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+                        ni.NetworkInterfaceType != NetworkInterfaceType.Tunnel)
+                    {
+                        var stats = ni.GetIPv4Statistics();
+                        if (stats != null)
+                        {
+                            totalInbound += stats.BytesReceived;
+                        }
+                    }
+                }
+
+                var now = DateTime.UtcNow;
+                if (_lastSystemInboundBytes < 0)
+                {
+                    _lastSystemInboundBytes = totalInbound;
+                    _lastSystemSampleTime = now;
+                    return 0;
+                }
+
+                double elapsedSeconds = (now - _lastSystemSampleTime).TotalSeconds;
+                long delta = totalInbound - _lastSystemInboundBytes;
+                _lastSystemInboundBytes = totalInbound;
+                _lastSystemSampleTime = now;
+
+                if (elapsedSeconds <= 0.1 || delta < 0) return 0;
+                return delta / elapsedSeconds;
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         public void Enqueue(AppItem item)
@@ -1038,24 +1095,28 @@ namespace SetupHub180Hz.Services
             return name;
         }
 
-        private static string FormatBytes(long bytes)
+        public static string FormatBytes(long bytes)
         {
+            if (bytes <= 0) return "0 B";
             if (bytes < 1024) return $"{bytes} B";
             double kb = bytes / 1024.0;
             if (kb < 1024) return $"{kb:0.0} KB";
             double mb = kb / 1024.0;
-            if (mb < 1024) return $"{mb:0.0} MB";
+            if (mb < 1024) return $"{mb:0.00} MB";
             double gb = mb / 1024.0;
             return $"{gb:0.00} GB";
         }
 
-        private static string FormatSpeed(double bytesPerSec)
+        public static string FormatSpeed(double bytesPerSec)
         {
+            if (bytesPerSec <= 0 || double.IsNaN(bytesPerSec)) return "0 B/s";
             if (bytesPerSec < 1024) return $"{bytesPerSec:0} B/s";
             double kb = bytesPerSec / 1024.0;
             if (kb < 1024) return $"{kb:0.0} KB/s";
             double mb = kb / 1024.0;
-            return $"{mb:0.1} MB/s";
+            if (mb < 1024) return $"{mb:0.00} MB/s";
+            double gb = mb / 1024.0;
+            return $"{gb:0.00} GB/s";
         }
 
         private static string FormatEta(double seconds)

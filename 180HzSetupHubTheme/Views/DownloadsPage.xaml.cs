@@ -46,7 +46,7 @@ namespace SetupHub180Hz.Views
             DownloadManagerService.Instance.QueueCompleted -= OnQueueCompleted;
         }
 
-        private void OnSpeedSampled(double mbps)
+        private void OnSpeedSampled(double bps)
         {
             Dispatcher.InvokeAsync(() =>
             {
@@ -241,6 +241,37 @@ namespace SetupHub180Hz.Views
             EmptyHistoryBorder.Visibility = history.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        private static double CalculateDynamicScale(double maxBps)
+        {
+            double[] niceSteps = new double[]
+            {
+                25 * 1024.0,       // 25 KB/s
+                50 * 1024.0,       // 50 KB/s
+                100 * 1024.0,      // 100 KB/s
+                250 * 1024.0,      // 250 KB/s
+                500 * 1024.0,      // 500 KB/s
+                1024 * 1024.0,     // 1 MB/s
+                2 * 1024 * 1024.0, // 2 MB/s
+                5 * 1024 * 1024.0, // 5 MB/s
+                10 * 1024 * 1024.0,// 10 MB/s
+                20 * 1024 * 1024.0,// 20 MB/s
+                30 * 1024 * 1024.0,// 30 MB/s
+                50 * 1024 * 1024.0,// 50 MB/s
+                100 * 1024 * 1024.0// 100 MB/s
+            };
+
+            double target = Math.Max(niceSteps[0], maxBps * 1.15);
+
+            foreach (var step in niceSteps)
+            {
+                if (step >= target)
+                    return step;
+            }
+
+            double unit = 25 * 1024 * 1024.0;
+            return Math.Ceiling(target / unit) * unit;
+        }
+
         private void RenderSpeedGraph()
         {
             double w = GraphCanvas.ActualWidth;
@@ -251,15 +282,15 @@ namespace SetupHub180Hz.Views
             var history = DownloadManagerService.Instance.SpeedHistory;
             if (history.Count == 0) return;
 
-            double currentSpeed = history.LastOrDefault();
-            double peakSession = DownloadManagerService.Instance.PeakSpeedBps / (1024.0 * 1024.0);
-            double maxSpeed = Math.Max(5.0, Math.Max(peakSession, history.Max()));
+            double currentBps = history.LastOrDefault();
+            double windowMaxBps = history.Max();
+            double scaleBps = CalculateDynamicScale(windowMaxBps);
 
-            // Update axis labels
-            YAxisMaxLabel.Text = $"{maxSpeed:0.0} MB/s";
-            YAxisHalfLabel.Text = $"{(maxSpeed / 2.0):0.0} MB/s";
-            GraphPeakLabel.Text = $"Scale: {maxSpeed:0.0} MB/s";
-            GraphCurrentLabel.Text = $"Now: {currentSpeed:0.1} MB/s";
+            // Update axis labels dynamically with dynamic units (B/s, KB/s, MB/s, GB/s)
+            YAxisMaxLabel.Text = DownloadManagerService.FormatSpeed(scaleBps);
+            YAxisHalfLabel.Text = DownloadManagerService.FormatSpeed(scaleBps / 2.0);
+            GraphPeakLabel.Text = $"Scale: {DownloadManagerService.FormatSpeed(scaleBps)}";
+            GraphCurrentLabel.Text = $"Now: {DownloadManagerService.FormatSpeed(currentBps)}";
 
             // Reposition gridlines dynamically
             GridLine75.Y1 = GridLine75.Y2 = h * 0.25;
@@ -280,7 +311,7 @@ namespace SetupHub180Hz.Views
             {
                 double x = (i / (double)(count - 1)) * w;
                 double speed = history[i];
-                double ratio = Math.Clamp(speed / maxSpeed, 0.0, 1.0);
+                double ratio = Math.Clamp(speed / scaleBps, 0.0, 1.0);
                 double y = h - (ratio * (h - 14)) - 7;
 
                 Point pt = new Point(x, y);
@@ -299,7 +330,7 @@ namespace SetupHub180Hz.Views
             GraphLine.Points = linePoints;
             GraphAreaPolygon.Points = areaPoints;
 
-            if (currentSpeed > 0.01)
+            if (currentBps > 1024)
             {
                 GraphDot.Visibility = Visibility.Visible;
                 Canvas.SetLeft(GraphDot, lastX - 4);
