@@ -312,7 +312,7 @@ namespace SetupHub180Hz.Views
                 double x = (i / (double)(count - 1)) * w;
                 double speed = history[i];
                 double ratio = Math.Clamp(speed / scaleBps, 0.0, 1.0);
-                double y = h - (ratio * (h - 14)) - 7;
+                double y = speed <= 0 ? h : (h - (ratio * (h - 14)) - 7);
 
                 Point pt = new Point(x, y);
                 linePoints.Add(pt);
@@ -368,16 +368,15 @@ namespace SetupHub180Hz.Views
 
         private void BtnCancelAll_Click(object sender, RoutedEventArgs e)
         {
-            var res = MessageBox.Show(
-                "Are you sure you want to cancel all pending and active downloads in the queue?",
-                "Cancel Queue",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+            DownloadManagerService.Instance.CancelAll();
+            DownloadManagerService.Instance.ResetBandwidthMonitor();
+            RefreshAllUI();
+        }
 
-            if (res == MessageBoxResult.Yes)
-            {
-                DownloadManagerService.Instance.CancelAll();
-            }
+        private void BtnResetBandwidth_Click(object sender, RoutedEventArgs e)
+        {
+            DownloadManagerService.Instance.ResetBandwidthMonitor();
+            RefreshAllUI();
         }
 
         private void BtnBrowseApps_Click(object sender, RoutedEventArgs e)
@@ -405,6 +404,8 @@ namespace SetupHub180Hz.Views
         private void BtnActiveCancel_Click(object sender, RoutedEventArgs e)
         {
             DownloadManagerService.Instance.CancelAll();
+            DownloadManagerService.Instance.ResetBandwidthMonitor();
+            RefreshAllUI();
         }
 
         private void BtnActiveWebsite_Click(object sender, RoutedEventArgs e)
