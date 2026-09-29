@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import { Lottie } from 'lottie-react';
+import downloadAnim from '../public/lottie/download.json';
+import waveAnim from '../public/lottie/wave.json';
+import gearsAnim from '../public/lottie/gears.json';
+import rocketAnim from '../public/lottie/rocket.json';
+import checkPopAnim from '../public/lottie/check_pop.json';
 import { 
-  Download, 
   Activity, 
   Layers, 
   Trash2, 
-  Zap, 
-  Gauge, 
   Play, 
   Pause, 
   RotateCcw, 
@@ -116,8 +119,8 @@ export default function App() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00D26A] to-[#38BDF8] p-[1px] flex items-center justify-center shadow-lg shadow-[#00D26A]/20">
-              <div className="w-full h-full bg-[#050811] rounded-[11px] flex items-center justify-center">
-                <Zap className="w-5 h-5 text-[#00D26A]" />
+              <div className="w-full h-full bg-[#050811] rounded-[11px] flex items-center justify-center p-1">
+                <Lottie src={gearsAnim} loop autoplay className="w-7 h-7" />
               </div>
             </div>
             <div>
@@ -178,7 +181,9 @@ export default function App() {
               whileTap={interactiveTap}
               className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#00D26A] to-[#38BDF8] text-black font-bold text-xs shadow-lg shadow-[#00D26A]/25 cursor-pointer"
             >
-              <Download className="w-4 h-4" />
+              <div className="w-4 h-4 flex items-center justify-center">
+                <Lottie src={rocketAnim} loop autoplay />
+              </div>
               <span>Get Installer (2 MB)</span>
             </motion.a>
           </div>
@@ -245,8 +250,8 @@ export default function App() {
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-white/10">
             <div>
               <div className="flex items-center space-x-3 mb-1">
-                <div className="p-2 rounded-lg bg-[#38BDF8]/10 text-[#38BDF8]">
-                  <Gauge className="w-5 h-5" />
+                <div className="p-1 rounded-lg bg-[#38BDF8]/10 text-[#38BDF8] w-9 h-9 flex items-center justify-center">
+                  <Lottie src={isDownloading ? downloadAnim : waveAnim} loop autoplay className="w-7 h-7" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -390,10 +395,10 @@ export default function App() {
                         <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xl">
                           {app.icon}
                         </div>
-                        <div className={`w-5 h-5 rounded-md flex items-center justify-center border transition-all ${
-                          app.selected ? 'bg-[#00D26A] border-[#00D26A] text-black' : 'border-slate-600'
+                        <div className={`w-6 h-6 rounded-md flex items-center justify-center border transition-all ${
+                          app.selected ? 'bg-[#00D26A]/20 border-[#00D26A]' : 'border-slate-600'
                         }`}>
-                          {app.selected && <CheckCircle2 className="w-3.5 h-3.5" />}
+                          {app.selected && <Lottie src={checkPopAnim} loop={false} autoplay className="w-5 h-5" />}
                         </div>
                       </div>
                       <h4 className="font-semibold text-sm text-white mt-3">{app.name}</h4>
