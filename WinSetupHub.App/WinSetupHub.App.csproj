@@ -24,6 +24,10 @@
     <Resource Include="Assets\AppIcon.ico" />
     <Resource Include="Assets\AppIcon-1024.png" />
     <Resource Include="Assets\BrandArtwork.png" />
+    <Resource Include="Assets\Lottie\*.json" />
+    <Content Include="Assets\Lottie\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Configuration\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -31,6 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="LottieSharp" Version="2.4.3" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
   </ItemGroup>
 

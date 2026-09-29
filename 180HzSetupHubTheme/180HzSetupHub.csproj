@@ -12,6 +12,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Lottie\*.json" />
+    <Content Include="Assets\Lottie\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LottieSharp" Version="2.4.3" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
   </ItemGroup>
 

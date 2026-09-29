@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SetupHub180Hz.Views"
+             xmlns:lottie="clr-namespace:LottieSharp.WPF;assembly=LottieSharp"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1100">
 
@@ -223,7 +224,9 @@
                                         BorderBrush="{StaticResource BrushBorder}"
                                         BorderThickness="1" Margin="0,0,14,0" ClipToBounds="True">
                                     <Grid>
-                                        <TextBlock Text="📦" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.4"/>
+                                        <lottie:LottieAnimationView Width="32" Height="32" AutoPlay="True" RepeatCount="-1"
+                                                                    ResourcePath="pack://application:,,,/Assets/Lottie/download.json"
+                                                                    HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.85"/>
                                         <Image x:Name="ActiveAppIcon" Width="36" Height="36" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
                                     </Grid>
                                 </Border>
@@ -284,7 +287,9 @@
                         <!-- Idle State Placeholder (visible when nothing is downloading) -->
                         <Grid x:Name="IdlePlaceholderGrid" Visibility="Collapsed" Margin="20">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="📥" FontSize="36" HorizontalAlignment="Center" Opacity="0.5" Margin="0,0,0,8"/>
+                                <lottie:LottieAnimationView Width="80" Height="80" AutoPlay="True" RepeatCount="-1"
+                                                            ResourcePath="pack://application:,,,/Assets/Lottie/loading_disc.json"
+                                                            HorizontalAlignment="Center" Margin="0,0,0,10"/>
                                 <TextBlock Text="No active downloads in progress" FontSize="15" FontWeight="SemiBold"
                                            Foreground="{DynamicResource BrushTextPrimary}" HorizontalAlignment="Center"/>
                                 <TextBlock Text="Head over to Setup Apps or search software to install packages with one-click deployment."
@@ -416,8 +421,9 @@
                                     <Border Width="26" Height="26" CornerRadius="13" Background="{DynamicResource BrushBackground}"
                                             BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
                                             VerticalAlignment="Center" Margin="0,0,12,0">
-                                        <TextBlock Text="✓" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="1"
+                                                                    ResourcePath="pack://application:,,,/Assets/Lottie/check_pop.json"
+                                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
 
                                     <!-- App Icon -->
