@@ -24,10 +24,7 @@
     <Resource Include="Assets\AppIcon.ico" />
     <Resource Include="Assets\AppIcon-1024.png" />
     <Resource Include="Assets\BrandArtwork.png" />
-    <Resource Include="Assets\Lottie\*.json" />
-    <Content Include="Assets\Lottie\*.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <EmbeddedResource Include="Assets\Lottie\*.json" />
     <Content Include="Configuration\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

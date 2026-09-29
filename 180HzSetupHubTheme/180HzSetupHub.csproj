@@ -12,10 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\Lottie\*.json" />
-    <Content Include="Assets\Lottie\*.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <EmbeddedResource Include="Assets\Lottie\*.json" />
   </ItemGroup>
 
   <ItemGroup>

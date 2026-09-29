@@ -34,6 +34,7 @@ namespace SetupHub180Hz
 
             ActivityLogger.Instance.Log("Application started (Administrator).", ActivityType.Info);
             ThemeService.ApplyTheme(SettingsService.Instance.Current.DarkTheme);
+            LottieService.Initialize();
 
             if (Array.Exists(e.Args, a => string.Equals(a, "--auto-check", StringComparison.OrdinalIgnoreCase)))
             {

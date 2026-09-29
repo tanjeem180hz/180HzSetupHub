@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SetupHub180Hz.Views"
              xmlns:lottie="clr-namespace:LottieSharp.WPF;assembly=LottieSharp"
+        xmlns:services="clr-namespace:SetupHub180Hz.Services"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1100">
 
@@ -225,7 +226,7 @@
                                         BorderThickness="1" Margin="0,0,14,0" ClipToBounds="True">
                                     <Grid>
                                         <lottie:LottieAnimationView Width="32" Height="32" AutoPlay="True" RepeatCount="-1"
-                                                                    ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/download.json"
+                                                                    services:LottieHelper.AssetName="download.json"
                                                                     HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.85"/>
                                         <Image x:Name="ActiveAppIcon" Width="36" Height="36" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
                                     </Grid>
@@ -288,7 +289,7 @@
                         <Grid x:Name="IdlePlaceholderGrid" Visibility="Collapsed" Margin="20">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <lottie:LottieAnimationView Width="80" Height="80" AutoPlay="True" RepeatCount="-1"
-                                                            ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/loading_disc.json"
+                                                            services:LottieHelper.AssetName="loading_disc.json"
                                                             HorizontalAlignment="Center" Margin="0,0,0,10"/>
                                 <TextBlock Text="No active downloads in progress" FontSize="15" FontWeight="SemiBold"
                                            Foreground="{DynamicResource BrushTextPrimary}" HorizontalAlignment="Center"/>
@@ -422,7 +423,7 @@
                                             BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
                                             VerticalAlignment="Center" Margin="0,0,12,0">
                                         <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="1"
-                                                                    ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/check_pop.json"
+                                                                    services:LottieHelper.AssetName="check_pop.json"
                                                                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
 
