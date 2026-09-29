@@ -9,6 +9,8 @@ using SetupHub180Hz.Models;
 
 namespace SetupHub180Hz.Services
 {
+    public record LeftoverDeleteProgress(int Current, int Total, LeftoverItem Item, bool Success);
+
     public class DeepUninstallService
     {
         private static readonly HashSet<string> StopWords = new(StringComparer.OrdinalIgnoreCase)
@@ -168,21 +170,28 @@ namespace SetupHub180Hz.Services
             return total;
         }
 
-        public async Task<(int deleted, int failed)> DeleteAsync(IEnumerable<LeftoverItem> items)
+        public async Task<(int deleted, int failed)> DeleteAsync(
+            IEnumerable<LeftoverItem> items,
+            IProgress<LeftoverDeleteProgress>? progress = null)
         {
             return await Task.Run(() =>
             {
+                var itemList = items.ToList();
+                int total = itemList.Count;
                 int deleted = 0;
                 int failed = 0;
 
-                foreach (var item in items)
+                for (int i = 0; i < total; i++)
                 {
+                    var item = itemList[i];
+                    bool ok = false;
                     try
                     {
                         if (item.Type == LeftoverType.RegistryKey)
                         {
                             DeleteRegistryKey(item.Path);
                             deleted++;
+                            ok = true;
                         }
                         else if (item.Type == LeftoverType.Folder)
                         {
@@ -191,6 +200,7 @@ namespace SetupHub180Hz.Services
                                 Directory.Delete(item.Path, recursive: true);
                             }
                             deleted++;
+                            ok = true;
                         }
                         else if (item.Type == LeftoverType.File)
                         {
@@ -199,12 +209,19 @@ namespace SetupHub180Hz.Services
                                 File.Delete(item.Path);
                             }
                             deleted++;
+                            ok = true;
                         }
                     }
                     catch
                     {
                         failed++;
+                        ok = false;
                     }
+
+                    progress?.Report(new LeftoverDeleteProgress(i + 1, total, item, ok));
+
+                    // Smooth visual feedback pacing (35ms per item)
+                    System.Threading.Thread.Sleep(35);
                 }
 
                 ActivityLogger.Instance.Log($"Deep clean: removed {deleted}, skipped {failed}.", ActivityType.Info);

@@ -66,6 +66,81 @@ namespace SetupHub180Hz.Models
             }
         }
 
+        private bool _isProcessing;
+        private bool _isDeleted;
+        private bool _isFailed;
+
+        public bool IsProcessing
+        {
+            get => _isProcessing;
+            set
+            {
+                if (_isProcessing != value)
+                {
+                    _isProcessing = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(StatusBadgeVisibility));
+                    OnPropertyChanged(nameof(StatusBadgeText));
+                    OnPropertyChanged(nameof(BadgeBackground));
+                    OnPropertyChanged(nameof(BadgeForeground));
+                }
+            }
+        }
+
+        public bool IsDeleted
+        {
+            get => _isDeleted;
+            set
+            {
+                if (_isDeleted != value)
+                {
+                    _isDeleted = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(StatusBadgeVisibility));
+                    OnPropertyChanged(nameof(StatusBadgeText));
+                    OnPropertyChanged(nameof(BadgeBackground));
+                    OnPropertyChanged(nameof(BadgeForeground));
+                    OnPropertyChanged(nameof(ItemOpacity));
+                }
+            }
+        }
+
+        public bool IsFailed
+        {
+            get => _isFailed;
+            set
+            {
+                if (_isFailed != value)
+                {
+                    _isFailed = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(StatusBadgeVisibility));
+                    OnPropertyChanged(nameof(StatusBadgeText));
+                    OnPropertyChanged(nameof(BadgeBackground));
+                    OnPropertyChanged(nameof(BadgeForeground));
+                }
+            }
+        }
+
+        public bool StatusBadgeVisibility => IsProcessing || IsDeleted || IsFailed;
+
+        public string StatusBadgeText =>
+            IsProcessing ? "⚡ PURGING" :
+            IsDeleted ? "✓ REMOVED" :
+            IsFailed ? "⚠️ SKIPPED" : string.Empty;
+
+        public string BadgeBackground =>
+            IsProcessing ? "#262FB6FF" :
+            IsDeleted ? "#263FCB7E" :
+            IsFailed ? "#26F5B84C" : "Transparent";
+
+        public string BadgeForeground =>
+            IsProcessing ? "#2FB6FF" :
+            IsDeleted ? "#3FCB7E" :
+            IsFailed ? "#F5B84C" : "#A0AEC0";
+
+        public double ItemOpacity => IsDeleted ? 0.45 : 1.0;
+
         public LeftoverViewModel(LeftoverItem item, string fullAppName)
         {
             Item = item;
