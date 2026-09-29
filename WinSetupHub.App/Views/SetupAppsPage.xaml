@@ -1,7 +1,9 @@
 <UserControl x:Class="SetupHub180Hz.Views.SetupAppsPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:models="clr-namespace:SetupHub180Hz.Models">
+             xmlns:models="clr-namespace:SetupHub180Hz.Models"
+             xmlns:lottie="clr-namespace:LottieSharp.WPF;assembly=LottieSharp"
+             xmlns:services="clr-namespace:SetupHub180Hz.Services">
 
     <UserControl.Resources>
         <!-- Category Filter Chip RadioButton -->
@@ -505,16 +507,22 @@
             <Button Grid.Column="1" Content="🔍" Tag="Filter" Style="{StaticResource ExpandableAccentButton}" Margin="8,0,0,0" Click="Search_Click"/>
 
             <!-- Winget Live Web Search Action -->
-            <Button x:Name="WingetSearchButton" Grid.Column="2" Content="🌐" Tag="Deep Web Search"
+            <Button x:Name="WingetSearchButton" Grid.Column="2" Tag="Deep Web Search"
                     Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0"
                     ToolTip="Search winget's full online repository for any software outside preset list"
-                    Click="WingetSearch_Click"/>
+                    Click="WingetSearch_Click">
+                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="scan.json"/>
+            </Button>
 
             <!-- Import & Install Action -->
-            <Button Grid.Column="3" Content="📥" Tag="Import &amp; Install"
+            <Button Grid.Column="3" Tag="Import &amp; Install"
                     Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0"
                     ToolTip="Import software list from JSON and sequentially install missing apps"
-                    Click="ImportInstall_Click"/>
+                    Click="ImportInstall_Click">
+                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="download.json"/>
+            </Button>
         </Grid>
 
         <!-- 4. Batch Selection Action Bar (Shown when 1+ apps selected) -->
@@ -540,7 +548,10 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button x:Name="InstallSelectedButton" Content="⚡" Tag="Install Selected" Style="{StaticResource ExpandableAccentButton}" Click="InstallSelected_Click"/>
+                    <Button x:Name="InstallSelectedButton" Tag="Install Selected" Style="{StaticResource ExpandableAccentButton}" Click="InstallSelected_Click">
+                        <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                                    services:LottieHelper.AssetName="rocket.json"/>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Border>

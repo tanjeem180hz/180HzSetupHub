@@ -1,7 +1,9 @@
 <UserControl x:Class="SetupHub180Hz.Views.StartupManagerPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:models="clr-namespace:SetupHub180Hz.Models">
+             xmlns:models="clr-namespace:SetupHub180Hz.Models"
+             xmlns:lottie="clr-namespace:LottieSharp.WPF;assembly=LottieSharp"
+             xmlns:services="clr-namespace:SetupHub180Hz.Services">
 
     <Grid Margin="28">
         <Grid.RowDefinitions>
@@ -33,8 +35,11 @@
             <TextBlock x:Name="SummaryText" Text="Scanning startup entries…"
                        VerticalAlignment="Center" Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
 
-            <Button Grid.Column="1" Content="🔄" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}"
-                    Click="Refresh_Click"/>
+            <Button Grid.Column="1" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}"
+                    Click="Refresh_Click">
+                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="loading_disc.json"/>
+            </Button>
         </Grid>
 
         <!-- Startup Items List -->

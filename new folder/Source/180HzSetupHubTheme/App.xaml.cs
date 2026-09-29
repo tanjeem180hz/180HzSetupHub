@@ -1,0 +1,170 @@
+using System;
+using System.Windows;
+using System.Windows.Threading;
+using SetupHub180Hz.Models;
+using SetupHub180Hz.Services;
+
+namespace SetupHub180Hz
+{
+    public partial class App : Application
+    {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            // Automatic Run as Administrator:
+            // Ensure 180Hz Setup Hub always runs with Administrator rights
+            // for system package installation, updates, uninstallation, and cleanup.
+            if (!IsRunningAsAdministrator())
+            {
+                if (TryRestartAsAdministrator(e.Args))
+                {
+                    Shutdown();
+                    return;
+                }
+            }
+
+            // Ensure Windows marks this application to always launch elevated
+            EnsureAppCompatRunAsAdmin();
+
+            // Don't let one bad Task/UI exception crash the whole app —
+            // log it and keep the shell alive.
+            DispatcherUnhandledException += OnDispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+
+            ActivityLogger.Instance.Log("Application started (Administrator).", ActivityType.Info);
+            ThemeService.ApplyTheme(SettingsService.Instance.Current.DarkTheme);
+
+            if (Array.Exists(e.Args, a => string.Equals(a, "--auto-check", StringComparison.OrdinalIgnoreCase)))
+            {
+                RunHeadlessAutoCheckAsync();
+                return;
+            }
+
+            UpdateMonitorService.Instance.Start();
+
+            var mainWindow = new MainWindow();
+            mainWindow.Show();
+        }
+
+        public static bool IsRunningAsAdministrator()
+        {
+            try
+            {
+                using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+                var principal = new System.Security.Principal.WindowsPrincipal(identity);
+                return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool TryRestartAsAdministrator(string[]? args = null)
+        {
+            try
+            {
+                var exePath = Environment.ProcessPath;
+                if (string.IsNullOrEmpty(exePath))
+                {
+                    exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+                }
+
+                if (string.IsNullOrEmpty(exePath) || !System.IO.File.Exists(exePath))
+                {
+                    return false;
+                }
+
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = exePath,
+                    UseShellExecute = true,
+                    Verb = "runas",
+                    WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory
+                };
+
+                if (args != null && args.Length > 0)
+                {
+                    psi.Arguments = string.Join(" ", System.Linq.Enumerable.Select(args, a => $"\"{a}\""));
+                }
+
+                var proc = System.Diagnostics.Process.Start(psi);
+                return proc != null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Could not self-elevate: {ex.Message}");
+                return false;
+            }
+        }
+
+        public static void EnsureAppCompatRunAsAdmin()
+        {
+            try
+            {
+                var exePath = Environment.ProcessPath;
+                if (string.IsNullOrEmpty(exePath))
+                {
+                    exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+                }
+
+                if (!string.IsNullOrEmpty(exePath) && System.IO.File.Exists(exePath))
+                {
+                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
+                    if (key != null)
+                    {
+                        var val = key.GetValue(exePath) as string;
+                        if (string.IsNullOrEmpty(val) || !val.Contains("RUNASADMIN"))
+                        {
+                            key.SetValue(exePath, "~ RUNASADMIN");
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Non-critical if registry write fails
+            }
+        }
+
+        private async void RunHeadlessAutoCheckAsync()
+        {
+            try
+            {
+                ActivityLogger.Instance.Log("Running headless scheduled update check…", ActivityType.Info);
+                var winget = new WingetService();
+                var upgradable = await winget.GetUpgradableAppsAsync();
+                if (upgradable.Count > 0)
+                {
+                    ActivityLogger.Instance.Log($"Scheduled check found {upgradable.Count} pending update(s).", ActivityType.Info);
+                    NotificationService.Notify("Updates Available", $"{upgradable.Count} app(s) have pending updates.");
+                }
+                else
+                {
+                    ActivityLogger.Instance.Log("Scheduled check: all applications are up to date.", ActivityType.Info);
+                }
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Scheduled check failed: {ex.Message}", ActivityType.Error);
+            }
+            finally
+            {
+                Shutdown();
+            }
+        }
+
+        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            ActivityLogger.Instance.Log($"Unexpected error: {e.Exception.Message}", ActivityType.Error);
+            e.Handled = true;
+        }
+
+        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if (e.ExceptionObject is Exception ex)
+                ActivityLogger.Instance.Log($"Fatal error: {ex.Message}", ActivityType.Error);
+        }
+    }
+}

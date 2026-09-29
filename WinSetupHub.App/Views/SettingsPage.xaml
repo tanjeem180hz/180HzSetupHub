@@ -39,7 +39,7 @@
 
         <!-- Settings Cards ScrollViewer -->
         <ScrollViewer Grid.Row="1" Style="{StaticResource CleanScrollViewer}">
-            <StackPanel MaxWidth="800" HorizontalAlignment="Left">
+            <StackPanel MaxWidth="1100" HorizontalAlignment="Stretch">
 
                 <!-- 1. Startup Card -->
                 <Border Style="{StaticResource Card}" Margin="0,0,0,16">

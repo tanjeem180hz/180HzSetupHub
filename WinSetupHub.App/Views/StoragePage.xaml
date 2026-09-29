@@ -1,26 +1,133 @@
 <UserControl x:Class="SetupHub180Hz.Views.StoragePage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <StackPanel Margin="28" MaxWidth="600" HorizontalAlignment="Left">
-        <TextBlock Text="Storage" Style="{StaticResource TextHeader}"/>
-        <TextBlock Text="Local data folder where package config, logs, and downloads are kept."
-                   Style="{StaticResource TextBody}" Margin="0,4,0,20"/>
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lottie="clr-namespace:LottieSharp.WPF;assembly=LottieSharp"
+             xmlns:services="clr-namespace:SetupHub180Hz.Services">
+    <Grid Margin="32,24,32,28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <Border Style="{StaticResource Card}">
-            <StackPanel>
-                <TextBlock Text="FOLDER PATH" FontSize="10" Foreground="{StaticResource BrushTextSecondary}"/>
-                <TextBlock x:Name="PathText" Text="—" Foreground="{StaticResource BrushTextPrimary}"
-                           FontFamily="{StaticResource AppFont}" Margin="0,4,0,16" TextWrapping="Wrap"/>
-
-                <TextBlock Text="SIZE ON DISK" FontSize="10" Foreground="{StaticResource BrushTextSecondary}"/>
-                <TextBlock x:Name="SizeText" Text="Calculating…" Foreground="{StaticResource BrushAccent}"
-                           FontSize="22" FontWeight="Bold" Margin="0,4,0,20"/>
-
-                <StackPanel Orientation="Horizontal">
-                    <Button Content="📁" Tag="Open Storage" Style="{StaticResource ExpandableAccentButton}" Click="OpenStorage_Click" Margin="0,0,8,0"/>
-                    <Button Content="🔄" Tag="Refresh Size" Style="{StaticResource ExpandableOutlineButton}" Click="Refresh_Click"/>
-                </StackPanel>
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,18">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Border Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
+                    <TextBlock Text="⚡ STORAGE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                </Border>
+                <TextBlock Text="SYSTEM &amp; APPLICATION FOOTPRINT" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
             </StackPanel>
-        </Border>
-    </StackPanel>
+            <TextBlock Text="Storage &amp; Footprint" Style="{StaticResource TextHeader}" FontSize="26"/>
+            <TextBlock Text="Monitor local application data directories, downloads cache, and primary system drive telemetry."
+                       Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Top Controls -->
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="StorageSummaryText" Text="Telemetry active" VerticalAlignment="Center" Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
+            <Button Grid.Column="1" Tag="Refresh Size" Style="{StaticResource ExpandableOutlineButton}" Margin="0,0,8,0" Click="Refresh_Click">
+                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="loading_disc.json"/>
+            </Button>
+            <Button Grid.Column="2" Content="📁" Tag="Open Storage Folder" Style="{StaticResource ExpandableAccentButton}" Click="OpenStorage_Click"/>
+        </Grid>
+
+        <!-- Cards -->
+        <ScrollViewer Grid.Row="2" Style="{StaticResource CleanScrollViewer}">
+            <Grid x:Name="CardsGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Card 1: App Data Footprint -->
+                <Border Grid.Column="0" Style="{StaticResource Card}" CornerRadius="10" Padding="22" VerticalAlignment="Top">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,14">
+                            <lottie:LottieAnimationView Width="22" Height="22" AutoPlay="True" RepeatCount="-1"
+                                                        services:LottieHelper.AssetName="scan.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="180Hz HUB APPLICATION DATA" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Margin="0,0,0,16">
+                            <TextBlock Text="SIZE ON DISK" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                            <TextBlock x:Name="SizeText" Text="Calculating…" Foreground="{DynamicResource BrushAccent}" FontSize="28" FontWeight="Bold" Margin="0,4,0,2"/>
+                            <TextBlock Text="Includes installer cache, manifests, app catalogs, and event history" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Margin="0,0,0,16">
+                            <TextBlock Text="APPLICATION DATA DIRECTORY" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                            <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,4,0,0">
+                                <TextBlock x:Name="PathText" Text="—" Foreground="{DynamicResource BrushTextPrimary}"
+                                           FontFamily="{StaticResource AppFont}" FontSize="12" TextWrapping="Wrap"/>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="3" Orientation="Horizontal">
+                            <Button Content="📁" Tag="Open Directory" Style="{StaticResource ExpandableAccentButton}" Click="OpenStorage_Click" Margin="0,0,8,0"/>
+                            <Button Tag="Recalculate" Style="{StaticResource ExpandableOutlineButton}" Click="Refresh_Click">
+                                <lottie:LottieAnimationView Width="14" Height="14" AutoPlay="True" RepeatCount="-1"
+                                                            services:LottieHelper.AssetName="loading_disc.json"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Card 2: System Drive C: Telemetry -->
+                <Border Grid.Column="2" Style="{StaticResource Card}" CornerRadius="10" Padding="22" VerticalAlignment="Top">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,14">
+                            <lottie:LottieAnimationView Width="22" Height="22" AutoPlay="True" RepeatCount="-1"
+                                                        services:LottieHelper.AssetName="rocket.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="SYSTEM PRIMARY DRIVE (C:)" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Margin="0,0,0,14">
+                            <TextBlock Text="FREE CAPACITY" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,2">
+                                <TextBlock x:Name="DriveFreeText" Text="0.0 GB Free" Foreground="{DynamicResource BrushTextPrimary}" FontSize="28" FontWeight="Bold"/>
+                                <TextBlock x:Name="DriveTotalText" Text=" of 0.0 GB" Foreground="{DynamicResource BrushTextSecondary}" FontSize="14" VerticalAlignment="Bottom" Margin="6,0,0,5"/>
+                            </StackPanel>
+                            <ProgressBar x:Name="DriveProgressBar" Style="{StaticResource FlatProgressBar}" Height="8" Minimum="0" Maximum="100" Value="0" Margin="0,8,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Margin="0,0,0,18">
+                            <TextBlock Text="DRIVE HEALTH &amp; OPTIMIZATION" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                            <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="12,10" Margin="0,4,0,0">
+                                <StackPanel>
+                                    <TextBlock x:Name="DriveStatusText" Text="NTFS Primary Partition Healthy" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource BrushSuccess}"/>
+                                    <TextBlock Text="Run Cleanup module anytime to purge cache and gain immediate free space." FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="3" Orientation="Horizontal">
+                            <Button Content="🧹" Tag="Run Cleanup" Style="{StaticResource ExpandableAccentButton}" Click="OpenCleanup_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

@@ -28,6 +28,14 @@ namespace SetupHub180Hz
                     isMax ? "M 2.5,0.5 H 9.5 V 7.5 H 2.5 Z M 0.5,2.5 H 7.5 V 9.5 H 0.5 Z"
                           : "M 0.5,0.5 H 9.5 V 9.5 H 0.5 Z");
                 MaximizeButton.ToolTip = isMax ? "Restore Down" : "Maximize";
+                if (RootGrid != null)
+                {
+                    RootGrid.Margin = isMax ? new Thickness(7) : new Thickness(0);
+                }
+                if (ContentHost != null)
+                {
+                    PlayEnterAnimation(ContentHost);
+                }
             };
 
             Activated += async (_, _) =>

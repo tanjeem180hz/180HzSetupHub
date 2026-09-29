@@ -27,8 +27,11 @@ namespace SetupHub180Hz.Views
 
             UpdateMonitorService.Instance.UpgradableApps.CollectionChanged += (_, _) => UpdateSummary();
 
+            SizeChanged += (_, _) => AdaptLayout();
+
             Loaded += async (_, _) =>
             {
+                AdaptLayout();
                 UpdateStats();
                 _statsTimer.Start();
                 await CheckEngineAsync();
@@ -39,6 +42,31 @@ namespace SetupHub180Hz.Views
             {
                 _statsTimer.Stop();
             };
+        }
+
+        private void AdaptLayout()
+        {
+            double width = ActualWidth;
+            if (width <= 0) return;
+
+            if (SystemStatsSection != null)
+            {
+                SystemStatsSection.Columns = width < 880 ? 1 : 3;
+            }
+
+            if (ModulesGrid != null)
+            {
+                if (width < 960)
+                {
+                    ModulesGrid.Columns = 2;
+                    ModulesGrid.Rows = 3;
+                }
+                else
+                {
+                    ModulesGrid.Columns = 3;
+                    ModulesGrid.Rows = 2;
+                }
+            }
         }
 
         private void UpdateStats()

@@ -62,6 +62,26 @@ namespace SetupHub180Hz.Services
             }
         }
 
+        public void Clear()
+        {
+            void DoClear()
+            {
+                Entries.Clear();
+                try
+                {
+                    if (File.Exists(_logFile)) File.Delete(_logFile);
+                }
+                catch
+                {
+                }
+            }
+
+            if (Application.Current?.Dispatcher.CheckAccess() == false)
+                Application.Current.Dispatcher.Invoke(DoClear);
+            else
+                DoClear();
+        }
+
         private void Save()
         {
             try

@@ -1,7 +1,9 @@
 <UserControl x:Class="SetupHub180Hz.Views.UpdateCenterPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:models="clr-namespace:SetupHub180Hz.Models">
+             xmlns:models="clr-namespace:SetupHub180Hz.Models"
+             xmlns:lottie="clr-namespace:LottieSharp.WPF;assembly=LottieSharp"
+             xmlns:services="clr-namespace:SetupHub180Hz.Services">
 
     <UserControl.Resources>
         <!-- Clean ListBox Item Style -->
@@ -135,9 +137,8 @@
                     <!-- 3. Upgrade Button & Official Link -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                         <ContentControl Loaded="OfficialLinkContainer_Loaded" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                        <Button Content="Upgrade"
-                                Style="{StaticResource AccentButton}"
-                                Padding="18,7,18,7"
+                        <Button Content="⬆" Tag="Upgrade"
+                                Style="{StaticResource ExpandableAccentButton}"
                                 VerticalAlignment="Center"
                                 Click="UpgradeButton_Click"/>
                     </StackPanel>
@@ -173,8 +174,14 @@
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="SummaryText" Text="Checking for updates…" VerticalAlignment="Center"
                        Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
-            <Button Grid.Column="1" Content="🔄" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}" Margin="0,0,8,0" Click="Refresh_Click"/>
-            <Button x:Name="UpgradeAllButton" Grid.Column="2" Content="⚡" Tag="Upgrade All" Style="{StaticResource ExpandableAccentButton}" Click="UpgradeAll_Click"/>
+            <Button Grid.Column="1" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}" Margin="0,0,8,0" Click="Refresh_Click">
+                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="loading_disc.json"/>
+            </Button>
+            <Button x:Name="UpgradeAllButton" Grid.Column="2" Tag="Upgrade All" Style="{StaticResource ExpandableAccentButton}" Click="UpgradeAll_Click">
+                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="rocket.json"/>
+            </Button>
         </Grid>
 
         <ListBox Grid.Row="2"

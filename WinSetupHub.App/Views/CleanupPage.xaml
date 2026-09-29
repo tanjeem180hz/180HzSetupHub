@@ -1,16 +1,25 @@
 <UserControl x:Class="SetupHub180Hz.Views.CleanupPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Grid Margin="28">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:lottie="clr-namespace:LottieSharp.WPF;assembly=LottieSharp"
+             xmlns:services="clr-namespace:SetupHub180Hz.Services">
+    <Grid Margin="32,24,32,28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Text="Cleanup" Style="{StaticResource TextHeader}"/>
-            <TextBlock Text="Temp files and caches that are safe to remove." Style="{StaticResource TextBody}" Margin="0,4,0,16"/>
+        <StackPanel Grid.Row="0" Margin="0,0,0,18">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
+                    <TextBlock Text="⚡ CLEANUP" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                </Border>
+                <TextBlock Text="SAFE SYSTEM CACHE PURGE" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <TextBlock Text="Cleanup" Style="{StaticResource TextHeader}" FontSize="26"/>
+            <TextBlock Text="Identify and safely purge temporary directories, application caches, and leftover staging files."
+                       Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
         </StackPanel>
 
         <Grid Grid.Row="1" Margin="0,0,0,16">
@@ -19,9 +28,15 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="SummaryText" Text="Scanning…" VerticalAlignment="Center" Style="{StaticResource TextBody}"/>
-            <Button Grid.Column="1" Content="Rescan" Style="{StaticResource OutlineButton}" Margin="0,0,8,0" Click="Rescan_Click"/>
-            <Button x:Name="CleanSelectedButton" Grid.Column="2" Content="Clean Selected" Style="{StaticResource AccentButton}" Click="CleanSelected_Click"/>
+            <TextBlock x:Name="SummaryText" Text="Scanning…" VerticalAlignment="Center" Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
+            <Button Grid.Column="1" Tag="Rescan" Style="{StaticResource ExpandableOutlineButton}" Margin="0,0,8,0" Click="Rescan_Click">
+                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="loading_disc.json"/>
+            </Button>
+            <Button x:Name="CleanSelectedButton" Grid.Column="2" Tag="Clean Selected" Style="{StaticResource ExpandableAccentButton}" Click="CleanSelected_Click">
+                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="rocket.json"/>
+            </Button>
         </Grid>
 
         <ScrollViewer Grid.Row="2" Style="{StaticResource CleanScrollViewer}">
