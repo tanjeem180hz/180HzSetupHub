@@ -244,10 +244,10 @@
                         </RadioButton>
                     </StackPanel>
 
-                    <!-- Bottom Section: Dark/Light Theme Button & Status Footer -->
+                    <!-- Bottom Section: Dark/Light Theme Button (Sidebar Footer) -->
                     <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
                         <!-- Theme Toggle Button inside Sidebar -->
-                        <Button x:Name="SidebarThemeButton" Style="{StaticResource SidebarButton}" Margin="0,0,0,8"
+                        <Button x:Name="SidebarThemeButton" Style="{StaticResource SidebarButton}" Margin="0,0,0,0"
                                 Click="ThemeToggle_Click" ToolTip="Toggle Dark / Light Theme">
                             <Grid Width="180">
                                 <Grid.ColumnDefinitions>
@@ -258,22 +258,6 @@
                                 <TextBlock x:Name="SidebarThemeLabel" Grid.Column="1" Text="Light Theme" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>
                         </Button>
-
-                        <!-- Status footer -->
-                        <Border x:Name="SidebarStatusCard" Style="{StaticResource Card}" Padding="8" CornerRadius="6" VerticalAlignment="Bottom">
-                            <Grid Width="180">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="36"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Ellipse Width="8" Height="8" Fill="{DynamicResource BrushSuccess}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <StackPanel x:Name="SidebarStatusPanel" Grid.Column="1" VerticalAlignment="Center" Opacity="0">
-                                    <TextBlock Text="STATUS" FontSize="9" Foreground="{DynamicResource BrushTextSecondary}"/>
-                                    <TextBlock x:Name="StatusText" Text="Ready for setup" Foreground="{DynamicResource BrushTextPrimary}"
-                                               FontFamily="{StaticResource AppFont}" FontWeight="SemiBold" FontSize="11" Margin="0,2,0,0"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
                     </StackPanel>
                 </DockPanel>
             </Border>

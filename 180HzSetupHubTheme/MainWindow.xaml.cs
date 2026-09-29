@@ -172,8 +172,7 @@ namespace SetupHub180Hz
                 NavActivityLabel,
                 NavStorageLabel,
                 NavSettingsLabel,
-                SidebarThemeLabel,
-                SidebarStatusPanel
+                SidebarThemeLabel
             };
 
             foreach (var elem in textElements)
@@ -249,7 +248,10 @@ namespace SetupHub180Hz
             PlayEnterAnimation(ContentHost);
         }
 
-        public void SetStatus(string text) => StatusText.Text = text;
+        public void SetStatus(string text)
+        {
+            // Status bar removed per user request; kept as safe no-op for backward compatibility
+        }
 
         public void GoToPage(string pageKey)
         {
