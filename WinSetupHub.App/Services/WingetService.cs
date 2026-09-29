@@ -315,19 +315,6 @@ namespace SetupHub180Hz.Services
                 using var process = new Process { StartInfo = psi, EnableRaisingEvents = true };
                 var sb = new StringBuilder();
 
-                process.OutputDataReceived += (_, e) =>
-                {
-                    if (e.Data == null) return;
-                    sb.AppendLine(e.Data);
-                    onOutputLine?.Invoke(e.Data);
-                };
-                process.ErrorDataReceived += (_, e) =>
-                {
-                    if (e.Data == null) return;
-                    sb.AppendLine(e.Data);
-                    onOutputLine?.Invoke(e.Data);
-                };
-
                 using var reg = ct.Register(() =>
                 {
                     try { process.Kill(true); } catch { }
@@ -336,17 +323,98 @@ namespace SetupHub180Hz.Services
                 try
                 {
                     process.Start();
-                    process.BeginOutputReadLine();
-                    process.BeginErrorReadLine();
+
+                    var readOutputTask = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var reader = process.StandardOutput;
+                            var lineBuf = new StringBuilder();
+                            char[] buf = new char[512];
+                            int read;
+                            while ((read = await reader.ReadAsync(buf, 0, buf.Length)) > 0)
+                            {
+                                for (int i = 0; i < read; i++)
+                                {
+                                    char c = buf[i];
+                                    if (c == '\r' || c == '\n')
+                                    {
+                                        if (lineBuf.Length > 0)
+                                        {
+                                            string line = lineBuf.ToString().Trim();
+                                            lineBuf.Clear();
+                                            if (!string.IsNullOrWhiteSpace(line))
+                                            {
+                                                lock (sb) sb.AppendLine(line);
+                                                onOutputLine?.Invoke(line);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        lineBuf.Append(c);
+                                    }
+                                }
+                            }
+                            if (lineBuf.Length > 0)
+                            {
+                                string line = lineBuf.ToString().Trim();
+                                if (!string.IsNullOrWhiteSpace(line))
+                                {
+                                    lock (sb) sb.AppendLine(line);
+                                    onOutputLine?.Invoke(line);
+                                }
+                            }
+                        }
+                        catch { }
+                    });
+
+                    var readErrorTask = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            var reader = process.StandardError;
+                            var lineBuf = new StringBuilder();
+                            char[] buf = new char[512];
+                            int read;
+                            while ((read = await reader.ReadAsync(buf, 0, buf.Length)) > 0)
+                            {
+                                for (int i = 0; i < read; i++)
+                                {
+                                    char c = buf[i];
+                                    if (c == '\r' || c == '\n')
+                                    {
+                                        if (lineBuf.Length > 0)
+                                        {
+                                            string line = lineBuf.ToString().Trim();
+                                            lineBuf.Clear();
+                                            if (!string.IsNullOrWhiteSpace(line))
+                                            {
+                                                lock (sb) sb.AppendLine(line);
+                                                onOutputLine?.Invoke(line);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        lineBuf.Append(c);
+                                    }
+                                }
+                            }
+                        }
+                        catch { }
+                    });
 
                     bool exited = process.WaitForExit(timeoutMs);
+                    try { Task.WaitAll(new[] { readOutputTask, readErrorTask }, 1500); } catch { }
+
                     if (!exited || ct.IsCancellationRequested)
                     {
                         try { process.Kill(true); } catch { }
-                        return (-1, sb.ToString());
+                        lock (sb) return (-1, sb.ToString());
                     }
 
-                    return (process.ExitCode, sb.ToString());
+                    lock (sb) return (process.ExitCode, sb.ToString());
                 }
                 catch (Exception ex)
                 {

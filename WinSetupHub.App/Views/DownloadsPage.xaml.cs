@@ -172,7 +172,14 @@ namespace SetupHub180Hz.Views
             ActiveVersionText.Text = info.App.FormattedVersion;
             ActiveStatusDetail.Text = string.IsNullOrWhiteSpace(info.StatusMessage) ? "Processing installation payload…" : info.StatusMessage;
 
-            ActiveProgressBar.Value = Math.Clamp(info.Percentage, 0, 100);
+            double targetPct = Math.Clamp(info.Percentage, 0, 100);
+            var anim = new System.Windows.Media.Animation.DoubleAnimation
+            {
+                To = targetPct,
+                Duration = TimeSpan.FromMilliseconds(200),
+                EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
+            };
+            ActiveProgressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, anim);
             ActiveProgressPercent.Text = $"{info.Percentage:0}%";
             ActiveSpeedText.Text = info.SpeedFormatted;
             ActiveEtaText.Text = info.EtaFormatted;

@@ -871,7 +871,14 @@ namespace SetupHub180Hz.Views
                 PopupAppName.Text = info.App.Name;
                 PopupAppIcon.Source = info.App.IconImageSource;
                 PopupQueueText.Text = $"App {info.QueueIndex} of {info.QueueTotal}";
-                PopupProgressBar.Value = info.Percentage;
+                double targetPct = Math.Clamp(info.Percentage, 0, 100);
+                var anim = new System.Windows.Media.Animation.DoubleAnimation
+                {
+                    To = targetPct,
+                    Duration = TimeSpan.FromMilliseconds(200),
+                    EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
+                };
+                PopupProgressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, anim);
 
                 PopupPercentageText.Text = $"{info.Percentage:0}%";
                 PopupSpeedText.Text = info.SpeedFormatted;
