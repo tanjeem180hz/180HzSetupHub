@@ -67,6 +67,9 @@
 
     <!-- ============ EASING ============ -->
     <CubicEase x:Key="EaseOutCubic" EasingMode="EaseOut"/>
+    <QuarticEase x:Key="EaseOutQuartic" EasingMode="EaseOut"/>
+    <QuarticEase x:Key="EaseInQuartic" EasingMode="EaseIn"/>
+    <QuarticEase x:Key="EaseInOutQuartic" EasingMode="EaseInOut"/>
 
     <!-- ============ WINDOW BASE STYLE ============ -->
     <Style TargetType="Window" x:Key="AppWindow">
@@ -317,8 +320,8 @@
         </Setter>
     </Style>
 
-    <!-- ============ EXPANDABLE ANIMATED ICON BUTTONS ============ -->
-    <!-- Displays Content (Icon) by default. On hover, smoothly expands with CubicEase revealing Tag (Label). -->
+    <!-- ============ EXPANDABLE ANIMATED ICON BUTTONS (Motion Design) ============ -->
+    <!-- Displays Content (Icon) by default. On hover, smoothly expands with QuarticEase revealing Tag (Label). -->
     <Style x:Key="ExpandableOutlineButton" TargetType="Button">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
@@ -342,6 +345,9 @@
                             <ContentPresenter x:Name="IconPart" ContentSource="Content"
                                               VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <Border x:Name="LabelWrapper" MaxWidth="0" Opacity="0" ClipToBounds="True" VerticalAlignment="Center">
+                                <Border.RenderTransform>
+                                    <TranslateTransform X="-6"/>
+                                </Border.RenderTransform>
                                 <TextBlock x:Name="LabelText"
                                            Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
                                            Foreground="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}"
@@ -362,14 +368,25 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="LabelWrapper"
                                                          Storyboard.TargetProperty="MaxWidth"
-                                                         To="220" Duration="0:0:0.22">
+                                                         To="240" Duration="0:0:0.25">
                                             <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
+                                                <QuarticEase EasingMode="EaseOut"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="LabelWrapper"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="1.0" Duration="0:0:0.20"/>
+                                                         To="1.0" Duration="0:0:0.22">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="LabelWrapper"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                         To="0" Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -380,12 +397,23 @@
                                                          Storyboard.TargetProperty="MaxWidth"
                                                          To="0" Duration="0:0:0.18">
                                             <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseIn"/>
+                                                <QuarticEase EasingMode="EaseIn"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="LabelWrapper"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="0" Duration="0:0:0.15"/>
+                                                         To="0" Duration="0:0:0.14">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="LabelWrapper"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                         To="-6" Duration="0:0:0.18">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -416,6 +444,9 @@
                             <ContentPresenter x:Name="IconPart" ContentSource="Content"
                                               VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <Border x:Name="LabelWrapper" MaxWidth="0" Opacity="0" ClipToBounds="True" VerticalAlignment="Center">
+                                <Border.RenderTransform>
+                                    <TranslateTransform X="-6"/>
+                                </Border.RenderTransform>
                                 <TextBlock x:Name="LabelText"
                                            Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
                                            Foreground="White"
@@ -435,14 +466,25 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="LabelWrapper"
                                                          Storyboard.TargetProperty="MaxWidth"
-                                                         To="220" Duration="0:0:0.22">
+                                                         To="240" Duration="0:0:0.25">
                                             <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
+                                                <QuarticEase EasingMode="EaseOut"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="LabelWrapper"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="1.0" Duration="0:0:0.20"/>
+                                                         To="1.0" Duration="0:0:0.22">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="LabelWrapper"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                         To="0" Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -453,12 +495,23 @@
                                                          Storyboard.TargetProperty="MaxWidth"
                                                          To="0" Duration="0:0:0.18">
                                             <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseIn"/>
+                                                <QuarticEase EasingMode="EaseIn"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="LabelWrapper"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="0" Duration="0:0:0.15"/>
+                                                         To="0" Duration="0:0:0.14">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="LabelWrapper"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                         To="-6" Duration="0:0:0.18">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -490,6 +543,9 @@
                             <ContentPresenter x:Name="IconPart" ContentSource="Content"
                                               VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <Border x:Name="LabelWrapper" MaxWidth="0" Opacity="0" ClipToBounds="True" VerticalAlignment="Center">
+                                <Border.RenderTransform>
+                                    <TranslateTransform X="-6"/>
+                                </Border.RenderTransform>
                                 <TextBlock x:Name="LabelText"
                                            Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
                                            Foreground="{DynamicResource BrushError}"
@@ -510,14 +566,25 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="LabelWrapper"
                                                          Storyboard.TargetProperty="MaxWidth"
-                                                         To="220" Duration="0:0:0.22">
+                                                         To="240" Duration="0:0:0.25">
                                             <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
+                                                <QuarticEase EasingMode="EaseOut"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="LabelWrapper"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="1.0" Duration="0:0:0.20"/>
+                                                         To="1.0" Duration="0:0:0.22">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="LabelWrapper"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                         To="0" Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -528,12 +595,23 @@
                                                          Storyboard.TargetProperty="MaxWidth"
                                                          To="0" Duration="0:0:0.18">
                                             <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseIn"/>
+                                                <QuarticEase EasingMode="EaseIn"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="LabelWrapper"
                                                          Storyboard.TargetProperty="Opacity"
-                                                         To="0" Duration="0:0:0.15"/>
+                                                         To="0" Duration="0:0:0.14">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="LabelWrapper"
+                                                         Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                                                         To="-6" Duration="0:0:0.18">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuarticEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -676,11 +754,20 @@
         <Setter Property="Padding" Value="0,0,4,0"/>
     </Style>
 
-    <!-- ============ PAGE ENTER TRANSITION (fade + slide, GPU-cheap) ============ -->
+    <!-- ============ PAGE ENTER TRANSITION (motion design: smooth organic glide + bloom) ============ -->
     <Storyboard x:Key="PageEnterAnimation">
         <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                          From="0" To="1" Duration="0:0:0.15"
-                          EasingFunction="{StaticResource EaseOutCubic}"/>
+                         From="0.0" To="1.0" Duration="0:0:0.24">
+            <DoubleAnimation.EasingFunction>
+                <QuarticEase EasingMode="EaseOut"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                         From="12" To="0" Duration="0:0:0.28">
+            <DoubleAnimation.EasingFunction>
+                <QuarticEase EasingMode="EaseOut"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
     </Storyboard>
 
     <!-- ============ TOGGLE SWITCH (pill 36x20) ============ -->

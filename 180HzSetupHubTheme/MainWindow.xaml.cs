@@ -118,8 +118,8 @@ namespace SetupHub180Hz
                 var anim = new DoubleAnimation
                 {
                     To = targetWidth,
-                    Duration = TimeSpan.FromMilliseconds(220),
-                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    Duration = TimeSpan.FromMilliseconds(260),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
                 };
                 SidebarBorder.BeginAnimation(WidthProperty, anim);
             }
@@ -142,8 +142,8 @@ namespace SetupHub180Hz
                 var anim = new DoubleAnimation
                 {
                     To = targetWidth,
-                    Duration = TimeSpan.FromMilliseconds(180),
-                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+                    Duration = TimeSpan.FromMilliseconds(200),
+                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseIn }
                 };
                 SidebarBorder.BeginAnimation(WidthProperty, anim);
             }
@@ -175,24 +175,42 @@ namespace SetupHub180Hz
                 SidebarThemeLabel
             };
 
+            bool isExpanding = targetOpacity > 0.5;
+
             foreach (var elem in textElements)
             {
                 if (elem == null) continue;
 
+                if (elem.RenderTransform is not TranslateTransform tt)
+                {
+                    tt = new TranslateTransform();
+                    elem.RenderTransform = tt;
+                }
+
                 if (animate)
                 {
-                    var anim = new DoubleAnimation
+                    var opacAnim = new DoubleAnimation
                     {
                         To = targetOpacity,
-                        Duration = TimeSpan.FromMilliseconds(180),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        Duration = TimeSpan.FromMilliseconds(isExpanding ? 240 : 160),
+                        EasingFunction = new QuarticEase { EasingMode = isExpanding ? EasingMode.EaseOut : EasingMode.EaseIn }
                     };
-                    elem.BeginAnimation(OpacityProperty, anim);
+                    elem.BeginAnimation(OpacityProperty, opacAnim);
+
+                    var transAnim = new DoubleAnimation
+                    {
+                        To = isExpanding ? 0 : -8,
+                        Duration = TimeSpan.FromMilliseconds(isExpanding ? 260 : 180),
+                        EasingFunction = new QuarticEase { EasingMode = isExpanding ? EasingMode.EaseOut : EasingMode.EaseIn }
+                    };
+                    tt.BeginAnimation(TranslateTransform.XProperty, transAnim);
                 }
                 else
                 {
                     elem.BeginAnimation(OpacityProperty, null);
                     elem.Opacity = targetOpacity;
+                    tt.BeginAnimation(TranslateTransform.XProperty, null);
+                    tt.X = isExpanding ? 0 : -8;
                 }
             }
         }
