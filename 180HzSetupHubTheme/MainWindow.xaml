@@ -4,7 +4,7 @@
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         Title="180Hz Setup Hub" Height="800" Width="1280" MinHeight="560" MinWidth="900"
         WindowStyle="None" ResizeMode="CanResize" AllowsTransparency="False"
-        Background="{StaticResource BrushBackground}"
+        Background="{DynamicResource BrushBackground}"
         Icon="Assets/AppIcon.ico"
         Style="{StaticResource AppWindow}">
 
@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
 
         <!-- ===== Custom Title Bar ===== -->
-        <Grid Grid.Row="0" Background="{StaticResource BrushSurface}">
+        <Grid x:Name="TitleBarGrid" Grid.Row="0" Background="{DynamicResource BrushSurface}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -33,22 +33,22 @@
             <StackPanel Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center"
                         shell:WindowChrome.IsHitTestVisibleInChrome="False">
                 <Border Width="22" Height="22" CornerRadius="5" Background="#16253B"
-                        BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" ClipToBounds="True" Margin="0,0,8,0">
+                        BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" ClipToBounds="True" Margin="0,0,8,0">
                     <Image Source="pack://application:,,,/Assets/AppIcon-1024.png" Width="18" Height="18"
                            Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
                 </Border>
                 <TextBlock Text="180Hz Setup Hub" VerticalAlignment="Center"
-                           Foreground="{StaticResource BrushTextPrimary}" FontFamily="{StaticResource AppFont}"
+                           Foreground="{DynamicResource BrushTextPrimary}" FontFamily="{StaticResource AppFont}"
                            FontSize="12" FontWeight="SemiBold"/>
                 <Border Background="#1C2E44" CornerRadius="4" Padding="5,1" Margin="8,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="PRO" FontSize="9" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
+                    <TextBlock Text="PRO" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
                 </Border>
             </StackPanel>
 
             <!-- Chrome Controls: Theme Pill & Vector Window Buttons -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                <!-- Theme Toggle Button -->
-                <Button x:Name="ThemeToggleButton" Style="{StaticResource ThemeToggleButtonStyle}" Margin="0,0,8,0" Click="ThemeToggle_Click" ToolTip="Toggle Dark / Light Theme">
+                <!-- Theme Toggle Button in Titlebar -->
+                <Button x:Name="ThemeToggleButton" Style="{StaticResource ThemeToggleButtonStyle}" Margin="0,0,10,0" Click="ThemeToggle_Click" ToolTip="Toggle Dark / Light Theme">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock x:Name="ThemeToggleIcon" Text="☀️" FontSize="11" Margin="0,0,6,0" VerticalAlignment="Center"/>
                         <TextBlock x:Name="ThemeToggleText" Text="Light" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
@@ -77,86 +77,209 @@
             </StackPanel>
         </Grid>
 
-        <!-- ===== Body: Sidebar + Content ===== -->
+        <!-- ===== Body: Collapsible Animated Sidebar + Content ===== -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Sidebar -->
-            <Border Grid.Column="0" Background="{StaticResource BrushBackground}"
-                    BorderBrush="{StaticResource BrushBorder}" BorderThickness="0,0,1,0">
-                <DockPanel Margin="10">
+            <!-- Sidebar (Collapsible / Auto-Expanding with smooth animation) -->
+            <Border x:Name="SidebarBorder" Grid.Column="0" Width="68"
+                    Background="{DynamicResource BrushBackground}"
+                    BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,1,0"
+                    ClipToBounds="True"
+                    MouseEnter="Sidebar_MouseEnter" MouseLeave="Sidebar_MouseLeave">
+                <DockPanel Margin="10,10,10,12">
+                    <!-- Top section: Header & Nav Items -->
                     <StackPanel DockPanel.Dock="Top">
+                        <!-- Sidebar Header with Pin/Expand toggle -->
+                        <Grid Margin="0,0,0,10" Height="28">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="BtnSidebarToggle" Grid.Column="0" Style="{StaticResource SidebarButton}"
+                                    Height="28" Padding="0" Click="SidebarToggle_Click" ToolTip="Pin / Unpin Sidebar">
+                                <TextBlock x:Name="SidebarToggleIcon" Text="☰" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
+
+                            <TextBlock x:Name="SidebarBrandText" Grid.Column="1" Text="NAVIGATION" FontSize="10" FontWeight="Bold"
+                                       Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" Margin="6,0,0,0" Opacity="0"/>
+
+                            <Button x:Name="BtnPinSidebar" Grid.Column="2" Style="{StaticResource SidebarButton}"
+                                    Height="24" Padding="4,2" Click="SidebarToggle_Click" ToolTip="Lock Sidebar Expanded" Opacity="0">
+                                <TextBlock x:Name="SidebarPinIcon" Text="📌" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Button>
+                        </Grid>
+
+                        <!-- Nav Items -->
                         <RadioButton x:Name="NavDashboard" Style="{StaticResource SidebarItem}" IsChecked="True"
-                                     Checked="NavItem_Checked" Tag="Dashboard" Margin="0,0,0,4">
-                            <TextBlock Text="🏠  Dashboard"/>
-                        </RadioButton>
-                        <RadioButton x:Name="NavSetupApps" Style="{StaticResource SidebarItem}"
-                                     Checked="NavItem_Checked" Tag="SetupApps" Margin="0,0,0,4">
-                            <TextBlock Text="⚙️  Setup Apps"/>
-                        </RadioButton>
-                        <RadioButton x:Name="NavDownloads" Style="{StaticResource SidebarItem}"
-                                     Checked="NavItem_Checked" Tag="Downloads" Margin="0,0,0,4">
-                            <Grid Width="176">
+                                     Checked="NavItem_Checked" Tag="Dashboard" Margin="0,0,0,4" ToolTip="Dashboard">
+                            <Grid Width="180">
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="🏠" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="NavDashboardLabel" Grid.Column="1" Text="Dashboard" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                            </Grid>
+                        </RadioButton>
+
+                        <RadioButton x:Name="NavSetupApps" Style="{StaticResource SidebarItem}"
+                                     Checked="NavItem_Checked" Tag="SetupApps" Margin="0,0,0,4" ToolTip="Setup Apps">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="⚙️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="NavSetupAppsLabel" Grid.Column="1" Text="Setup Apps" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                            </Grid>
+                        </RadioButton>
+
+                        <RadioButton x:Name="NavDownloads" Style="{StaticResource SidebarItem}"
+                                     Checked="NavItem_Checked" Tag="Downloads" Margin="0,0,0,4" ToolTip="Downloads &amp; Bandwidth">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="📥  Downloads" VerticalAlignment="Center"/>
-                                <Border x:Name="DownloadsNavBadge" Grid.Column="1" Background="{StaticResource BrushAccent}"
-                                        CornerRadius="8" Padding="6,1" Margin="6,0,0,0" Visibility="Collapsed" VerticalAlignment="Center">
+                                <TextBlock Text="📥" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="NavDownloadsLabel" Grid.Column="1" Text="Downloads" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                                <Border x:Name="DownloadsNavBadge" Grid.Column="2" Background="{DynamicResource BrushAccent}"
+                                        CornerRadius="8" Padding="6,1" Margin="4,0,0,0" Visibility="Collapsed" VerticalAlignment="Center">
                                     <TextBlock x:Name="DownloadsNavBadgeText" Text="0" FontSize="10" FontWeight="Bold" Foreground="#0A0E17"/>
                                 </Border>
                             </Grid>
                         </RadioButton>
+
                         <RadioButton x:Name="NavUpdateCenter" Style="{StaticResource SidebarItem}"
-                                     Checked="NavItem_Checked" Tag="UpdateCenter" Margin="0,0,0,4">
-                            <TextBlock Text="🔄  Update Center"/>
+                                     Checked="NavItem_Checked" Tag="UpdateCenter" Margin="0,0,0,4" ToolTip="Update Center">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="🔄" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="NavUpdateCenterLabel" Grid.Column="1" Text="Update Center" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                            </Grid>
                         </RadioButton>
+
                         <RadioButton x:Name="NavUninstaller" Style="{StaticResource SidebarItem}"
-                                     Checked="NavItem_Checked" Tag="Uninstaller" Margin="0,0,0,4">
-                            <TextBlock Text="🗑️  Uninstaller"/>
+                                     Checked="NavItem_Checked" Tag="Uninstaller" Margin="0,0,0,4" ToolTip="Uninstaller">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="🗑️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="NavUninstallerLabel" Grid.Column="1" Text="Uninstaller" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                            </Grid>
                         </RadioButton>
+
                         <RadioButton x:Name="NavStartup" Style="{StaticResource SidebarItem}"
-                                     Checked="NavItem_Checked" Tag="Startup" Margin="0,0,0,4">
-                            <TextBlock Text="🚀  Startup Apps"/>
+                                     Checked="NavItem_Checked" Tag="Startup" Margin="0,0,0,4" ToolTip="Startup Apps">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="🚀" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="NavStartupLabel" Grid.Column="1" Text="Startup Apps" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                            </Grid>
                         </RadioButton>
+
                         <RadioButton x:Name="NavCleanup" Style="{StaticResource SidebarItem}"
-                                     Checked="NavItem_Checked" Tag="Cleanup" Margin="0,0,0,4">
-                            <TextBlock Text="🧹  Cleanup"/>
+                                     Checked="NavItem_Checked" Tag="Cleanup" Margin="0,0,0,4" ToolTip="Disk Cleanup">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="🧹" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="NavCleanupLabel" Grid.Column="1" Text="Cleanup" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                            </Grid>
                         </RadioButton>
+
                         <RadioButton x:Name="NavActivity" Style="{StaticResource SidebarItem}"
-                                     Checked="NavItem_Checked" Tag="Activity" Margin="0,0,0,4">
-                            <TextBlock Text="📈  Activity"/>
+                                     Checked="NavItem_Checked" Tag="Activity" Margin="0,0,0,4" ToolTip="Activity Log">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="📈" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="NavActivityLabel" Grid.Column="1" Text="Activity" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                            </Grid>
                         </RadioButton>
+
                         <RadioButton x:Name="NavStorage" Style="{StaticResource SidebarItem}"
-                                     Checked="NavItem_Checked" Tag="Storage" Margin="0,0,0,4">
-                            <TextBlock Text="📁  Storage"/>
+                                     Checked="NavItem_Checked" Tag="Storage" Margin="0,0,0,4" ToolTip="Storage Analysis">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="📁" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="NavStorageLabel" Grid.Column="1" Text="Storage" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                            </Grid>
                         </RadioButton>
-                        <Border BorderThickness="0,1,0,0" BorderBrush="{StaticResource BrushBorder}" Margin="0,8,0,8"/>
+
+                        <Border BorderThickness="0,1,0,0" BorderBrush="{DynamicResource BrushBorder}" Margin="0,6,0,6"/>
+
                         <RadioButton x:Name="NavSettings" Style="{StaticResource SidebarItem}"
-                                     Checked="NavItem_Checked" Tag="Settings" Margin="0,0,0,4">
-                            <TextBlock Text="⚙️  Settings"/>
+                                     Checked="NavItem_Checked" Tag="Settings" Margin="0,0,0,4" ToolTip="Settings">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="⚙️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="NavSettingsLabel" Grid.Column="1" Text="Settings" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                            </Grid>
                         </RadioButton>
                     </StackPanel>
 
-                    <!-- Status footer -->
-                    <Border DockPanel.Dock="Bottom" Style="{StaticResource Card}" Padding="12" VerticalAlignment="Bottom">
-                        <StackPanel>
-                            <TextBlock Text="STATUS" FontSize="10" Foreground="{StaticResource BrushTextSecondary}"/>
-                            <TextBlock x:Name="StatusText" Text="Ready for setup" Foreground="{StaticResource BrushTextPrimary}"
-                                       FontFamily="{StaticResource AppFont}" FontWeight="SemiBold" Margin="0,4,0,0"/>
-                        </StackPanel>
-                    </Border>
+                    <!-- Bottom Section: Dark/Light Theme Button & Status Footer -->
+                    <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+                        <!-- Theme Toggle Button inside Sidebar -->
+                        <Button x:Name="SidebarThemeButton" Style="{StaticResource SidebarButton}" Margin="0,0,0,8"
+                                Click="ThemeToggle_Click" ToolTip="Toggle Dark / Light Theme">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="SidebarThemeIcon" Text="☀️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="SidebarThemeLabel" Grid.Column="1" Text="Light Theme" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
+                            </Grid>
+                        </Button>
 
-                    <Grid/>
+                        <!-- Status footer -->
+                        <Border x:Name="SidebarStatusCard" Style="{StaticResource Card}" Padding="8" CornerRadius="6" VerticalAlignment="Bottom">
+                            <Grid Width="180">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Ellipse Width="8" Height="8" Fill="{DynamicResource BrushSuccess}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <StackPanel x:Name="SidebarStatusPanel" Grid.Column="1" VerticalAlignment="Center" Opacity="0">
+                                    <TextBlock Text="STATUS" FontSize="9" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                    <TextBlock x:Name="StatusText" Text="Ready for setup" Foreground="{DynamicResource BrushTextPrimary}"
+                                               FontFamily="{StaticResource AppFont}" FontWeight="SemiBold" FontSize="11" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
                 </DockPanel>
             </Border>
 
             <!-- Content host: pages are swapped in here with a fade+slide transition -->
-            <Border Grid.Column="1" Background="{StaticResource BrushBackground}" ClipToBounds="True">
+            <Border Grid.Column="1" Background="{DynamicResource BrushBackground}" ClipToBounds="True">
                 <ContentControl x:Name="ContentHost" RenderTransformOrigin="0.5,0.5">
                     <ContentControl.RenderTransform>
                         <TranslateTransform/>

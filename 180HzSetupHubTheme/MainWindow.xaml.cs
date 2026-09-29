@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using SetupHub180Hz.Services;
 using SetupHub180Hz.Views;
@@ -8,17 +12,24 @@ namespace SetupHub180Hz
 {
     public partial class MainWindow : Window
     {
+        private bool _isSidebarPinned;
+        private bool _isSidebarExpanded;
+        private string _currentPageKey = "Dashboard";
+        private readonly Dictionary<string, UserControl> _pageCache = new();
+
         public MainWindow()
         {
             InitializeComponent();
+
             StateChanged += (_, _) =>
             {
                 bool isMax = WindowState == WindowState.Maximized;
-                MaximizeIconPath.Data = System.Windows.Media.Geometry.Parse(
+                MaximizeIconPath.Data = Geometry.Parse(
                     isMax ? "M 2.5,0.5 H 9.5 V 7.5 H 2.5 Z M 0.5,2.5 H 7.5 V 9.5 H 0.5 Z"
                           : "M 0.5,0.5 H 9.5 V 9.5 H 0.5 Z");
                 MaximizeButton.ToolTip = isMax ? "Restore Down" : "Maximize";
             };
+
             Activated += async (_, _) =>
             {
                 if (!UpdateMonitorService.Instance.ShouldSkipDueToRecency())
@@ -26,12 +37,165 @@ namespace SetupHub180Hz
                     await UpdateMonitorService.Instance.RefreshAsync();
                 }
             };
+
+            ThemeService.ThemeChanged += OnThemeChanged;
             UpdateThemeButtonText();
+
             DownloadManagerService.Instance.QueueChanged += UpdateDownloadsBadge;
             DownloadManagerService.Instance.ProgressChanged += _ => UpdateDownloadsBadge();
             DownloadManagerService.Instance.QueueCompleted += UpdateDownloadsBadge;
             UpdateDownloadsBadge();
+
+            // Initialize sidebar in collapsed compact mode
+            CollapseSidebar(animate: false);
+
             NavigateTo("Dashboard");
+        }
+
+        private void OnThemeChanged(bool isDark)
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                UpdateThemeButtonText();
+
+                // Reapply active brushes to the shell window elements
+                Background = (Brush)Application.Current.FindResource("BrushBackground");
+                TitleBarGrid.Background = (Brush)Application.Current.FindResource("BrushSurface");
+                SidebarBorder.Background = (Brush)Application.Current.FindResource("BrushBackground");
+                SidebarBorder.BorderBrush = (Brush)Application.Current.FindResource("BrushBorder");
+
+                // Clear page cache and re-navigate so views cleanly rehydrate under the new theme
+                _pageCache.Clear();
+                if (!string.IsNullOrWhiteSpace(_currentPageKey))
+                {
+                    NavigateTo(_currentPageKey);
+                }
+            });
+        }
+
+        // ================= Collapsible Animated Cyber Sidebar =================
+        private void Sidebar_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (!_isSidebarPinned && !_isSidebarExpanded)
+            {
+                ExpandSidebar(animate: true);
+            }
+        }
+
+        private void Sidebar_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!_isSidebarPinned && _isSidebarExpanded)
+            {
+                CollapseSidebar(animate: true);
+            }
+        }
+
+        private void SidebarToggle_Click(object sender, RoutedEventArgs e)
+        {
+            _isSidebarPinned = !_isSidebarPinned;
+
+            if (_isSidebarPinned)
+            {
+                SidebarPinIcon.Text = "🔒";
+                BtnPinSidebar.ToolTip = "Unlock Sidebar (Auto-collapse)";
+                ExpandSidebar(animate: true);
+            }
+            else
+            {
+                SidebarPinIcon.Text = "📌";
+                BtnPinSidebar.ToolTip = "Lock Sidebar Expanded";
+                CollapseSidebar(animate: true);
+            }
+        }
+
+        private void ExpandSidebar(bool animate)
+        {
+            _isSidebarExpanded = true;
+            double targetWidth = 220;
+
+            if (animate)
+            {
+                var anim = new DoubleAnimation
+                {
+                    To = targetWidth,
+                    Duration = TimeSpan.FromMilliseconds(220),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
+                SidebarBorder.BeginAnimation(WidthProperty, anim);
+            }
+            else
+            {
+                SidebarBorder.BeginAnimation(WidthProperty, null);
+                SidebarBorder.Width = targetWidth;
+            }
+
+            AnimateSidebarLabels(1.0, animate);
+        }
+
+        private void CollapseSidebar(bool animate)
+        {
+            _isSidebarExpanded = false;
+            double targetWidth = 68;
+
+            if (animate)
+            {
+                var anim = new DoubleAnimation
+                {
+                    To = targetWidth,
+                    Duration = TimeSpan.FromMilliseconds(180),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+                };
+                SidebarBorder.BeginAnimation(WidthProperty, anim);
+            }
+            else
+            {
+                SidebarBorder.BeginAnimation(WidthProperty, null);
+                SidebarBorder.Width = targetWidth;
+            }
+
+            AnimateSidebarLabels(0.0, animate);
+        }
+
+        private void AnimateSidebarLabels(double targetOpacity, bool animate)
+        {
+            var textElements = new FrameworkElement?[]
+            {
+                SidebarBrandText,
+                BtnPinSidebar,
+                NavDashboardLabel,
+                NavSetupAppsLabel,
+                NavDownloadsLabel,
+                NavUpdateCenterLabel,
+                NavUninstallerLabel,
+                NavStartupLabel,
+                NavCleanupLabel,
+                NavActivityLabel,
+                NavStorageLabel,
+                NavSettingsLabel,
+                SidebarThemeLabel,
+                SidebarStatusPanel
+            };
+
+            foreach (var elem in textElements)
+            {
+                if (elem == null) continue;
+
+                if (animate)
+                {
+                    var anim = new DoubleAnimation
+                    {
+                        To = targetOpacity,
+                        Duration = TimeSpan.FromMilliseconds(180),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    elem.BeginAnimation(OpacityProperty, anim);
+                }
+                else
+                {
+                    elem.BeginAnimation(OpacityProperty, null);
+                    elem.Opacity = targetOpacity;
+                }
+            }
         }
 
         private void UpdateDownloadsBadge()
@@ -58,10 +222,10 @@ namespace SetupHub180Hz
                 NavigateTo(tag);
         }
 
-        private readonly System.Collections.Generic.Dictionary<string, UserControl> _pageCache = new();
-
         private void NavigateTo(string pageKey)
         {
+            _currentPageKey = pageKey;
+
             if (!_pageCache.TryGetValue(pageKey, out var page))
             {
                 page = pageKey switch
@@ -87,8 +251,6 @@ namespace SetupHub180Hz
 
         public void SetStatus(string text) => StatusText.Text = text;
 
-        /// <summary>Lets a child page (e.g. Dashboard's module tiles) trigger navigation
-        /// through the same RadioButton-checked flow the sidebar uses.</summary>
         public void GoToPage(string pageKey)
         {
             RadioButton? target = pageKey switch
@@ -116,22 +278,31 @@ namespace SetupHub180Hz
             clone.Begin();
         }
 
-        // ===== Custom chrome window controls =====
+        // ===== Custom chrome & theme controls =====
         private void ThemeToggle_Click(object sender, RoutedEventArgs e)
         {
-            var currentDark = SetupHub180Hz.Services.SettingsService.Instance.Current.DarkTheme;
-            SetupHub180Hz.Services.ThemeService.ApplyTheme(!currentDark);
-            UpdateThemeButtonText();
+            var currentDark = SettingsService.Instance.Current.DarkTheme;
+            ThemeService.ApplyTheme(!currentDark);
         }
 
         private void UpdateThemeButtonText()
         {
-            var isDark = SetupHub180Hz.Services.SettingsService.Instance.Current.DarkTheme;
+            var isDark = SettingsService.Instance.Current.DarkTheme;
+
+            // TitleBar Theme Button
             if (ThemeToggleIcon != null)
                 ThemeToggleIcon.Text = isDark ? "☀️" : "🌙";
             if (ThemeToggleText != null)
                 ThemeToggleText.Text = isDark ? "Light" : "Dark";
             ThemeToggleButton.ToolTip = isDark ? "Switch to Light Theme" : "Switch to Dark Theme";
+
+            // Sidebar Theme Button
+            if (SidebarThemeIcon != null)
+                SidebarThemeIcon.Text = isDark ? "☀️" : "🌙";
+            if (SidebarThemeLabel != null)
+                SidebarThemeLabel.Text = isDark ? "Light Theme" : "Dark Theme";
+            if (SidebarThemeButton != null)
+                SidebarThemeButton.ToolTip = isDark ? "Switch to Light Theme" : "Switch to Dark Theme";
         }
 
         private void Minimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
