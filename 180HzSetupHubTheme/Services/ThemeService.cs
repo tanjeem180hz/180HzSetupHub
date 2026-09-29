@@ -17,6 +17,8 @@ namespace SetupHub180Hz.Services
             { "BrushTextSecondary", ("ColorTextSecondary", "ColorTextSecondaryLight") }
         };
 
+        public static event Action<bool>? ThemeChanged;
+
         public static void ApplyTheme(bool dark)
         {
             if (Application.Current == null) return;
@@ -24,22 +26,18 @@ namespace SetupHub180Hz.Services
             foreach (var (brushKey, (darkKey, lightKey)) in ThemeColorMap)
             {
                 var colorKey = dark ? darkKey : lightKey;
-                if (Application.Current.TryFindResource(brushKey) is SolidColorBrush brush &&
-                    Application.Current.TryFindResource(colorKey) is Color targetColor)
+                if (Application.Current.TryFindResource(colorKey) is Color targetColor)
                 {
-                    if (brush.IsFrozen)
-                    {
-                        Application.Current.Resources[brushKey] = new SolidColorBrush(targetColor);
-                    }
-                    else
-                    {
-                        brush.Color = targetColor;
-                    }
+                    var newBrush = new SolidColorBrush(targetColor);
+                    newBrush.Freeze();
+                    Application.Current.Resources[brushKey] = newBrush;
                 }
             }
 
             SettingsService.Instance.Current.DarkTheme = dark;
             SettingsService.Instance.Save();
+
+            ThemeChanged?.Invoke(dark);
         }
     }
 }
