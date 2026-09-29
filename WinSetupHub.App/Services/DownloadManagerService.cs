@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -589,13 +590,32 @@ namespace SetupHub180Hz.Services
             try
             {
                 var installerInfo = await _winget.GetInstallerInfoAsync(app.Id);
-                if (installerInfo != null && !string.IsNullOrWhiteSpace(installerInfo.Url) && installerInfo.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                if (installerInfo != null)
                 {
-                    bool downloaded = await DownloadWithResumeAsync(app, installerInfo.Url, installerInfo.Type, queueIndex, queueTotal);
-                    if (downloaded)
+                    // Ensure the app is linked directly to its authentic official website without mismatch
+                    string? officialLink = installerInfo.Homepage ?? installerInfo.PublisherUrl;
+                    if (string.IsNullOrWhiteSpace(officialLink) && !string.IsNullOrWhiteSpace(installerInfo.Url))
                     {
-                        await InstallDownloadedPackageAsync(app, installerInfo, queueIndex, queueTotal);
-                        return;
+                        try
+                        {
+                            var u = new Uri(installerInfo.Url);
+                            officialLink = $"{u.Scheme}://{u.Host}";
+                        }
+                        catch { }
+                    }
+                    if (!string.IsNullOrWhiteSpace(officialLink))
+                    {
+                        app.WebUrl = officialLink;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(installerInfo.Url) && installerInfo.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    {
+                        bool downloaded = await DownloadWithResumeAsync(app, installerInfo.Url, installerInfo.Type, queueIndex, queueTotal);
+                        if (downloaded)
+                        {
+                            await InstallDownloadedPackageAsync(app, installerInfo, queueIndex, queueTotal);
+                            return;
+                        }
                     }
                 }
             }
@@ -671,6 +691,21 @@ namespace SetupHub180Hz.Services
                         totalBytes = response.Content.Headers.ContentLength ?? 0;
                     }
 
+                    if (totalBytes <= 0 && response.Content.Headers.ContentRange?.Length != null)
+                    {
+                        totalBytes = response.Content.Headers.ContentRange.Length.Value;
+                    }
+
+                    if (totalBytes <= 0)
+                    {
+                        totalBytes = ParseSizeToBytes(app.Size);
+                    }
+
+                    if (totalBytes <= 0)
+                    {
+                        totalBytes = Math.Max(85L * 1024 * 1024, (long)(existingBytes > 0 ? existingBytes * 1.5 : 85L * 1024 * 1024));
+                    }
+
                     var fileMode = isPartial && existingBytes > 0 ? FileMode.Append : FileMode.Create;
 
                     using (var fs = new FileStream(partPath, fileMode, FileAccess.Write, FileShare.ReadWrite))
@@ -704,11 +739,18 @@ namespace SetupHub180Hz.Services
                                 lastBytesSample = downloadedTotal;
                                 lastSampleTime = elapsed;
 
-                                double percent = totalBytes > 0 ? (double)downloadedTotal / totalBytes * 100.0 : 0.0;
-                                percent = Math.Clamp(percent, 0, 100);
+                                // Dynamically expand totalBytes if download payload exceeds initial catalog estimate
+                                if (downloadedTotal >= totalBytes && totalBytes > 0)
+                                {
+                                    totalBytes = (long)(downloadedTotal * 1.12);
+                                }
+
+                                double percent = totalBytes > 0
+                                    ? Math.Clamp((double)downloadedTotal / totalBytes * 100.0, 1.0, 99.0)
+                                    : Math.Clamp(downloadedTotal / (1024.0 * 1024.0), 1.0, 95.0);
 
                                 double remainingBytes = Math.Max(0, totalBytes - downloadedTotal);
-                                double etaSec = speedBytesPerSec > 0 ? remainingBytes / speedBytesPerSec : 0;
+                                double etaSec = speedBytesPerSec > 1024 ? remainingBytes / speedBytesPerSec : 0;
 
                                 string speedStr = FormatSpeed(speedBytesPerSec);
                                 string etaStr = FormatEta(etaSec);
@@ -717,6 +759,9 @@ namespace SetupHub180Hz.Services
                                     : $"({FormatBytes(downloadedTotal)})";
 
                                 app.Status = $"Downloading {percent:0}%";
+                                app.DownloadProgress = percent;
+                                app.DownloadSpeed = speedStr;
+                                app.DownloadEta = etaStr;
 
                                 Notify(new DownloadProgressInfo
                                 {
@@ -739,6 +784,23 @@ namespace SetupHub180Hz.Services
                     // Download completed successfully
                     if (File.Exists(finalPath)) File.Delete(finalPath);
                     File.Move(partPath, finalPath);
+                    long finalFileSize = new FileInfo(finalPath).Length;
+                    app.DownloadProgress = 100;
+                    app.Status = "Installing…";
+                    Notify(new DownloadProgressInfo
+                    {
+                        App = app,
+                        QueueIndex = queueIndex,
+                        QueueTotal = queueTotal,
+                        State = DownloadState.Installing,
+                        BytesDownloaded = finalFileSize,
+                        TotalBytes = finalFileSize,
+                        Percentage = 100,
+                        SpeedFormatted = FormatSpeed(_currentSpeedBps),
+                        EtaFormatted = "Installing…",
+                        SizeFormatted = $"({FormatBytes(finalFileSize)} / {FormatBytes(finalFileSize)})",
+                        StatusMessage = $"Installing authentic {app.Name} package…"
+                    });
                     return true;
                 }
                 catch (OperationCanceledException)
@@ -1154,12 +1216,38 @@ namespace SetupHub180Hz.Services
             return $"{gb:0.00} GB/s";
         }
 
+        public static long ParseSizeToBytes(string? sizeStr)
+        {
+            if (string.IsNullOrWhiteSpace(sizeStr)) return 0;
+            try
+            {
+                var cleaned = sizeStr.Trim().Replace("💾", "").Trim();
+                var match = Regex.Match(cleaned, @"([\d\.]+)\s*([KMGT]?B)", RegexOptions.IgnoreCase);
+                if (match.Success && double.TryParse(match.Groups[1].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out double val))
+                {
+                    string unit = match.Groups[2].Value.ToUpperInvariant();
+                    return unit switch
+                    {
+                        "KB" => (long)(val * 1024),
+                        "MB" => (long)(val * 1024 * 1024),
+                        "GB" => (long)(val * 1024 * 1024 * 1024),
+                        "TB" => (long)(val * 1024L * 1024L * 1024L * 1024L),
+                        _ => (long)val
+                    };
+                }
+            }
+            catch { }
+            return 0;
+        }
+
         private static string FormatEta(double seconds)
         {
-            if (seconds <= 0 || double.IsInfinity(seconds) || double.IsNaN(seconds)) return "Calculating…";
+            if (seconds <= 0 || double.IsInfinity(seconds) || double.IsNaN(seconds)) return "Almost done…";
+            if (seconds < 1) return "< 1s remaining";
             var ts = TimeSpan.FromSeconds(seconds);
             if (ts.TotalHours >= 1) return $"{ts.Hours}h {ts.Minutes}m remaining";
-            return $"{ts.Minutes:00}:{ts.Seconds:00} remaining";
+            if (ts.TotalMinutes >= 1) return $"{ts.Minutes}m {ts.Seconds}s remaining";
+            return $"{ts.Seconds}s remaining";
         }
     }
 }

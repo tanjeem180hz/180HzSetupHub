@@ -242,7 +242,8 @@
                                 <!-- Title, Category, Version, Live State -->
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock x:Name="ActiveAppName" Text="Application Name" FontSize="16" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}"/>
+                                        <TextBlock x:Name="ActiveAppName" Text="Application Name" FontSize="16" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}"
+                                                   Cursor="Hand" ToolTip="Click to visit official website" MouseLeftButtonUp="ActiveAppName_Click"/>
                                         <Border x:Name="ActiveStateBadge" Background="#162D42" CornerRadius="4" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
                                             <TextBlock x:Name="ActiveStateText" Text="DOWNLOADING" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
                                         </Border>

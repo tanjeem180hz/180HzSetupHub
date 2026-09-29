@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,8 +10,9 @@ using System.Windows.Media.Animation;
 namespace SetupHub180Hz.Services
 {
     /// <summary>
-    /// Provides 180Hz ultra-fluid physics-based smooth scrolling animation with QuarticEase deceleration
+    /// Provides 180Hz responsive, ultra-fluid physics smooth scrolling animation
     /// across all ScrollViewers, ListBoxes, and scrollable lists throughout the entire application.
+    /// Fast, user-friendly CubicEase deceleration with momentum chaining for quick wheel flicks.
     /// </summary>
     public static class SmoothScrollHelper
     {
@@ -50,9 +52,12 @@ namespace SetupHub180Hz.Services
             public double TargetHorizontalOffset;
             public bool IsVerticalAnimating;
             public bool IsHorizontalAnimating;
+            public long LastWheelTimestamp;
+            public double VelocityMultiplier = 1.0;
         }
 
         private static readonly ConditionalWeakTable<ScrollViewer, ScrollState> _states = new();
+        private static readonly Stopwatch _clock = Stopwatch.StartNew();
 
         private static void OnIsSmoothScrollEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -141,13 +146,27 @@ namespace SetupHub180Hz.Services
                 || (sv.HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled && sv.ScrollableWidth > 0 && sv.ScrollableHeight <= 0.001);
 
             var state = _states.GetOrCreateValue(sv);
+            long now = _clock.ElapsedMilliseconds;
+            long deltaT = now - state.LastWheelTimestamp;
+            state.LastWheelTimestamp = now;
+
+            // Momentum acceleration: rapid continuous scrolling boosts speed up to 2.2x
+            if (deltaT < 160 && deltaT > 0)
+            {
+                state.VelocityMultiplier = Math.Min(2.2, state.VelocityMultiplier + 0.35);
+            }
+            else
+            {
+                state.VelocityMultiplier = 1.0;
+            }
 
             if (isHorizontal)
             {
                 if (sv.ScrollableWidth <= 0) return;
 
                 double current = state.IsHorizontalAnimating ? state.TargetHorizontalOffset : sv.HorizontalOffset;
-                double delta = e.Delta * 0.85;
+                // Responsive 160px base travel per notch
+                double delta = (e.Delta / 120.0) * 160.0 * state.VelocityMultiplier;
                 double target = Math.Clamp(current - delta, 0, sv.ScrollableWidth);
                 state.TargetHorizontalOffset = target;
 
@@ -155,8 +174,8 @@ namespace SetupHub180Hz.Services
                 {
                     From = sv.HorizontalOffset,
                     To = target,
-                    Duration = TimeSpan.FromMilliseconds(240),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    Duration = TimeSpan.FromMilliseconds(140),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                 };
 
                 state.IsHorizontalAnimating = true;
@@ -174,7 +193,7 @@ namespace SetupHub180Hz.Services
                 // Support both pixel scrolling and item-based virtualized lists
                 if (sv.CanContentScroll && VirtualizingPanel.GetScrollUnit(sv) == ScrollUnit.Item)
                 {
-                    double itemStep = (e.Delta > 0 ? -2.0 : 2.0);
+                    double itemStep = (e.Delta > 0 ? -3.0 : 3.0) * Math.Ceiling(state.VelocityMultiplier);
                     double targetItem = Math.Clamp(current + itemStep, 0, sv.ScrollableHeight);
                     state.TargetVerticalOffset = targetItem;
 
@@ -182,8 +201,8 @@ namespace SetupHub180Hz.Services
                     {
                         From = sv.VerticalOffset,
                         To = targetItem,
-                        Duration = TimeSpan.FromMilliseconds(220),
-                        EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                        Duration = TimeSpan.FromMilliseconds(130),
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                     };
 
                     state.IsVerticalAnimating = true;
@@ -194,7 +213,8 @@ namespace SetupHub180Hz.Services
                     return;
                 }
 
-                double delta = e.Delta * 0.85;
+                // Highly responsive 160px travel distance per notch with CubicEase for fast, natural feel
+                double delta = (e.Delta / 120.0) * 160.0 * state.VelocityMultiplier;
                 double target = Math.Clamp(current - delta, 0, sv.ScrollableHeight);
                 state.TargetVerticalOffset = target;
 
@@ -202,8 +222,8 @@ namespace SetupHub180Hz.Services
                 {
                     From = sv.VerticalOffset,
                     To = target,
-                    Duration = TimeSpan.FromMilliseconds(240),
-                    EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
+                    Duration = TimeSpan.FromMilliseconds(140),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                 };
 
                 state.IsVerticalAnimating = true;

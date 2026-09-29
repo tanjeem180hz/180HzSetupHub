@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using SetupHub180Hz.Models;
@@ -180,6 +181,27 @@ namespace SetupHub180Hz.Views
             ActiveVersionText.Text = info.App.FormattedVersion;
             ActiveStatusDetail.Text = string.IsNullOrWhiteSpace(info.StatusMessage) ? "Processing installation payload…" : info.StatusMessage;
 
+            // Link authentic official site and enable instant visit
+            string? webUrl = info.App.WebUrl;
+            if (string.IsNullOrWhiteSpace(webUrl))
+            {
+                webUrl = AppMetadataHelper.ResolveOfficialUrl(info.App);
+                if (!string.IsNullOrWhiteSpace(webUrl))
+                {
+                    info.App.WebUrl = webUrl;
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(webUrl))
+            {
+                BtnActiveWebsite.ToolTip = $"Visit Official Site: {webUrl}";
+                ActiveAppName.ToolTip = $"Visit Official Site: {webUrl} (Click to open)";
+                ActiveAppName.Cursor = System.Windows.Input.Cursors.Hand;
+            }
+            else
+            {
+                BtnActiveWebsite.ToolTip = "Open Official Website";
+            }
+
             double targetPct = Math.Clamp(info.Percentage, 0, 100);
             var anim = new System.Windows.Media.Animation.DoubleAnimation
             {
@@ -190,7 +212,8 @@ namespace SetupHub180Hz.Views
             ActiveProgressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, anim);
             ActiveProgressPercent.Text = $"{info.Percentage:0}%";
             ActiveSpeedText.Text = info.SpeedFormatted;
-            ActiveEtaText.Text = info.EtaFormatted;
+            string eta = info.EtaFormatted ?? "Calculating…";
+            ActiveEtaText.Text = eta.StartsWith("ETA:", StringComparison.OrdinalIgnoreCase) ? eta : $"ETA: {eta}";
             ActiveTransferredText.Text = string.IsNullOrWhiteSpace(info.SizeFormatted) ? "" : info.SizeFormatted;
             ActiveQueueCountText.Text = $"App {info.QueueIndex} of {info.QueueTotal}";
 
@@ -422,10 +445,27 @@ namespace SetupHub180Hz.Views
         private void BtnActiveWebsite_Click(object sender, RoutedEventArgs e)
         {
             var app = DownloadManagerService.Instance.CurrentApp;
-            if (app != null && !string.IsNullOrWhiteSpace(app.WebUrl))
+            if (app != null)
             {
-                OpenBrowserUrl(app.WebUrl);
+                string? url = app.WebUrl;
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    url = AppMetadataHelper.ResolveOfficialUrl(app);
+                }
+                if (string.IsNullOrWhiteSpace(url) && !string.IsNullOrWhiteSpace(app.Id))
+                {
+                    url = $"https://winget.run/pkg/{app.Id}";
+                }
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    OpenBrowserUrl(url);
+                }
             }
+        }
+
+        private void ActiveAppName_Click(object sender, MouseButtonEventArgs e)
+        {
+            BtnActiveWebsite_Click(sender, e);
         }
 
         private void QueueItemMoveToTop_Click(object sender, RoutedEventArgs e)

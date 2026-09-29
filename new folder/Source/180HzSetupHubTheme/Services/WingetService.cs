@@ -145,7 +145,14 @@ namespace SetupHub180Hz.Services
             }
         }
 
-        public record WingetInstallerInfo(string? Url, string? Type, string? Sha256);
+        public record WingetInstallerInfo(
+            string? Url,
+            string? Type,
+            string? Sha256,
+            string? Homepage = null,
+            string? PublisherUrl = null,
+            string? Publisher = null);
+
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, WingetInstallerInfo?> _installerInfoCache =
             new(StringComparer.OrdinalIgnoreCase);
 
@@ -168,6 +175,9 @@ namespace SetupHub180Hz.Services
                 string? installerUrl = null;
                 string? installerType = null;
                 string? sha256 = null;
+                string? homepage = null;
+                string? publisherUrl = null;
+                string? publisher = null;
 
                 using var reader = new System.IO.StringReader(output);
                 string? line;
@@ -189,10 +199,25 @@ namespace SetupHub180Hz.Services
                         var val = trimmed.Substring("Installer SHA256:".Length).Trim();
                         if (!string.IsNullOrWhiteSpace(val)) sha256 = val;
                     }
+                    else if (trimmed.StartsWith("Homepage:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Homepage:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) homepage = val;
+                    }
+                    else if (trimmed.StartsWith("Publisher Url:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Publisher Url:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) publisherUrl = val;
+                    }
+                    else if (trimmed.StartsWith("Publisher:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Publisher:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) publisher = val;
+                    }
                 }
 
                 var result = !string.IsNullOrWhiteSpace(installerUrl)
-                    ? new WingetInstallerInfo(installerUrl, installerType, sha256)
+                    ? new WingetInstallerInfo(installerUrl, installerType, sha256, homepage, publisherUrl, publisher)
                     : null;
 
                 if (result != null)
