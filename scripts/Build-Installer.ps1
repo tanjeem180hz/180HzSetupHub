@@ -83,6 +83,15 @@ if (-not (Test-Path -LiteralPath $installerExe)) {
 $fileInfo = Get-Item -LiteralPath $installerExe
 $sizeMb = [Math]::Round($fileInfo.Length / 1MB, 2)
 
+# Sync build outputs directly into "new folder"
+$newFolderDir = Join-Path $root "new folder"
+if (Test-Path -LiteralPath $newFolderDir) {
+    Copy-Item -Path $installerExe -Destination (Join-Path $newFolderDir "180HzSetupHubSetup.exe") -Force
+    Copy-Item -Path $installerExe -Destination (Join-Path $newFolderDir "Installer\180HzSetupHubSetup.exe") -Force
+    Copy-Item -Path $appExe -Destination (Join-Path $newFolderDir "StandaloneApp\180HzSetupHub.exe") -Force
+    Write-Host "Updated artifacts in: $newFolderDir" -ForegroundColor Cyan
+}
+
 Write-Host "`n========================================================" -ForegroundColor Green
 Write-Host " BUILD SUCCESSFUL! " -ForegroundColor Green
 Write-Host " Bootstrapper Installer : $installerExe ($sizeMb MB)" -ForegroundColor Green

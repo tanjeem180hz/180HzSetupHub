@@ -415,13 +415,21 @@ public sealed class InstallerService
             return adjacent;
         }
 
-        // 3. Artifacts publish folder in development/test environment
+        // 3. Search local directories in development/portable folder structures
         var testPaths = new[]
         {
+            Path.Combine(baseDir, "StandaloneApp", InstalledExeName),
+            Path.Combine(baseDir, "..", "StandaloneApp", InstalledExeName),
+            Path.Combine(baseDir, "..", "publish", "win-x64", InstalledExeName),
+            Path.Combine(baseDir, "..", "artifacts", "publish", "win-x64", InstalledExeName),
             Path.Combine(baseDir, "..", "..", "artifacts", "publish", "win-x64", InstalledExeName),
             Path.Combine(baseDir, "..", "..", "..", "artifacts", "publish", "win-x64", InstalledExeName),
             Path.Combine(baseDir, "artifacts", "publish", "win-x64", InstalledExeName),
-            @"C:\Users\PSYCHOPATH\Downloads\WinSetupHub\artifacts\publish\win-x64\180HzSetupHub.exe"
+            Path.Combine(baseDir, "new folder", "StandaloneApp", InstalledExeName),
+            Path.Combine(baseDir, "..", "new folder", "StandaloneApp", InstalledExeName),
+            Path.Combine(baseDir, "..", "..", "new folder", "StandaloneApp", InstalledExeName),
+            @"C:\Users\PSYCHOPATH\Downloads\WinSetupHub\artifacts\publish\win-x64\180HzSetupHub.exe",
+            @"C:\Users\PSYCHOPATH\Downloads\WinSetupHub\new folder\StandaloneApp\180HzSetupHub.exe"
         };
 
         foreach (var p in testPaths)

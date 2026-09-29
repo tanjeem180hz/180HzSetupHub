@@ -43,8 +43,21 @@ namespace SetupHub180Hz
 
             UpdateMonitorService.Instance.Start();
 
-            var mainWindow = new MainWindow();
-            mainWindow.Show();
+            try
+            {
+                var mainWindow = new MainWindow();
+                mainWindow.Show();
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Startup error: {ex}", ActivityType.Error);
+                MessageBox.Show(
+                    $"180Hz Setup Hub encountered a startup error:\n\n{ex.Message}\n\n{ex.InnerException?.Message}",
+                    "180Hz Setup Hub - Startup Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                Shutdown(1);
+            }
         }
 
         public static bool IsRunningAsAdministrator()
@@ -111,6 +124,12 @@ namespace SetupHub180Hz
 
                 if (!string.IsNullOrEmpty(exePath) && System.IO.File.Exists(exePath))
                 {
+                    var fileName = System.IO.Path.GetFileName(exePath);
+                    if (!fileName.Equals("180HzSetupHub.exe", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return;
+                    }
+
                     using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers");
                     if (key != null)
                     {
@@ -158,6 +177,17 @@ namespace SetupHub180Hz
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             ActivityLogger.Instance.Log($"Unexpected error: {e.Exception.Message}", ActivityType.Error);
+            if (MainWindow == null || Windows.Count == 0)
+            {
+                MessageBox.Show(
+                    $"Fatal UI error during startup:\n\n{e.Exception.Message}\n\n{e.Exception.InnerException?.Message}",
+                    "180Hz Setup Hub",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                e.Handled = false;
+                Shutdown(1);
+                return;
+            }
             e.Handled = true;
         }
 

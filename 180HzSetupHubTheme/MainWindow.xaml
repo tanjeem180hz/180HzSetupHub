@@ -117,7 +117,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            ResourcePath="pack://application:,,,/Assets/Lottie/wave.json"
+                                                            ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/wave.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavDashboardLabel" Grid.Column="1" Text="Dashboard" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>
@@ -131,7 +131,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            ResourcePath="pack://application:,,,/Assets/Lottie/gears.json"
+                                                            ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/gears.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavSetupAppsLabel" Grid.Column="1" Text="Setup Apps" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>
@@ -146,7 +146,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            ResourcePath="pack://application:,,,/Assets/Lottie/download.json"
+                                                            ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/download.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavDownloadsLabel" Grid.Column="1" Text="Downloads" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                                 <Border x:Name="DownloadsNavBadge" Grid.Column="2" Background="{DynamicResource BrushAccent}"
@@ -164,7 +164,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            ResourcePath="pack://application:,,,/Assets/Lottie/loading_disc.json"
+                                                            ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/loading_disc.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavUpdateCenterLabel" Grid.Column="1" Text="Update Center" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>
@@ -190,7 +190,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            ResourcePath="pack://application:,,,/Assets/Lottie/rocket.json"
+                                                            ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/rocket.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavStartupLabel" Grid.Column="1" Text="Startup Apps" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>
@@ -216,7 +216,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            ResourcePath="pack://application:,,,/Assets/Lottie/wave.json"
+                                                            ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/wave.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavActivityLabel" Grid.Column="1" Text="Activity" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>
@@ -230,7 +230,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            ResourcePath="pack://application:,,,/Assets/Lottie/scan.json"
+                                                            ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/scan.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavStorageLabel" Grid.Column="1" Text="Storage" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>
@@ -246,7 +246,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            ResourcePath="pack://application:,,,/Assets/Lottie/gears.json"
+                                                            ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/gears.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavSettingsLabel" Grid.Column="1" Text="Settings" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>
@@ -265,7 +265,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="22" Height="22" AutoPlay="True" RepeatCount="-1"
-                                                            ResourcePath="pack://application:,,,/Assets/Lottie/toggle_switch.json"
+                                                            ResourcePath="pack://application:,,,/180HzSetupHub;component/Assets/Lottie/toggle_switch.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="SidebarThemeLabel" Grid.Column="1" Text="Light Theme" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                                 <TextBlock x:Name="SidebarThemeIcon" Visibility="Collapsed"/>
