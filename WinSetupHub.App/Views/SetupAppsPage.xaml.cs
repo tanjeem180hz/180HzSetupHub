@@ -49,6 +49,22 @@ namespace SetupHub180Hz.Views
             DownloadManagerService.Instance.QueueCompleted += OnDownloadQueueCompleted;
             DownloadManagerService.Instance.QueueCancelled += OnDownloadQueueCancelled;
 
+            PackageCatalogService.AppInstallationStatusChanged += (idOrName, isInstalled) =>
+            {
+                Dispatcher.InvokeAsync(() =>
+                {
+                    var matches = _allPackages.Where(p =>
+                        string.Equals(p.Id, idOrName, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(p.Name, idOrName, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                    foreach (var p in matches)
+                    {
+                        p.IsInstalled = isInstalled;
+                        p.Status = isInstalled ? "Installed" : "Install";
+                    }
+                });
+            };
+
             Loaded += async (_, _) =>
             {
                 SyncDownloadPopupState();
@@ -58,11 +74,15 @@ namespace SetupHub180Hz.Views
                 }
             };
 
-            IsVisibleChanged += (_, e) =>
+            IsVisibleChanged += async (_, e) =>
             {
                 if ((bool)e.NewValue)
                 {
                     SyncDownloadPopupState();
+                    if (_allPackages.Count > 0)
+                    {
+                        await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
+                    }
                 }
             };
 
@@ -802,13 +822,19 @@ namespace SetupHub180Hz.Views
 
                 if (app.IsBusy) return;
 
-                // 1. Check if already installed on system or status is Installed
-                if (app.IsInstalled || app.Status == "Installed" || CheckIfAppAlreadyInstalled(app))
+                // 1. Check if already installed on system
+                bool isInstalled = CheckIfAppAlreadyInstalled(app);
+                if (isInstalled)
                 {
                     app.IsInstalled = true;
                     app.Status = "Installed";
                     ShowAlreadyInstalledModal(app);
                     return;
+                }
+                else
+                {
+                    app.IsInstalled = false;
+                    app.Status = "Install";
                 }
 
                 // 2. Not installed -> proceed with download and installation
@@ -873,7 +899,7 @@ namespace SetupHub180Hz.Views
 
             foreach (var app in selected)
             {
-                if (app.IsInstalled || app.Status == "Installed" || CheckIfAppAlreadyInstalled(app))
+                if (CheckIfAppAlreadyInstalled(app))
                 {
                     app.IsInstalled = true;
                     app.Status = "Installed";
@@ -881,6 +907,8 @@ namespace SetupHub180Hz.Views
                 }
                 else
                 {
+                    app.IsInstalled = false;
+                    app.Status = "Install";
                     uninstalled.Add(app);
                 }
             }
@@ -1286,7 +1314,7 @@ namespace SetupHub180Hz.Views
                     {
                         app = new AppItem { Id = id, Name = id };
                     }
-                    if (app.IsInstalled || app.Status == "Installed" || CheckIfAppAlreadyInstalled(app))
+                    if (CheckIfAppAlreadyInstalled(app))
                     {
                         app.IsInstalled = true;
                         app.Status = "Installed";
@@ -1294,6 +1322,8 @@ namespace SetupHub180Hz.Views
                     }
                     else
                     {
+                        app.IsInstalled = false;
+                        app.Status = "Install";
                         targetApps.Add(app);
                     }
                 }
@@ -1379,8 +1409,6 @@ namespace SetupHub180Hz.Views
 
         private bool CheckIfAppAlreadyInstalled(AppItem app)
         {
-            if (app.IsInstalled) return true;
-
             // 1. Windows Registry uninstall check (covers 99% of win32/x64 software)
             var reg = AppMetadataHelper.GetRegistryInfo(app.Name, app.Id);
             if (reg != null)
@@ -1402,25 +1430,33 @@ namespace SetupHub180Hz.Views
                 return true;
             }
 
-            // 3. Check App InstallLocation if present
+            // 3. Check App InstallLocation if present (must contain executable)
             if (!string.IsNullOrWhiteSpace(app.InstallLocation) && Directory.Exists(app.InstallLocation))
             {
-                return true;
+                try
+                {
+                    if (Directory.EnumerateFiles(app.InstallLocation, "*.exe", SearchOption.TopDirectoryOnly).Any())
+                    {
+                        return true;
+                    }
+                }
+                catch { }
             }
 
-            // 4. Check standard program directories and Start Menu shortcuts
+            // 4. Check standard program directories (strictly requiring an executable)
             string normName = AppMetadataHelper.NormalizeAppName(app.Name);
             string[] baseDirs = {
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs"),
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs")
             };
 
             foreach (var b in baseDirs)
             {
                 if (string.IsNullOrWhiteSpace(b) || !Directory.Exists(b)) continue;
-                if (Directory.Exists(Path.Combine(b, app.Name)) || Directory.Exists(Path.Combine(b, normName)))
+                string dir1 = Path.Combine(b, app.Name);
+                string dir2 = Path.Combine(b, normName);
+                if (DirectoryContainsExe(dir1) || DirectoryContainsExe(dir2))
                 {
                     return true;
                 }
@@ -1435,15 +1471,32 @@ namespace SetupHub180Hz.Views
             {
                 if (Directory.Exists(dir))
                 {
-                    var lnks = Directory.GetFiles(dir, $"*{normName}*.lnk", SearchOption.AllDirectories);
-                    if (lnks.Length > 0)
+                    try
                     {
-                        return true;
+                        var lnks = Directory.GetFiles(dir, $"*{normName}*.lnk", SearchOption.AllDirectories);
+                        if (lnks.Length > 0)
+                        {
+                            return true;
+                        }
                     }
+                    catch { }
                 }
             }
 
             return false;
+        }
+
+        private static bool DirectoryContainsExe(string dir)
+        {
+            if (!Directory.Exists(dir)) return false;
+            try
+            {
+                return Directory.EnumerateFiles(dir, "*.exe", SearchOption.TopDirectoryOnly).Any();
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private void ShowAlreadyInstalledModal(AppItem app)
@@ -1569,20 +1622,44 @@ namespace SetupHub180Hz.Views
                     }
                 }
 
-                // 5. Fallback to official web URL
-                string? url = app.WebUrl;
-                if (string.IsNullOrWhiteSpace(url))
+                // 5. App executable was not found on system (uninstalled or moved).
+                // Do NOT open the website! Reset status and offer reinstallation prompt.
+                app.IsInstalled = false;
+                app.Status = "Install";
+
+                var result = MessageBox.Show(
+                    $"Could not find the executable for {app.Name} on this PC.\nIt may have been uninstalled or moved.\n\nWould you like to install {app.Name} now?",
+                    $"{app.Name} Not Found",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
                 {
-                    url = AppMetadataHelper.ResolveOfficialUrl(app);
-                }
-                if (!string.IsNullOrWhiteSpace(url))
-                {
-                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                    StartSequentialQueue(new[] { app });
                 }
             }
             catch (Exception ex)
             {
                 ActivityLogger.Instance.Log($"Could not launch {app.Name}: {ex.Message}", ActivityType.Warning);
+            }
+        }
+
+        private async void Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                StatusText.Text = "Refreshing application catalog and verifying installed status…";
+                StatusText.Visibility = Visibility.Visible;
+                AppMetadataHelper.InvalidateCache();
+                await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
+                ApplyFilter();
+                StatusText.Visibility = Visibility.Collapsed;
+                ActivityLogger.Instance.Log("Setup apps catalog status refreshed successfully.", ActivityType.Info);
+            }
+            catch (Exception ex)
+            {
+                StatusText.Visibility = Visibility.Collapsed;
+                ActivityLogger.Instance.Log($"Error refreshing setup apps catalog: {ex.Message}", ActivityType.Warning);
             }
         }
 

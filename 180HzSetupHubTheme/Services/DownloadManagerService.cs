@@ -74,7 +74,8 @@ namespace SetupHub180Hz.Services
         private volatile bool _isSkipping;
         private volatile bool _isCancelled;
         private volatile bool _isQueueRunning;
-        private int _currentIndex;
+        private int _batchTotal;
+        private int _batchCompleted;
 
         private double _currentSpeedBps;
         private double _peakSpeedBps;
@@ -121,9 +122,9 @@ namespace SetupHub180Hz.Services
             {
                 lock (_lock)
                 {
-                    if (_currentIndex + 1 < _queue.Count)
+                    if (_queue.Count > 1)
                     {
-                        return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Skip(_queue, _currentIndex + 1));
+                        return _queue.Skip(1).ToList();
                     }
                     return new List<AppItem>();
                 }
@@ -142,7 +143,7 @@ namespace SetupHub180Hz.Services
         {
             get
             {
-                lock (_lock) return _queue.Count;
+                lock (_lock) return Math.Max(_batchTotal, _queue.Count + _batchCompleted);
             }
         }
 
@@ -150,11 +151,11 @@ namespace SetupHub180Hz.Services
         {
             get
             {
-                lock (_lock) return Math.Max(0, _queue.Count - (_currentIndex + 1));
+                lock (_lock) return Math.Max(0, _queue.Count - 1);
             }
         }
 
-        public int CurrentIndex => _currentIndex;
+        public int CurrentIndex => _batchCompleted;
 
         public AppItem? CurrentApp
         {
@@ -162,7 +163,7 @@ namespace SetupHub180Hz.Services
             {
                 lock (_lock)
                 {
-                    return (_currentIndex >= 0 && _currentIndex < _queue.Count) ? _queue[_currentIndex] : null;
+                    return _queue.Count > 0 ? _queue[0] : null;
                 }
             }
         }
@@ -292,6 +293,7 @@ namespace SetupHub180Hz.Services
 
         public void EnqueueRange(IEnumerable<AppItem> items, bool isUpgrade = false)
         {
+            int added = 0;
             lock (_lock)
             {
                 foreach (var item in items)
@@ -307,14 +309,21 @@ namespace SetupHub180Hz.Services
                         item.Status = item.IsUpgrade ? "⏳ Queued (Update)" : "⏳ Queued";
                         item.IsBusy = true;
                         _queue.Add(item);
+                        added++;
                     }
+                }
+
+                if (added > 0)
+                {
+                    _batchTotal += added;
                 }
 
                 if (!_isQueueRunning && _queue.Count > 0)
                 {
                     _isQueueRunning = true;
                     _isCancelled = false;
-                    _currentIndex = 0;
+                    _batchCompleted = 0;
+                    _batchTotal = _queue.Count;
                     Task.Run(ProcessQueueAsync);
                 }
             }
@@ -326,13 +335,14 @@ namespace SetupHub180Hz.Services
             lock (_lock)
             {
                 int idx = _queue.IndexOf(item);
-                if (idx > _currentIndex)
+                if (idx > 0)
                 {
                     _queue.RemoveAt(idx);
                     item.IsBusy = false;
                     item.Status = "Install";
+                    _batchTotal = Math.Max(0, _batchTotal - 1);
                 }
-                else if (idx == _currentIndex && _isQueueRunning)
+                else if (idx == 0 && _isQueueRunning)
                 {
                     SkipCurrent();
                 }
@@ -345,10 +355,10 @@ namespace SetupHub180Hz.Services
             lock (_lock)
             {
                 int idx = _queue.IndexOf(item);
-                if (idx > _currentIndex + 1)
+                if (idx > 1)
                 {
                     _queue.RemoveAt(idx);
-                    _queue.Insert(_currentIndex + 1, item);
+                    _queue.Insert(1, item);
                 }
             }
             QueueChanged?.Invoke();
@@ -387,8 +397,8 @@ namespace SetupHub180Hz.Services
                 ProgressChanged?.Invoke(new DownloadProgressInfo
                 {
                     App = current,
-                    QueueIndex = _currentIndex + 1,
-                    QueueTotal = _queue.Count,
+                    QueueIndex = _batchCompleted + 1,
+                    QueueTotal = Math.Max(_batchTotal, _queue.Count + _batchCompleted),
                     State = DownloadState.Paused,
                     StatusMessage = "Download paused. Partial bytes preserved on disk.",
                     SpeedFormatted = "0 MB/s",
@@ -466,6 +476,8 @@ namespace SetupHub180Hz.Services
                 }
                 _queue.Clear();
                 _isQueueRunning = false;
+                _batchTotal = 0;
+                _batchCompleted = 0;
             }
 
             QueueChanged?.Invoke();
@@ -495,15 +507,15 @@ namespace SetupHub180Hz.Services
 
                 lock (_lock)
                 {
-                    if (_isCancelled || _currentIndex >= _queue.Count)
+                    if (_isCancelled || _queue.Count == 0)
                     {
                         _isQueueRunning = false;
                         break;
                     }
 
-                    item = _queue[_currentIndex];
-                    idx = _currentIndex + 1;
-                    total = _queue.Count;
+                    item = _queue[0];
+                    idx = _batchCompleted + 1;
+                    total = Math.Max(_batchTotal, _queue.Count + _batchCompleted);
                 }
 
                 if (item == null) break;
@@ -541,8 +553,14 @@ namespace SetupHub180Hz.Services
 
                 lock (_lock)
                 {
-                    _currentIndex++;
+                    if (_queue.Count > 0 && _queue[0] == item)
+                    {
+                        _queue.RemoveAt(0);
+                    }
+                    _batchCompleted++;
                 }
+
+                QueueChanged?.Invoke();
             }
 
             bool wasCancelled;
@@ -551,6 +569,11 @@ namespace SetupHub180Hz.Services
                 wasCancelled = _isCancelled;
                 _isQueueRunning = false;
                 _currentSpeedBps = 0;
+                if (!wasCancelled)
+                {
+                    _batchTotal = 0;
+                    _batchCompleted = 0;
+                }
             }
 
             if (wasCancelled)
@@ -1122,11 +1145,17 @@ namespace SetupHub180Hz.Services
                     }
                     app.AvailableVersion = "";
                     app.IsUpgrade = false;
+                    UpdateMonitorService.Instance.MarkAsUpdated(app.Id, app.Name);
                     _ = Task.Run(async () =>
                     {
                         try { await UpdateMonitorService.Instance.RefreshAsync(force: true); } catch { }
                     });
                 }
+
+                // Invalidate registry cache and notify catalog of newly installed app
+                AppMetadataHelper.InvalidateCache();
+                PackageCatalogService.NotifyStatusChanged(app.Id, true);
+                PackageCatalogService.NotifyStatusChanged(app.Name, true);
 
                 ActivityLogger.Instance.Log($"Successfully deployed {app.Name}.", ActivityType.Success);
                 Notify(new DownloadProgressInfo

@@ -57,6 +57,11 @@ namespace SetupHub180Hz.Views
             var appsToUpgrade = new List<AppItem>(UpdateMonitorService.Instance.UpgradableApps);
             if (appsToUpgrade.Count == 0) return;
 
+            foreach (var app in appsToUpgrade)
+            {
+                UpdateMonitorService.Instance.MarkAsUpdated(app.Id, app.Name);
+            }
+
             DownloadManagerService.Instance.EnqueueRange(appsToUpgrade, isUpgrade: true);
             ActivityLogger.Instance.Log($"Enqueued {appsToUpgrade.Count} application updates to the download queue.", ActivityType.Info);
             NotificationService.Notify("Updates Enqueued", $"Enqueued {appsToUpgrade.Count} updates to Download Manager.");
@@ -70,6 +75,7 @@ namespace SetupHub180Hz.Views
         {
             if (sender is Button btn && btn.DataContext is AppItem app)
             {
+                UpdateMonitorService.Instance.MarkAsUpdated(app.Id, app.Name);
                 DownloadManagerService.Instance.Enqueue(app, isUpgrade: true);
                 ActivityLogger.Instance.Log($"Enqueued update for {app.Name} to the download queue.", ActivityType.Info);
 

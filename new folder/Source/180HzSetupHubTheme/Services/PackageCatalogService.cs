@@ -11,6 +11,14 @@ namespace SetupHub180Hz.Services
 {
     public class PackageCatalogService
     {
+        public static event Action<string, bool>? AppInstallationStatusChanged;
+
+        public static void NotifyStatusChanged(string idOrName, bool isInstalled)
+        {
+            if (string.IsNullOrWhiteSpace(idOrName)) return;
+            AppInstallationStatusChanged?.Invoke(idOrName, isInstalled);
+        }
+
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true
@@ -68,13 +76,33 @@ namespace SetupHub180Hz.Services
         {
             try
             {
-                // 1. Instant check via Windows Registry (0-5 milliseconds, zero UI freeze)
-                foreach (var item in items)
+                // Invalidate registry cache before full recheck to ensure fresh, authentic state
+                AppMetadataHelper.InvalidateCache();
+
+                var itemList = items.ToList();
+
+                // 1. Instant check via Windows Registry and local executable presence
+                foreach (var item in itemList)
                 {
                     var reg = AppMetadataHelper.GetRegistryInfo(item.Name, item.Id);
                     if (reg != null)
                     {
                         item.IsInstalled = true;
+                        item.Status = "Installed";
+                        if (!string.IsNullOrWhiteSpace(reg.DisplayVersion))
+                        {
+                            item.Version = reg.DisplayVersion;
+                        }
+                    }
+                    else if (CheckLocalExeExists(item))
+                    {
+                        item.IsInstalled = true;
+                        item.Status = "Installed";
+                    }
+                    else
+                    {
+                        item.IsInstalled = false;
+                        item.Status = "Install";
                     }
                 }
 
@@ -83,11 +111,12 @@ namespace SetupHub180Hz.Services
                 var installedMap = new HashSet<string>(installed.Select(i => i.Id), StringComparer.OrdinalIgnoreCase);
                 var installedNames = new HashSet<string>(installed.Select(i => i.Name), StringComparer.OrdinalIgnoreCase);
 
-                foreach (var item in items)
+                foreach (var item in itemList)
                 {
-                    if (!item.IsInstalled && (installedMap.Contains(item.Id) || installedNames.Contains(item.Name)))
+                    if (installedMap.Contains(item.Id) || installedNames.Contains(item.Name))
                     {
                         item.IsInstalled = true;
+                        item.Status = "Installed";
                     }
                 }
             }
@@ -95,6 +124,30 @@ namespace SetupHub180Hz.Services
             {
                 // Best effort check
             }
+        }
+
+        private static bool CheckLocalExeExists(AppItem item)
+        {
+            if (!string.IsNullOrWhiteSpace(item.LocalIconPath) &&
+                item.LocalIconPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) &&
+                File.Exists(item.LocalIconPath))
+            {
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(item.InstallLocation) && Directory.Exists(item.InstallLocation))
+            {
+                try
+                {
+                    if (Directory.EnumerateFiles(item.InstallLocation, "*.exe", SearchOption.TopDirectoryOnly).Any())
+                    {
+                        return true;
+                    }
+                }
+                catch { }
+            }
+
+            return false;
         }
 
         private static async Task<List<AppItem>> LoadFromJsonAsync()

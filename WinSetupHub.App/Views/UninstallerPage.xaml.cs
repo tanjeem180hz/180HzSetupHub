@@ -286,6 +286,13 @@ namespace SetupHub180Hz.Views
                 ApplyFilter();
                 InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
 
+                // Crucial: Invalidate cached registry data and notify all components that this app is now uninstalled!
+                AppMetadataHelper.InvalidateCache();
+                PackageCatalogService.NotifyStatusChanged(appToUninstall.Id, false);
+                PackageCatalogService.NotifyStatusChanged(appToUninstall.Name, false);
+                UpdateMonitorService.Instance.UnmarkUpdated(appToUninstall.Id);
+                UpdateMonitorService.Instance.UnmarkUpdated(appToUninstall.Name);
+
                 // Universal heuristic scan for leftover registry keys and folders
                 try
                 {

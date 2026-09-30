@@ -344,6 +344,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- Search Input Container -->
@@ -533,6 +534,15 @@
                     Click="ImportInstall_Click">
                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
                                             services:LottieHelper.AssetName="download.json"/>
+            </Button>
+
+            <!-- Refresh Catalog & Status Action -->
+            <Button Grid.Column="4" Tag="Refresh Status"
+                    Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0"
+                    ToolTip="Refresh installed status and reload application catalog"
+                    Click="Refresh_Click">
+                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="refresh.json"/>
             </Button>
         </Grid>
 

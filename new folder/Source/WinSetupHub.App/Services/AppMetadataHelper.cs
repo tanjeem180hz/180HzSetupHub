@@ -24,6 +24,11 @@ namespace SetupHub180Hz.Services
 
         private static Dictionary<string, RegistryAppInfo>? _registryCache;
 
+        public static void InvalidateCache()
+        {
+            _registryCache = null;
+        }
+
         public static void EnrichAppItem(AppItem app, IEnumerable<AppItem>? catalog = null)
         {
             // 1. Smart match against catalog

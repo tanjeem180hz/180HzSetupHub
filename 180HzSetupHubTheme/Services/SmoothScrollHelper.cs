@@ -54,8 +54,6 @@ namespace SetupHub180Hz.Services
             public int HorizontalAnimId;
             public bool IsVerticalAnimating;
             public bool IsHorizontalAnimating;
-            public long LastWheelTimestamp;
-            public double VelocityMultiplier = 1.0;
         }
 
         private static readonly ConditionalWeakTable<ScrollViewer, ScrollState> _states = new();
@@ -148,27 +146,17 @@ namespace SetupHub180Hz.Services
                 || (sv.HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled && sv.ScrollableWidth > 0 && sv.ScrollableHeight <= 0.001);
 
             var state = _states.GetOrCreateValue(sv);
-            long now = _clock.ElapsedMilliseconds;
-            long deltaT = now - state.LastWheelTimestamp;
-            state.LastWheelTimestamp = now;
 
-            // Momentum acceleration: rapid continuous scrolling boosts speed up to 3.2x
-            if (deltaT < 220 && deltaT > 0)
-            {
-                state.VelocityMultiplier = Math.Min(3.2, state.VelocityMultiplier + 0.55);
-            }
-            else
-            {
-                state.VelocityMultiplier = 1.0;
-            }
+            // Default natural scrolling calibrated to Windows OS WheelScrollLines
+            double lines = SystemParameters.WheelScrollLines > 0 ? SystemParameters.WheelScrollLines : 3;
+            double defaultTravel = lines * 28.0; // Standard ~84px travel per notch
 
             if (isHorizontal)
             {
                 if (sv.ScrollableWidth <= 0) return;
 
                 double current = state.IsHorizontalAnimating ? state.TargetHorizontalOffset : sv.HorizontalOffset;
-                // Responsive 220px base travel per notch
-                double delta = (e.Delta / 120.0) * 220.0 * state.VelocityMultiplier;
+                double delta = (e.Delta / 120.0) * defaultTravel;
                 double target = Math.Clamp(current - delta, 0, sv.ScrollableWidth);
                 state.TargetHorizontalOffset = target;
 
@@ -179,7 +167,7 @@ namespace SetupHub180Hz.Services
                 {
                     From = sv.HorizontalOffset,
                     To = target,
-                    Duration = TimeSpan.FromMilliseconds(70),
+                    Duration = TimeSpan.FromMilliseconds(100),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
 
@@ -203,7 +191,7 @@ namespace SetupHub180Hz.Services
                 // Support both pixel scrolling and item-based virtualized lists
                 if (sv.CanContentScroll && VirtualizingPanel.GetScrollUnit(sv) == ScrollUnit.Item)
                 {
-                    double itemStep = (e.Delta > 0 ? -3.0 : 3.0) * Math.Ceiling(state.VelocityMultiplier);
+                    double itemStep = (e.Delta > 0 ? -1.0 : 1.0) * lines;
                     double targetItem = Math.Clamp(current + itemStep, 0, sv.ScrollableHeight);
                     state.TargetVerticalOffset = targetItem;
 
@@ -214,7 +202,7 @@ namespace SetupHub180Hz.Services
                     {
                         From = sv.VerticalOffset,
                         To = targetItem,
-                        Duration = TimeSpan.FromMilliseconds(65),
+                        Duration = TimeSpan.FromMilliseconds(100),
                         EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                     };
 
@@ -231,8 +219,8 @@ namespace SetupHub180Hz.Services
                     return;
                 }
 
-                // Blazing fast 220px travel distance per notch with 70ms QuadraticEase for immediate, buttery 180Hz feel
-                double delta = (e.Delta / 120.0) * 220.0 * state.VelocityMultiplier;
+                // Default natural travel distance per notch with clean ease
+                double delta = (e.Delta / 120.0) * defaultTravel;
                 double target = Math.Clamp(current - delta, 0, sv.ScrollableHeight);
                 state.TargetVerticalOffset = target;
 
@@ -243,7 +231,7 @@ namespace SetupHub180Hz.Services
                 {
                     From = sv.VerticalOffset,
                     To = target,
-                    Duration = TimeSpan.FromMilliseconds(70),
+                    Duration = TimeSpan.FromMilliseconds(100),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
 

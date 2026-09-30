@@ -67,6 +67,37 @@ namespace SetupHub180Hz.Services
             ActivityLogger.Instance.Log($"Background update monitor interval set to {hours}h.", ActivityType.Info);
         }
 
+        private readonly HashSet<string> _recentlyUpdated = new(StringComparer.OrdinalIgnoreCase);
+
+        public void MarkAsUpdated(string appId, string? appName = null)
+        {
+            if (!string.IsNullOrWhiteSpace(appId)) _recentlyUpdated.Add(appId);
+            if (!string.IsNullOrWhiteSpace(appName)) _recentlyUpdated.Add(appName);
+
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher == null) return;
+
+            dispatcher.InvokeAsync(() =>
+            {
+                var matches = UpgradableApps.Where(a =>
+                    string.Equals(a.Id, appId, StringComparison.OrdinalIgnoreCase) ||
+                    (!string.IsNullOrWhiteSpace(appName) && string.Equals(a.Name, appName, StringComparison.OrdinalIgnoreCase))).ToList();
+
+                foreach (var match in matches)
+                {
+                    UpgradableApps.Remove(match);
+                }
+            });
+        }
+
+        public void UnmarkUpdated(string appIdOrName)
+        {
+            if (!string.IsNullOrWhiteSpace(appIdOrName))
+            {
+                _recentlyUpdated.Remove(appIdOrName);
+            }
+        }
+
         public async Task RefreshAsync(bool force = false)
         {
             if (!force && ShouldSkipDueToRecency())
@@ -84,8 +115,17 @@ namespace SetupHub180Hz.Services
             {
                 if (!await _winget.IsAvailableAsync()) return;
 
-                var latestUpgradable = await _winget.GetUpgradableAppsAsync();
+                var rawUpgradable = await _winget.GetUpgradableAppsAsync();
                 _catalogCache ??= await _catalogService.GetAllAsync();
+
+                // Filter out any packages where current version already matches available version,
+                // or where the app was already updated in the current session
+                var latestUpgradable = rawUpgradable
+                    .Where(a => !string.IsNullOrWhiteSpace(a.AvailableVersion) &&
+                                !string.Equals(a.Version?.Trim(), a.AvailableVersion?.Trim(), StringComparison.OrdinalIgnoreCase) &&
+                                !_recentlyUpdated.Contains(a.Id) &&
+                                !_recentlyUpdated.Contains(a.Name))
+                    .ToList();
 
                 foreach (var app in latestUpgradable)
                 {

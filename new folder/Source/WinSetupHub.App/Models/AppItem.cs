@@ -231,6 +231,10 @@ namespace SetupHub180Hz.Models
                     {
                         Status = "Installed";
                     }
+                    else if (!_isInstalled && _status == "Installed")
+                    {
+                        Status = "Install";
+                    }
                 }
             }
         }
