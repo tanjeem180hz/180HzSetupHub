@@ -19,6 +19,7 @@ namespace SetupHub180Hz.Services
             public string? DisplayIcon { get; set; }
             public string? UninstallString { get; set; }
             public string? WebUrl { get; set; }
+            public DateTime? InstallDate { get; set; }
         }
 
         private static Dictionary<string, RegistryAppInfo>? _registryCache;
@@ -101,6 +102,20 @@ namespace SetupHub180Hz.Services
                 {
                     app.WebUrl = regInfo.WebUrl;
                 }
+
+                if (regInfo.InstallDate.HasValue && !app.InstallDate.HasValue)
+                {
+                    app.InstallDate = regInfo.InstallDate;
+                }
+            }
+
+            if (!app.InstallDate.HasValue && !string.IsNullOrWhiteSpace(app.InstallLocation) && Directory.Exists(app.InstallLocation))
+            {
+                try
+                {
+                    app.InstallDate = Directory.GetCreationTime(app.InstallLocation);
+                }
+                catch { }
             }
 
             // 3. If local icon still missing, try Windows App Paths registry
@@ -711,6 +726,22 @@ namespace SetupHub180Hz.Services
                                     sizeStr = mb >= 1024 ? $"{mb / 1024:0.0} GB" : $"{mb:0.0} MB";
                                 }
 
+                                var rawInstallDate = appKey.GetValue("InstallDate") as string;
+                                DateTime? installDate = null;
+                                if (!string.IsNullOrWhiteSpace(rawInstallDate) && rawInstallDate.Length == 8 &&
+                                    DateTime.TryParseExact(rawInstallDate, "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var parsedDate))
+                                {
+                                    installDate = parsedDate;
+                                }
+                                else if (!string.IsNullOrWhiteSpace(installLoc) && Directory.Exists(installLoc))
+                                {
+                                    try
+                                    {
+                                        installDate = Directory.GetCreationTime(installLoc);
+                                    }
+                                    catch { }
+                                }
+
                                 var entry = new RegistryAppInfo
                                 {
                                     DisplayName = dispName ?? subName,
@@ -719,7 +750,8 @@ namespace SetupHub180Hz.Services
                                     InstallLocation = installLoc,
                                     DisplayIcon = dispIcon,
                                     UninstallString = uninstStr,
-                                    WebUrl = webUrl
+                                    WebUrl = webUrl,
+                                    InstallDate = installDate
                                 };
 
                                 if (!string.IsNullOrWhiteSpace(dispName))

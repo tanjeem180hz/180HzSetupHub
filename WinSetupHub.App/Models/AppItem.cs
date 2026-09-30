@@ -174,6 +174,50 @@ namespace SetupHub180Hz.Models
         public string FormattedSize => string.IsNullOrWhiteSpace(Size) ? "-" : $"💾 {Size}";
         public string Initial => !string.IsNullOrWhiteSpace(Name) ? Name[0].ToString().ToUpperInvariant() : "•";
 
+        private bool _isUpgrade;
+        public bool IsUpgrade
+        {
+            get => _isUpgrade;
+            set
+            {
+                if (_isUpgrade != value)
+                {
+                    _isUpgrade = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private DateTime? _installDate;
+        public DateTime? InstallDate
+        {
+            get => _installDate;
+            set
+            {
+                if (_installDate != value)
+                {
+                    _installDate = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(FormattedInstallDate));
+                }
+            }
+        }
+
+        public string FormattedInstallDate
+        {
+            get
+            {
+                if (!_installDate.HasValue) return "";
+                var date = _installDate.Value;
+                var diff = DateTime.Now.Date - date.Date;
+                if (diff.TotalDays == 0) return "🕒 Installed: Today";
+                if (diff.TotalDays == 1) return "🕒 Installed: Yesterday";
+                if (diff.TotalDays < 7) return $"🕒 Installed: {(int)diff.TotalDays}d ago";
+                if (diff.TotalDays < 30) return $"🕒 Installed: {(int)(diff.TotalDays / 7)}w ago";
+                return $"🕒 {date:MMM dd, yyyy}";
+            }
+        }
+
         public bool IsInstalled
         {
             get => _isInstalled;

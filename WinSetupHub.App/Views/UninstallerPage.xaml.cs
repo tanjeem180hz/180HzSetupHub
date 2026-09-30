@@ -53,10 +53,19 @@ namespace SetupHub180Hz.Views
             _allApps = await _winget.GetInstalledAppsAsync();
             var presetCatalog = await _catalog.GetAllAsync();
 
-            // Enrich all installed apps with exact registry details
+            // Enrich all installed apps with exact registry details & session download history
+            var completedHistory = DownloadManagerService.Instance.CompletedHistory;
             foreach (var app in _allApps)
             {
                 AppMetadataHelper.EnrichAppItem(app, presetCatalog);
+
+                var completedInSession = completedHistory.FirstOrDefault(h =>
+                    string.Equals(h.App.Id, app.Id, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(h.App.Name, app.Name, StringComparison.OrdinalIgnoreCase));
+                if (completedInSession != null)
+                {
+                    app.InstallDate = completedInSession.CompletedAt;
+                }
             }
 
             InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
@@ -147,6 +156,12 @@ namespace SetupHub180Hz.Views
                     a.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                     a.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                     a.Category.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            // Default sort: Most recently downloaded / installed apps at the very top
+            filtered = filtered
+                .OrderByDescending(a => a.InstallDate ?? DateTime.MinValue)
+                .ThenBy(a => a.Name)
+                .ToList();
 
             if (filtered.Count == 0)
             {

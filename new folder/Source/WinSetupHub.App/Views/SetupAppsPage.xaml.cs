@@ -205,6 +205,7 @@ namespace SetupHub180Hz.Views
                 ("Developer", "Developer Tools", "💻"),
                 ("Gaming", "Gaming Tools", "🎮"),
                 ("Productivity", "Office & Productivity", "💼"),
+                ("Research & Science", "Research & Science", "🔬"),
                 ("Communication", "Communication & Chat", "💬"),
                 ("Design & Creative", "Design & Creative", "🎨"),
                 ("Media & Streaming", "Media & Audio", "🎬"),

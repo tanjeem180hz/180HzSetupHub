@@ -285,20 +285,26 @@ namespace SetupHub180Hz.Services
             }
         }
 
-        public void Enqueue(AppItem item)
+        public void Enqueue(AppItem item, bool isUpgrade = false)
         {
-            EnqueueRange(new[] { item });
+            EnqueueRange(new[] { item }, isUpgrade);
         }
 
-        public void EnqueueRange(IEnumerable<AppItem> items)
+        public void EnqueueRange(IEnumerable<AppItem> items, bool isUpgrade = false)
         {
             lock (_lock)
             {
                 foreach (var item in items)
                 {
-                    if (!_queue.Contains(item) && !item.IsInstalled)
+                    if (isUpgrade)
                     {
-                        item.Status = "⏳ Queued";
+                        item.IsUpgrade = true;
+                    }
+
+                    bool eligible = item.IsUpgrade || item.HasUpdate || !item.IsInstalled;
+                    if (!_queue.Contains(item) && eligible)
+                    {
+                        item.Status = item.IsUpgrade ? "⏳ Queued (Update)" : "⏳ Queued";
                         item.IsBusy = true;
                         _queue.Add(item);
                     }
@@ -560,7 +566,8 @@ namespace SetupHub180Hz.Services
         private async Task ProcessSingleAppAsync(AppItem app, int queueIndex, int queueTotal)
         {
             app.IsBusy = true;
-            app.Status = "Preparing…";
+            string actionVerb = (app.IsUpgrade || app.HasUpdate) ? "update" : "install";
+            app.Status = (app.IsUpgrade || app.HasUpdate) ? "Updating…" : "Preparing…";
 
             Notify(new DownloadProgressInfo
             {
@@ -568,7 +575,7 @@ namespace SetupHub180Hz.Services
                 QueueIndex = queueIndex,
                 QueueTotal = queueTotal,
                 State = DownloadState.Downloading,
-                StatusMessage = $"Preparing to install {app.Name}…",
+                StatusMessage = $"Preparing to {actionVerb} {app.Name}…",
                 SpeedFormatted = "Connecting…",
                 EtaFormatted = "Starting…"
             });
@@ -933,8 +940,10 @@ namespace SetupHub180Hz.Services
 
             if (!success)
             {
-                // Fallback to winget install command
-                success = await _winget.InstallAsync(app.Id, app.Source);
+                // Fallback to winget install or upgrade command
+                success = (app.IsUpgrade || app.HasUpdate)
+                    ? await _winget.UpgradeAsync(app.Id)
+                    : await _winget.InstallAsync(app.Id, app.Source);
             }
 
             FinalizeAppStatus(app, success, queueIndex, queueTotal);
@@ -994,7 +1003,7 @@ namespace SetupHub180Hz.Services
             };
             smoothTimer.Start();
 
-            bool success = await _winget.InstallAsync(app.Id, app.Source, line =>
+            Action<string> onOutputLine = line =>
             {
                 if (string.IsNullOrWhiteSpace(line)) return;
 
@@ -1016,7 +1025,8 @@ namespace SetupHub180Hz.Services
                     currentPct = percent;
                 }
                 else if (line.Contains("Starting package install", StringComparison.OrdinalIgnoreCase) ||
-                         line.Contains("Installing", StringComparison.OrdinalIgnoreCase))
+                         line.Contains("Installing", StringComparison.OrdinalIgnoreCase) ||
+                         line.Contains("Upgrading", StringComparison.OrdinalIgnoreCase))
                 {
                     percent = Math.Max(currentPct, 85);
                     currentPct = percent;
@@ -1039,7 +1049,7 @@ namespace SetupHub180Hz.Services
                 }
                 else if (currentPct >= 85)
                 {
-                    eta = "Installing…";
+                    eta = (app.IsUpgrade || app.HasUpdate) ? "Updating…" : "Installing…";
                 }
 
                 string sizeStr = "";
@@ -1051,7 +1061,7 @@ namespace SetupHub180Hz.Services
 
                 var state = currentPct >= 85 ? DownloadState.Installing : DownloadState.Downloading;
                 string statusMsg = currentPct >= 85
-                    ? $"Installing {app.Name} quietly in background…"
+                    ? $"{(app.IsUpgrade || app.HasUpdate ? "Updating" : "Installing")} {app.Name} quietly in background…"
                     : $"Downloading authentic {app.Name} package…";
 
                 app.Status = $"{statusMsg} ({percent:0}%)";
@@ -1068,7 +1078,11 @@ namespace SetupHub180Hz.Services
                     SizeFormatted = sizeStr,
                     StatusMessage = statusMsg
                 });
-            }, ct);
+            };
+
+            bool success = (app.IsUpgrade || app.HasUpdate)
+                ? await _winget.UpgradeAsync(app.Id, onOutputLine, ct)
+                : await _winget.InstallAsync(app.Id, app.Source, onOutputLine, ct);
 
             smoothTimer.Stop();
 
@@ -1097,6 +1111,23 @@ namespace SetupHub180Hz.Services
                 app.IsInstalled = true;
                 app.Status = "Installed";
                 app.IsSelected = false;
+                app.InstallDate = DateTime.Now;
+
+                bool wasUpgrade = app.IsUpgrade || app.HasUpdate;
+                if (wasUpgrade)
+                {
+                    if (!string.IsNullOrWhiteSpace(app.AvailableVersion))
+                    {
+                        app.Version = app.AvailableVersion;
+                    }
+                    app.AvailableVersion = "";
+                    app.IsUpgrade = false;
+                    _ = Task.Run(async () =>
+                    {
+                        try { await UpdateMonitorService.Instance.RefreshAsync(force: true); } catch { }
+                    });
+                }
+
                 ActivityLogger.Instance.Log($"Successfully deployed {app.Name}.", ActivityType.Success);
                 Notify(new DownloadProgressInfo
                 {
@@ -1105,7 +1136,7 @@ namespace SetupHub180Hz.Services
                     QueueTotal = queueTotal,
                     State = DownloadState.Completed,
                     Percentage = 100,
-                    StatusMessage = $"Successfully installed {app.Name}!"
+                    StatusMessage = wasUpgrade ? $"Successfully updated {app.Name}!" : $"Successfully installed {app.Name}!"
                 });
             }
             else
@@ -1119,7 +1150,7 @@ namespace SetupHub180Hz.Services
                     QueueTotal = queueTotal,
                     State = DownloadState.Error,
                     Percentage = 0,
-                    StatusMessage = $"Installation failed for {app.Name}."
+                    StatusMessage = $"{(app.IsUpgrade ? "Update" : "Installation")} failed for {app.Name}."
                 });
             }
 
@@ -1130,7 +1161,9 @@ namespace SetupHub180Hz.Services
                     App = app,
                     CompletedAt = DateTime.Now,
                     Success = success,
-                    Message = success ? "Installed successfully" : "Installation failed"
+                    Message = success
+                        ? (app.IsUpgrade ? "Updated successfully" : "Installed successfully")
+                        : (app.IsUpgrade ? "Update failed" : "Installation failed")
                 });
             }
             QueueChanged?.Invoke();

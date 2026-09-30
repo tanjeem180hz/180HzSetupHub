@@ -264,8 +264,8 @@ namespace SetupHub180Hz.Services
             return success;
         }
 
-        public Task<bool> UpgradeAsync(string id, Action<string>? onOutputLine = null) =>
-            RunActionAsync($"upgrade --id \"{id}\" -e --silent --accept-package-agreements --accept-source-agreements", onOutputLine);
+        public Task<bool> UpgradeAsync(string id, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default) =>
+            RunActionAsync($"upgrade --id \"{id}\" -e --silent --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
 
         public Task<bool> UpgradeAllAsync(Action<string>? onOutputLine = null) =>
             RunActionAsync("upgrade --all --silent --accept-package-agreements --accept-source-agreements", onOutputLine);

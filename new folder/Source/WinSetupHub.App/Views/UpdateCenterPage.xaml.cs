@@ -52,51 +52,30 @@ namespace SetupHub180Hz.Views
             UpdateSummary();
         }
 
-        private async void UpgradeAll_Click(object sender, RoutedEventArgs e)
+        private void UpgradeAll_Click(object sender, RoutedEventArgs e)
         {
-            var count = UpdateMonitorService.Instance.UpgradableApps.Count;
-            UpgradeAllButton.IsEnabled = false;
-            UpgradeAllButton.Content = "Upgrading All…";
+            var appsToUpgrade = new List<AppItem>(UpdateMonitorService.Instance.UpgradableApps);
+            if (appsToUpgrade.Count == 0) return;
 
-            var success = await _winget.UpgradeAllAsync();
+            DownloadManagerService.Instance.EnqueueRange(appsToUpgrade, isUpgrade: true);
+            ActivityLogger.Instance.Log($"Enqueued {appsToUpgrade.Count} application updates to the download queue.", ActivityType.Info);
+            NotificationService.Notify("Updates Enqueued", $"Enqueued {appsToUpgrade.Count} updates to Download Manager.");
 
-            ActivityLogger.Instance.Log(
-                success ? "Upgraded all available applications." : "Upgrade-all finished with some warnings.",
-                success ? ActivityType.Success : ActivityType.Warning);
-
-            NotificationService.Notify(
-                "Upgrade Complete",
-                success ? $"{count} apps upgraded successfully." : "Upgrade-all finished with some warnings.");
-
-            UpgradeAllButton.Content = "⚡ Upgrade All";
-            await UpdateMonitorService.Instance.RefreshAsync(force: true);
-            UpdateSummary();
+            // Route to Downloads section so user sees real-time CDN speed, progress, ETA, and hero cards
+            var mw = Window.GetWindow(this) as MainWindow;
+            mw?.GoToPage("Downloads");
         }
 
-        private async void UpgradeButton_Click(object sender, RoutedEventArgs e)
+        private void UpgradeButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.DataContext is AppItem app)
             {
-                btn.IsEnabled = false;
-                btn.Content = "Upgrading…";
+                DownloadManagerService.Instance.Enqueue(app, isUpgrade: true);
+                ActivityLogger.Instance.Log($"Enqueued update for {app.Name} to the download queue.", ActivityType.Info);
 
-                var success = await _winget.UpgradeAsync(app.Id);
-
-                btn.Content = success ? "Updated ✓" : "Failed";
-                ActivityLogger.Instance.Log(
-                    success ? $"Upgraded {app.Name} to {app.AvailableVersion}." : $"Failed to upgrade {app.Name}.",
-                    success ? ActivityType.Success : ActivityType.Error);
-
-                if (success)
-                {
-                    await UpdateMonitorService.Instance.RefreshAsync(force: true);
-                    UpdateSummary();
-                }
-                else
-                {
-                    btn.IsEnabled = true;
-                    btn.Content = "Retry";
-                }
+                // Route to Downloads section
+                var mw = Window.GetWindow(this) as MainWindow;
+                mw?.GoToPage("Downloads");
             }
         }
 
