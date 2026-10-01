@@ -654,7 +654,6 @@
 
                 <Grid Margin="0,0,0,14">
                     <TextBlock Text="COMMAND MODULES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
-                    <TextBlock Text="Click any tile to jump directly into the module" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 </Grid>
 
                 <!-- 8 Responsive Module Tiles in Dynamic UniformGrid -->
