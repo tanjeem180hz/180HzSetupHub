@@ -178,7 +178,9 @@
                                     <ColumnDefinition Width="36"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="🗑️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
+                                                            services:LottieHelper.AssetName="uninstaller_bin.json"
+                                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavUninstallerLabel" Grid.Column="1" Text="Uninstaller" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>
                         </RadioButton>
@@ -191,7 +193,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            services:LottieHelper.AssetName="rocket.json"
+                                                            services:LottieHelper.AssetName="startup_boost.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavStartupLabel" Grid.Column="1" Text="Startup Apps" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>

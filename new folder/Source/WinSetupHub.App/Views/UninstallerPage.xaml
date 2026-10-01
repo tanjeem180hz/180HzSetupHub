@@ -260,7 +260,11 @@
                         </Border>
                         <TextBlock Text="AUTHENTIC SYSTEM APPLICATION MANAGER" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <TextBlock Text="Uninstall Software" Style="{StaticResource TextHeader}" FontSize="26"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
+                                                    services:LottieHelper.AssetName="uninstaller_bin.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Uninstall Software" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
+                    </StackPanel>
                     <TextBlock Text="View installed software with authentic versions, measured disk sizes, and verified registry entries."
                                Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
                 </StackPanel>

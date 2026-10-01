@@ -20,7 +20,11 @@
                 </Border>
                 <TextBlock Text="WINDOWS LAUNCH MANAGER" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
             </StackPanel>
-            <TextBlock Text="Startup Manager" Style="{StaticResource TextHeader}" FontSize="26"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="startup_boost.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Startup Manager" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
+            </StackPanel>
             <TextBlock Text="View, enable, or disable applications configured to launch automatically with Windows."
                        Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
         </StackPanel>
