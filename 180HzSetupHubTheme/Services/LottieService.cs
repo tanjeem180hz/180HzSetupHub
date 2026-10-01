@@ -49,19 +49,25 @@ namespace SetupHub180Hz.Services
             {
                 Directory.CreateDirectory(LottieFolder);
                 var target = Path.Combine(LottieFolder, assetName);
-                if (File.Exists(target) && new FileInfo(target).Length > 0)
-                {
-                    return target;
-                }
 
-                // Fallback: extract directly from embedded resource
+                // Check embedded resource first to guarantee latest assets are always extracted
                 var asm = typeof(LottieService).Assembly;
                 var resourceName = $"SetupHub180Hz.Assets.Lottie.{assetName}";
-                using var src = asm.GetManifestResourceStream(resourceName);
-                if (src != null)
+                using (var src = asm.GetManifestResourceStream(resourceName))
                 {
-                    using var dst = File.Create(target);
-                    src.CopyTo(dst);
+                    if (src != null)
+                    {
+                        if (!File.Exists(target) || new FileInfo(target).Length != src.Length)
+                        {
+                            using var dst = File.Create(target);
+                            src.CopyTo(dst);
+                        }
+                        return target;
+                    }
+                }
+
+                if (File.Exists(target) && new FileInfo(target).Length > 0)
+                {
                     return target;
                 }
 
