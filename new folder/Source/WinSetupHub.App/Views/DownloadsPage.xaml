@@ -22,16 +22,9 @@
 
                     <StackPanel VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <lottie:LottieAnimationView Width="24" Height="24" AutoPlay="True" RepeatCount="-1"
+                            <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
                                                         services:LottieHelper.AssetName="download_flow.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="DOWNLOADS &amp; BANDWIDTH" Style="{StaticResource TextHeader}" FontSize="22" FontWeight="Bold" VerticalAlignment="Center"/>
-                            <!-- Live Status Indicator Pill -->
-                            <Border x:Name="LiveStatusBadge" Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="14,0,0,0" VerticalAlignment="Center">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Ellipse x:Name="LiveStatusDot" Width="8" Height="8" Fill="{DynamicResource BrushAccent}" Margin="0,0,6,0"/>
-                                    <TextBlock x:Name="LiveStatusText" Text="IDLE" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
-                                </StackPanel>
-                            </Border>
+                            <TextBlock Text="Downloads" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Text="Real-time network throughput, active deployment pipeline, and queue prioritization."
                                    Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
@@ -39,6 +32,14 @@
 
                     <!-- Top Action Controls -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Live Status Indicator Pill (Hidden when idle, visible only when actively downloading or paused) -->
+                        <Border x:Name="LiveStatusBadge" Visibility="Collapsed" Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse x:Name="LiveStatusDot" Width="8" Height="8" Fill="{DynamicResource BrushAccent}" Margin="0,0,6,0"/>
+                                <TextBlock x:Name="LiveStatusText" Text="DOWNLOADING" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                            </StackPanel>
+                        </Border>
+
                         <Button x:Name="BtnPauseAll" Tag="Pause All" Style="{StaticResource ExpandableOutlineButton}"
                                 Margin="0,0,8,0" Click="BtnPauseAll_Click">
                             <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"

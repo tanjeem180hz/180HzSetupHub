@@ -164,11 +164,23 @@ namespace SetupHub180Hz.Views
 
         private void SetStatusBadge(string text, string brushKey)
         {
-            LiveStatusText.Text = text;
+            if (LiveStatusBadge == null) return;
+
+            if (string.Equals(text, "IDLE", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(text))
+            {
+                LiveStatusBadge.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            LiveStatusBadge.Visibility = Visibility.Visible;
+            if (LiveStatusText != null)
+            {
+                LiveStatusText.Text = text;
+            }
             if (TryFindResource(brushKey) is Brush b)
             {
-                LiveStatusText.Foreground = b;
-                LiveStatusDot.Fill = b;
+                if (LiveStatusText != null) LiveStatusText.Foreground = b;
+                if (LiveStatusDot != null) LiveStatusDot.Fill = b;
             }
             if (TryFindResource("BrushSurfaceHover") is Brush bg)
             {
