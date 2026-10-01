@@ -373,6 +373,15 @@ namespace SetupHub180Hz.Views
             GraphLine.Points = linePoints;
             GraphAreaPolygon.Points = areaPoints;
 
+            if (Application.Current?.TryFindResource("BrushAccent") is SolidColorBrush accentBrush)
+            {
+                var accentCol = accentBrush.Color;
+                GraphAreaPolygon.Fill = new LinearGradientBrush(
+                    Color.FromArgb(0x40, accentCol.R, accentCol.G, accentCol.B),
+                    Color.FromArgb(0x00, accentCol.R, accentCol.G, accentCol.B),
+                    new Point(0, 0), new Point(0, 1));
+            }
+
             if (currentBps > 1024)
             {
                 GraphDot.Visibility = Visibility.Visible;

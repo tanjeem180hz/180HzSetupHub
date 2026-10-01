@@ -56,20 +56,9 @@
                                     BorderThickness="1"
                                     Padding="18,16"
                                     SnapsToDevicePixels="True"
-                                    ClipToBounds="True">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#121913" Offset="0"/>
-                                        <GradientStop Color="#080C09" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                                <Border.BorderBrush>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Color="#223124" Offset="0"/>
-                                        <GradientStop Color="#131C14" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Border.BorderBrush>
-
+                                    ClipToBounds="True"
+                                    Background="{DynamicResource BrushSurface}"
+                                    BorderBrush="{DynamicResource BrushBorder}">
                                 <Grid>
                                     <!-- Ambient Radial Cyber Aura in Top-Right Corner -->
                                     <Ellipse x:Name="RadialAura"
@@ -77,26 +66,12 @@
                                              HorizontalAlignment="Right" VerticalAlignment="Top"
                                              Margin="0,-50,-50,0"
                                              IsHitTestVisible="False"
-                                             Opacity="0.05">
-                                        <Ellipse.Fill>
-                                            <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
-                                                <GradientStop Color="#00FF66" Offset="0"/>
-                                                <GradientStop Color="#00B347" Offset="0.55"/>
-                                                <GradientStop Color="#00000000" Offset="1"/>
-                                            </RadialGradientBrush>
-                                        </Ellipse.Fill>
-                                    </Ellipse>
+                                             Opacity="0.05"
+                                             Fill="{DynamicResource BrushAccent}"/>
 
                                     <!-- Top Specular Glass Edge Highlight -->
-                                    <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,0,10,0" IsHitTestVisible="False">
-                                        <Border.Background>
-                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                                <GradientStop Color="#00000000" Offset="0"/>
-                                                <GradientStop Color="#3000FF66" Offset="0.5"/>
-                                                <GradientStop Color="#00000000" Offset="1"/>
-                                            </LinearGradientBrush>
-                                        </Border.Background>
-                                    </Border>
+                                    <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,0,10,0" IsHitTestVisible="False"
+                                            Background="{DynamicResource BrushAccent}" Opacity="0.25"/>
 
                                     <!-- Card Content -->
                                     <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
@@ -107,22 +82,8 @@
                         <ControlTemplate.Triggers>
                             <!-- MouseOver Hover Pop Up State -->
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="TileBorder" Property="BorderBrush">
-                                    <Setter.Value>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#00FF66" Offset="0"/>
-                                            <GradientStop Color="#00CC52" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter TargetName="TileBorder" Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#1A281C" Offset="0"/>
-                                            <GradientStop Color="#0F1710" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
+                                <Setter TargetName="TileBorder" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                                <Setter TargetName="TileBorder" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
                                 <Trigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
@@ -225,14 +186,7 @@
 
                             <!-- Pressed State -->
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="TileBorder" Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#101811" Offset="0"/>
-                                            <GradientStop Color="#060A07" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
+                                <Setter TargetName="TileBorder" Property="Background" Value="{DynamicResource BrushBorder}"/>
                                 <Trigger.EnterActions>
                                     <BeginStoryboard>
                                         <Storyboard>
@@ -264,22 +218,8 @@
             <Setter Property="Padding" Value="18,16"/>
             <Setter Property="Margin" Value="6,0,6,0"/>
             <Setter Property="SnapsToDevicePixels" Value="True"/>
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#121913" Offset="0"/>
-                        <GradientStop Color="#080C09" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="BorderBrush">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#223124" Offset="0"/>
-                        <GradientStop Color="#131C14" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Background" Value="{DynamicResource BrushSurface}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="RenderTransform">
                 <Setter.Value>
@@ -288,22 +228,8 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush">
-                        <Setter.Value>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#00FF66" Offset="0"/>
-                                <GradientStop Color="#00CC52" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="Background">
-                        <Setter.Value>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#1A281C" Offset="0"/>
-                                <GradientStop Color="#0F1710" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Setter.Value>
-                    </Setter>
+                    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                    <Setter Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
                     <Trigger.EnterActions>
                         <BeginStoryboard>
                             <Storyboard>
@@ -342,22 +268,8 @@
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="ClipToBounds" Value="True"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#131B14" Offset="0"/>
-                        <GradientStop Color="#070A07" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="BorderBrush">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#28382A" Offset="0"/>
-                        <GradientStop Color="#131C14" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Background" Value="{DynamicResource BrushSurface}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="RenderTransform">
                 <Setter.Value>
@@ -366,14 +278,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush">
-                        <Setter.Value>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#00FF66" Offset="0"/>
-                                <GradientStop Color="#00CC52" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Setter.Value>
-                    </Setter>
+                    <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                     <Trigger.EnterActions>
                         <BeginStoryboard>
                             <Storyboard>
@@ -513,26 +418,12 @@
                 <Grid>
                     <!-- Ambient Cybernetic Glow Orb in top-right -->
                     <Ellipse Width="340" Height="340" HorizontalAlignment="Right" VerticalAlignment="Top"
-                             Margin="0,-120,-100,0" IsHitTestVisible="False" Opacity="0.12">
-                        <Ellipse.Fill>
-                            <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
-                                <GradientStop Color="#00FF66" Offset="0"/>
-                                <GradientStop Color="#008833" Offset="0.6"/>
-                                <GradientStop Color="#00000000" Offset="1"/>
-                            </RadialGradientBrush>
-                        </Ellipse.Fill>
-                    </Ellipse>
+                             Margin="0,-120,-100,0" IsHitTestVisible="False" Opacity="0.08"
+                             Fill="{DynamicResource BrushAccent}"/>
 
                     <!-- Top Specular Glass Highlight -->
-                    <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="14,0,14,0" IsHitTestVisible="False">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#00000000" Offset="0"/>
-                                <GradientStop Color="#4000FF66" Offset="0.5"/>
-                                <GradientStop Color="#00000000" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                    </Border>
+                    <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="14,0,14,0" IsHitTestVisible="False"
+                            Background="{DynamicResource BrushAccent}" Opacity="0.25"/>
 
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -566,20 +457,10 @@
                         </StackPanel>
 
                         <!-- Right Module Counter Card -->
-                        <Border Grid.Column="1" CornerRadius="10" Padding="18" VerticalAlignment="Center" SnapsToDevicePixels="True">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                    <GradientStop Color="#0E140F" Offset="0"/>
-                                    <GradientStop Color="#060906" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
-                            <Border.BorderBrush>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                    <GradientStop Color="#4000FF66" Offset="0"/>
-                                    <GradientStop Color="#1500FF66" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.BorderBrush>
-                            <Border.BorderThickness>1</Border.BorderThickness>
+                        <Border Grid.Column="1" CornerRadius="10" Padding="18" VerticalAlignment="Center" SnapsToDevicePixels="True"
+                                Background="{DynamicResource BrushBackground}"
+                                BorderBrush="{DynamicResource BrushBorder}"
+                                BorderThickness="1">
                             <StackPanel HorizontalAlignment="Center">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
                                     <Border Width="10" Height="10" CornerRadius="2" Background="{DynamicResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
@@ -604,15 +485,8 @@
                 <Border Style="{StaticResource DashboardStatCard}">
                     <Grid>
                         <!-- Specular Edge -->
-                        <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="6,0,6,0" IsHitTestVisible="False">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop Color="#00000000" Offset="0"/>
-                                    <GradientStop Color="#2500FF66" Offset="0.5"/>
-                                    <GradientStop Color="#00000000" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
-                        </Border>
+                        <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="6,0,6,0" IsHitTestVisible="False"
+                                Background="{DynamicResource BrushAccent}" Opacity="0.25"/>
 
                         <Grid Margin="0,2,0,0">
                             <Grid.RowDefinitions>
@@ -625,12 +499,12 @@
                                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
                                                             services:LottieHelper.AssetName="wave.json"
                                                             Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="CPU LOAD" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                                <TextBlock Text="CPU LOAD" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Bottom">
-                                <TextBlock x:Name="CpuPercentText" Text="0.0%" FontSize="24" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}"/>
-                                <TextBlock Text=" active" FontSize="12" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Bottom" Margin="4,0,0,3"/>
+                                <TextBlock x:Name="CpuPercentText" Text="0.0%" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}"/>
+                                <TextBlock Text=" active" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Bottom" Margin="4,0,0,3"/>
                             </StackPanel>
 
                             <ProgressBar Grid.Row="2" x:Name="CpuProgressBar" Style="{StaticResource FlatProgressBar}"
@@ -643,15 +517,8 @@
                 <Border Style="{StaticResource DashboardStatCard}">
                     <Grid>
                         <!-- Specular Edge -->
-                        <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="6,0,6,0" IsHitTestVisible="False">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop Color="#00000000" Offset="0"/>
-                                    <GradientStop Color="#2500FF66" Offset="0.5"/>
-                                    <GradientStop Color="#00000000" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
-                        </Border>
+                        <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="6,0,6,0" IsHitTestVisible="False"
+                                Background="{DynamicResource BrushAccent}" Opacity="0.25"/>
 
                         <Grid Margin="0,2,0,0">
                             <Grid.RowDefinitions>
@@ -664,12 +531,12 @@
                                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
                                                             services:LottieHelper.AssetName="gears.json"
                                                             Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="MEMORY (RAM)" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                                <TextBlock Text="MEMORY (RAM)" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Bottom">
-                                <TextBlock x:Name="RamUsageText" Text="0.0 / 0.0 GB" FontSize="20" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Bottom"/>
-                                <TextBlock x:Name="RamPercentText" Text=" (0%)" FontSize="12" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Bottom" Margin="4,0,0,2"/>
+                                <TextBlock x:Name="RamUsageText" Text="0.0 / 0.0 GB" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Bottom"/>
+                                <TextBlock x:Name="RamPercentText" Text=" (0%)" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Bottom" Margin="4,0,0,2"/>
                             </StackPanel>
 
                             <ProgressBar Grid.Row="2" x:Name="RamProgressBar" Style="{StaticResource FlatProgressBar}"
@@ -682,15 +549,8 @@
                 <Border Style="{StaticResource DashboardStatCard}">
                     <Grid>
                         <!-- Specular Edge -->
-                        <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="6,0,6,0" IsHitTestVisible="False">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop Color="#00000000" Offset="0"/>
-                                    <GradientStop Color="#2500FF66" Offset="0.5"/>
-                                    <GradientStop Color="#00000000" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
-                        </Border>
+                        <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="6,0,6,0" IsHitTestVisible="False"
+                                Background="{DynamicResource BrushAccent}" Opacity="0.25"/>
 
                         <Grid Margin="0,2,0,0">
                             <Grid.RowDefinitions>
@@ -703,12 +563,12 @@
                                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
                                                             services:LottieHelper.AssetName="scan.json"
                                                             Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="DISK (C:)" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                                <TextBlock Text="DISK (C:)" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Bottom">
-                                <TextBlock x:Name="DiskUsageText" Text="0.0 GB Free" FontSize="20" FontWeight="Bold" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Bottom"/>
-                                <TextBlock x:Name="DiskTotalText" Text=" of 0.0 GB" FontSize="12" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Bottom" Margin="4,0,0,2"/>
+                                <TextBlock x:Name="DiskUsageText" Text="0.0 GB Free" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Bottom"/>
+                                <TextBlock x:Name="DiskTotalText" Text=" of 0.0 GB" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Bottom" Margin="4,0,0,2"/>
                             </StackPanel>
 
                             <ProgressBar Grid.Row="2" x:Name="DiskProgressBar" Style="{StaticResource FlatProgressBar}"
@@ -725,8 +585,8 @@
                 </StackPanel.RenderTransform>
 
                 <Grid Margin="0,0,0,14">
-                    <TextBlock Text="COMMAND MODULES" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
-                    <TextBlock Text="Click any tile to jump directly into the module" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    <TextBlock Text="COMMAND MODULES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                    <TextBlock Text="Click any tile to jump directly into the module" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 </Grid>
 
                 <!-- 8 Responsive Module Tiles in Dynamic UniformGrid -->
@@ -741,17 +601,17 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                                        <TextBlock Text="01" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
+                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                        <TextBlock Text="01" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="gears.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="→" Foreground="{StaticResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Setup Apps" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextPrimary}" Margin="0,12,0,4"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
                             <TextBlock Grid.Row="2" Text="Search winget catalog and install essential applications with one click."
                                        Style="{StaticResource TextBody}" FontSize="12"/>
                         </Grid>
@@ -767,17 +627,17 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                                        <TextBlock Text="02" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
+                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                        <TextBlock Text="02" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="download_flow.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="→" Foreground="{StaticResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Downloads" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextPrimary}" Margin="0,12,0,4"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
                             <TextBlock Grid.Row="2" Text="Real-time bandwidth monitoring, concurrent queue manager, and speed charts."
                                        Style="{StaticResource TextBody}" FontSize="12"/>
                         </Grid>
@@ -793,17 +653,17 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                                        <TextBlock Text="03" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
+                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                        <TextBlock Text="03" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="update_sync.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="→" Foreground="{StaticResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Update Center" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextPrimary}" Margin="0,12,0,4"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
                             <TextBlock Grid.Row="2" Text="Detect out-of-date apps and upgrade them individually or all at once."
                                        Style="{StaticResource TextBody}" FontSize="12"/>
                         </Grid>
@@ -819,17 +679,17 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                                        <TextBlock Text="04" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
+                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                        <TextBlock Text="04" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="uninstaller_bin.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="→" Foreground="{StaticResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Uninstaller" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextPrimary}" Margin="0,12,0,4"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
                             <TextBlock Grid.Row="2" Text="View all installed applications and cleanly uninstall unwanted software."
                                        Style="{StaticResource TextBody}" FontSize="12"/>
                         </Grid>
@@ -845,17 +705,17 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                                        <TextBlock Text="05" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
+                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                        <TextBlock Text="05" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="startup_boost.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="→" Foreground="{StaticResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Startup Apps" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextPrimary}" Margin="0,12,0,4"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
                             <TextBlock Grid.Row="2" Text="Inspect and control apps configured to launch automatically with Windows."
                                        Style="{StaticResource TextBody}" FontSize="12"/>
                         </Grid>
@@ -871,17 +731,17 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                                        <TextBlock Text="06" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
+                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                        <TextBlock Text="06" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="cleanup_sparkle.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="→" Foreground="{StaticResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Cleanup" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextPrimary}" Margin="0,12,0,4"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
                             <TextBlock Grid.Row="2" Text="Scan and safely purge temporary files, caches, and prefetch items."
                                        Style="{StaticResource TextBody}" FontSize="12"/>
                         </Grid>
@@ -897,17 +757,17 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                                        <TextBlock Text="07" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
+                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                        <TextBlock Text="07" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="activity_pulse.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="→" Foreground="{StaticResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Activity" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextPrimary}" Margin="0,12,0,4"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
                             <TextBlock Grid.Row="2" Text="Live event log and telemetry history for installs, updates and cleanups."
                                        Style="{StaticResource TextBody}" FontSize="12"/>
                         </Grid>
@@ -923,17 +783,17 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                                        <TextBlock Text="08" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
+                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                        <TextBlock Text="08" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="scan.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="→" Foreground="{StaticResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Storage" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{StaticResource BrushTextPrimary}" Margin="0,12,0,4"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
                             <TextBlock Grid.Row="2" Text="View disk footprint and open the local application data directory."
                                        Style="{StaticResource TextBody}" FontSize="12"/>
                         </Grid>

@@ -178,14 +178,17 @@
                             </Border>
 
                             <!-- Category badge -->
-                            <Border Background="#1C2538"
+                            <Border Background="{DynamicResource BrushSurfaceHover}"
+                                    BorderBrush="{DynamicResource BrushAccent}"
+                                    BorderThickness="1"
                                     CornerRadius="4"
                                     Padding="6,1,6,1"
                                     Margin="6,0,0,0"
                                     VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Category}"
                                            FontSize="10"
-                                           Foreground="{StaticResource BrushAccent}"/>
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource BrushAccent}"/>
                             </Border>
                         </StackPanel>
 
@@ -238,7 +241,7 @@
                                 <Style TargetType="Button" BasedOn="{StaticResource AccentButton}">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsInstalled}" Value="True">
-                                            <Setter Property="Background" Value="#163A29"/>
+                                            <Setter Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
                                             <Setter Property="Foreground" Value="{DynamicResource BrushSuccess}"/>
                                             <Setter Property="BorderThickness" Value="1"/>
                                             <Setter Property="BorderBrush" Value="{DynamicResource BrushSuccess}"/>
@@ -448,10 +451,10 @@
                                                     </Border>
                                                     <ControlTemplate.Triggers>
                                                         <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter TargetName="ItemBorder" Property="Background" Value="#182436"/>
+                                                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
                                                         </Trigger>
                                                         <Trigger Property="IsSelected" Value="True">
-                                                            <Setter TargetName="ItemBorder" Property="Background" Value="#1C2E46"/>
+                                                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BrushBorder}"/>
                                                         </Trigger>
                                                     </ControlTemplate.Triggers>
                                                 </ControlTemplate>
@@ -468,8 +471,8 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
                                             <Border Width="22" Height="22" CornerRadius="4"
-                                                    Background="{StaticResource BrushBackground}"
-                                                    BorderBrush="{StaticResource BrushBorder}"
+                                                    Background="{DynamicResource BrushBackground}"
+                                                    BorderBrush="{DynamicResource BrushBorder}"
                                                     BorderThickness="1" Margin="0,0,10,0" ClipToBounds="True">
                                                 <Grid>
                                                     <TextBlock Text="📦" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.4"/>
@@ -477,11 +480,11 @@
                                                 </Grid>
                                             </Border>
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource BrushTextPrimary}"/>
-                                                <TextBlock Text="{Binding Id}" FontSize="10" Foreground="{StaticResource BrushTextSecondary}"/>
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource BrushTextPrimary}"/>
+                                                <TextBlock Text="{Binding Id}" FontSize="10" Foreground="{DynamicResource BrushTextSecondary}"/>
                                             </StackPanel>
-                                            <Border Grid.Column="2" Background="#162536" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Category}" FontSize="10" Foreground="{StaticResource BrushAccent}"/>
+                                            <Border Grid.Column="2" Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Category}" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushAccent}"/>
                                             </Border>
                                         </Grid>
                                     </DataTemplate>
@@ -490,7 +493,7 @@
 
                             <!-- Deep Web Search Action Row -->
                             <Border Grid.Row="2" Margin="0,4,0,0" Padding="8,8"
-                                    Background="#142234" BorderBrush="{StaticResource BrushAccent}"
+                                    Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}"
                                     BorderThickness="1" CornerRadius="6" Cursor="Hand"
                                     MouseLeftButtonDown="PopupDeepWebSearch_Click">
                                 <Grid>
@@ -815,7 +818,7 @@
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock x:Name="ModalAppName" Text="Application Name" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" TextTrimming="CharacterEllipsis"/>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
-                                <Border Background="#163A29" BorderBrush="{DynamicResource BrushSuccess}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushSuccess}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                     <TextBlock Text="INSTALLED" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}"/>
                                 </Border>
                                 <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
@@ -834,7 +837,7 @@
                     </Grid>
 
                     <!-- Row 1: Status Alert Banner -->
-                    <Border Grid.Row="1" Background="#142C20" BorderBrush="{DynamicResource BrushSuccess}" BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,0,16">
+                    <Border Grid.Row="1" Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushSuccess}" BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,0,16">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>

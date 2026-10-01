@@ -13,6 +13,7 @@
     <Color x:Key="ColorAccent">#00FF66</Color>
     <Color x:Key="ColorAccentHover">#33FF80</Color>
     <Color x:Key="ColorAccentPressed">#00CC52</Color>
+    <Color x:Key="ColorAccentForeground">#050B06</Color>
     <Color x:Key="ColorTextPrimary">#F2FFF5</Color>
     <Color x:Key="ColorTextSecondary">#809283</Color>
     <Color x:Key="ColorSuccess">#00FF66</Color>
@@ -20,16 +21,17 @@
     <Color x:Key="ColorError">#FF2255</Color>
     <Color x:Key="ColorCloseHover">#FF2255</Color>
 
-    <!-- Light Color Tokens -->
-    <Color x:Key="ColorBackgroundLight">#F4F6FA</Color>
+    <!-- Light Color Tokens (Executive Emerald & Clean Mint Studio) -->
+    <Color x:Key="ColorBackgroundLight">#F4F8F5</Color>
     <Color x:Key="ColorSurfaceLight">#FFFFFF</Color>
-    <Color x:Key="ColorSurfaceHoverLight">#EEF2F8</Color>
-    <Color x:Key="ColorBorderLight">#DCE2EC</Color>
-    <Color x:Key="ColorAccentLight">#0284C7</Color>
-    <Color x:Key="ColorAccentHoverLight">#0369A1</Color>
-    <Color x:Key="ColorAccentPressedLight">#075985</Color>
-    <Color x:Key="ColorTextPrimaryLight">#0F172A</Color>
-    <Color x:Key="ColorTextSecondaryLight">#566479</Color>
+    <Color x:Key="ColorSurfaceHoverLight">#EBF3ED</Color>
+    <Color x:Key="ColorBorderLight">#D1E0D5</Color>
+    <Color x:Key="ColorAccentLight">#059669</Color>
+    <Color x:Key="ColorAccentHoverLight">#10B981</Color>
+    <Color x:Key="ColorAccentPressedLight">#047857</Color>
+    <Color x:Key="ColorAccentForegroundLight">#FFFFFF</Color>
+    <Color x:Key="ColorTextPrimaryLight">#0F1A12</Color>
+    <Color x:Key="ColorTextSecondaryLight">#4D6352</Color>
 
     <!-- ============ BRUSHES ============ -->
     <SolidColorBrush x:Key="BrushBackground" Color="{StaticResource ColorBackground}"/>
@@ -39,6 +41,7 @@
     <SolidColorBrush x:Key="BrushAccent" Color="{StaticResource ColorAccent}"/>
     <SolidColorBrush x:Key="BrushAccentHover" Color="{StaticResource ColorAccentHover}"/>
     <SolidColorBrush x:Key="BrushAccentPressed" Color="{StaticResource ColorAccentPressed}"/>
+    <SolidColorBrush x:Key="BrushAccentForeground" Color="{StaticResource ColorAccentForeground}"/>
     <SolidColorBrush x:Key="BrushTextPrimary" Color="{StaticResource ColorTextPrimary}"/>
     <SolidColorBrush x:Key="BrushTextSecondary" Color="{StaticResource ColorTextSecondary}"/>
     <SolidColorBrush x:Key="BrushSuccess" Color="{StaticResource ColorSuccess}"/>
@@ -49,13 +52,13 @@
     <FontFamily x:Key="AppFont">Segoe UI Variable, Segoe UI</FontFamily>
     <Style x:Key="TextHeader" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="26"/>
         <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
     </Style>
     <Style x:Key="TextSubHeader" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="16"/>
         <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
     </Style>
@@ -266,23 +269,30 @@
     <!-- ============ ACCENT BUTTON ============ -->
     <Style x:Key="AccentButton" TargetType="Button">
         <Setter Property="Background" Value="{DynamicResource BrushAccent}"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushAccentForeground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushAccentHover}"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Padding" Value="16,8"/>
-        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="6">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          Margin="{TemplateBinding Padding}"/>
+                                          Margin="{TemplateBinding Padding}"
+                                          TextBlock.Foreground="{DynamicResource BrushAccentForeground}"
+                                          TextBlock.FontWeight="Bold"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushAccentHover}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushAccentPressed}"/>
@@ -433,27 +443,33 @@
 
     <Style x:Key="ExpandableAccentButton" TargetType="Button" BasedOn="{StaticResource ExpandableOutlineButton}">
         <Setter Property="Background" Value="{DynamicResource BrushAccent}"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushAccentForeground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushAccentHover}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="6" Padding="{TemplateBinding Padding}"
                             SnapsToDevicePixels="True">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                             <ContentPresenter x:Name="IconPart" ContentSource="Content"
-                                              VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                              VerticalAlignment="Center" HorizontalAlignment="Center"
+                                              TextBlock.Foreground="{DynamicResource BrushAccentForeground}"
+                                              TextBlock.FontWeight="Bold"/>
                             <Border x:Name="LabelWrapper" MaxWidth="0" Opacity="0" ClipToBounds="True" VerticalAlignment="Center">
                                 <Border.RenderTransform>
                                     <TranslateTransform X="-6"/>
                                 </Border.RenderTransform>
                                 <TextBlock x:Name="LabelText"
                                            Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
-                                           Foreground="White"
+                                           Foreground="{DynamicResource BrushAccentForeground}"
                                            FontFamily="{StaticResource AppFont}"
                                            FontSize="{TemplateBinding FontSize}"
-                                           FontWeight="SemiBold"
+                                           FontWeight="Bold"
                                            VerticalAlignment="Center"
                                            Margin="6,0,2,0"/>
                             </Border>

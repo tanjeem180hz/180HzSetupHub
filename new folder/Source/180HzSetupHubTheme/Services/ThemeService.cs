@@ -17,7 +17,8 @@ namespace SetupHub180Hz.Services
             { "BrushAccentHover", ("ColorAccentHover", "ColorAccentHoverLight") },
             { "BrushAccentPressed", ("ColorAccentPressed", "ColorAccentPressedLight") },
             { "BrushTextPrimary", ("ColorTextPrimary", "ColorTextPrimaryLight") },
-            { "BrushTextSecondary", ("ColorTextSecondary", "ColorTextSecondaryLight") }
+            { "BrushTextSecondary", ("ColorTextSecondary", "ColorTextSecondaryLight") },
+            { "BrushAccentForeground", ("ColorAccentForeground", "ColorAccentForegroundLight") }
         };
 
         public static event Action<bool>? ThemeChanged;
