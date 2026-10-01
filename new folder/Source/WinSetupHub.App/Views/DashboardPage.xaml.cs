@@ -170,7 +170,7 @@ namespace SetupHub180Hz.Views
 
             if (BtnEngineStatus != null)
             {
-                BtnEngineStatus.Tag = "ENGINE READY";
+                BtnEngineStatus.Tag = "180Hz";
                 BtnEngineStatus.ToolTip = "Winget Core Engine Active (180Hz Ready)";
             }
             if (EngineStatusDot != null)

@@ -393,8 +393,8 @@
 
                 <!-- Engine Status and Refresh Action -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button x:Name="BtnEngineStatus" Tag="ENGINE READY" Style="{StaticResource ExpandableSuccessButton}"
-                            ToolTip="Winget Core Engine Status (Click to re-check)" Click="EngineStatus_Click" Margin="0,0,8,0">
+                    <Button x:Name="BtnEngineStatus" Tag="180Hz" Style="{StaticResource ExpandableSuccessButton}"
+                            ToolTip="Winget Core Engine Active (180Hz Ready) (Click to re-check)" Click="EngineStatus_Click" Margin="0,0,8,0">
                         <Ellipse x:Name="EngineStatusDot" Width="9" Height="9" Fill="{DynamicResource BrushSuccess}" VerticalAlignment="Center"/>
                     </Button>
                     <Button x:Name="RefreshSummaryButton" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}" Margin="0,0,0,0" Click="RefreshSummary_Click">
