@@ -16,12 +16,6 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,18">
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                <Border Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
-                    <TextBlock Text="⚡ ACTIVITY" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
-                </Border>
-                <TextBlock Text="SYSTEM TELEMETRY AUDIT TRAIL" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
-            </StackPanel>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
                                             services:LottieHelper.AssetName="activity_pulse.json" Margin="0,0,10,0" VerticalAlignment="Center"/>

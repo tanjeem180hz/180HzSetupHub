@@ -34,13 +34,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                        <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                            <TextBlock Text="⚡ REVO-ENGINE" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
-                        </Border>
-                        <TextBlock Text="DEEP CLEAN RESIDUAL DATA" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
-                    </StackPanel>
+                <StackPanel VerticalAlignment="Center">
                     <TextBlock x:Name="DialogTitleText" Text="Leftovers Detected" Style="{StaticResource TextHeader}" FontSize="20"/>
                     <TextBlock x:Name="DialogSubtitleText" Text="Review leftover traces detected after application uninstallation." Style="{StaticResource TextBody}" Margin="0,2,0,0"/>
                 </StackPanel>

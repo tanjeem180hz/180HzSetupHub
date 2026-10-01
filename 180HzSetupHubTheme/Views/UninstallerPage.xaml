@@ -253,13 +253,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                        <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
-                            <TextBlock Text="⚡ UNINSTALLER" FontSize="10" FontWeight="Bold" Foreground="{StaticResource BrushAccent}"/>
-                        </Border>
-                        <TextBlock Text="AUTHENTIC SYSTEM APPLICATION MANAGER" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
-                    </StackPanel>
+                <StackPanel VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
                                                     services:LottieHelper.AssetName="uninstaller_bin.json" Margin="0,0,10,0" VerticalAlignment="Center"/>

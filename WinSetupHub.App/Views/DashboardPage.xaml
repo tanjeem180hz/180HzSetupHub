@@ -386,13 +386,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                        <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
-                            <TextBlock Text="⚡ 180Hz PRO" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
-                        </Border>
-                        <TextBlock Text="COMMAND CENTER" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
-                    </StackPanel>
+                <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="Dashboard" Style="{StaticResource TextHeader}" FontSize="26"/>
                     <TextBlock Text="System status, feature flow, and quick actions." Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
                 </StackPanel>

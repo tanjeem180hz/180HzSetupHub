@@ -12,12 +12,6 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,18">
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                <Border Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,10,0">
-                    <TextBlock Text="⚡ STORAGE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
-                </Border>
-                <TextBlock Text="SYSTEM &amp; APPLICATION FOOTPRINT" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
-            </StackPanel>
             <TextBlock Text="Storage &amp; Footprint" Style="{StaticResource TextHeader}" FontSize="26"/>
             <TextBlock Text="Monitor local application data directories, downloads cache, and primary system drive telemetry."
                        Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
