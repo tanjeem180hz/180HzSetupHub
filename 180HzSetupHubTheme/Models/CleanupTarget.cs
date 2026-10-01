@@ -7,6 +7,7 @@ namespace SetupHub180Hz.Models
         public string Name { get; set; } = "";
         public string Path { get; set; } = "";
         public List<string>? AdditionalPaths { get; set; }
+        public bool IsRamTarget { get; set; }
         public long SizeBytes { get; set; }
         public bool IsSelected { get; set; } = true;
 

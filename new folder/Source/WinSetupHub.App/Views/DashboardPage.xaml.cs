@@ -1,3 +1,4 @@
+using SetupHub180Hz.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -239,5 +240,37 @@ namespace SetupHub180Hz.Views
         private void TileActivity_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Activity");
         private void TileStorage_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Storage");
         private void TileOptimization_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Optimization");
-    }
+            private async void BtnCleanRam_Click(object sender, RoutedEventArgs e)
+        {
+            if (BtnCleanRam == null || TxtCleanRamBtn == null) return;
+
+            BtnCleanRam.IsEnabled = false;
+            TxtCleanRamBtn.Text = "CLEARING…";
+
+            long freed = await Task.Run(() => MemoryCleaner.CleanRam());
+
+            // Immediately refresh live stats gauge
+            UpdateStats();
+
+            string freedDisplay = FormatBytes(freed);
+            TxtCleanRamBtn.Text = $"✓ {freedDisplay}";
+
+            ActivityLogger.Instance.Log($"RAM Cleared: Reclaimed {freedDisplay} physical memory.", ActivityType.Success);
+            NotificationService.Notify("RAM Cleaned", $"Successfully reclaimed {freedDisplay} of RAM.");
+
+            await Task.Delay(2500);
+            TxtCleanRamBtn.Text = "CLEAR";
+            BtnCleanRam.IsEnabled = true;
+        }
+
+        private void BtnGoToCleanup_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Cleanup");
+
+        private static string FormatBytes(long bytes)
+        {
+            double mb = bytes / 1024.0 / 1024.0;
+            if (mb >= 1024.0)
+                return $"{mb / 1024.0:0.0} GB";
+            return $"{mb:0} MB";
+        }
+}
 }

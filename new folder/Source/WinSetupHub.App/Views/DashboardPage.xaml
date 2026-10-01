@@ -597,12 +597,43 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
-                                                            services:LottieHelper.AssetName="gears.json"
-                                                            Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Text="MEMORY (RAM)" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
-                            </StackPanel>
+                            <!-- Header with Title, Clear RAM button, and Cleanup Link -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                                                services:LottieHelper.AssetName="gears.json"
+                                                                Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="MEMORY (RAM)" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Clear RAM Action Button -->
+                                    <Button x:Name="BtnCleanRam" Style="{StaticResource OutlineButton}"
+                                            Height="24" Padding="8,2" Margin="0,0,6,0"
+                                            Click="BtnCleanRam_Click"
+                                            ToolTip="Purge process working sets &amp; reclaim physical RAM">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="⚡" FontSize="10" Foreground="{DynamicResource BrushAccent}" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="TxtCleanRamBtn" Text="CLEAR" FontSize="10" FontWeight="Bold"
+                                                       Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <!-- Link to Cleanup Page Button -->
+                                    <Button x:Name="BtnGoToCleanup" Style="{StaticResource OutlineButton}"
+                                            Height="24" Width="24" Padding="0"
+                                            Click="BtnGoToCleanup_Click"
+                                            ToolTip="Open Full Disk &amp; Memory Cleanup Page">
+                                        <TextBlock Text="➜" FontSize="10" FontWeight="Bold"
+                                                   Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
 
                             <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Bottom">
                                 <TextBlock x:Name="RamUsageText" Text="0.0 / 0.0 GB" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Bottom"/>

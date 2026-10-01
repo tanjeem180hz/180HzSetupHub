@@ -13,6 +13,11 @@ namespace SetupHub180Hz.Services
         {
             return Task.Run(() =>
             {
+                long totalMem = MemoryCleaner.GetTotalMemoryBytes();
+                long availMem = MemoryCleaner.GetAvailableMemoryBytes();
+                long usedMem = Math.Max(0, totalMem - availMem);
+                long estimatedReclaimableRam = usedMem > 0 ? (long)(usedMem * 0.25) : 512L * 1024L * 1024L;
+
                 var targets = new List<CleanupTarget>
                 {
                     new() { Name = "User Temp Files", Path = Path.GetTempPath() },
@@ -36,11 +41,22 @@ namespace SetupHub180Hz.Services
                             Environment.ExpandEnvironmentVariables(@"%WINDIR%\ServiceProfiles\NetworkService\AppData\Local\Temp"),
                             Environment.ExpandEnvironmentVariables(@"%WINDIR%\ServiceProfiles\LocalService\AppData\Local\Temp"),
                         }
+                    },
+
+                    // System RAM Working Set Cache target
+                    new()
+                    {
+                        Name = "System Memory (RAM Cache)",
+                        Path = "Process Working Sets & RAM Cache",
+                        IsRamTarget = true,
+                        SizeBytes = estimatedReclaimableRam
                     }
                 };
 
                 foreach (var t in targets)
                 {
+                    if (t.IsRamTarget) continue;
+
                     long total = GetDirectorySize(t.Path);
                     if (t.AdditionalPaths != null)
                     {
@@ -58,6 +74,13 @@ namespace SetupHub180Hz.Services
         {
             return Task.Run(() =>
             {
+                if (target.IsRamTarget)
+                {
+                    long ramFreed = MemoryCleaner.CleanRam();
+                    onFile?.Invoke("Purged process working sets and RAM cache");
+                    return ramFreed;
+                }
+
                 long freed = CleanDirectory(target.Path, onFile);
 
                 if (target.AdditionalPaths != null)
@@ -85,10 +108,7 @@ namespace SetupHub180Hz.Services
                     freed += size;
                     onFile?.Invoke(file);
                 }
-                catch
-                {
-                    // File is locked or in use — skip and proceed with the rest
-                }
+                catch { }
             }
 
             foreach (var dir in SafeEnumerateDirectories(path).OrderByDescending(d => d.Length))
