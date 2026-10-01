@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using SetupHub180Hz.Services;
 
@@ -103,17 +104,17 @@ namespace SetupHub180Hz.Views
                 if (width < 800)
                 {
                     ModulesGrid.Columns = 1;
-                    ModulesGrid.Rows = 8;
+                    ModulesGrid.Rows = 0;
                 }
-                else if (width < 1200)
+                else if (width < 1150)
                 {
                     ModulesGrid.Columns = 2;
-                    ModulesGrid.Rows = 4;
+                    ModulesGrid.Rows = 0;
                 }
                 else
                 {
-                    ModulesGrid.Columns = 4;
-                    ModulesGrid.Rows = 2;
+                    ModulesGrid.Columns = 3;
+                    ModulesGrid.Rows = 0;
                 }
             }
         }
@@ -250,6 +251,15 @@ namespace SetupHub180Hz.Views
         private void TileActivity_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Activity");
         private void TileStorage_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Storage");
         private void TileOptimization_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Optimization");
+        private void HeroOptimizationChip_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Optimization");
+
+        private void UserControl_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (DashboardScrollViewer != null && DashboardScrollViewer.ScrollableHeight > 0)
+            {
+                SmoothScrollHelper.HandleMouseWheel(DashboardScrollViewer, e);
+            }
+        }
             private async void BtnCleanRam_Click(object sender, RoutedEventArgs e)
         {
             if (BtnCleanRam == null || TxtCleanRamBtn == null) return;

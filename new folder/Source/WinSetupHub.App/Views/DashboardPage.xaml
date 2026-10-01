@@ -2,7 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:lottie="clr-namespace:LottieSharp.WPF;assembly=LottieSharp"
-             xmlns:services="clr-namespace:SetupHub180Hz.Services">
+             xmlns:services="clr-namespace:SetupHub180Hz.Services"
+             PreviewMouseWheel="UserControl_PreviewMouseWheel">
 
     <UserControl.Resources>
         <!-- ======================================================== -->
@@ -210,6 +211,193 @@
         </Style>
 
         <!-- ======================================================== -->
+        <!--  1b. HIGHLIGHTED / FEATURED CYBER-GLASS MODULE TILE      -->
+        <!-- ======================================================== -->
+        <Style x:Key="DashboardHighlightTile" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="MinHeight" Value="92"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid RenderTransformOrigin="0.5,0.5">
+                            <Grid.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform x:Name="TileScale" ScaleX="1.0" ScaleY="1.0"/>
+                                    <TranslateTransform x:Name="TileTranslate" Y="0"/>
+                                </TransformGroup>
+                            </Grid.RenderTransform>
+
+                            <!-- Ambient Cyber Neon Glow Shadow (Active & blooms on hover) -->
+                            <Border x:Name="GlowShadow"
+                                    CornerRadius="10"
+                                    Margin="2"
+                                    Opacity="0.45"
+                                    Background="Transparent">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#00FF66" BlurRadius="24" ShadowDepth="4" Direction="270" Opacity="0.45"/>
+                                </Border.Effect>
+                            </Border>
+
+                            <!-- Dark Elevation Depth Shadow -->
+                            <Border x:Name="DepthShadow"
+                                    CornerRadius="10"
+                                    Margin="2"
+                                    Opacity="0.5"
+                                    Background="Transparent">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#000000" BlurRadius="16" ShadowDepth="4" Direction="270" Opacity="0.6"/>
+                                </Border.Effect>
+                            </Border>
+
+                            <!-- Main Glass Card Container with Cyber Accent Border -->
+                            <Border x:Name="TileBorder"
+                                    CornerRadius="10"
+                                    BorderThickness="1.5"
+                                    Padding="18,16"
+                                    SnapsToDevicePixels="True"
+                                    ClipToBounds="True"
+                                    Background="{DynamicResource BrushSurface}"
+                                    BorderBrush="{DynamicResource BrushAccent}">
+                                <Grid>
+                                    <!-- Ambient Radial Cyber Aura in Top-Right Corner -->
+                                    <Ellipse x:Name="RadialAura"
+                                             Width="180" Height="180"
+                                             HorizontalAlignment="Right" VerticalAlignment="Top"
+                                             Margin="0,-50,-50,0"
+                                             IsHitTestVisible="False"
+                                             Opacity="0.14"
+                                             Fill="{DynamicResource BrushAccent}"/>
+
+                                    <!-- Top Specular Glass Edge Highlight -->
+                                    <Border Height="1.5" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="10,0,10,0" IsHitTestVisible="False"
+                                            Background="{DynamicResource BrushAccent}" Opacity="0.65"/>
+
+                                    <!-- Card Content -->
+                                    <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TileBorder" Property="BorderBrush" Value="{DynamicResource BrushAccentHover}"/>
+                                <Setter TargetName="TileBorder" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="TileTranslate"
+                                                             Storyboard.TargetProperty="Y"
+                                                             To="-5" Duration="0:0:0.24">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuarticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="TileScale"
+                                                             Storyboard.TargetProperty="ScaleX"
+                                                             To="1.025" Duration="0:0:0.24">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuarticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="TileScale"
+                                                             Storyboard.TargetProperty="ScaleY"
+                                                             To="1.025" Duration="0:0:0.24">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuarticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="RadialAura"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0.45" Duration="0:0:0.24">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="GlowShadow"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="1.0" Duration="0:0:0.24">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="TileTranslate"
+                                                             Storyboard.TargetProperty="Y"
+                                                             To="0" Duration="0:0:0.28">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="TileScale"
+                                                             Storyboard.TargetProperty="ScaleX"
+                                                             To="1.0" Duration="0:0:0.28">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="TileScale"
+                                                             Storyboard.TargetProperty="ScaleY"
+                                                             To="1.0" Duration="0:0:0.28">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="RadialAura"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0.14" Duration="0:0:0.28">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="GlowShadow"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0.45" Duration="0:0:0.28">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+
+                            <!-- Pressed State -->
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="TileBorder" Property="Background" Value="{DynamicResource BrushBorder}"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="TileTranslate"
+                                                             Storyboard.TargetProperty="Y"
+                                                             To="-1" Duration="0:0:0.06"/>
+                                            <DoubleAnimation Storyboard.TargetName="TileScale"
+                                                             Storyboard.TargetProperty="ScaleX"
+                                                             To="0.992" Duration="0:0:0.06"/>
+                                            <DoubleAnimation Storyboard.TargetName="TileScale"
+                                                             Storyboard.TargetProperty="ScaleY"
+                                                             To="0.992" Duration="0:0:0.06"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- ======================================================== -->
         <!--  2. INTERACTIVE LIVE SYSTEM STAT CARD STYLE              -->
         <!-- ======================================================== -->
         <Style x:Key="DashboardStatCard" TargetType="Border">
@@ -367,13 +555,13 @@
         </EventTrigger>
     </UserControl.Triggers>
 
-    <ScrollViewer Style="{StaticResource CleanScrollViewer}" Padding="32,24,32,32">
+    <ScrollViewer x:Name="DashboardScrollViewer" Style="{StaticResource CleanScrollViewer}" Padding="32,24,32,32" Focusable="True">
         <Grid HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- 1. Header Block with Status -->
@@ -470,6 +658,19 @@
                                     </StackPanel>
                                 </Button>
 
+                                <!-- Chip 3: Interactive System Optimization Highlight Chip -->
+                                <Button x:Name="HeroOptimizationChip" Style="{StaticResource OutlineButton}" Click="HeroOptimizationChip_Click"
+                                        Height="34" Padding="12,6" Margin="0,0,10,6"
+                                        ToolTip="Click to open Windows Tweaks &amp; System Optimization">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                                                    services:LottieHelper.AssetName="rocket.json" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="System Optimization" FontSize="11.5" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource BrushAccent}" FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
+                                        <TextBlock Text=" ➜" FontSize="10" Foreground="{DynamicResource BrushAccent}" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+
                                 <!-- Chip 3: Architecture Chip -->
                                 <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}"
                                         BorderThickness="1" CornerRadius="6" Padding="12,7" Margin="0,0,0,6"
@@ -520,7 +721,7 @@
                                     <!-- Metrics Column -->
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                            <TextBlock x:Name="ModuleCountText" Text="8" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}"
+                                            <TextBlock x:Name="ModuleCountText" Text="9" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}"
                                                        FontFamily="{StaticResource AppFont}" Margin="0,0,6,0"/>
                                             <TextBlock Text="MODULES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"
                                                        FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
@@ -689,8 +890,8 @@
                     <TextBlock Text="COMMAND MODULES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
                 </Grid>
 
-                <!-- 8 Responsive Module Tiles in Dynamic UniformGrid -->
-                <UniformGrid x:Name="ModulesGrid" Columns="4" Rows="2" Margin="-6,0,-6,0">
+                <!-- 9 Responsive Module Tiles in Dynamic UniformGrid -->
+                <UniformGrid x:Name="ModulesGrid" Columns="3" Margin="-6,0,-6,0">
                     <!-- 01 Setup Apps -->
                     <Button x:Name="TileSetupApps" Style="{StaticResource DashboardTile}" Margin="6" Click="TileSetupApps_Click">
                         <Grid>
@@ -875,8 +1076,9 @@
                         </Grid>
                     </Button>
 
-                    <!-- 09 Optimization -->
-                    <Button x:Name="TileOptimization" Style="{StaticResource DashboardTile}" Margin="6" Click="TileOptimization_Click">
+                    <!-- 09 Optimization (Highlighted Module) -->
+                    <Button x:Name="TileOptimization" Style="{StaticResource DashboardHighlightTile}" Margin="6" Click="TileOptimization_Click"
+                            ToolTip="Windows &amp; Gaming Performance Tweaks, Debloat &amp; System Optimization">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -884,17 +1086,24 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
                                         <TextBlock Text="09" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
-                                    <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
+                                    <Border Background="#2500FF66" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                        <TextBlock Text="RECOMMENDED" Foreground="{DynamicResource BrushAccent}" FontSize="8.5" FontWeight="Bold"/>
+                                    </Border>
+                                    <lottie:LottieAnimationView Width="22" Height="22" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="rocket.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
-                            <TextBlock Grid.Row="1" Text="Optimization" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
+                            <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="0,14,0,0">
+                                <TextBlock Text="Optimization" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="Bold"
+                                           Foreground="{DynamicResource BrushTextPrimary}"/>
+                                <TextBlock Text="Windows &amp; Gaming Tweaks" FontFamily="{StaticResource AppFont}" FontSize="11"
+                                           Foreground="{DynamicResource BrushAccent}" Margin="0,2,0,0"/>
+                            </StackPanel>
                         </Grid>
                     </Button>
                 </UniformGrid>
