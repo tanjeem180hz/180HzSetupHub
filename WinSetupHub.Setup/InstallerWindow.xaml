@@ -230,49 +230,49 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Left Details -->
-                <StackPanel Grid.Column="0" VerticalAlignment="Top">
-                    <!-- Title -->
-                    <TextBlock Text="Install 180Hz Setup Hub?"
-                               FontSize="23"
-                               FontWeight="Bold"
-                               Foreground="#FFFFFF"
-                               Margin="0,0,0,8" />
-
-                    <!-- Trusted App Badge -->
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Center">
-                        <Border Background="#0D2E14" BorderBrush="#00FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="✓" FontSize="11" FontWeight="Bold" Foreground="#00FF66" Margin="0,0,4,0"/>
-                                <TextBlock Text="VERIFIED SAFE &amp; SECURE" FontSize="10" FontWeight="Bold" Foreground="#00FF66"/>
-                            </StackPanel>
+                <!-- Left Details (Clear & Simple Dashboard Style) -->
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <!-- Brand Title with PRO badge -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,8">
+                        <TextBlock Text="180Hz Setup Hub"
+                                   FontSize="23"
+                                   FontWeight="Bold"
+                                   Foreground="#FFFFFF"
+                                   VerticalAlignment="Center" />
+                        <Border Background="#162919" BorderBrush="#00FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="PRO" FontSize="10" FontWeight="Bold" Foreground="#00FF66" />
                         </Border>
-                        <TextBlock Text="High-Performance Edition" FontSize="11" Foreground="#B6C9B9" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <!-- Publisher & Version -->
-                    <TextBlock Text="Publisher: 180Hz Core Operations"
-                               FontSize="12"
-                               Foreground="#B6C9B9"
-                               Margin="0,0,0,2" />
-                    <TextBlock Text="Version: 1.0.0.0 (Production Release)"
-                               FontSize="12"
-                               Foreground="#B6C9B9"
-                               Margin="0,0,0,12" />
+                    <!-- Headline with 3 Power Keywords (matching Dashboard) -->
+                    <TextBlock FontSize="13" FontWeight="Bold" Margin="0,0,0,14">
+                        <Run Text="SETUP" Foreground="#FFFFFF" />
+                        <Run Text=" • " Foreground="#00FF66" />
+                        <Run Text="OVERDRIVE" Foreground="#00FF66" />
+                        <Run Text=" • " Foreground="#00FF66" />
+                        <Run Text="COMMAND" Foreground="#FFFFFF" />
+                    </TextBlock>
 
-                    <!-- Capabilities -->
-                    <TextBlock Text="Capabilities:"
-                               FontSize="12"
-                               FontWeight="Bold"
-                               Foreground="#FFFFFF"
-                               Margin="0,0,0,4" />
-                    <TextBlock Text="• High-throughput execution &amp; system optimization"
-                               FontSize="11.5"
-                               Foreground="#B6C9B9"
-                               Margin="0,0,0,2" />
-                    <TextBlock Text="• Native Windows Package Manager (winget) integration"
-                               FontSize="11.5"
-                               Foreground="#B6C9B9" />
+                    <!-- Minimalist Tactical Chips -->
+                    <WrapPanel Orientation="Horizontal">
+                        <Border Background="#0D2E14" BorderBrush="#00FF66" BorderThickness="1" CornerRadius="5" Padding="9,4" Margin="0,0,8,6">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="✓" FontSize="11" FontWeight="Bold" Foreground="#00FF66" Margin="0,0,5,0" />
+                                <TextBlock Text="Verified Safe" FontSize="11" FontWeight="Bold" Foreground="#00FF66" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#0F1410" BorderBrush="#212C23" BorderThickness="1" CornerRadius="5" Padding="9,4" Margin="0,0,8,6">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="⚡" FontSize="11" Foreground="#00FF66" Margin="0,0,5,0" />
+                                <TextBlock Text="High Performance" FontSize="11" FontWeight="SemiBold" Foreground="#B6C9B9" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="#0F1410" BorderBrush="#212C23" BorderThickness="1" CornerRadius="5" Padding="9,4" Margin="0,0,0,6">
+                            <TextBlock Text="Windows 64-bit" FontSize="11" FontWeight="SemiBold" Foreground="#B6C9B9" />
+                        </Border>
+                    </WrapPanel>
                 </StackPanel>
 
                 <!-- Right Square App Tile (Cyber Surface with Toxic Accent Glow) -->
