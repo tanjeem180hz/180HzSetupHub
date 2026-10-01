@@ -98,6 +98,15 @@ namespace SetupHub180Hz.Views
 
         private static readonly string[] TopBasicDailyApps = new[]
         {
+            // Top AI Assistants & Agents
+            "9PLM9XGG6VKS", // ChatGPT Desktop
+            "Anthropic.Claude", // Claude Desktop
+            "ElementLabs.LMStudio", // LM Studio
+            "Ollama.Ollama", // Ollama
+            "Anysphere.Cursor", // Cursor
+            "Codeium.Windsurf", // Windsurf
+            "Perplexity.Perplexity", // Perplexity
+
             // Top Browsers
             "Google.Chrome",
             "Mozilla.Firefox",
@@ -220,6 +229,7 @@ namespace SetupHub180Hz.Views
             var categories = new List<(string Key, string Display, string Emoji)>
             {
                 ("All", "All Apps", "🌟"),
+                ("AI", "AI Tools", "🤖"),
                 ("Microsoft Store", "Microsoft Store", "🛍️"),
                 ("Browsers", "Browsers & Web", "🌐"),
                 ("Developer", "Developer Tools", "💻"),

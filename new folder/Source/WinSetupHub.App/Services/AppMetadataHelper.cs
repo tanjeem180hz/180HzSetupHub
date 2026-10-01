@@ -230,6 +230,33 @@ namespace SetupHub180Hz.Services
 
         private static readonly Dictionary<string, string> KnownDomainMap = new(StringComparer.OrdinalIgnoreCase)
         {
+            // Artificial Intelligence (AI Desktop Applications)
+            ["9PLM9XGG6VKS"] = "https://openai.com/chatgpt/",
+            ["OpenAI.ChatGPT"] = "https://openai.com/chatgpt/",
+            ["Anthropic.Claude"] = "https://claude.ai/",
+            ["Anthropic.ClaudeCode"] = "https://claude.ai/code",
+            ["ElementLabs.LMStudio"] = "https://lmstudio.ai/",
+            ["Ollama.Ollama"] = "https://ollama.com/",
+            ["Jan.Jan"] = "https://jan.ai/",
+            ["Anysphere.Cursor"] = "https://cursor.com/",
+            ["Codeium.Windsurf"] = "https://codeium.com/windsurf",
+            ["ByteDance.Trae"] = "https://www.trae.ai/",
+            ["Perplexity.Perplexity"] = "https://www.perplexity.ai/",
+            ["GitHub.CopilotApp"] = "https://github.com/features/copilot",
+            ["nomic.gpt4all"] = "https://gpt4all.io/",
+            ["pinokiocomputer.pinokio"] = "https://pinokio.computer/",
+            ["Comfy.ComfyUI-Desktop"] = "https://comfy.org/",
+            ["Upscayl.Upscayl"] = "https://upscayl.org/",
+            ["Bin-Huang.Chatbox"] = "https://chatboxai.app/",
+            ["kangfenmao.CherryStudio"] = "https://cherry-ai.com/",
+            ["CloudStack.Msty"] = "https://msty.app/",
+            ["Quora.Poe"] = "https://poe.com/",
+            ["AhoyLabs.BackyardAI"] = "https://backyard.ai/",
+            ["ChidiWilliams.Buzz"] = "https://chidiwilliams.com/",
+            ["zcx960.DeepSeekDesktop"] = "https://github.com/zcx960/deepseek-desktop",
+            ["Microsoft.365Copilot"] = "https://www.microsoft.com/microsoft-365/copilot",
+            ["SuperUltra.superwhisper"] = "https://superwhisper.com/",
+
             // Browsers & Web
             ["Google.Chrome"] = "https://www.google.com/chrome/",
             ["Mozilla.Firefox"] = "https://www.mozilla.org/firefox/",
