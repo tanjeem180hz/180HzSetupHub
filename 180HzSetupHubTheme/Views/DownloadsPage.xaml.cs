@@ -222,7 +222,11 @@ namespace SetupHub180Hz.Views
             ActiveProgressPercent.Text = $"{info.Percentage:0}%";
             ActiveSpeedText.Text = info.SpeedFormatted;
             string eta = info.EtaFormatted ?? "Calculating…";
-            ActiveEtaText.Text = eta.StartsWith("ETA:", StringComparison.OrdinalIgnoreCase) ? eta : $"ETA: {eta}";
+            if (eta.StartsWith("ETA:", StringComparison.OrdinalIgnoreCase))
+            {
+                eta = eta.Substring(4).TrimStart();
+            }
+            ActiveEtaText.Text = eta;
             ActiveTransferredText.Text = string.IsNullOrWhiteSpace(info.SizeFormatted) ? "" : info.SizeFormatted;
             ActiveQueueCountText.Text = $"App {info.QueueIndex} of {info.QueueTotal}";
 

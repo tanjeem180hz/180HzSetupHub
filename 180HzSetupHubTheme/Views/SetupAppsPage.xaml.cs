@@ -1084,7 +1084,12 @@ namespace SetupHub180Hz.Views
 
                 PopupPercentageText.Text = $"{info.Percentage:0}%";
                 PopupSpeedText.Text = info.SpeedFormatted;
-                PopupEtaText.Text = info.EtaFormatted;
+                string eta = info.EtaFormatted ?? "Calculating…";
+                if (eta.StartsWith("ETA:", StringComparison.OrdinalIgnoreCase))
+                {
+                    eta = eta.Substring(4).TrimStart();
+                }
+                PopupEtaText.Text = eta;
                 PopupSizeText.Text = info.SizeFormatted;
                 PopupStatusDetail.Text = info.StatusMessage;
 

@@ -695,7 +695,13 @@
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock x:Name="PopupPercentageText" Text="0%" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource BrushAccent}" Margin="0,0,12,0"/>
                             <TextBlock x:Name="PopupSpeedText" Text="0 MB/s" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,12,0"/>
-                            <TextBlock x:Name="PopupEtaText" Text="ETA: Calculating…" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,12,0"/>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                                <lottie:LottieAnimationView Width="14" Height="14" AutoPlay="True" RepeatCount="-1"
+                                                            services:LottieHelper.AssetName="clock.json"
+                                                            Margin="0,0,5,0" VerticalAlignment="Center"
+                                                            ToolTip="Estimated time remaining"/>
+                                <TextBlock x:Name="PopupEtaText" Text="Calculating…" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                            </StackPanel>
                             <TextBlock x:Name="PopupSizeText" Text="" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"/>
                         </StackPanel>
 

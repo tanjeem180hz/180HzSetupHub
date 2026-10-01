@@ -287,7 +287,13 @@
                                     <TextBlock x:Name="ActiveProgressPercent" Text="0%" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,0,16,0"/>
                                     <TextBlock x:Name="ActiveTransferredText" Text="0 MB / 0 MB" FontSize="12" Foreground="{DynamicResource BrushTextPrimary}" Margin="0,0,16,0"/>
                                     <TextBlock x:Name="ActiveSpeedText" Text="0.0 MB/s" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,16,0"/>
-                                    <TextBlock x:Name="ActiveEtaText" Text="ETA: Calculating…" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                                                    services:LottieHelper.AssetName="clock.json"
+                                                                    Margin="0,0,6,0" VerticalAlignment="Center"
+                                                                    ToolTip="Estimated time remaining"/>
+                                        <TextBlock x:Name="ActiveEtaText" Text="Calculating…" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                                    </StackPanel>
                                 </StackPanel>
 
                                 <TextBlock x:Name="ActiveQueueCountText" Text="Item 1 of 1" HorizontalAlignment="Right"
