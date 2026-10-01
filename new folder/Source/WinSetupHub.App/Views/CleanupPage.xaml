@@ -17,7 +17,11 @@
                 </Border>
                 <TextBlock Text="SAFE SYSTEM CACHE PURGE" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
             </StackPanel>
-            <TextBlock Text="Cleanup" Style="{StaticResource TextHeader}" FontSize="26"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="cleanup_sparkle.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Cleanup" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
+            </StackPanel>
             <TextBlock Text="Identify and safely purge temporary directories, application caches, and leftover staging files."
                        Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
         </StackPanel>
@@ -31,7 +35,7 @@
             <TextBlock x:Name="SummaryText" Text="Scanning…" VerticalAlignment="Center" Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
             <Button Grid.Column="1" Tag="Rescan" Style="{StaticResource ExpandableOutlineButton}" Margin="0,0,8,0" Click="Rescan_Click">
                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
-                                            services:LottieHelper.AssetName="loading_disc.json"/>
+                                            services:LottieHelper.AssetName="cleanup_sparkle.json"/>
             </Button>
             <Button x:Name="CleanSelectedButton" Grid.Column="2" Tag="Clean Selected" Style="{StaticResource ExpandableAccentButton}" Click="CleanSelected_Click">
                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"

@@ -161,7 +161,11 @@
                 </Border>
                 <TextBlock Text="WINGET UPGRADE CENTER" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
             </StackPanel>
-            <TextBlock Text="Update Center" Style="{StaticResource TextHeader}" FontSize="26"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="update_sync.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Update Center" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
+            </StackPanel>
             <TextBlock Text="Keep your applications up to date with the latest versions and security patches."
                        Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
         </StackPanel>
@@ -176,7 +180,7 @@
                        Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
             <Button Grid.Column="1" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}" Margin="0,0,8,0" Click="Refresh_Click">
                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
-                                            services:LottieHelper.AssetName="loading_disc.json"/>
+                                            services:LottieHelper.AssetName="update_sync.json"/>
             </Button>
             <Button x:Name="UpgradeAllButton" Grid.Column="2" Tag="Upgrade All" Style="{StaticResource ExpandableAccentButton}" Click="UpgradeAll_Click">
                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"

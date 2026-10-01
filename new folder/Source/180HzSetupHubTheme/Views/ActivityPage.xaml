@@ -22,7 +22,11 @@
                 </Border>
                 <TextBlock Text="SYSTEM TELEMETRY AUDIT TRAIL" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
             </StackPanel>
-            <TextBlock Text="Activity Feed" Style="{StaticResource TextHeader}" FontSize="26"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="activity_pulse.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Activity Feed" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
+            </StackPanel>
             <TextBlock Text="Live immutable event ledger of installations, upgrades, cleanups, and service lifecycle events."
                        Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
         </StackPanel>
@@ -37,7 +41,7 @@
             <TextBlock x:Name="LogCountText" Text="Live event feed active" VerticalAlignment="Center" Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
             <Button Grid.Column="1" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}" Margin="0,0,8,0" Click="Refresh_Click">
                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
-                                            services:LottieHelper.AssetName="loading_disc.json"/>
+                                            services:LottieHelper.AssetName="activity_pulse.json"/>
             </Button>
             <Button Grid.Column="2" Content="✕" Tag="Clear Log" Style="{StaticResource ExpandableDangerButton}" Click="Clear_Click"/>
         </Grid>
