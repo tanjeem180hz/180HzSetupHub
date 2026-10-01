@@ -388,7 +388,6 @@
 
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="Dashboard" Style="{StaticResource TextHeader}" FontSize="26"/>
-                    <TextBlock Text="System status, feature flow, and quick actions." Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
                 </StackPanel>
 
                 <!-- Engine Status and Refresh Action -->
@@ -435,17 +434,13 @@
                         <!-- Left: Tactical Command Overview -->
                         <StackPanel x:Name="HeroOverviewPanel" VerticalAlignment="Center" Margin="0,0,24,0">
                             <!-- Headline with 3 Power Keywords -->
-                            <TextBlock FontSize="22" FontWeight="Bold" FontFamily="{StaticResource AppFont}" Margin="0,0,0,6">
+                            <TextBlock FontSize="22" FontWeight="Bold" FontFamily="{StaticResource AppFont}" Margin="0,0,0,16">
                                 <Run Text="SETUP" Foreground="{DynamicResource BrushTextPrimary}"/>
                                 <Run Text=" • " Foreground="{DynamicResource BrushAccent}"/>
                                 <Run Text="OVERDRIVE" Foreground="{DynamicResource BrushAccent}"/>
                                 <Run Text=" • " Foreground="{DynamicResource BrushAccent}"/>
                                 <Run Text="COMMAND" Foreground="{DynamicResource BrushTextPrimary}"/>
                             </TextBlock>
-
-                            <!-- Subtitle: Uncommon High-Performance Mastery Line -->
-                            <TextBlock Text="From bare-metal setup to peak silicon velocity — absolute machine mastery."
-                                       Style="{StaticResource TextBody}" FontSize="12.5" Margin="0,0,0,16" HorizontalAlignment="Left" MaxWidth="620"/>
 
                             <!-- Interactive Quick Chips -->
                             <WrapPanel Orientation="Horizontal">
@@ -468,7 +463,8 @@
                                         Height="34" Padding="12,6" Margin="0,0,10,6"
                                         ToolTip="Click to open full Disk &amp; Cache Cleanup utility">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock Text="🧹" FontSize="11" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                        <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                                    services:LottieHelper.AssetName="cleanup_sparkle.json" Margin="0,0,7,0" VerticalAlignment="Center"/>
                                         <TextBlock Text="Deep Cleanup" FontSize="11.5" FontWeight="SemiBold"
                                                    Foreground="{DynamicResource BrushTextSecondary}" FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
                                     </StackPanel>
@@ -479,8 +475,9 @@
                                         BorderThickness="1" CornerRadius="6" Padding="12,7" Margin="0,0,0,6"
                                         ToolTip="Native x64 high-performance architecture">
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock Text="🛡️" FontSize="11" Margin="0,0,7,0" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Windows 64-bit Core" FontSize="11.5" FontWeight="SemiBold"
+                                        <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                                    services:LottieHelper.AssetName="windows_logo.json" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Windows 64-bit" FontSize="11.5" FontWeight="SemiBold"
                                                    Foreground="{DynamicResource BrushTextSecondary}" FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Border>
