@@ -434,12 +434,17 @@
 
                         <!-- Left: Tactical Command Overview -->
                         <StackPanel x:Name="HeroOverviewPanel" VerticalAlignment="Center" Margin="0,0,24,0">
-                            <!-- Headline -->
-                            <TextBlock Text="SYSTEM ACCELERATION &amp; CONTROL" FontSize="22" FontWeight="Bold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" FontFamily="{StaticResource AppFont}" Margin="0,0,0,6"/>
+                            <!-- Headline with 3 Power Keywords -->
+                            <TextBlock FontSize="22" FontWeight="Bold" FontFamily="{StaticResource AppFont}" Margin="0,0,0,6">
+                                <Run Text="SETUP" Foreground="{DynamicResource BrushTextPrimary}"/>
+                                <Run Text=" • " Foreground="{DynamicResource BrushAccent}"/>
+                                <Run Text="OVERDRIVE" Foreground="{DynamicResource BrushAccent}"/>
+                                <Run Text=" • " Foreground="{DynamicResource BrushAccent}"/>
+                                <Run Text="COMMAND" Foreground="{DynamicResource BrushTextPrimary}"/>
+                            </TextBlock>
 
-                            <!-- Description -->
-                            <TextBlock Text="Automated app deployment, live hardware monitoring, junk cache purging, and low-latency system tuning — unified in one tactical console."
+                            <!-- Subtitle: Uncommon High-Performance Mastery Line -->
+                            <TextBlock Text="From bare-metal setup to peak silicon velocity — absolute machine mastery."
                                        Style="{StaticResource TextBody}" FontSize="12.5" Margin="0,0,0,16" HorizontalAlignment="Left" MaxWidth="620"/>
 
                             <!-- Interactive Quick Chips -->
