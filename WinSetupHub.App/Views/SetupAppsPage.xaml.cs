@@ -1073,7 +1073,8 @@ namespace SetupHub180Hz.Views
                 PopupAppName.Text = info.App.Name;
                 PopupAppIcon.Source = info.App.IconImageSource;
                 PopupQueueText.Text = $"App {info.QueueIndex} of {info.QueueTotal}";
-                double targetPct = Math.Clamp(info.Percentage, 0, 100);
+                double displayPct = info.Percentage > 0 ? info.Percentage : (info.App?.DownloadProgress ?? 0);
+                double targetPct = Math.Clamp(displayPct, 0, 100);
                 var anim = new System.Windows.Media.Animation.DoubleAnimation
                 {
                     To = targetPct,
@@ -1082,7 +1083,7 @@ namespace SetupHub180Hz.Views
                 };
                 PopupProgressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, anim);
 
-                PopupPercentageText.Text = $"{info.Percentage:0}%";
+                PopupPercentageText.Text = $"{displayPct:0}%";
                 PopupSpeedText.Text = info.SpeedFormatted;
                 string eta = info.EtaFormatted ?? "Calculating…";
                 if (eta.StartsWith("ETA:", StringComparison.OrdinalIgnoreCase))
@@ -1090,7 +1091,8 @@ namespace SetupHub180Hz.Views
                     eta = eta.Substring(4).TrimStart();
                 }
                 PopupEtaText.Text = eta;
-                PopupSizeText.Text = info.SizeFormatted;
+                string size = !string.IsNullOrWhiteSpace(info.SizeFormatted) ? info.SizeFormatted : (DownloadManagerService.Instance.CurrentProgressInfo?.SizeFormatted ?? "");
+                PopupSizeText.Text = size;
                 PopupStatusDetail.Text = info.StatusMessage;
 
                 switch (info.State)

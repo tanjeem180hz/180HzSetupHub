@@ -211,7 +211,8 @@ namespace SetupHub180Hz.Views
                 BtnActiveWebsite.ToolTip = "Open Official Website";
             }
 
-            double targetPct = Math.Clamp(info.Percentage, 0, 100);
+            double displayPct = info.Percentage > 0 ? info.Percentage : (info.App?.DownloadProgress ?? 0);
+            double targetPct = Math.Clamp(displayPct, 0, 100);
             var anim = new System.Windows.Media.Animation.DoubleAnimation
             {
                 To = targetPct,
@@ -219,7 +220,7 @@ namespace SetupHub180Hz.Views
                 EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
             };
             ActiveProgressBar.BeginAnimation(System.Windows.Controls.Primitives.RangeBase.ValueProperty, anim);
-            ActiveProgressPercent.Text = $"{info.Percentage:0}%";
+            ActiveProgressPercent.Text = $"{displayPct:0}%";
             ActiveSpeedText.Text = info.SpeedFormatted;
             string eta = info.EtaFormatted ?? "Calculating…";
             if (eta.StartsWith("ETA:", StringComparison.OrdinalIgnoreCase))
@@ -227,7 +228,8 @@ namespace SetupHub180Hz.Views
                 eta = eta.Substring(4).TrimStart();
             }
             ActiveEtaText.Text = eta;
-            ActiveTransferredText.Text = string.IsNullOrWhiteSpace(info.SizeFormatted) ? "" : info.SizeFormatted;
+            string size = !string.IsNullOrWhiteSpace(info.SizeFormatted) ? info.SizeFormatted : (DownloadManagerService.Instance.CurrentProgressInfo?.SizeFormatted ?? "");
+            ActiveTransferredText.Text = size;
             ActiveQueueCountText.Text = $"App {info.QueueIndex} of {info.QueueTotal}";
 
             switch (info.State)

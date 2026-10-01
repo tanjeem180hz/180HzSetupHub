@@ -388,18 +388,29 @@ namespace SetupHub180Hz.Services
 
             _isPaused = true;
             _resumeTcs = new TaskCompletionSource<bool>();
+            _currentSpeedBps = 0;
             _currentCts?.Cancel();
 
             var current = CurrentApp;
             if (current != null)
             {
+                var prev = CurrentProgressInfo;
+                double preservedPct = prev != null && prev.Percentage > 0 ? prev.Percentage : current.DownloadProgress;
+                long bytesDownloaded = prev?.BytesDownloaded ?? 0;
+                long totalBytes = prev?.TotalBytes ?? 0;
+                string sizeFormatted = prev?.SizeFormatted ?? "";
+
                 current.Status = "Paused";
-                ProgressChanged?.Invoke(new DownloadProgressInfo
+                Notify(new DownloadProgressInfo
                 {
                     App = current,
-                    QueueIndex = _batchCompleted + 1,
-                    QueueTotal = Math.Max(_batchTotal, _queue.Count + _batchCompleted),
+                    QueueIndex = prev?.QueueIndex ?? (_batchCompleted + 1),
+                    QueueTotal = prev?.QueueTotal ?? Math.Max(_batchTotal, _queue.Count + _batchCompleted),
                     State = DownloadState.Paused,
+                    BytesDownloaded = bytesDownloaded,
+                    TotalBytes = totalBytes,
+                    Percentage = preservedPct,
+                    SizeFormatted = sizeFormatted,
                     StatusMessage = "Download paused. Partial bytes preserved on disk.",
                     SpeedFormatted = "0 MB/s",
                     EtaFormatted = "Paused"
@@ -412,6 +423,33 @@ namespace SetupHub180Hz.Services
             if (!_isQueueRunning || !_isPaused) return;
 
             _isPaused = false;
+
+            var current = CurrentApp;
+            if (current != null)
+            {
+                var prev = CurrentProgressInfo;
+                double preservedPct = prev != null && prev.Percentage > 0 ? prev.Percentage : current.DownloadProgress;
+                long bytesDownloaded = prev?.BytesDownloaded ?? 0;
+                long totalBytes = prev?.TotalBytes ?? 0;
+                string sizeFormatted = prev?.SizeFormatted ?? "";
+
+                current.Status = preservedPct > 0 ? $"Downloading {preservedPct:0}%" : "Downloading…";
+                Notify(new DownloadProgressInfo
+                {
+                    App = current,
+                    QueueIndex = prev?.QueueIndex ?? (_batchCompleted + 1),
+                    QueueTotal = prev?.QueueTotal ?? Math.Max(_batchTotal, _queue.Count + _batchCompleted),
+                    State = DownloadState.Downloading,
+                    BytesDownloaded = bytesDownloaded,
+                    TotalBytes = totalBytes,
+                    Percentage = preservedPct,
+                    SizeFormatted = sizeFormatted,
+                    StatusMessage = $"Resuming download for {current.Name}…",
+                    SpeedFormatted = "Connecting…",
+                    EtaFormatted = "Calculating…"
+                });
+            }
+
             _resumeTcs?.TrySetResult(true);
         }
 
@@ -857,9 +895,28 @@ namespace SetupHub180Hz.Services
                         continue;
                     }
                 }
+                catch (Exception ex) when (_isPaused || ex.InnerException is OperationCanceledException)
+                {
+                    if (_isSkipping || _isCancelled)
+                    {
+                        return false;
+                    }
+
+                    if (_isPaused)
+                    {
+                        // Paused cleanly; wait for resume loop
+                        continue;
+                    }
+                }
                 catch (Exception ex)
                 {
                     ActivityLogger.Instance.Log($"Download interrupted for {app.Name}: {ex.Message}", ActivityType.Warning);
+
+                    var prev = CurrentProgressInfo;
+                    double preservedPct = prev != null && prev.Percentage > 0 ? prev.Percentage : app.DownloadProgress;
+                    long bytesDownloaded = prev?.BytesDownloaded ?? 0;
+                    long totalBytes = prev?.TotalBytes ?? 0;
+                    string sizeFormatted = prev?.SizeFormatted ?? "";
 
                     app.Status = "Connection Error";
                     Notify(new DownloadProgressInfo
@@ -868,6 +925,10 @@ namespace SetupHub180Hz.Services
                         QueueIndex = queueIndex,
                         QueueTotal = queueTotal,
                         State = DownloadState.Error,
+                        BytesDownloaded = bytesDownloaded,
+                        TotalBytes = totalBytes,
+                        Percentage = preservedPct,
+                        SizeFormatted = sizeFormatted,
                         StatusMessage = $"Connection interrupted: {ex.Message}. Download saved. Click Resume to continue.",
                         SpeedFormatted = "0 MB/s",
                         EtaFormatted = "Interrupted",
