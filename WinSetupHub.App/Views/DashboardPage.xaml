@@ -35,7 +35,7 @@
                                     Opacity="0"
                                     Background="Transparent">
                                 <Border.Effect>
-                                    <DropShadowEffect Color="#00F0FF" BlurRadius="22" ShadowDepth="4" Direction="270" Opacity="0.32"/>
+                                    <DropShadowEffect Color="#00FF66" BlurRadius="22" ShadowDepth="4" Direction="270" Opacity="0.32"/>
                                 </Border.Effect>
                             </Border>
 
@@ -59,14 +59,14 @@
                                     ClipToBounds="True">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#151F30" Offset="0"/>
-                                        <GradientStop Color="#0D131F" Offset="1"/>
+                                        <GradientStop Color="#121913" Offset="0"/>
+                                        <GradientStop Color="#080C09" Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
                                 <Border.BorderBrush>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Color="#2A3C56" Offset="0"/>
-                                        <GradientStop Color="#162232" Offset="1"/>
+                                        <GradientStop Color="#223124" Offset="0"/>
+                                        <GradientStop Color="#131C14" Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.BorderBrush>
 
@@ -80,8 +80,8 @@
                                              Opacity="0.05">
                                         <Ellipse.Fill>
                                             <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
-                                                <GradientStop Color="#00F0FF" Offset="0"/>
-                                                <GradientStop Color="#0077B6" Offset="0.55"/>
+                                                <GradientStop Color="#00FF66" Offset="0"/>
+                                                <GradientStop Color="#00B347" Offset="0.55"/>
                                                 <GradientStop Color="#00000000" Offset="1"/>
                                             </RadialGradientBrush>
                                         </Ellipse.Fill>
@@ -92,7 +92,7 @@
                                         <Border.Background>
                                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                                 <GradientStop Color="#00000000" Offset="0"/>
-                                                <GradientStop Color="#3000F0FF" Offset="0.5"/>
+                                                <GradientStop Color="#3000FF66" Offset="0.5"/>
                                                 <GradientStop Color="#00000000" Offset="1"/>
                                             </LinearGradientBrush>
                                         </Border.Background>
@@ -110,16 +110,16 @@
                                 <Setter TargetName="TileBorder" Property="BorderBrush">
                                     <Setter.Value>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#00F0FF" Offset="0"/>
-                                            <GradientStop Color="#0080FF" Offset="1"/>
+                                            <GradientStop Color="#00FF66" Offset="0"/>
+                                            <GradientStop Color="#00CC52" Offset="1"/>
                                         </LinearGradientBrush>
                                     </Setter.Value>
                                 </Setter>
                                 <Setter TargetName="TileBorder" Property="Background">
                                     <Setter.Value>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#1A2840" Offset="0"/>
-                                            <GradientStop Color="#101726" Offset="1"/>
+                                            <GradientStop Color="#1A281C" Offset="0"/>
+                                            <GradientStop Color="#0F1710" Offset="1"/>
                                         </LinearGradientBrush>
                                     </Setter.Value>
                                 </Setter>
@@ -228,8 +228,8 @@
                                 <Setter TargetName="TileBorder" Property="Background">
                                     <Setter.Value>
                                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                            <GradientStop Color="#121B2A" Offset="0"/>
-                                            <GradientStop Color="#090E16" Offset="1"/>
+                                            <GradientStop Color="#101811" Offset="0"/>
+                                            <GradientStop Color="#060A07" Offset="1"/>
                                         </LinearGradientBrush>
                                     </Setter.Value>
                                 </Setter>
@@ -267,16 +267,16 @@
             <Setter Property="Background">
                 <Setter.Value>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#151F30" Offset="0"/>
-                        <GradientStop Color="#0D131F" Offset="1"/>
+                        <GradientStop Color="#121913" Offset="0"/>
+                        <GradientStop Color="#080C09" Offset="1"/>
                     </LinearGradientBrush>
                 </Setter.Value>
             </Setter>
             <Setter Property="BorderBrush">
                 <Setter.Value>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#2A3C56" Offset="0"/>
-                        <GradientStop Color="#162232" Offset="1"/>
+                        <GradientStop Color="#223124" Offset="0"/>
+                        <GradientStop Color="#131C14" Offset="1"/>
                     </LinearGradientBrush>
                 </Setter.Value>
             </Setter>
@@ -291,16 +291,16 @@
                     <Setter Property="BorderBrush">
                         <Setter.Value>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#00F0FF" Offset="0"/>
-                                <GradientStop Color="#0080FF" Offset="1"/>
+                                <GradientStop Color="#00FF66" Offset="0"/>
+                                <GradientStop Color="#00CC52" Offset="1"/>
                             </LinearGradientBrush>
                         </Setter.Value>
                     </Setter>
                     <Setter Property="Background">
                         <Setter.Value>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#1A2840" Offset="0"/>
-                                <GradientStop Color="#101726" Offset="1"/>
+                                <GradientStop Color="#1A281C" Offset="0"/>
+                                <GradientStop Color="#0F1710" Offset="1"/>
                             </LinearGradientBrush>
                         </Setter.Value>
                     </Setter>
@@ -345,16 +345,16 @@
             <Setter Property="Background">
                 <Setter.Value>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#152136" Offset="0"/>
-                        <GradientStop Color="#0C121D" Offset="1"/>
+                        <GradientStop Color="#131B14" Offset="0"/>
+                        <GradientStop Color="#070A07" Offset="1"/>
                     </LinearGradientBrush>
                 </Setter.Value>
             </Setter>
             <Setter Property="BorderBrush">
                 <Setter.Value>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#304462" Offset="0"/>
-                        <GradientStop Color="#162232" Offset="1"/>
+                        <GradientStop Color="#28382A" Offset="0"/>
+                        <GradientStop Color="#131C14" Offset="1"/>
                     </LinearGradientBrush>
                 </Setter.Value>
             </Setter>
@@ -369,8 +369,8 @@
                     <Setter Property="BorderBrush">
                         <Setter.Value>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#00F0FF" Offset="0"/>
-                                <GradientStop Color="#0080FF" Offset="1"/>
+                                <GradientStop Color="#00FF66" Offset="0"/>
+                                <GradientStop Color="#00CC52" Offset="1"/>
                             </LinearGradientBrush>
                         </Setter.Value>
                     </Setter>
@@ -516,8 +516,8 @@
                              Margin="0,-120,-100,0" IsHitTestVisible="False" Opacity="0.12">
                         <Ellipse.Fill>
                             <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
-                                <GradientStop Color="#00F0FF" Offset="0"/>
-                                <GradientStop Color="#0055AA" Offset="0.6"/>
+                                <GradientStop Color="#00FF66" Offset="0"/>
+                                <GradientStop Color="#008833" Offset="0.6"/>
                                 <GradientStop Color="#00000000" Offset="1"/>
                             </RadialGradientBrush>
                         </Ellipse.Fill>
@@ -528,7 +528,7 @@
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                 <GradientStop Color="#00000000" Offset="0"/>
-                                <GradientStop Color="#4000F0FF" Offset="0.5"/>
+                                <GradientStop Color="#4000FF66" Offset="0.5"/>
                                 <GradientStop Color="#00000000" Offset="1"/>
                             </LinearGradientBrush>
                         </Border.Background>
@@ -569,14 +569,14 @@
                         <Border Grid.Column="1" CornerRadius="10" Padding="18" VerticalAlignment="Center" SnapsToDevicePixels="True">
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                    <GradientStop Color="#101826" Offset="0"/>
-                                    <GradientStop Color="#090E17" Offset="1"/>
+                                    <GradientStop Color="#0E140F" Offset="0"/>
+                                    <GradientStop Color="#060906" Offset="1"/>
                                 </LinearGradientBrush>
                             </Border.Background>
                             <Border.BorderBrush>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                    <GradientStop Color="#4000F0FF" Offset="0"/>
-                                    <GradientStop Color="#1500F0FF" Offset="1"/>
+                                    <GradientStop Color="#4000FF66" Offset="0"/>
+                                    <GradientStop Color="#1500FF66" Offset="1"/>
                                 </LinearGradientBrush>
                             </Border.BorderBrush>
                             <Border.BorderThickness>1</Border.BorderThickness>
@@ -608,7 +608,7 @@
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                     <GradientStop Color="#00000000" Offset="0"/>
-                                    <GradientStop Color="#2500F0FF" Offset="0.5"/>
+                                    <GradientStop Color="#2500FF66" Offset="0.5"/>
                                     <GradientStop Color="#00000000" Offset="1"/>
                                 </LinearGradientBrush>
                             </Border.Background>
@@ -647,7 +647,7 @@
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                     <GradientStop Color="#00000000" Offset="0"/>
-                                    <GradientStop Color="#2500F0FF" Offset="0.5"/>
+                                    <GradientStop Color="#2500FF66" Offset="0.5"/>
                                     <GradientStop Color="#00000000" Offset="1"/>
                                 </LinearGradientBrush>
                             </Border.Background>
@@ -686,7 +686,7 @@
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                                     <GradientStop Color="#00000000" Offset="0"/>
-                                    <GradientStop Color="#2500F0FF" Offset="0.5"/>
+                                    <GradientStop Color="#2500FF66" Offset="0.5"/>
                                     <GradientStop Color="#00000000" Offset="1"/>
                                 </LinearGradientBrush>
                             </Border.Background>
@@ -741,7 +741,7 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500F0FF" BorderBrush="#3500F0FF" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="01" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
@@ -767,7 +767,7 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500F0FF" BorderBrush="#3500F0FF" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="02" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
@@ -793,7 +793,7 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500F0FF" BorderBrush="#3500F0FF" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="03" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
@@ -819,7 +819,7 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500F0FF" BorderBrush="#3500F0FF" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="04" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
@@ -845,7 +845,7 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500F0FF" BorderBrush="#3500F0FF" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="05" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
@@ -871,7 +871,7 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500F0FF" BorderBrush="#3500F0FF" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="06" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
@@ -897,7 +897,7 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500F0FF" BorderBrush="#3500F0FF" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="07" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
@@ -923,7 +923,7 @@
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="#1500F0FF" BorderBrush="#3500F0FF" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                    <Border Background="#1500FF66" BorderBrush="#3500FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="08" Foreground="{StaticResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"

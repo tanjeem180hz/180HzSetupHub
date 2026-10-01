@@ -31,11 +31,8 @@ namespace SetupHub180Hz.Services
                         using var src = asm.GetManifestResourceStream(r);
                         if (src != null)
                         {
-                            if (!File.Exists(target) || new FileInfo(target).Length != src.Length)
-                            {
-                                using var dst = File.Create(target);
-                                src.CopyTo(dst);
-                            }
+                            using var dst = File.Create(target);
+                            src.CopyTo(dst);
                         }
                     }
                 }

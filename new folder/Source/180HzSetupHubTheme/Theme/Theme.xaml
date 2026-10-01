@@ -5,20 +5,20 @@
     <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
     <!-- ============ COLOR TOKENS ============ -->
-    <!-- Dark Color Tokens (Default) -->
-    <Color x:Key="ColorBackground">#0E1420</Color>
-    <Color x:Key="ColorSurface">#161D2C</Color>
-    <Color x:Key="ColorSurfaceHover">#1D2537</Color>
-    <Color x:Key="ColorBorder">#2A3348</Color>
-    <Color x:Key="ColorAccent">#2FB6FF</Color>
-    <Color x:Key="ColorAccentHover">#57C6FF</Color>
-    <Color x:Key="ColorAccentPressed">#1A93D6</Color>
-    <Color x:Key="ColorTextPrimary">#F2F5FA</Color>
-    <Color x:Key="ColorTextSecondary">#8B95A8</Color>
-    <Color x:Key="ColorSuccess">#3FCB7E</Color>
-    <Color x:Key="ColorWarning">#F5B84C</Color>
-    <Color x:Key="ColorError">#F0556B</Color>
-    <Color x:Key="ColorCloseHover">#E24C63</Color>
+    <!-- Dark Color Tokens (Default: Toxic Biohazard & Cyber Carbon) -->
+    <Color x:Key="ColorBackground">#080B08</Color>
+    <Color x:Key="ColorSurface">#0F1410</Color>
+    <Color x:Key="ColorSurfaceHover">#161E17</Color>
+    <Color x:Key="ColorBorder">#212C23</Color>
+    <Color x:Key="ColorAccent">#00FF66</Color>
+    <Color x:Key="ColorAccentHover">#33FF80</Color>
+    <Color x:Key="ColorAccentPressed">#00CC52</Color>
+    <Color x:Key="ColorTextPrimary">#F2FFF5</Color>
+    <Color x:Key="ColorTextSecondary">#809283</Color>
+    <Color x:Key="ColorSuccess">#00FF66</Color>
+    <Color x:Key="ColorWarning">#FFB800</Color>
+    <Color x:Key="ColorError">#FF2255</Color>
+    <Color x:Key="ColorCloseHover">#FF2255</Color>
 
     <!-- Light Color Tokens -->
     <Color x:Key="ColorBackgroundLight">#F4F6FA</Color>
