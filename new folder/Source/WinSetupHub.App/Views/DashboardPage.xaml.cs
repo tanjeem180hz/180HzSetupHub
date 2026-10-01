@@ -229,13 +229,13 @@ namespace SetupHub180Hz.Views
                 TxtQuickBoostBtn.Text = "BOOSTED!";
 
                 await Task.Delay(2500);
-                TxtQuickBoostBtn.Text = "1-CLICK OPTIMIZE";
+                TxtQuickBoostBtn.Text = "OPTIMIZE";
                 TxtBoostStatus.Text = "✓ All Systems Nominal";
                 TxtBoostStatus.Foreground = (System.Windows.Media.Brush)FindResource("BrushTextSecondary");
             }
             catch
             {
-                TxtQuickBoostBtn.Text = "1-CLICK OPTIMIZE";
+                TxtQuickBoostBtn.Text = "OPTIMIZE";
             }
             finally
             {
