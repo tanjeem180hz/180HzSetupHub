@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,7 +13,9 @@ namespace SetupHub180Hz.Views
         private readonly MainWindow _mainWindow;
         private readonly WingetService _winget = new();
         private readonly SystemStatsService _stats = new();
+        private readonly CleanupService _cleanup = new();
         private readonly DispatcherTimer _statsTimer;
+        private bool _isBoosting = false;
 
         public DashboardPage(MainWindow mainWindow)
         {
@@ -48,6 +51,36 @@ namespace SetupHub180Hz.Views
         {
             double width = ActualWidth;
             if (width <= 0) return;
+
+            if (HeroContentGrid != null && HeroOverviewPanel != null && HeroTelemetryPod != null)
+            {
+                if (width < 860)
+                {
+                    HeroContentGrid.ColumnDefinitions.Clear();
+                    HeroContentGrid.RowDefinitions.Clear();
+                    HeroContentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                    HeroContentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                    Grid.SetColumn(HeroOverviewPanel, 0);
+                    Grid.SetRow(HeroOverviewPanel, 0);
+                    Grid.SetColumn(HeroTelemetryPod, 0);
+                    Grid.SetRow(HeroTelemetryPod, 1);
+                    HeroTelemetryPod.Margin = new Thickness(0, 16, 0, 0);
+                    HeroTelemetryPod.HorizontalAlignment = HorizontalAlignment.Left;
+                }
+                else
+                {
+                    HeroContentGrid.RowDefinitions.Clear();
+                    HeroContentGrid.ColumnDefinitions.Clear();
+                    HeroContentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    HeroContentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                    Grid.SetRow(HeroOverviewPanel, 0);
+                    Grid.SetColumn(HeroOverviewPanel, 0);
+                    Grid.SetRow(HeroTelemetryPod, 0);
+                    Grid.SetColumn(HeroTelemetryPod, 1);
+                    HeroTelemetryPod.Margin = new Thickness(16, 0, 0, 0);
+                    HeroTelemetryPod.HorizontalAlignment = HorizontalAlignment.Right;
+                }
+            }
 
             if (SystemStatsSection != null)
             {
@@ -100,9 +133,20 @@ namespace SetupHub180Hz.Views
         private void UpdateSummary()
         {
             var count = UpdateMonitorService.Instance.UpgradableApps.Count;
-            UpdateSummaryText.Text = count == 0
-                ? "Everything is up to date."
-                : $"{count} update-ready app(s) found.";
+            if (UpdateSummaryText != null)
+            {
+                UpdateSummaryText.Text = count == 0
+                    ? "All apps up to date"
+                    : $"{count} update(s) available";
+            }
+            if (HeroUpdateIcon != null)
+            {
+                HeroUpdateIcon.Text = count == 0 ? "✓" : "⚡";
+            }
+            if (HeroUpdateArrow != null)
+            {
+                HeroUpdateArrow.Visibility = count == 0 ? Visibility.Collapsed : Visibility.Visible;
+            }
 
             _mainWindow.SetStatus(count == 0 ? "Up to date" : $"{count} update(s) available");
         }
@@ -147,6 +191,57 @@ namespace SetupHub180Hz.Views
             await UpdateMonitorService.Instance.RefreshAsync(force: true);
             UpdateSummary();
             RefreshSummaryButton.IsEnabled = true;
+        }
+
+        private void HeroUpdateChip_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("UpdateCenter");
+        private void HeroCleanupChip_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Cleanup");
+
+        private async void BtnQuickBoost_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isBoosting) return;
+            _isBoosting = true;
+            BtnQuickBoost.IsEnabled = false;
+            TxtQuickBoostBtn.Text = "OPTIMIZING...";
+
+            try
+            {
+                long freedBytes = 0;
+                var targets = await _cleanup.ScanAsync();
+                foreach (var t in targets.Where(x => x.Name.Contains("Temp", StringComparison.OrdinalIgnoreCase) || x.Name.Contains("Recent", StringComparison.OrdinalIgnoreCase)))
+                {
+                    freedBytes += await _cleanup.CleanAsync(t);
+                }
+
+                UpdateStats();
+
+                double freedMb = Math.Round((double)freedBytes / (1024 * 1024), 1);
+                if (freedMb > 0)
+                {
+                    TxtBoostStatus.Text = $"✓ +{freedMb} MB Freed! Peak Mode";
+                    TxtBoostStatus.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
+                }
+                else
+                {
+                    TxtBoostStatus.Text = "✓ System 100% Optimized";
+                    TxtBoostStatus.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
+                }
+
+                TxtQuickBoostBtn.Text = "BOOSTED!";
+
+                await Task.Delay(2500);
+                TxtQuickBoostBtn.Text = "1-CLICK OPTIMIZE";
+                TxtBoostStatus.Text = "✓ All Systems Nominal";
+                TxtBoostStatus.Foreground = (System.Windows.Media.Brush)FindResource("BrushTextSecondary");
+            }
+            catch
+            {
+                TxtQuickBoostBtn.Text = "1-CLICK OPTIMIZE";
+            }
+            finally
+            {
+                BtnQuickBoost.IsEnabled = true;
+                _isBoosting = false;
+            }
         }
 
         private void TileSetupApps_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("SetupApps");

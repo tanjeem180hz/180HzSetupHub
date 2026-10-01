@@ -417,59 +417,173 @@
                 </Border.RenderTransform>
                 <Grid>
                     <!-- Ambient Cybernetic Glow Orb in top-right -->
-                    <Ellipse Width="340" Height="340" HorizontalAlignment="Right" VerticalAlignment="Top"
-                             Margin="0,-120,-100,0" IsHitTestVisible="False" Opacity="0.08"
+                    <Ellipse Width="380" Height="380" HorizontalAlignment="Right" VerticalAlignment="Top"
+                             Margin="0,-140,-100,0" IsHitTestVisible="False" Opacity="0.10"
                              Fill="{DynamicResource BrushAccent}"/>
 
                     <!-- Top Specular Glass Highlight -->
-                    <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="14,0,14,0" IsHitTestVisible="False"
-                            Background="{DynamicResource BrushAccent}" Opacity="0.25"/>
+                    <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="14,0,14,0" IsHitTestVisible="False">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#0000FF66" Offset="0.0"/>
+                                <GradientStop Color="#00FF66" Offset="0.5"/>
+                                <GradientStop Color="#0000FF66" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
 
-                    <Grid>
+                    <Grid x:Name="HeroContentGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="220"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="OPTIMIZE. MONITOR. DEPLOY." FontSize="22" FontWeight="Bold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" FontFamily="{StaticResource AppFont}"/>
-                            <TextBlock Text="Automated app setup, update tracking, bandwidth monitoring, and junk cleanup — all in one place."
-                                       Style="{StaticResource TextBody}" FontSize="13" Margin="0,8,0,18" HorizontalAlignment="Left"/>
-
-                            <StackPanel Orientation="Horizontal">
-                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="12,7" Margin="0,0,10,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="🔔" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                        <TextBlock x:Name="UpdateSummaryText" Text="Checking for updates…" Style="{StaticResource TextBody}"
-                                                   Foreground="{DynamicResource BrushAccent}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center"/>
+                        <!-- Left: Tactical Command Overview -->
+                        <StackPanel x:Name="HeroOverviewPanel" VerticalAlignment="Center" Margin="0,0,24,0">
+                            <!-- Tactical Badge Row -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}"
+                                        BorderThickness="1" CornerRadius="4" Padding="8,3" Margin="0,0,10,0">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Width="6" Height="6" CornerRadius="3" Background="{DynamicResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center">
+                                            <Border.Effect>
+                                                <DropShadowEffect Color="#00FF66" BlurRadius="6" ShadowDepth="0" Opacity="0.9"/>
+                                            </Border.Effect>
+                                        </Border>
+                                        <TextBlock Text="SYSTEM ARMED &amp; READY" FontSize="10.5" FontWeight="Bold"
+                                                   Foreground="{DynamicResource BrushAccent}" FontFamily="{StaticResource AppFont}"/>
                                     </StackPanel>
                                 </Border>
-
-                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="12,7">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="🛡️" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Windows 64-bit Ready" Style="{StaticResource TextBody}"
-                                                   Foreground="{DynamicResource BrushTextSecondary}" FontSize="12" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Border>
+                                <TextBlock Text="180Hz KERNEL // v1.0.0" FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource BrushTextSecondary}" VerticalAlignment="Center" FontFamily="{StaticResource AppFont}"/>
                             </StackPanel>
+
+                            <!-- Headline -->
+                            <TextBlock Text="SYSTEM ACCELERATION &amp; CONTROL" FontSize="22" FontWeight="Bold"
+                                       Foreground="{DynamicResource BrushTextPrimary}" FontFamily="{StaticResource AppFont}" Margin="0,0,0,6"/>
+
+                            <!-- Description -->
+                            <TextBlock Text="Automated app deployment, live hardware monitoring, junk cache purging, and low-latency system tuning — unified in one tactical console."
+                                       Style="{StaticResource TextBody}" FontSize="12.5" Margin="0,0,0,16" HorizontalAlignment="Left" MaxWidth="620"/>
+
+                            <!-- Interactive Quick Chips -->
+                            <WrapPanel Orientation="Horizontal">
+                                <!-- Chip 1: Interactive Update Chip (Opens Update Center) -->
+                                <Button x:Name="HeroUpdateChip" Style="{StaticResource OutlineButton}" Click="HeroUpdateChip_Click"
+                                        Height="34" Padding="12,6" Margin="0,0,10,6"
+                                        ToolTip="Click to review and deploy available package updates">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock x:Name="HeroUpdateIcon" Text="⚡" FontSize="11" Margin="0,0,7,0"
+                                                   Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="UpdateSummaryText" Text="Checking for updates…" FontSize="11.5" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource BrushAccent}" FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="HeroUpdateArrow" Text=" ➜" FontSize="10"
+                                                   Foreground="{DynamicResource BrushAccent}" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- Chip 2: Interactive Cleanup Shortcut Chip -->
+                                <Button x:Name="HeroCleanupChip" Style="{StaticResource OutlineButton}" Click="HeroCleanupChip_Click"
+                                        Height="34" Padding="12,6" Margin="0,0,10,6"
+                                        ToolTip="Click to open full Disk &amp; Cache Cleanup utility">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="🧹" FontSize="11" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Deep Cleanup" FontSize="11.5" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource BrushTextSecondary}" FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- Chip 3: Architecture Chip -->
+                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}"
+                                        BorderThickness="1" CornerRadius="6" Padding="12,7" Margin="0,0,0,6"
+                                        ToolTip="Native x64 high-performance architecture">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="🛡️" FontSize="11" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Windows 64-bit Core" FontSize="11.5" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource BrushTextSecondary}" FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </WrapPanel>
                         </StackPanel>
 
-                        <!-- Right Module Counter Card -->
-                        <Border Grid.Column="1" CornerRadius="10" Padding="18" VerticalAlignment="Center" SnapsToDevicePixels="True"
+                        <!-- Right: Tactical Telemetry & Quick Optimizer Pod -->
+                        <Border x:Name="HeroTelemetryPod" Grid.Column="1" Width="300" CornerRadius="10" Padding="16,14" VerticalAlignment="Center" SnapsToDevicePixels="True"
                                 Background="{DynamicResource BrushBackground}"
                                 BorderBrush="{DynamicResource BrushBorder}"
                                 BorderThickness="1">
-                            <StackPanel HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
-                                    <Border Width="10" Height="10" CornerRadius="2" Background="{DynamicResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="180Hz HUB" Foreground="{DynamicResource BrushAccent}" FontSize="11" FontWeight="Bold" FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
-                                </StackPanel>
-                                <TextBlock x:Name="ModuleCountText" Text="8" FontSize="36" FontWeight="Bold"
-                                           Foreground="{DynamicResource BrushTextPrimary}" HorizontalAlignment="Center" Margin="0,-2,0,0"/>
-                                <TextBlock Text="MODULES ACTIVE" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Center"/>
-                            </StackPanel>
+                            <Border.Effect>
+                                <DropShadowEffect Color="#00FF66" BlurRadius="16" ShadowDepth="0" Opacity="0.18"/>
+                            </Border.Effect>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Top Header: Engine Status & Health Index -->
+                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Width="8" Height="8" CornerRadius="4" Background="{DynamicResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center">
+                                            <Border.Effect>
+                                                <DropShadowEffect Color="#00FF66" BlurRadius="6" ShadowDepth="0" Opacity="0.9"/>
+                                            </Border.Effect>
+                                        </Border>
+                                        <TextBlock Text="TELEMETRY HUB" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"
+                                                   FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <Border HorizontalAlignment="Right" Background="{DynamicResource BrushSurfaceHover}"
+                                            BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2">
+                                        <TextBlock Text="100% HEALTH" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" FontFamily="{StaticResource AppFont}"/>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Middle Row: Animated Lottie Visual + Active Modules Info -->
+                                <Grid Grid.Row="1" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Animated Radar / Pulse Ring Frame -->
+                                    <Border Grid.Column="0" Width="54" Height="54" CornerRadius="27"
+                                            Background="{DynamicResource BrushSurfaceHover}"
+                                            BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" Margin="0,0,14,0" SnapsToDevicePixels="True">
+                                        <Border.Effect>
+                                            <DropShadowEffect Color="#00FF66" BlurRadius="12" ShadowDepth="0" Opacity="0.3"/>
+                                        </Border.Effect>
+                                        <lottie:LottieAnimationView Width="38" Height="38" AutoPlay="True" RepeatCount="-1"
+                                                                    services:LottieHelper.AssetName="startup_boost.json"
+                                                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <!-- Metrics Column -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock x:Name="ModuleCountText" Text="8" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}"
+                                                       FontFamily="{StaticResource AppFont}" Margin="0,0,6,0"/>
+                                            <TextBlock Text="MODULES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"
+                                                       FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="TxtBoostStatus" Text="✓ All Systems Nominal" FontSize="11"
+                                                   Foreground="{DynamicResource BrushTextSecondary}" FontFamily="{StaticResource AppFont}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Bottom Row: 1-Click Quick Boost Button -->
+                                <Button Grid.Row="2" x:Name="BtnQuickBoost" Style="{StaticResource AccentButton}" Click="BtnQuickBoost_Click"
+                                        Height="34" Padding="12,0"
+                                        ToolTip="Instantly sweep temporary junk files and refresh telemetry">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock x:Name="BoostIcon" Text="⚡" FontSize="12" FontWeight="Bold" Margin="0,0,6,0"
+                                                   Foreground="{DynamicResource BrushAccentForeground}"/>
+                                        <TextBlock x:Name="TxtQuickBoostBtn" Text="1-CLICK OPTIMIZE" FontSize="11.5" FontWeight="Bold"
+                                                   Foreground="{DynamicResource BrushAccentForeground}" FontFamily="{StaticResource AppFont}"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
                         </Border>
                     </Grid>
                 </Grid>
