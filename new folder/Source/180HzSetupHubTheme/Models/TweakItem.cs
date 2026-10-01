@@ -15,6 +15,7 @@ namespace SetupHub180Hz.Models
         public string Category { get; set; } = "";
         public int CategoryOrder { get; set; }
         public bool IsAdvanced { get; set; }
+        public bool IsRecommended { get; set; }
         public bool RequiresReboot { get; set; }
         public string Link { get; set; } = "";
 

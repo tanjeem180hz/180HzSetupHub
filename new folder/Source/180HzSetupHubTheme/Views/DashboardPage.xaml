@@ -857,7 +857,7 @@
                                         <TextBlock Text="09" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                     <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                                services:LottieHelper.AssetName="startup_boost.json"
+                                                                services:LottieHelper.AssetName="rocket.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>

@@ -87,14 +87,14 @@
             <Setter Property="Margin" Value="0,0,0,6"/>
         </Style>
 
-        <!-- Apply button -->
+        <!-- Apply button (Primary Accent) -->
         <Style x:Key="ApplyButton" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="{StaticResource BrushAccent}"/>
             <Setter Property="Foreground" Value="#0A0E17"/>
             <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="20,8"/>
+            <Setter Property="Padding" Value="16,8"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
@@ -121,10 +121,17 @@
             </Setter>
         </Style>
 
-        <!-- Secondary/Undo button -->
+        <!-- Secondary action button -->
         <Style x:Key="UndoButton" TargetType="{x:Type Button}" BasedOn="{StaticResource ApplyButton}">
             <Setter Property="Background" Value="{StaticResource BrushSurfaceHover}"/>
             <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <!-- Danger / Restore button -->
+        <Style x:Key="DangerButton" TargetType="{x:Type Button}" BasedOn="{StaticResource ApplyButton}">
+            <Setter Property="Background" Value="#2D1515"/>
+            <Setter Property="Foreground" Value="#FF6B6B"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
 
@@ -132,6 +139,16 @@
         <Style x:Key="AdvancedBadge" TargetType="{x:Type Border}">
             <Setter Property="Background" Value="#1F1500"/>
             <Setter Property="BorderBrush" Value="#F59E0B"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Recommended badge -->
+        <Style x:Key="RecommendedBadge" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="4"/>
             <Setter Property="Padding" Value="6,2"/>
@@ -149,14 +166,14 @@
         <!-- ===== PAGE HEADER ===== -->
         <Border Grid.Row="0" Background="{DynamicResource BrushSurface}"
                 BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
-                Padding="24,16,24,14">
+                Padding="24,14,24,12">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0">
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
                     <TextBlock Text="Optimization" FontFamily="{StaticResource AppFont}"
                                FontSize="22" FontWeight="Bold"
                                Foreground="{DynamicResource BrushTextPrimary}"/>
@@ -165,24 +182,38 @@
                                Foreground="{DynamicResource BrushTextSecondary}"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                <!-- Actions WrapPanel -->
+                <WrapPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="12,0,0,0">
+                    <!-- Restore All Default -->
+                    <Button x:Name="BtnRestoreDefault" Style="{StaticResource DangerButton}"
+                            Content="RESTORE ALL DEFAULT" Padding="12,7" Margin="0,0,8,4"
+                            Click="BtnRestoreDefault_Click" ToolTip="Restore all Windows settings back to factory defaults"/>
+
+                    <!-- Deselect All / Clear -->
+                    <Button x:Name="BtnDeselectAll" Style="{StaticResource UndoButton}"
+                            Content="DESELECT ALL" Padding="10,7" Margin="0,0,8,4"
+                            Click="BtnDeselectAll_Click" ToolTip="Deselect all checkboxes"/>
+
                     <!-- Select All -->
                     <Button x:Name="BtnSelectAll" Style="{StaticResource UndoButton}"
-                            Content="SELECT ALL" Padding="12,7" Margin="0,0,8,0"
-                            Click="BtnSelectAll_Click"/>
-                    <!-- Deselect All -->
-                    <Button x:Name="BtnDeselectAll" Style="{StaticResource UndoButton}"
-                            Content="DESELECT ALL" Padding="12,7" Margin="0,0,8,0"
-                            Click="BtnDeselectAll_Click"/>
-                    <!-- Undo / Restore -->
+                            Content="SELECT ALL" Padding="10,7" Margin="0,0,8,4"
+                            Click="BtnSelectAll_Click" ToolTip="Select all visible tweaks"/>
+
+                    <!-- Undo Selected -->
                     <Button x:Name="BtnUndoSelected" Style="{StaticResource UndoButton}"
-                            Content="UNDO SELECTED" Padding="12,7" Margin="0,0,8,0"
-                            Click="BtnUndoSelected_Click"/>
-                    <!-- Apply -->
-                    <Button x:Name="BtnApplySelected" Style="{StaticResource ApplyButton}"
-                            Content="APPLY SELECTED" Padding="14,7"
-                            Click="BtnApplySelected_Click"/>
-                </StackPanel>
+                            Content="UNDO SELECTED" Padding="10,7" Margin="0,0,8,4"
+                            Click="BtnUndoSelected_Click" ToolTip="Undo only checked tweaks"/>
+
+                    <!-- Apply All -->
+                    <Button x:Name="BtnApplyAll" Style="{StaticResource UndoButton}"
+                            Content="APPLY ALL" Padding="12,7" Margin="0,0,8,4"
+                            Click="BtnApplyAll_Click" ToolTip="Apply all optimizations across the system"/>
+
+                    <!-- Apply Recommendation (Primary Accent) -->
+                    <Button x:Name="BtnApplyRecommendation" Style="{StaticResource ApplyButton}"
+                            Content="APPLY RECOMMENDATION" Padding="14,7" Margin="0,0,0,4"
+                            Click="BtnApplyRecommendation_Click" ToolTip="Apply 12 recommended safe optimizations instantly"/>
+                </WrapPanel>
             </Grid>
         </Border>
 
@@ -198,13 +229,25 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Category Filter Bar -->
-                <Border Grid.Row="0" Padding="24,12,24,10"
+                <!-- Category Filter Bar + Quick Select Helpers -->
+                <Border Grid.Row="0" Padding="24,10,24,10"
                         BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
                         Background="{DynamicResource BrushBackground}">
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                        <StackPanel x:Name="CategoryChipsPanel" Orientation="Horizontal"/>
-                    </ScrollViewer>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                            <StackPanel x:Name="CategoryChipsPanel" Orientation="Horizontal"/>
+                        </ScrollViewer>
+
+                        <!-- Quick Select Recommended Helper -->
+                        <Button Grid.Column="1" x:Name="BtnSelectRecommended" Style="{StaticResource UndoButton}"
+                                Content="SELECT RECOMMENDED" Padding="10,5" Margin="8,0,0,0"
+                                Click="BtnSelectRecommended_Click" ToolTip="Check the 12 recommended tweaks"/>
+                    </Grid>
                 </Border>
 
                 <!-- Tweak List -->
@@ -229,7 +272,7 @@
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                                     <lottie:LottieAnimationView x:Name="StatusLottie" Width="22" Height="22"
                                                                 AutoPlay="True" RepeatCount="-1"
-                                                                services:LottieHelper.AssetName="startup_boost.json"
+                                                                services:LottieHelper.AssetName="rocket.json"
                                                                 VerticalAlignment="Center" Visibility="Collapsed"/>
                                 </StackPanel>
                             </Grid>
@@ -269,6 +312,13 @@
                                                                FontSize="13" FontWeight="SemiBold"
                                                                Foreground="{DynamicResource BrushTextPrimary}"
                                                                VerticalAlignment="Center"/>
+                                                    <!-- Recommended badge -->
+                                                    <Border Style="{StaticResource RecommendedBadge}"
+                                                            Margin="8,0,0,0"
+                                                            Visibility="{Binding IsRecommended, Converter={StaticResource BoolToVis}}">
+                                                        <TextBlock Text="RECOMMENDED" FontSize="9" FontWeight="Bold"
+                                                                   Foreground="{DynamicResource BrushAccent}"/>
+                                                    </Border>
                                                     <!-- Advanced badge -->
                                                     <Border Style="{StaticResource AdvancedBadge}"
                                                             Margin="8,0,0,0"

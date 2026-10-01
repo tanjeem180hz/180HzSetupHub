@@ -21,6 +21,22 @@ namespace SetupHub180Hz.Services
             PropertyNameCaseInsensitive = true
         };
 
+        private static readonly HashSet<string> RecommendedIds = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "WPFTweaksActivity",
+            "WPFTweaksConsumerFeatures",
+            "WPFTweaksDisableExplorerAutoDiscovery",
+            "WPFTweaksWPBT",
+            "WPFTweaksLocation",
+            "WPFTweaksServices",
+            "WPFTweaksTelemetry",
+            "WPFTweaksDeliveryOptimization",
+            "WPFTweaksDiskCleanup",
+            "WPFTweaksDeleteTempFiles",
+            "WPFTweaksEndTaskOnTaskbar",
+            "WPFTweaksRestorePoint"
+        };
+
         private List<TweakItem>? _cache;
 
         public async Task<List<TweakItem>> GetAllAsync()
@@ -46,7 +62,11 @@ namespace SetupHub180Hz.Services
                 {
                     var json = await File.ReadAllTextAsync(p);
                     var items = JsonSerializer.Deserialize<List<TweakItem>>(json, JsonOptions);
-                    if (items != null && items.Count > 0) return items;
+                    if (items != null && items.Count > 0)
+                    {
+                        TagRecommended(items);
+                        return items;
+                    }
                 }
                 catch { }
             }
@@ -66,13 +86,28 @@ namespace SetupHub180Hz.Services
                         using var reader = new StreamReader(stream);
                         var json = await reader.ReadToEndAsync();
                         var items = JsonSerializer.Deserialize<List<TweakItem>>(json, JsonOptions);
-                        if (items != null && items.Count > 0) return items;
+                        if (items != null && items.Count > 0)
+                        {
+                            TagRecommended(items);
+                            return items;
+                        }
                     }
                 }
             }
             catch { }
 
             return new List<TweakItem>();
+        }
+
+        private static void TagRecommended(List<TweakItem> items)
+        {
+            foreach (var item in items)
+            {
+                if (RecommendedIds.Contains(item.Id))
+                {
+                    item.IsRecommended = true;
+                }
+            }
         }
 
         // ───────────────────────────────────────────────
@@ -138,21 +173,18 @@ namespace SetupHub180Hz.Services
                 string value = undo ? reg.OriginalValue : reg.Value;
                 string type = reg.Type;
 
-                // Parse hive from path like "HKLM:\SOFTWARE\..."
                 (RegistryKey? hive, string subKey) = ParseHivePath(path);
                 if (hive == null) return;
 
                 if (undo && value == "<RemoveEntry>")
                 {
-                    // Delete the value
                     using var key = hive.OpenSubKey(subKey, writable: true);
                     key?.DeleteValue(name, throwOnMissingValue: false);
                     return;
                 }
 
-                if (value == "<RemoveEntry>") return; // Apply: skip removal-only entries in non-undo
+                if (value == "<RemoveEntry>") return;
 
-                // Ensure the key exists
                 using var regKey = hive.CreateSubKey(subKey, writable: true);
                 if (regKey == null) return;
 
@@ -182,15 +214,11 @@ namespace SetupHub180Hz.Services
                         break;
                 }
             }
-            catch
-            {
-                // Log silently – registry errors often need elevation
-            }
+            catch { }
         }
 
         private static (RegistryKey? hive, string subKey) ParseHivePath(string path)
         {
-            // path format: "HKLM:\SOFTWARE\..." or "HKCU:\..."
             path = path.Replace("/", "\\");
             string[] parts = path.Split(new[] { ':', '\\' }, 3);
             if (parts.Length < 2) return (null, "");
@@ -250,10 +278,7 @@ namespace SetupHub180Hz.Services
                     using var proc = System.Diagnostics.Process.Start(psi);
                     proc?.WaitForExit(30_000);
                 }
-                catch
-                {
-                    // Elevation may be rejected; swallow silently
-                }
+                catch { }
             });
         }
 

@@ -81,7 +81,8 @@ namespace SetupHub180Hz.Views
             AdvancedWarningBanner.Visibility = hasAdvanced ? Visibility.Visible : Visibility.Collapsed;
 
             int total = _allTweaks.Count;
-            TxtSubtitle.Text = $"{total} tweaks available — toggle to select, then Apply or Undo";
+            int recCount = _allTweaks.Count(t => t.IsRecommended);
+            TxtSubtitle.Text = $"{total} tweaks available • {recCount} recommended safe";
         }
 
         private void BtnSelectAll_Click(object sender, RoutedEventArgs e)
@@ -92,8 +93,79 @@ namespace SetupHub180Hz.Views
 
         private void BtnDeselectAll_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var t in GetCurrentItems())
+            foreach (var t in _allTweaks)
                 t.IsSelected = false;
+        }
+
+        private void BtnSelectRecommended_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var t in _allTweaks)
+                t.IsSelected = t.IsRecommended;
+        }
+
+        private async void BtnApplyRecommendation_Click(object sender, RoutedEventArgs e)
+        {
+            var recommended = _allTweaks.Where(t => t.IsRecommended).ToList();
+            if (recommended.Count == 0)
+            {
+                MessageBox.Show("No recommended tweaks found in configuration.",
+                    "180Hz Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            foreach (var t in _allTweaks)
+                t.IsSelected = t.IsRecommended;
+
+            var result = MessageBox.Show(
+                $"This will apply {recommended.Count} recommended optimizations for peak desktop velocity & system cleanliness:\n\n" +
+                string.Join("\n", recommended.Select(t => $"• {t.Name}")) +
+                "\n\nApply these optimizations now?",
+                "⚡ Apply Recommended Optimizations",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes) return;
+
+            await RunTweaksAsync(recommended, undo: false);
+        }
+
+        private async void BtnRestoreDefault_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show(
+                "This will revert all 67 system tweaks and restore standard Windows defaults (services, registry keys, and preferences).\n\nAre you sure you want to restore defaults?",
+                "Restore All Default Settings",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes) return;
+
+            foreach (var t in _allTweaks)
+                t.IsSelected = false;
+
+            await RunTweaksAsync(_allTweaks, undo: true);
+        }
+
+        private async void BtnApplyAll_Click(object sender, RoutedEventArgs e)
+        {
+            var advanced = _allTweaks.Where(t => t.IsAdvanced).ToList();
+            string msg = $"This will apply ALL {_allTweaks.Count} system optimizations across all categories";
+            if (advanced.Count > 0)
+            {
+                msg += $", including {advanced.Count} Advanced Tweaks marked CAUTION.\n\nMake sure to create a System Restore point.\n\nProceed with full optimization?";
+            }
+            else
+            {
+                msg += ".\n\nProceed?";
+            }
+
+            var result = MessageBox.Show(msg, "Apply All Optimizations",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result != MessageBoxResult.Yes) return;
+
+            foreach (var t in _allTweaks)
+                t.IsSelected = true;
+
+            await RunTweaksAsync(_allTweaks, undo: false);
         }
 
         private async void BtnApplySelected_Click(object sender, RoutedEventArgs e)
@@ -138,14 +210,11 @@ namespace SetupHub180Hz.Views
 
         private async Task RunTweaksAsync(List<TweakItem> tweaks, bool undo)
         {
-            BtnApplySelected.IsEnabled = false;
-            BtnUndoSelected.IsEnabled = false;
-            BtnSelectAll.IsEnabled = false;
-            BtnDeselectAll.IsEnabled = false;
+            SetButtonsEnabled(false);
 
             StatusBar.Visibility = Visibility.Visible;
             StatusLottie.Visibility = Visibility.Visible;
-            string action = undo ? "Undoing" : "Applying";
+            string action = undo ? "Restoring" : "Applying";
 
             try
             {
@@ -153,7 +222,7 @@ namespace SetupHub180Hz.Views
                 foreach (var tweak in tweaks)
                 {
                     TxtStatus.Text = $"{action} ({done + 1}/{tweaks.Count}): {tweak.Name}";
-                    await Task.Delay(30); // yield to UI
+                    await Task.Delay(30);
 
                     try
                     {
@@ -171,7 +240,7 @@ namespace SetupHub180Hz.Views
                 }
 
                 TxtStatus.Text = undo
-                    ? $"✓ Undone {done} tweak(s) successfully."
+                    ? $"✓ Restored {done} tweak(s) to Windows defaults."
                     : $"✓ Applied {done} tweak(s) successfully. Some changes require a reboot.";
 
                 StatusLottie.Visibility = Visibility.Collapsed;
@@ -187,11 +256,19 @@ namespace SetupHub180Hz.Views
             }
             finally
             {
-                BtnApplySelected.IsEnabled = true;
-                BtnUndoSelected.IsEnabled = true;
-                BtnSelectAll.IsEnabled = true;
-                BtnDeselectAll.IsEnabled = true;
+                SetButtonsEnabled(true);
             }
+        }
+
+        private void SetButtonsEnabled(bool enabled)
+        {
+            BtnApplyRecommendation.IsEnabled = enabled;
+            BtnRestoreDefault.IsEnabled = enabled;
+            BtnApplyAll.IsEnabled = enabled;
+            BtnUndoSelected.IsEnabled = enabled;
+            BtnSelectAll.IsEnabled = enabled;
+            BtnDeselectAll.IsEnabled = enabled;
+            BtnSelectRecommended.IsEnabled = enabled;
         }
 
         private IEnumerable<TweakItem> GetCurrentItems()

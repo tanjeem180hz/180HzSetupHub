@@ -250,7 +250,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            services:LottieHelper.AssetName="startup_boost.json"
+                                                            services:LottieHelper.AssetName="rocket.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavOptimizationLabel" Grid.Column="1" Text="Optimization" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>

@@ -182,6 +182,7 @@ namespace SetupHub180Hz
                 NavCleanupLabel,
                 NavActivityLabel,
                 NavStorageLabel,
+                NavOptimizationLabel,
                 NavSettingsLabel,
                 SidebarThemeLabel
             };
