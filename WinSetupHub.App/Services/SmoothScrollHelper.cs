@@ -10,9 +10,9 @@ using System.Windows.Media.Animation;
 namespace SetupHub180Hz.Services
 {
     /// <summary>
-    /// Provides 180Hz responsive, ultra-fluid physics smooth scrolling animation
-    /// across all ScrollViewers, ListBoxes, and scrollable lists throughout the entire application.
-    /// Fast, user-friendly CubicEase deceleration with momentum chaining for quick wheel flicks.
+    /// Provides Windows 11 / Edge standard smooth scroll physics and animation across
+    /// all ScrollViewers, ListBoxes, and scrollable panels throughout the entire application.
+    /// Snappy 180ms CubicEase deceleration with momentum chaining for rapid wheel flicks.
     /// </summary>
     public static class SmoothScrollHelper
     {
@@ -54,6 +54,8 @@ namespace SetupHub180Hz.Services
             public int HorizontalAnimId;
             public bool IsVerticalAnimating;
             public bool IsHorizontalAnimating;
+            public long LastVerticalTimeMs;
+            public long LastHorizontalTimeMs;
         }
 
         private static readonly ConditionalWeakTable<ScrollViewer, ScrollState> _states = new();
@@ -74,18 +76,19 @@ namespace SetupHub180Hz.Services
             }
             else if (d is FrameworkElement fe)
             {
+                bool isEnabled = (bool)e.NewValue;
                 bool TryAttach()
                 {
                     var childSv = FindChildScrollViewer(fe);
                     if (childSv != null)
                     {
-                        SetIsSmoothScrollEnabled(childSv, (bool)e.NewValue);
+                        SetIsSmoothScrollEnabled(childSv, isEnabled);
                         return true;
                     }
                     return false;
                 }
 
-                if (!TryAttach())
+                if (!TryAttach() && isEnabled)
                 {
                     EventHandler? layoutHandler = null;
                     layoutHandler = (_, _) =>
@@ -122,18 +125,68 @@ namespace SetupHub180Hz.Services
             return null;
         }
 
+        public static void ScrollToTopImmediate(ScrollViewer sv)
+        {
+            if (sv == null) return;
+            var state = _states.GetOrCreateValue(sv);
+            state.IsVerticalAnimating = false;
+            state.VerticalAnimId++;
+            sv.BeginAnimation(AnimatedVerticalOffsetProperty, null);
+            SetAnimatedVerticalOffset(sv, 0);
+            state.TargetVerticalOffset = 0;
+            sv.ScrollToVerticalOffset(0);
+            sv.ScrollToTop();
+        }
+
+        public static void ScrollToOffsetImmediate(ScrollViewer sv, double offset)
+        {
+            if (sv == null) return;
+            var state = _states.GetOrCreateValue(sv);
+            state.IsVerticalAnimating = false;
+            state.VerticalAnimId++;
+            sv.BeginAnimation(AnimatedVerticalOffsetProperty, null);
+            SetAnimatedVerticalOffset(sv, offset);
+            state.TargetVerticalOffset = offset;
+            sv.ScrollToVerticalOffset(offset);
+        }
+
         private static void Sv_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (sender is ScrollViewer sv)
             {
                 var state = _states.GetOrCreateValue(sv);
+
+                // If user is directly dragging scrollbar thumb or clicking track, cancel active animation immediately
+                if (Mouse.LeftButton == MouseButtonState.Pressed)
+                {
+                    if (state.IsVerticalAnimating)
+                    {
+                        state.IsVerticalAnimating = false;
+                        state.VerticalAnimId++;
+                        sv.BeginAnimation(AnimatedVerticalOffsetProperty, null);
+                    }
+                    if (state.IsHorizontalAnimating)
+                    {
+                        state.IsHorizontalAnimating = false;
+                        state.HorizontalAnimId++;
+                        sv.BeginAnimation(AnimatedHorizontalOffsetProperty, null);
+                    }
+                    state.TargetVerticalOffset = sv.VerticalOffset;
+                    SetAnimatedVerticalOffset(sv, sv.VerticalOffset);
+                    state.TargetHorizontalOffset = sv.HorizontalOffset;
+                    SetAnimatedHorizontalOffset(sv, sv.HorizontalOffset);
+                    return;
+                }
+
                 if (!state.IsVerticalAnimating)
                 {
                     state.TargetVerticalOffset = sv.VerticalOffset;
+                    SetAnimatedVerticalOffset(sv, sv.VerticalOffset);
                 }
                 if (!state.IsHorizontalAnimating)
                 {
                     state.TargetHorizontalOffset = sv.HorizontalOffset;
+                    SetAnimatedHorizontalOffset(sv, sv.HorizontalOffset);
                 }
             }
         }
@@ -141,34 +194,52 @@ namespace SetupHub180Hz.Services
         private static void Sv_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (sender is not ScrollViewer sv || !GetIsSmoothScrollEnabled(sv)) return;
+            HandleMouseWheel(sv, e, forceHorizontal: false);
+        }
 
-            bool isHorizontal = (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift
+        public static void HandleMouseWheel(ScrollViewer sv, MouseWheelEventArgs e, bool forceHorizontal = false)
+        {
+            if (sv == null || e == null) return;
+
+            bool isHorizontal = forceHorizontal
+                || (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift
                 || (sv.HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled && sv.ScrollableWidth > 0 && sv.ScrollableHeight <= 0.001);
 
             var state = _states.GetOrCreateValue(sv);
+            long now = _clock.ElapsedMilliseconds;
 
-            // Default natural scrolling calibrated to Windows OS WheelScrollLines
+            // Windows-standard wheel scroll travel
             double lines = SystemParameters.WheelScrollLines > 0 ? SystemParameters.WheelScrollLines : 3;
-            double defaultTravel = lines * 28.0; // Standard ~84px travel per notch
+            double travelPerNotch = lines * 40.0; // ~120px travel per notch (Windows 11 / Edge standard)
 
             if (isHorizontal)
             {
                 if (sv.ScrollableWidth <= 0) return;
 
-                double current = state.IsHorizontalAnimating ? state.TargetHorizontalOffset : sv.HorizontalOffset;
-                double delta = (e.Delta / 120.0) * defaultTravel;
-                double target = Math.Clamp(current - delta, 0, sv.ScrollableWidth);
-                state.TargetHorizontalOffset = target;
+                // Momentum chaining for quick flicks
+                double speedMultiplier = 1.0;
+                long elapsed = now - state.LastHorizontalTimeMs;
+                if (elapsed < 140 && elapsed > 0)
+                {
+                    speedMultiplier = Math.Min(1.8, 1.0 + (140 - elapsed) / 140.0 * 0.8);
+                }
+                state.LastHorizontalTimeMs = now;
 
+                double currentTarget = state.IsHorizontalAnimating ? state.TargetHorizontalOffset : sv.HorizontalOffset;
+                double delta = (e.Delta / 120.0) * travelPerNotch * speedMultiplier;
+                double target = Math.Clamp(currentTarget - delta, 0, sv.ScrollableWidth);
+
+                if (Math.Abs(target - sv.HorizontalOffset) < 0.1 && Math.Abs(target - currentTarget) < 0.1) return;
+
+                state.TargetHorizontalOffset = target;
                 int animId = ++state.HorizontalAnimId;
                 state.IsHorizontalAnimating = true;
 
                 var anim = new DoubleAnimation
                 {
-                    From = sv.HorizontalOffset,
                     To = target,
-                    Duration = TimeSpan.FromMilliseconds(100),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    Duration = TimeSpan.FromMilliseconds(180),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                 };
 
                 anim.Completed += (_, _) =>
@@ -176,63 +247,43 @@ namespace SetupHub180Hz.Services
                     if (state.HorizontalAnimId == animId)
                     {
                         state.IsHorizontalAnimating = false;
+                        sv.BeginAnimation(AnimatedHorizontalOffsetProperty, null);
+                        SetAnimatedHorizontalOffset(sv, target);
+                        sv.ScrollToHorizontalOffset(target);
                     }
                 };
 
-                sv.BeginAnimation(AnimatedHorizontalOffsetProperty, anim);
+                sv.BeginAnimation(AnimatedHorizontalOffsetProperty, anim, HandoffBehavior.SnapshotAndReplace);
                 e.Handled = true;
             }
             else
             {
                 if (sv.ScrollableHeight <= 0) return;
 
-                double current = state.IsVerticalAnimating ? state.TargetVerticalOffset : sv.VerticalOffset;
-
-                // Support both pixel scrolling and item-based virtualized lists
-                if (sv.CanContentScroll && VirtualizingPanel.GetScrollUnit(sv) == ScrollUnit.Item)
+                // Momentum chaining for quick flicks
+                double speedMultiplier = 1.0;
+                long elapsed = now - state.LastVerticalTimeMs;
+                if (elapsed < 140 && elapsed > 0)
                 {
-                    double itemStep = (e.Delta > 0 ? -1.0 : 1.0) * lines;
-                    double targetItem = Math.Clamp(current + itemStep, 0, sv.ScrollableHeight);
-                    state.TargetVerticalOffset = targetItem;
-
-                    int animIdItem = ++state.VerticalAnimId;
-                    state.IsVerticalAnimating = true;
-
-                    var animItem = new DoubleAnimation
-                    {
-                        From = sv.VerticalOffset,
-                        To = targetItem,
-                        Duration = TimeSpan.FromMilliseconds(100),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-
-                    animItem.Completed += (_, _) =>
-                    {
-                        if (state.VerticalAnimId == animIdItem)
-                        {
-                            state.IsVerticalAnimating = false;
-                        }
-                    };
-
-                    sv.BeginAnimation(AnimatedVerticalOffsetProperty, animItem);
-                    e.Handled = true;
-                    return;
+                    speedMultiplier = Math.Min(1.8, 1.0 + (140 - elapsed) / 140.0 * 0.8);
                 }
+                state.LastVerticalTimeMs = now;
 
-                // Default natural travel distance per notch with clean ease
-                double delta = (e.Delta / 120.0) * defaultTravel;
-                double target = Math.Clamp(current - delta, 0, sv.ScrollableHeight);
+                double currentTarget = state.IsVerticalAnimating ? state.TargetVerticalOffset : sv.VerticalOffset;
+                double delta = (e.Delta / 120.0) * travelPerNotch * speedMultiplier;
+                double target = Math.Clamp(currentTarget - delta, 0, sv.ScrollableHeight);
+
+                if (Math.Abs(target - sv.VerticalOffset) < 0.1 && Math.Abs(target - currentTarget) < 0.1) return;
+
                 state.TargetVerticalOffset = target;
-
                 int animId = ++state.VerticalAnimId;
                 state.IsVerticalAnimating = true;
 
                 var anim = new DoubleAnimation
                 {
-                    From = sv.VerticalOffset,
                     To = target,
-                    Duration = TimeSpan.FromMilliseconds(100),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    Duration = TimeSpan.FromMilliseconds(180),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                 };
 
                 anim.Completed += (_, _) =>
@@ -240,10 +291,13 @@ namespace SetupHub180Hz.Services
                     if (state.VerticalAnimId == animId)
                     {
                         state.IsVerticalAnimating = false;
+                        sv.BeginAnimation(AnimatedVerticalOffsetProperty, null);
+                        SetAnimatedVerticalOffset(sv, target);
+                        sv.ScrollToVerticalOffset(target);
                     }
                 };
 
-                sv.BeginAnimation(AnimatedVerticalOffsetProperty, anim);
+                sv.BeginAnimation(AnimatedVerticalOffsetProperty, anim, HandoffBehavior.SnapshotAndReplace);
                 e.Handled = true;
             }
         }

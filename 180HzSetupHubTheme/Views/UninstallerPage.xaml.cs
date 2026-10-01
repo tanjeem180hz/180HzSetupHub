@@ -144,10 +144,10 @@ namespace SetupHub180Hz.Views
         private void ClearFilter_Click(object sender, RoutedEventArgs e)
         {
             FilterBox.Text = string.Empty;
-            ApplyFilter();
+            ApplyFilter(resetScroll: true);
         }
 
-        private void ApplyFilter()
+        private void ApplyFilter(bool resetScroll = false)
         {
             var query = FilterBox.Text.Trim();
             var filtered = string.IsNullOrWhiteSpace(query)
@@ -174,6 +174,23 @@ namespace SetupHub180Hz.Views
             }
 
             AppsListBox.ItemsSource = filtered;
+
+            if (resetScroll)
+            {
+                try
+                {
+                    var sv = SmoothScrollHelper.FindChildScrollViewer(AppsListBox);
+                    if (sv != null)
+                    {
+                        SmoothScrollHelper.ScrollToTopImmediate(sv);
+                    }
+                    else if (AppsListBox.Items.Count > 0)
+                    {
+                        AppsListBox.ScrollIntoView(AppsListBox.Items[0]);
+                    }
+                }
+                catch { }
+            }
         }
 
         private void UninstallButton_Click(object sender, RoutedEventArgs e)

@@ -41,7 +41,7 @@ namespace SetupHub180Hz.Views
             _searchDebounceTimer.Tick += (_, _) =>
             {
                 _searchDebounceTimer.Stop();
-                ApplyFilter();
+                ApplyFilter(resetScroll: true);
             };
 
             DownloadManagerService.Instance.ProgressChanged += OnDownloadProgressChanged;
@@ -270,14 +270,24 @@ namespace SetupHub180Hz.Views
                 chip.Checked += (_, _) =>
                 {
                     _activeCategory = key;
-                    ApplyFilter();
+                    ApplyFilter(resetScroll: true);
+                };
+
+                chip.Click += (_, _) =>
+                {
+                    _activeCategory = key;
+                    if (!string.IsNullOrEmpty(SearchBox.Text))
+                    {
+                        SearchBox.Text = string.Empty;
+                    }
+                    ApplyFilter(resetScroll: true);
                 };
 
                 CategoryChipsPanel.Children.Add(chip);
             }
         }
 
-        private void ApplyFilter()
+        private void ApplyFilter(bool resetScroll = false)
         {
             var query = SearchBox.Text.Trim();
             var filtered = _allPackages.AsEnumerable();
@@ -316,6 +326,45 @@ namespace SetupHub180Hz.Views
             }
 
             AppsListBox.ItemsSource = results;
+
+            if (resetScroll)
+            {
+                ResetAppsListScrollToTop();
+            }
+        }
+
+        private void ResetAppsListScrollToTop()
+        {
+            try
+            {
+                var sv = SmoothScrollHelper.FindChildScrollViewer(AppsListBox);
+                if (sv != null)
+                {
+                    SmoothScrollHelper.ScrollToTopImmediate(sv);
+                }
+                else if (AppsListBox.Items.Count > 0)
+                {
+                    AppsListBox.ScrollIntoView(AppsListBox.Items[0]);
+                }
+
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    try
+                    {
+                        var s = SmoothScrollHelper.FindChildScrollViewer(AppsListBox);
+                        if (s != null)
+                        {
+                            SmoothScrollHelper.ScrollToTopImmediate(s);
+                        }
+                        else if (AppsListBox.Items.Count > 0)
+                        {
+                            AppsListBox.ScrollIntoView(AppsListBox.Items[0]);
+                        }
+                    }
+                    catch { }
+                }), System.Windows.Threading.DispatcherPriority.Loaded);
+            }
+            catch { }
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -663,6 +712,7 @@ namespace SetupHub180Hz.Views
             CatalogCountText.Text = $"1 Online Package Ready for '{app.Name}'";
             StatusText.Visibility = Visibility.Collapsed;
             AppsListBox.ItemsSource = list;
+            ResetAppsListScrollToTop();
 
             // Load icon
             if (app.IconImageSource == null && (!string.IsNullOrWhiteSpace(app.IconUrl) || !string.IsNullOrWhiteSpace(app.LocalIconPath)))
@@ -690,7 +740,7 @@ namespace SetupHub180Hz.Views
             SearchGhostText.Text = "";
             TabHintBadge.Visibility = Visibility.Collapsed;
             SearchSuggestionsPopup.IsOpen = false;
-            ApplyFilter();
+            ApplyFilter(resetScroll: true);
         }
 
         private void SearchBox_KeyDown(object sender, KeyEventArgs e)
@@ -701,7 +751,7 @@ namespace SetupHub180Hz.Views
                 SearchGhostText.Text = "";
                 TabHintBadge.Visibility = Visibility.Collapsed;
                 _searchDebounceTimer.Stop();
-                ApplyFilter();
+                ApplyFilter(resetScroll: true);
 
                 // If no local packages found for the typed query, automatically run Deep Web Search!
                 var currentItems = AppsListBox.ItemsSource as IEnumerable<AppItem>;
@@ -1234,18 +1284,18 @@ namespace SetupHub180Hz.Views
 
         private void CategoryScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (sender is ScrollViewer sv)
+            if (sender is ScrollViewer sv && sv.ScrollableWidth > 0)
             {
-                sv.ScrollToHorizontalOffset(sv.HorizontalOffset - e.Delta);
+                SmoothScrollHelper.HandleMouseWheel(sv, e, forceHorizontal: true);
                 e.Handled = true;
             }
         }
 
         private void BundlesScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (sender is ScrollViewer sv)
+            if (sender is ScrollViewer sv && sv.ScrollableWidth > 0)
             {
-                sv.ScrollToHorizontalOffset(sv.HorizontalOffset - e.Delta);
+                SmoothScrollHelper.HandleMouseWheel(sv, e, forceHorizontal: true);
                 e.Handled = true;
             }
         }

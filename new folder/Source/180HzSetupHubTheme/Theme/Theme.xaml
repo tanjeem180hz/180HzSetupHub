@@ -849,11 +849,28 @@
         </Style.Triggers>
     </Style>
 
-    <!-- CleanScrollViewer with modern slim styling and native default scrolling -->
+    <!-- CleanScrollViewer with modern slim styling and Windows-standard smooth animated scrolling -->
     <Style x:Key="CleanScrollViewer" TargetType="ScrollViewer">
         <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
         <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="Padding" Value="0,0,4,0"/>
+        <Setter Property="services:SmoothScrollHelper.IsSmoothScrollEnabled" Value="True"/>
+    </Style>
+
+    <Style TargetType="{x:Type ScrollViewer}">
+        <Setter Property="services:SmoothScrollHelper.IsSmoothScrollEnabled" Value="True"/>
+    </Style>
+
+    <Style TargetType="{x:Type ListBox}">
+        <Setter Property="services:SmoothScrollHelper.IsSmoothScrollEnabled" Value="True"/>
+    </Style>
+
+    <Style TargetType="{x:Type ListView}">
+        <Setter Property="services:SmoothScrollHelper.IsSmoothScrollEnabled" Value="True"/>
+    </Style>
+
+    <Style TargetType="{x:Type DataGrid}">
+        <Setter Property="services:SmoothScrollHelper.IsSmoothScrollEnabled" Value="True"/>
     </Style>
 
     <!-- ============ PAGE ENTER TRANSITION (motion design: smooth organic glide + bloom) ============ -->
