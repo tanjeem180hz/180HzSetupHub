@@ -140,7 +140,7 @@ namespace SetupHub180Hz.Services
 
         private static void Sv_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (sender is not ScrollViewer sv) return;
+            if (sender is not ScrollViewer sv || !GetIsSmoothScrollEnabled(sv)) return;
 
             bool isHorizontal = (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift
                 || (sv.HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled && sv.ScrollableWidth > 0 && sv.ScrollableHeight <= 0.001);
