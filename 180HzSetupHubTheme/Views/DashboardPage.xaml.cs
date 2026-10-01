@@ -59,16 +59,16 @@ namespace SetupHub180Hz.Views
                 if (width < 800)
                 {
                     ModulesGrid.Columns = 1;
-                    ModulesGrid.Rows = 6;
+                    ModulesGrid.Rows = 8;
                 }
-                else if (width < 1120)
+                else if (width < 1200)
                 {
                     ModulesGrid.Columns = 2;
-                    ModulesGrid.Rows = 3;
+                    ModulesGrid.Rows = 4;
                 }
                 else
                 {
-                    ModulesGrid.Columns = 3;
+                    ModulesGrid.Columns = 4;
                     ModulesGrid.Rows = 2;
                 }
             }
@@ -150,8 +150,10 @@ namespace SetupHub180Hz.Views
         }
 
         private void TileSetupApps_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("SetupApps");
+        private void TileDownloads_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Downloads");
         private void TileUpdateCenter_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("UpdateCenter");
         private void TileUninstaller_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Uninstaller");
+        private void TileStartup_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Startup");
         private void TileCleanup_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Cleanup");
         private void TileActivity_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Activity");
         private void TileStorage_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Storage");

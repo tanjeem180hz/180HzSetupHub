@@ -56,14 +56,19 @@ namespace SetupHub180Hz.Views
 
             if (ModulesGrid != null)
             {
-                if (width < 960)
+                if (width < 800)
+                {
+                    ModulesGrid.Columns = 1;
+                    ModulesGrid.Rows = 8;
+                }
+                else if (width < 1200)
                 {
                     ModulesGrid.Columns = 2;
-                    ModulesGrid.Rows = 3;
+                    ModulesGrid.Rows = 4;
                 }
                 else
                 {
-                    ModulesGrid.Columns = 3;
+                    ModulesGrid.Columns = 4;
                     ModulesGrid.Rows = 2;
                 }
             }
@@ -107,11 +112,32 @@ namespace SetupHub180Hz.Views
             if (!await _winget.IsAvailableAsync())
             {
                 UpdateSummaryText.Text = "winget not found on this system.";
-                EngineStatusText.Text = "WINGET MISSING";
+                if (BtnEngineStatus != null)
+                {
+                    BtnEngineStatus.Tag = "WINGET MISSING";
+                    BtnEngineStatus.ToolTip = "Winget core engine not detected on system (Click to re-check)";
+                }
+                if (EngineStatusDot != null)
+                {
+                    EngineStatusDot.Fill = (System.Windows.Media.Brush)FindResource("BrushError");
+                }
                 return;
             }
 
-            EngineStatusText.Text = "ENGINE READY";
+            if (BtnEngineStatus != null)
+            {
+                BtnEngineStatus.Tag = "ENGINE READY";
+                BtnEngineStatus.ToolTip = "Winget Core Engine Active (180Hz Ready)";
+            }
+            if (EngineStatusDot != null)
+            {
+                EngineStatusDot.Fill = (System.Windows.Media.Brush)FindResource("BrushSuccess");
+            }
+        }
+
+        private async void EngineStatus_Click(object sender, RoutedEventArgs e)
+        {
+            await CheckEngineAsync();
         }
 
         private async void RefreshSummary_Click(object sender, RoutedEventArgs e)
@@ -124,8 +150,10 @@ namespace SetupHub180Hz.Views
         }
 
         private void TileSetupApps_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("SetupApps");
+        private void TileDownloads_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Downloads");
         private void TileUpdateCenter_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("UpdateCenter");
         private void TileUninstaller_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Uninstaller");
+        private void TileStartup_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Startup");
         private void TileCleanup_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Cleanup");
         private void TileActivity_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Activity");
         private void TileStorage_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Storage");
