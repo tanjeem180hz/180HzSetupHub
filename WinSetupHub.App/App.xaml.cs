@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Threading;
 using SetupHub180Hz.Models;
 using SetupHub180Hz.Services;
+using SetupHub180Hz.Views;
 
 namespace SetupHub180Hz
 {
@@ -52,7 +53,7 @@ namespace SetupHub180Hz
             catch (Exception ex)
             {
                 ActivityLogger.Instance.Log($"Startup error: {ex}", ActivityType.Error);
-                MessageBox.Show(
+                ThemedMessageBox.Show(
                     $"180Hz Setup Hub encountered a startup error:\n\n{ex.Message}\n\n{ex.InnerException?.Message}",
                     "180Hz Setup Hub - Startup Error",
                     MessageBoxButton.OK,
@@ -180,7 +181,7 @@ namespace SetupHub180Hz
             ActivityLogger.Instance.Log($"Unexpected error: {e.Exception.Message}", ActivityType.Error);
             if (MainWindow == null || Windows.Count == 0)
             {
-                MessageBox.Show(
+                ThemedMessageBox.Show(
                     $"Fatal UI error during startup:\n\n{e.Exception.Message}\n\n{e.Exception.InnerException?.Message}",
                     "180Hz Setup Hub",
                     MessageBoxButton.OK,

@@ -778,7 +778,7 @@ namespace SetupHub180Hz.Views
             var query = SearchBox.Text.Trim();
             if (string.IsNullOrWhiteSpace(query))
             {
-                MessageBox.Show("Please enter a software name in the search box to search Winget's online repository.",
+                ThemedMessageBox.Show("Please enter a software name in the search box to search Winget's online repository.",
                     "Search Query Required", MessageBoxButton.OK, MessageBoxImage.Information);
                 SearchBox.Focus();
                 return;
@@ -952,7 +952,7 @@ namespace SetupHub180Hz.Views
             var selected = _allPackages.Where(p => p.IsSelected).ToList();
             if (selected.Count == 0)
             {
-                MessageBox.Show("Please select at least one app to install.", "No Apps Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                ThemedMessageBox.Show("Please select at least one app to install.", "No Apps Selected", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
@@ -1366,7 +1366,7 @@ namespace SetupHub180Hz.Views
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Could not open website: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ThemedMessageBox.Show($"Could not open website: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
         }
@@ -1429,11 +1429,11 @@ namespace SetupHub180Hz.Views
                     var importedApps = await exporter.ImportAsync(dlg.FileName);
                     if (importedApps.Count == 0)
                     {
-                        MessageBox.Show("No valid applications found in JSON file.", "Import Applications", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ThemedMessageBox.Show("No valid applications found in JSON file.", "Import Applications", MessageBoxButton.OK, MessageBoxImage.Information);
                         return;
                     }
 
-                    var confirm = MessageBox.Show($"Found {importedApps.Count} applications in list.\n\nDo you want to sequentially install missing packages now?", "Confirm Import & Install", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    var confirm = ThemedMessageBox.Show($"Found {importedApps.Count} applications in list.\n\nDo you want to sequentially install missing packages now?", "Confirm Import & Install", MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (confirm != MessageBoxResult.Yes) return;
 
                     StatusText.Text = $"Installing imported packages (0/{importedApps.Count})…";
@@ -1464,12 +1464,12 @@ namespace SetupHub180Hz.Views
                     StatusText.Visibility = Visibility.Collapsed;
                     ActivityLogger.Instance.Log($"Import installation finished: {ok}/{total} succeeded.", ActivityType.Success);
                     NotificationService.Notify("Import & Install Complete", $"{ok}/{total} packages installed successfully.");
-                    MessageBox.Show($"Import & Install completed!\n{ok} of {total} packages succeeded.", "Import Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ThemedMessageBox.Show($"Import & Install completed!\n{ok} of {total} packages succeeded.", "Import Complete", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
                     ActivityLogger.Instance.Log($"Import error: {ex.Message}", ActivityType.Error);
-                    MessageBox.Show($"Failed to import file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ThemedMessageBox.Show($"Failed to import file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -1698,7 +1698,7 @@ namespace SetupHub180Hz.Views
                 app.IsInstalled = false;
                 app.Status = "Install";
 
-                var result = MessageBox.Show(
+                var result = ThemedMessageBox.Show(
                     $"Could not find the executable for {app.Name} on this PC.\nIt may have been uninstalled or moved.\n\nWould you like to install {app.Name} now?",
                     $"{app.Name} Not Found",
                     MessageBoxButton.YesNo,

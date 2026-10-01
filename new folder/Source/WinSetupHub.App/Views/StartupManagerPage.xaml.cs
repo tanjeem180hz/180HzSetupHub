@@ -224,7 +224,7 @@ namespace SetupHub180Hz.Views
                     item.IsEnabled = !newEnabled;
                     toggle.IsChecked = !newEnabled;
 
-                    MessageBox.Show(ex.Message, "Permission Required", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ThemedMessageBox.Show(ex.Message, "Permission Required", MessageBoxButton.OK, MessageBoxImage.Warning);
                     ActivityLogger.Instance.Log($"Permission denied modifying {item.Name} startup entry.", ActivityType.Warning);
                 }
                 catch (Exception ex)
@@ -232,7 +232,7 @@ namespace SetupHub180Hz.Views
                     item.IsEnabled = !newEnabled;
                     toggle.IsChecked = !newEnabled;
 
-                    MessageBox.Show($"Could not update startup item: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ThemedMessageBox.Show($"Could not update startup item: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     ActivityLogger.Instance.Log($"Failed to toggle {item.Name}: {ex.Message}", ActivityType.Error);
                 }
             }

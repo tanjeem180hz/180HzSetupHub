@@ -22,7 +22,7 @@ namespace SetupHub180Hz.Views
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Could not open browser: {ex.Message}", "Browser Error",
+                    ThemedMessageBox.Show($"Could not open browser: {ex.Message}", "Browser Error",
                         MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             };

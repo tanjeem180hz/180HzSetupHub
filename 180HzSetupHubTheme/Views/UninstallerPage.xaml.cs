@@ -121,12 +121,12 @@ namespace SetupHub180Hz.Views
                     await exporter.ExportAsync(dlg.FileName, _allApps);
                     ActivityLogger.Instance.Log($"Exported {_allApps.Count} applications to {dlg.FileName}", ActivityType.Success);
                     NotificationService.Notify("Export Complete", $"Exported {_allApps.Count} installed apps to JSON.");
-                    MessageBox.Show($"Successfully exported {_allApps.Count} applications to:\n{dlg.FileName}", "Export Successful", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ThemedMessageBox.Show($"Successfully exported {_allApps.Count} applications to:\n{dlg.FileName}", "Export Successful", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
                     ActivityLogger.Instance.Log($"Export failed: {ex.Message}", ActivityType.Error);
-                    MessageBox.Show($"Export failed: {ex.Message}", "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ThemedMessageBox.Show($"Export failed: {ex.Message}", "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

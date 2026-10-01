@@ -159,7 +159,7 @@ namespace SetupHub180Hz.Views
 
             if (recommended.Count == 0)
             {
-                MessageBox.Show("No recommended tweaks found for the current selection.",
+                ThemedMessageBox.Show("No recommended tweaks found for the current selection.",
                     "180Hz Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
@@ -263,7 +263,7 @@ namespace SetupHub180Hz.Views
             var selected = _allTweaks.Where(t => t.IsSelected).ToList();
             if (selected.Count == 0)
             {
-                MessageBox.Show("No tweaks selected. Toggle the tweaks you want to apply first.",
+                ThemedMessageBox.Show("No tweaks selected. Toggle the tweaks you want to apply first.",
                     "180Hz Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
@@ -291,7 +291,7 @@ namespace SetupHub180Hz.Views
             var selected = _allTweaks.Where(t => t.IsSelected).ToList();
             if (selected.Count == 0)
             {
-                MessageBox.Show("No tweaks selected to undo.",
+                ThemedMessageBox.Show("No tweaks selected to undo.",
                     "180Hz Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
@@ -317,7 +317,7 @@ namespace SetupHub180Hz.Views
         {
             if (tweaks.Any(t => t.RequiresReboot))
             {
-                var r = MessageBox.Show(
+                var r = ThemedMessageBox.Show(
                     "Some tweaks require a system restart to take full effect.\n\nRestart now?",
                     "Restart Required", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (r == MessageBoxResult.Yes)
