@@ -533,7 +533,7 @@
                     ToolTip="Import software list from JSON and sequentially install missing apps"
                     Click="ImportInstall_Click">
                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
-                                            services:LottieHelper.AssetName="download.json"/>
+                                            services:LottieHelper.AssetName="download_flow.json"/>
             </Button>
 
             <!-- Refresh Catalog & Status Action -->

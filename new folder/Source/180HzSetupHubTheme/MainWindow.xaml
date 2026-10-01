@@ -147,7 +147,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            services:LottieHelper.AssetName="download.json"
+                                                            services:LottieHelper.AssetName="download_flow.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavDownloadsLabel" Grid.Column="1" Text="Downloads" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                                 <Border x:Name="DownloadsNavBadge" Grid.Column="2" Background="{DynamicResource BrushAccent}"
@@ -247,7 +247,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
-                                                            services:LottieHelper.AssetName="gears.json"
+                                                            services:LottieHelper.AssetName="settings_dial.json"
                                                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="NavSettingsLabel" Grid.Column="1" Text="Settings" VerticalAlignment="Center" FontWeight="SemiBold" Opacity="0"/>
                             </Grid>

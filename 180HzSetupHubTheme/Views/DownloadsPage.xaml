@@ -22,7 +22,9 @@
 
                     <StackPanel VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="DOWNLOADS &amp; BANDWIDTH" Style="{StaticResource TextHeader}" FontSize="22" FontWeight="Bold"/>
+                            <lottie:LottieAnimationView Width="24" Height="24" AutoPlay="True" RepeatCount="-1"
+                                                        services:LottieHelper.AssetName="download_flow.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="DOWNLOADS &amp; BANDWIDTH" Style="{StaticResource TextHeader}" FontSize="22" FontWeight="Bold" VerticalAlignment="Center"/>
                             <!-- Live Status Indicator Pill -->
                             <Border x:Name="LiveStatusBadge" Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="14,0,0,0" VerticalAlignment="Center">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -90,7 +92,7 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
-                                                            services:LottieHelper.AssetName="download.json" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                                            services:LottieHelper.AssetName="download_flow.json" Margin="0,0,6,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="SESSION TRANSFERRED" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
                             </StackPanel>
                             <TextBlock x:Name="MetricTotalDownloaded" Text="0.0 MB" FontSize="22" FontWeight="Bold"
@@ -233,7 +235,7 @@
                                         BorderThickness="1" Margin="0,0,14,0" ClipToBounds="True">
                                     <Grid>
                                         <lottie:LottieAnimationView Width="32" Height="32" AutoPlay="True" RepeatCount="-1"
-                                                                    services:LottieHelper.AssetName="download.json"
+                                                                    services:LottieHelper.AssetName="download_flow.json"
                                                                     HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.85"/>
                                         <Image x:Name="ActiveAppIcon" Width="36" Height="36" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
                                     </Grid>

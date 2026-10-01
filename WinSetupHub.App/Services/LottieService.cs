@@ -28,10 +28,10 @@ namespace SetupHub180Hz.Services
                     {
                         var fileName = r.Substring(r.IndexOf("Assets.Lottie.", StringComparison.OrdinalIgnoreCase) + "Assets.Lottie.".Length);
                         var target = Path.Combine(LottieFolder, fileName);
-                        if (!File.Exists(target) || new FileInfo(target).Length == 0)
+                        using var src = asm.GetManifestResourceStream(r);
+                        if (src != null)
                         {
-                            using var src = asm.GetManifestResourceStream(r);
-                            if (src != null)
+                            if (!File.Exists(target) || new FileInfo(target).Length != src.Length)
                             {
                                 using var dst = File.Create(target);
                                 src.CopyTo(dst);
