@@ -35,7 +35,11 @@ namespace SetupHub180Hz.Services
             _isStarted = true;
 
             var hours = SettingsService.Instance.Current.UpdateCheckFrequencyHours;
-            if (hours <= 0) hours = 6;
+            if (hours <= 0)
+            {
+                ActivityLogger.Instance.Log("Background update monitor disabled by settings (Never).", ActivityType.Info);
+                return;
+            }
 
             var intervalMs = (long)TimeSpan.FromHours(hours).TotalMilliseconds;
 
@@ -60,7 +64,11 @@ namespace SetupHub180Hz.Services
             if (_timer == null) return;
 
             var hours = SettingsService.Instance.Current.UpdateCheckFrequencyHours;
-            if (hours <= 0) hours = 6;
+            if (hours <= 0)
+            {
+                ActivityLogger.Instance.Log("Background update monitor disabled by settings (Never).", ActivityType.Info);
+                return;
+            }
 
             var interval = TimeSpan.FromHours(hours);
             _timer.Change(interval, interval);

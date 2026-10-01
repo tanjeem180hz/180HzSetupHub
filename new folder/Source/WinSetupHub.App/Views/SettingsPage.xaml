@@ -5,24 +5,147 @@
              xmlns:services="clr-namespace:SetupHub180Hz.Services">
 
     <UserControl.Resources>
-        <Style x:Key="SettingCheckBox" TargetType="CheckBox">
-            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+        <!-- ToggleButton Template for ComboBox Chrome -->
+        <ControlTemplate x:Key="ComboBoxToggleButtonTemplate" TargetType="{x:Type ToggleButton}">
+            <Border x:Name="Border"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="32"/>
+                    </Grid.ColumnDefinitions>
+                    <Path x:Name="Arrow"
+                          Grid.Column="1"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Data="M 0 0 L 4 4 L 8 0"
+                          Stroke="{DynamicResource BrushTextSecondary}"
+                          StrokeThickness="1.8"/>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                    <Setter TargetName="Arrow" Property="Stroke" Value="{DynamicResource BrushAccent}"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                    <Setter TargetName="Arrow" Property="Stroke" Value="{DynamicResource BrushAccent}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- ComboBoxItem Style (Cyber Dark Hover & Selection) -->
+        <Style x:Key="SettingComboBoxItem" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
             <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
             <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border x:Name="ItemBorder"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                CornerRadius="4"
+                                Margin="2,1"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
-        <Style x:Key="SettingComboBox" TargetType="ComboBox">
-            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
-            <Setter Property="Background" Value="{StaticResource BrushSurface}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+        <!-- Full Cyber-Styled ComboBox -->
+        <Style x:Key="SettingComboBox" TargetType="{x:Type ComboBox}">
+            <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+            <Setter Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
             <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="Height" Value="34"/>
+            <Setter Property="Height" Value="36"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource SettingComboBoxItem}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton"
+                                          Template="{StaticResource ComboBoxToggleButtonTemplate}"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          Focusable="False"
+                                          IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          ClickMode="Press"/>
+
+                            <ContentPresenter x:Name="ContentSite"
+                                              IsHitTestVisible="False"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                              Margin="12,0,32,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left"/>
+
+                            <Popup x:Name="Popup"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Fade"
+                                   VerticalOffset="4">
+                                <Grid x:Name="DropDown"
+                                      SnapsToDevicePixels="True"
+                                      MinWidth="{TemplateBinding ActualWidth}"
+                                      MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder"
+                                            Background="{DynamicResource BrushSurface}"
+                                            BorderBrush="{DynamicResource BrushBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="4">
+                                        <Border.Effect>
+                                            <DropShadowEffect Color="#000000" BlurRadius="20" ShadowDepth="6" Opacity="0.75"/>
+                                        </Border.Effect>
+                                        <ScrollViewer SnapsToDevicePixels="True">
+                                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="False">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="50"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ToggleButton" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
 
@@ -55,7 +178,7 @@
                                    Style="{StaticResource TextBody}" Margin="0,0,0,14"/>
 
                         <CheckBox x:Name="ChkAutoStart"
-                                  Style="{StaticResource SettingCheckBox}"
+                                  Style="{StaticResource AppCheckBox}"
                                   Content="Launch 180Hz Setup Hub when Windows starts"
                                   Checked="ChkAutoStart_Changed"
                                   Unchecked="ChkAutoStart_Changed"/>
@@ -70,20 +193,21 @@
                                    Style="{StaticResource TextBody}" Margin="0,0,0,14"/>
 
                         <CheckBox x:Name="ChkNotifications"
-                                  Style="{StaticResource SettingCheckBox}"
+                                  Style="{StaticResource AppCheckBox}"
                                   Content="Show Windows toast notifications for completed actions"
                                   Margin="0,0,0,16"
                                   Checked="ChkNotifications_Changed"
                                   Unchecked="ChkNotifications_Changed"/>
 
                         <TextBlock Text="Automated Update Check Frequency" Style="{StaticResource TextBody}"
-                                   FontWeight="SemiBold" Foreground="{StaticResource BrushTextPrimary}" Margin="0,0,0,6"/>
+                                   FontWeight="SemiBold" Foreground="{DynamicResource BrushTextPrimary}" Margin="0,0,0,8"/>
 
                         <ComboBox x:Name="CmbUpdateFrequency"
                                   Style="{StaticResource SettingComboBox}"
-                                  Width="220"
+                                  Width="240"
                                   HorizontalAlignment="Left"
                                   SelectionChanged="CmbUpdateFrequency_SelectionChanged">
+                            <ComboBoxItem Content="Never" Tag="0"/>
                             <ComboBoxItem Content="Every 6 hours" Tag="6"/>
                             <ComboBoxItem Content="Every 12 hours" Tag="12"/>
                             <ComboBoxItem Content="Daily" Tag="24"/>
@@ -100,7 +224,7 @@
                                    Style="{StaticResource TextBody}" Margin="0,0,0,14"/>
 
                         <CheckBox x:Name="ChkRequireAdmin"
-                                  Style="{StaticResource SettingCheckBox}"
+                                  Style="{StaticResource AppCheckBox}"
                                   Content="Require Administrator privileges for cleanup and uninstallation (re-elevates if needed)"
                                   Checked="ChkRequireAdmin_Changed"
                                   Unchecked="ChkRequireAdmin_Changed"/>

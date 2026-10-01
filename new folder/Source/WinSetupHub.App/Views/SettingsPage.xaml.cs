@@ -30,19 +30,28 @@ namespace SetupHub180Hz.Views
             ChkNotifications.IsChecked = settings.ShowNotifications;
             ChkRequireAdmin.IsChecked = settings.RequireAdminForActions;
 
-            // Select ComboBoxItem matching frequency
+            // Select ComboBoxItem matching frequency (including 0 for Never)
+            bool matched = false;
             foreach (ComboBoxItem item in CmbUpdateFrequency.Items)
             {
                 if (item.Tag is string tag && int.TryParse(tag, out var hours) && hours == settings.UpdateCheckFrequencyHours)
                 {
                     CmbUpdateFrequency.SelectedItem = item;
+                    matched = true;
                     break;
                 }
             }
 
-            if (CmbUpdateFrequency.SelectedItem == null && CmbUpdateFrequency.Items.Count > 2)
+            if (!matched)
             {
-                CmbUpdateFrequency.SelectedIndex = 2; // Daily (24h)
+                if (settings.UpdateCheckFrequencyHours == 0)
+                {
+                    CmbUpdateFrequency.SelectedIndex = 0; // Never
+                }
+                else
+                {
+                    CmbUpdateFrequency.SelectedIndex = 1; // Default: Every 6 hours
+                }
             }
 
             _isInitializing = false;
@@ -108,7 +117,14 @@ namespace SetupHub180Hz.Views
                 SettingsService.Instance.Current.UpdateCheckFrequencyHours = hours;
                 SettingsService.Instance.Save();
 
-                ActivityLogger.Instance.Log($"Set automated update frequency to {hours} hours.", ActivityType.Info);
+                if (hours == 0)
+                {
+                    ActivityLogger.Instance.Log("Automated update checks disabled (Never).", ActivityType.Info);
+                }
+                else
+                {
+                    ActivityLogger.Instance.Log($"Set automated update frequency to {hours} hours.", ActivityType.Info);
+                }
 
                 // Sync background update monitor and task scheduler
                 try
