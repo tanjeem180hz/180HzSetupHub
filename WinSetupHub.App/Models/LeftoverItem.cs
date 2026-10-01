@@ -11,7 +11,12 @@ namespace SetupHub180Hz.Models
         File
     }
 
-    public record LeftoverItem(LeftoverType Type, string Path, long? SizeBytes, string MatchedOn);
+    public record LeftoverItem(
+        LeftoverType Type,
+        string Path,
+        long? SizeBytes,
+        string MatchedOn,
+        bool IsHighConfidence = true);
 
     public class LeftoverViewModel : INotifyPropertyChanged
     {
@@ -22,6 +27,8 @@ namespace SetupHub180Hz.Models
         public string Path => Item.Path;
         public string MatchedOn => Item.MatchedOn;
         public long? SizeBytes => Item.SizeBytes;
+        public bool IsHighConfidence => Item.IsHighConfidence;
+        public string ConfidenceBadge => IsHighConfidence ? "Verified Safe" : "Review Recommended";
 
         public string TypeIcon => Type switch
         {
@@ -148,8 +155,8 @@ namespace SetupHub180Hz.Models
         public LeftoverViewModel(LeftoverItem item, string fullAppName)
         {
             Item = item;
-            // High-confidence matches (full app name) start checked; partial/shorter token matches start unchecked
-            _isSelected = string.Equals(item.MatchedOn, fullAppName, StringComparison.OrdinalIgnoreCase);
+            // Pre-select verified safe leftover items by default
+            _isSelected = item.IsHighConfidence;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

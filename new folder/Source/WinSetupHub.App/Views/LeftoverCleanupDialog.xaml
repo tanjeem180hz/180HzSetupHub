@@ -47,14 +47,14 @@
             </Grid>
 
             <!-- 2. Warning Banner -->
-            <Border Grid.Row="1" Background="#20F5B84C" BorderBrush="{StaticResource BrushWarning}" BorderThickness="1" CornerRadius="6" Padding="12,10" Margin="0,0,0,12">
+            <Border Grid.Row="1" Background="#203FCB7E" BorderBrush="{StaticResource BrushSuccess}" BorderThickness="1" CornerRadius="6" Padding="12,10" Margin="0,0,0,12">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="⚠️" FontSize="14" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="1" Text="These matches are based on name similarity. Review before deleting — entries can belong to unrelated software that happens to share a word."
+                    <TextBlock Text="🛡️" FontSize="14" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="Deep Clean Shield: All residual items are verified with strict safety exclusions. System directories, Windows components, and shared vendor roots are automatically protected."
                                FontSize="11" LineHeight="16" Foreground="{StaticResource BrushTextPrimary}" TextWrapping="Wrap"/>
                 </Grid>
             </Border>

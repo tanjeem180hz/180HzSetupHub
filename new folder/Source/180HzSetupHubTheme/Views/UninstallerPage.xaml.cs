@@ -332,56 +332,58 @@ namespace SetupHub180Hz.Views
             _targetApp = null;
         }
 
+        private static readonly HashSet<string> ProtectedProcessNames = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "explorer", "svchost", "csrss", "services", "lsass", "winlogon", "system", "registry",
+            "smss", "wininit", "fontdrvhost", "dwm", "taskmgr", "powershell", "cmd", "conhost",
+            "runtimebroker", "sihost", "ctfmon", "startmenuexperiencehost", "shellexperiencehost",
+            "searchhost", "searchindexer", "applicationframehost", "audiodg", "spoolsv", "wlanext",
+            "smartscreen", "securityhealthservice", "antigravity", "code", "180hzsetuphub", "devenv"
+        };
+
         private static void KillProcessesForApp(AppItem app)
         {
             try
             {
-                var cleanName = app.Name?.Trim() ?? "";
-                var tokens = new List<string>();
-                if (!string.IsNullOrWhiteSpace(cleanName))
-                {
-                    tokens.Add(cleanName);
-                    var parts = cleanName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length > 0 && parts[0].Length >= 3)
-                    {
-                        tokens.Add(parts[0]);
-                    }
-                }
-                if (!string.IsNullOrWhiteSpace(app.Id))
-                {
-                    var idParts = app.Id.Split('.', StringSplitOptions.RemoveEmptyEntries);
-                    if (idParts.Length > 0 && idParts.Last().Length >= 3)
-                    {
-                        tokens.Add(idParts.Last());
-                    }
-                }
-
+                var sig = new DeepUninstallService().BuildSearchSignature(app);
                 var procs = System.Diagnostics.Process.GetProcesses();
+
                 foreach (var p in procs)
                 {
                     try
                     {
-                        bool shouldKill = false;
-                        foreach (var token in tokens)
-                        {
-                            if (p.ProcessName.Contains(token, StringComparison.OrdinalIgnoreCase))
-                            {
-                                shouldKill = true;
-                                break;
-                            }
-                        }
+                        var procName = p.ProcessName;
+                        if (ProtectedProcessNames.Contains(procName)) continue;
 
-                        if (!shouldKill && !string.IsNullOrWhiteSpace(app.InstallLocation))
+                        bool shouldKill = false;
+
+                        // Priority 1: If InstallLocation is verified safe, check process executable path
+                        if (!string.IsNullOrWhiteSpace(app.InstallLocation) &&
+                            DeepUninstallService.IsSafePathToDelete(app.InstallLocation))
                         {
                             try
                             {
                                 var procPath = p.MainModule?.FileName;
-                                if (!string.IsNullOrEmpty(procPath) && procPath.StartsWith(app.InstallLocation, StringComparison.OrdinalIgnoreCase))
+                                if (!string.IsNullOrEmpty(procPath) &&
+                                    procPath.StartsWith(app.InstallLocation, StringComparison.OrdinalIgnoreCase))
                                 {
                                     shouldKill = true;
                                 }
                             }
                             catch { }
+                        }
+
+                        // Priority 2: Exact process name matching (Never partial substring on generic tokens)
+                        if (!shouldKill)
+                        {
+                            if (string.Equals(procName, sig.CleanName, StringComparison.OrdinalIgnoreCase) ||
+                                (!string.IsNullOrWhiteSpace(sig.DistinctProductName) &&
+                                 string.Equals(procName, sig.DistinctProductName, StringComparison.OrdinalIgnoreCase)) ||
+                                (!string.IsNullOrWhiteSpace(sig.IdProductPart) &&
+                                 string.Equals(procName, sig.IdProductPart, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                shouldKill = true;
+                            }
                         }
 
                         if (shouldKill)
@@ -400,8 +402,10 @@ namespace SetupHub180Hz.Views
         {
             KillProcessesForApp(app);
 
-            // 1. Delete InstallLocation folder if exists
-            if (!string.IsNullOrWhiteSpace(app.InstallLocation) && Directory.Exists(app.InstallLocation))
+            // 1. Delete InstallLocation folder ONLY if verified safe
+            if (!string.IsNullOrWhiteSpace(app.InstallLocation) &&
+                Directory.Exists(app.InstallLocation) &&
+                DeepUninstallService.IsSafePathToDelete(app.InstallLocation))
             {
                 try
                 {
@@ -410,22 +414,23 @@ namespace SetupHub180Hz.Views
                 catch { }
             }
 
-            // 2. Scan and purge leftover folders and registry entries
+            // 2. Remove registry uninstall keys specifically for this app
+            RemoveRegistryUninstallKeys(app);
+
+            // 3. Remove desktop and start menu shortcuts
+            RemoveShortcutsForApp(app);
+
+            // 4. Safely purge verified leftover folders and registry entries
             try
             {
                 var leftovers = await _deepUninstall.ScanAsync(app);
                 if (leftovers.Count > 0)
                 {
-                    await _deepUninstall.DeleteAsync(leftovers);
+                    // Only high-confidence items are purged during force removal
+                    await _deepUninstall.DeleteAsync(leftovers.Where(l => l.IsHighConfidence));
                 }
             }
             catch { }
-
-            // 3. Remove registry uninstall keys specifically for this app
-            RemoveRegistryUninstallKeys(app);
-
-            // 4. Remove desktop and start menu shortcuts
-            RemoveShortcutsForApp(app);
         }
 
         private static string? FindRegistryUninstallString(AppItem app)
@@ -448,7 +453,7 @@ namespace SetupHub180Hz.Views
                     foreach (var subName in uninst.GetSubKeyNames())
                     {
                         if (subName.Equals(app.Id, StringComparison.OrdinalIgnoreCase) ||
-                            subName.Contains(app.Name, StringComparison.OrdinalIgnoreCase))
+                            subName.Equals(app.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             using var sub = uninst.OpenSubKey(subName);
                             var qStr = sub?.GetValue("QuietUninstallString") as string;
@@ -472,6 +477,8 @@ namespace SetupHub180Hz.Views
                 (Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\Uninstall")
             };
 
+            var cleanName = app.Name?.Trim() ?? string.Empty;
+
             foreach (var target in targets)
             {
                 try
@@ -483,8 +490,7 @@ namespace SetupHub180Hz.Views
                     foreach (var subName in uninst.GetSubKeyNames())
                     {
                         bool isMatch = false;
-                        if (subName.Equals(app.Id, StringComparison.OrdinalIgnoreCase) ||
-                            subName.Contains(app.Name, StringComparison.OrdinalIgnoreCase))
+                        if (!string.IsNullOrWhiteSpace(app.Id) && subName.Equals(app.Id, StringComparison.OrdinalIgnoreCase))
                         {
                             isMatch = true;
                         }
@@ -492,7 +498,9 @@ namespace SetupHub180Hz.Views
                         {
                             using var sub = uninst.OpenSubKey(subName);
                             var disp = sub?.GetValue("DisplayName") as string;
-                            if (!string.IsNullOrEmpty(disp) && disp.Contains(app.Name, StringComparison.OrdinalIgnoreCase))
+                            if (!string.IsNullOrWhiteSpace(disp) &&
+                                (string.Equals(disp.Trim(), cleanName, StringComparison.OrdinalIgnoreCase) ||
+                                 string.Equals(disp.Trim(), app.Name?.Trim(), StringComparison.OrdinalIgnoreCase)))
                             {
                                 isMatch = true;
                             }
@@ -523,6 +531,9 @@ namespace SetupHub180Hz.Views
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
             };
 
+            var cleanName = app.Name?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(cleanName)) return;
+
             foreach (var dir in candidateDirs)
             {
                 try
@@ -532,9 +543,13 @@ namespace SetupHub180Hz.Views
                     foreach (var lnk in lnks)
                     {
                         var name = Path.GetFileNameWithoutExtension(lnk);
-                        if (name.Contains(app.Name, StringComparison.OrdinalIgnoreCase))
+                        if (string.Equals(name, cleanName, StringComparison.OrdinalIgnoreCase) ||
+                            (cleanName.Length >= 4 && name.StartsWith(cleanName + " ", StringComparison.OrdinalIgnoreCase)))
                         {
-                            try { File.Delete(lnk); } catch { }
+                            if (DeepUninstallService.IsSafePathToDelete(lnk))
+                            {
+                                try { File.Delete(lnk); } catch { }
+                            }
                         }
                     }
                 }
