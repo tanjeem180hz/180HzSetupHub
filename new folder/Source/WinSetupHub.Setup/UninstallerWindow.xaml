@@ -9,15 +9,16 @@
         AllowsTransparency="True"
         Background="Transparent"
         ResizeMode="NoResize"
-        FontFamily="Segoe UI, Arial, sans-serif">
+        FontFamily="Bahnschrift, Segoe UI Variable Display, Segoe UI, Arial, sans-serif">
 
     <Window.Resources>
-        <Color x:Key="WindowsBlueColor">#0078D7</Color>
-        <Color x:Key="WindowsBlueHoverColor">#1084E3</Color>
-        <Color x:Key="WindowsBluePressedColor">#006CBE</Color>
-        <Color x:Key="WindowsRedColor">#D13438</Color>
-        <Color x:Key="WindowsRedHoverColor">#E81123</Color>
-        <Color x:Key="WindowsRedPressedColor">#A80000</Color>
+        <!-- Cyber Carbon, Toxic Neon & Danger Crimson Accent Colors -->
+        <Color x:Key="WindowsBlueColor">#00FF66</Color>
+        <Color x:Key="WindowsBlueHoverColor">#33FF80</Color>
+        <Color x:Key="WindowsBluePressedColor">#00CC52</Color>
+        <Color x:Key="WindowsRedColor">#FF2255</Color>
+        <Color x:Key="WindowsRedHoverColor">#FF4477</Color>
+        <Color x:Key="WindowsRedPressedColor">#CC113F</Color>
 
         <SolidColorBrush x:Key="WindowsBlueBrush" Color="{StaticResource WindowsBlueColor}" />
         <SolidColorBrush x:Key="WindowsBlueHoverBrush" Color="{StaticResource WindowsBlueHoverColor}" />
@@ -26,21 +27,22 @@
         <SolidColorBrush x:Key="WindowsRedHoverBrush" Color="{StaticResource WindowsRedHoverColor}" />
         <SolidColorBrush x:Key="WindowsRedPressedBrush" Color="{StaticResource WindowsRedPressedColor}" />
 
-        <!-- Windows Standard Primary Button Style (Blue - for Repair / Launch) -->
+        <!-- Primary Action Button (Toxic Green - for Repair / Launch) -->
         <Style x:Key="WinPrimaryButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource WindowsBlueBrush}" />
-            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="Foreground" Value="#050B06" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="FontSize" Value="12.5" />
-            <Setter Property="Height" Value="32" />
-            <Setter Property="Width" Value="94" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Width" Value="104" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="border"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="2">
+                                CornerRadius="4">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -51,7 +53,7 @@
                                 <Setter TargetName="border" Property="Background" Value="{StaticResource WindowsBluePressedBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="border" Property="Opacity" Value="0.5" />
+                                <Setter TargetName="border" Property="Opacity" Value="0.4" />
                                 <Setter Property="Cursor" Value="Arrow" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -60,19 +62,20 @@
             </Setter>
         </Style>
 
-        <!-- Danger Button Style (Red - for Uninstall) -->
+        <!-- Danger Button (Cyber Crimson - for Uninstall) -->
         <Style x:Key="WinDangerButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource WindowsRedBrush}" />
             <Setter Property="Foreground" Value="#FFFFFF" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="FontSize" Value="12.5" />
-            <Setter Property="Height" Value="32" />
-            <Setter Property="Width" Value="94" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Width" Value="104" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="2">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="4">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -83,7 +86,7 @@
                                 <Setter TargetName="border" Property="Background" Value="{StaticResource WindowsRedPressedBrush}" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="border" Property="Opacity" Value="0.5" />
+                                <Setter TargetName="border" Property="Opacity" Value="0.4" />
                                 <Setter Property="Cursor" Value="Arrow" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -92,15 +95,16 @@
             </Setter>
         </Style>
 
-        <!-- Secondary Button Style (Cancel / Close) -->
+        <!-- Secondary Button (Cancel / Close) -->
         <Style x:Key="WinSecondaryButton" TargetType="Button">
-            <Setter Property="Background" Value="#E1E1E1" />
-            <Setter Property="Foreground" Value="#1A1A1A" />
-            <Setter Property="BorderBrush" Value="#ADADAD" />
+            <Setter Property="Background" Value="#161E17" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#212C23" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="FontSize" Value="12.5" />
-            <Setter Property="Height" Value="32" />
-            <Setter Property="Width" Value="94" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Width" Value="104" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -109,19 +113,19 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="2">
+                                CornerRadius="4">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#E5E5E5" />
-                                <Setter TargetName="border" Property="BorderBrush" Value="#999999" />
+                                <Setter TargetName="border" Property="Background" Value="#212C23" />
+                                <Setter TargetName="border" Property="BorderBrush" Value="#00FF66" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#CCCCCC" />
+                                <Setter TargetName="border" Property="Background" Value="#0F1410" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="border" Property="Opacity" Value="0.5" />
+                                <Setter TargetName="border" Property="Opacity" Value="0.4" />
                                 <Setter Property="Cursor" Value="Arrow" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -130,12 +134,13 @@
             </Setter>
         </Style>
 
+        <!-- Dark Titlebar Buttons -->
         <Style x:Key="WinTitlebarBtn" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="#444444" />
+            <Setter Property="Foreground" Value="#809283" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Width" Value="46" />
-            <Setter Property="Height" Value="30" />
+            <Setter Property="Height" Value="32" />
             <Setter Property="FontSize" Value="11" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
@@ -146,7 +151,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bg" Property="Background" Value="#E5E5E5" />
+                                <Setter TargetName="bg" Property="Background" Value="#161E17" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="#212C23" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -163,7 +172,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bg" Property="Background" Value="#E81123" />
+                                <Setter TargetName="bg" Property="Background" Value="#FF2255" />
+                                <Setter Property="Foreground" Value="#FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bg" Property="Background" Value="#CC113F" />
                                 <Setter Property="Foreground" Value="#FFFFFF" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -173,32 +186,46 @@
         </Style>
     </Window.Resources>
 
-    <Border Background="#FFFFFF"
-            BorderBrush="#7A7A7A"
+    <Border Background="#080B08"
+            BorderBrush="#212C23"
             BorderThickness="1"
+            CornerRadius="8"
             Margin="6">
         <Border.Effect>
-            <DropShadowEffect Color="#000000" BlurRadius="12" ShadowDepth="2" Opacity="0.22" />
+            <DropShadowEffect Color="#000000" BlurRadius="20" ShadowDepth="4" Opacity="0.8" />
         </Border.Effect>
 
         <Grid MouseLeftButtonDown="Window_MouseDown">
             <Grid.RowDefinitions>
-                <RowDefinition Height="30" />
+                <RowDefinition Height="32" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="56" />
+                <RowDefinition Height="58" />
             </Grid.RowDefinitions>
 
             <!-- Titlebar -->
-            <Grid Grid.Row="0" Background="#FFFFFF">
+            <Grid Grid.Row="0" Background="Transparent" Margin="16,0,0,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="7" Height="7" CornerRadius="3.5" Background="#FF2255" Margin="0,0,8,0">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#FF2255" BlurRadius="6" ShadowDepth="0" Opacity="0.9"/>
+                        </Border.Effect>
+                    </Border>
+                    <TextBlock Text="180Hz SETUP HUB // MAINTENANCE &amp; UNINSTALL"
+                               FontSize="10.5"
+                               FontWeight="Bold"
+                               Foreground="#B6C9B9"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Style="{StaticResource WinTitlebarBtn}" Content="🗖" Foreground="#CCCCCC" Cursor="Arrow" IsHitTestVisible="False" />
+                    <Button Style="{StaticResource WinTitlebarBtn}" Content="🗖" Foreground="#2A382C" Cursor="Arrow" IsHitTestVisible="False" />
                     <Button x:Name="BtnClose" Style="{StaticResource WinCloseBtn}" Content="✕" Click="BtnClose_Click" />
                 </StackPanel>
             </Grid>
 
             <!-- Upper Content Area -->
-            <Grid Grid.Row="1" Margin="32,4,32,0">
+            <Grid Grid.Row="1" Margin="32,6,32,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -207,42 +234,46 @@
                 <StackPanel Grid.Column="0" VerticalAlignment="Top">
                     <TextBlock Text="Modify 180Hz Setup Hub"
                                FontSize="23"
-                               FontWeight="Normal"
-                               Foreground="#1A1A1A"
-                               Margin="0,0,0,6" />
+                               FontWeight="Bold"
+                               Foreground="#FFFFFF"
+                               Margin="0,0,0,8" />
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8" VerticalAlignment="Center">
-                        <Grid Width="16" Height="14" Margin="0,0,6,0" VerticalAlignment="Center">
-                            <Border BorderBrush="#0078D7" BorderThickness="1.2" CornerRadius="1" Height="12" VerticalAlignment="Top" />
-                            <Border Background="#0078D7" Height="2.5" VerticalAlignment="Top" Margin="0,0,0,0" />
-                            <Ellipse Width="7" Height="7" Fill="#107C10" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
-                            <TextBlock Text="✓" FontSize="5.5" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,1,0" />
-                        </Grid>
-                        <TextBlock Text="Trusted App"
-                                   FontSize="12"
-                                   FontWeight="SemiBold"
-                                   Foreground="#0078D7"
-                                   VerticalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Center">
+                        <Border Background="#0D2E14" BorderBrush="#00FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="✓" FontSize="11" FontWeight="Bold" Foreground="#00FF66" Margin="0,0,4,0"/>
+                                <TextBlock Text="VERIFIED SAFE &amp; SECURE" FontSize="10" FontWeight="Bold" Foreground="#00FF66"/>
+                            </StackPanel>
+                        </Border>
+                        <TextBlock Text="Maintenance Console" FontSize="11" Foreground="#B6C9B9" VerticalAlignment="Center"/>
                     </StackPanel>
 
-                    <TextBlock Text="Publisher: 180Hz" FontSize="12" Foreground="#333333" Margin="0,0,0,1" />
-                    <TextBlock Text="Version: 1.0.0.0" FontSize="12" Foreground="#333333" Margin="0,0,0,12" />
+                    <TextBlock Text="Publisher: 180Hz Core Operations" FontSize="12" Foreground="#B6C9B9" Margin="0,0,0,2" />
+                    <TextBlock Text="Version: 1.0.0.0 (Production Release)" FontSize="12" Foreground="#B6C9B9" Margin="0,0,0,12" />
 
-                    <TextBlock Text="Available actions:" FontSize="12" FontWeight="SemiBold" Foreground="#222222" Margin="0,0,0,3" />
-                    <TextBlock Text="• Repair: Reinstalls fresh files, repairs bugs, restores config and shortcuts" FontSize="11.5" Foreground="#666666" Margin="0,0,0,2" />
-                    <TextBlock Text="• Uninstall: Cleanly removes the application and shortcuts from your PC" FontSize="11.5" Foreground="#666666" />
+                    <TextBlock Text="Available actions:" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,4" />
+                    <TextBlock Text="• Repair: Reinstalls fresh files, repairs bugs, restores config and shortcuts" FontSize="11.5" Foreground="#B6C9B9" Margin="0,0,0,2" />
+                    <TextBlock Text="• Uninstall: Cleanly removes the application and shortcuts from your PC" FontSize="11.5" Foreground="#B6C9B9" />
                 </StackPanel>
 
                 <!-- Right Square App Tile -->
                 <Border Grid.Column="1"
-                        Width="86"
-                        Height="86"
-                        Background="#0078D7"
+                        Width="90"
+                        Height="90"
+                        Background="#0F1410"
+                        BorderBrush="#00FF66"
+                        BorderThickness="1.5"
+                        CornerRadius="8"
                         VerticalAlignment="Top"
-                        Margin="12,6,0,0">
+                        Margin="12,4,0,0">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#00FF66" BlurRadius="16" ShadowDepth="0" Opacity="0.3" />
+                    </Border.Effect>
                     <Image Source="Assets/AppIcon-1024.png"
-                           Width="62"
-                           Height="62"
+                           Width="66"
+                           Height="66"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
                            RenderOptions.BitmapScalingMode="HighQuality" />
                 </Border>
             </Grid>
@@ -252,17 +283,20 @@
                 <TextBlock x:Name="TxtUninstallStatus"
                            Text="Ready to repair or uninstall"
                            FontSize="12"
-                           Foreground="#333333"
+                           FontWeight="SemiBold"
+                           Foreground="#B6C9B9"
                            Margin="0,0,0,6" />
 
-                <ProgressBar x:Name="UninstallProgressBar"
-                             Height="4"
-                             Minimum="0"
-                             Maximum="100"
-                             Value="0"
-                             Background="#E6E6E6"
-                             Foreground="{StaticResource WindowsBlueBrush}"
-                             BorderThickness="0" />
+                <Border Height="6" Background="#0F1410" BorderBrush="#212C23" BorderThickness="1" CornerRadius="3" ClipToBounds="True">
+                    <ProgressBar x:Name="UninstallProgressBar"
+                                 Height="4"
+                                 Minimum="0"
+                                 Maximum="100"
+                                 Value="0"
+                                 Background="Transparent"
+                                 Foreground="{StaticResource WindowsBlueBrush}"
+                                 BorderThickness="0" />
+                </Border>
             </StackPanel>
 
             <!-- Bottom Row: Buttons (Repair, Uninstall, Cancel) -->

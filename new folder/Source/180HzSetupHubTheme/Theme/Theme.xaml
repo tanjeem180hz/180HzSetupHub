@@ -14,8 +14,8 @@
     <Color x:Key="ColorAccentHover">#33FF80</Color>
     <Color x:Key="ColorAccentPressed">#00CC52</Color>
     <Color x:Key="ColorAccentForeground">#050B06</Color>
-    <Color x:Key="ColorTextPrimary">#F2FFF5</Color>
-    <Color x:Key="ColorTextSecondary">#809283</Color>
+    <Color x:Key="ColorTextPrimary">#FFFFFF</Color>
+    <Color x:Key="ColorTextSecondary">#B6C9B9</Color>
     <Color x:Key="ColorSuccess">#00FF66</Color>
     <Color x:Key="ColorWarning">#FFB800</Color>
     <Color x:Key="ColorError">#FF2255</Color>
@@ -49,7 +49,7 @@
     <SolidColorBrush x:Key="BrushError" Color="{StaticResource ColorError}"/>
 
     <!-- ============ TYPOGRAPHY ============ -->
-    <FontFamily x:Key="AppFont">Segoe UI Variable, Segoe UI</FontFamily>
+    <FontFamily x:Key="AppFont">Bahnschrift, Segoe UI Variable Display, Segoe UI, Arial, sans-serif</FontFamily>
     <Style x:Key="TextHeader" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
         <Setter Property="FontWeight" Value="Bold"/>
@@ -971,8 +971,8 @@
                                 VerticalAlignment="Center">
                             <Path x:Name="CheckMark"
                                   Data="M 3 8 L 7 12 L 14 4"
-                                  Stroke="White"
-                                  StrokeThickness="2"
+                                  Stroke="{DynamicResource BrushAccentForeground}"
+                                  StrokeThickness="2.2"
                                   StrokeStartLineCap="Round"
                                   StrokeEndLineCap="Round"
                                   StrokeLineJoin="Round"
