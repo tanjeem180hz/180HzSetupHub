@@ -5,6 +5,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 using SetupHub180Hz.Services;
 using SetupHub180Hz.Views;
 
@@ -30,7 +32,7 @@ namespace SetupHub180Hz
                 MaximizeButton.ToolTip = isMax ? "Restore Down" : "Maximize";
                 if (RootGrid != null)
                 {
-                    RootGrid.Margin = isMax ? new Thickness(7) : new Thickness(0);
+                    RootGrid.Margin = new Thickness(0);
                 }
                 if (ContentHost != null)
                 {
@@ -333,5 +335,83 @@ namespace SetupHub180Hz
             WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
 
         private void Close_Click(object sender, RoutedEventArgs e) => Close();
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            var handle = new WindowInteropHelper(this).Handle;
+            var source = HwndSource.FromHwnd(handle);
+            source?.AddHook(WndProc);
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == WM_GETMINMAXINFO)
+            {
+                WmGetMinMaxInfo(hwnd, lParam);
+                handled = true;
+            }
+            return IntPtr.Zero;
+        }
+
+        private static void WmGetMinMaxInfo(IntPtr hwnd, IntPtr lParam)
+        {
+            var mmi = Marshal.PtrToStructure<MINMAXINFO>(lParam);
+            var hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+            if (hMonitor != IntPtr.Zero)
+            {
+                var mi = new MONITORINFO();
+                mi.cbSize = Marshal.SizeOf(typeof(MONITORINFO));
+                if (GetMonitorInfo(hMonitor, ref mi))
+                {
+                    var rcWork = mi.rcWork;
+                    var rcMonitor = mi.rcMonitor;
+
+                    mmi.ptMaxPosition.x = Math.Abs(rcWork.left - rcMonitor.left);
+                    mmi.ptMaxPosition.y = Math.Abs(rcWork.top - rcMonitor.top);
+                    mmi.ptMaxSize.x = Math.Abs(rcWork.right - rcWork.left);
+                    mmi.ptMaxSize.y = Math.Abs(rcWork.bottom - rcWork.top);
+                    mmi.ptMaxTrackSize.x = mmi.ptMaxSize.x;
+                    mmi.ptMaxTrackSize.y = mmi.ptMaxSize.y;
+                }
+            }
+            Marshal.StructureToPtr(mmi, lParam, true);
+        }
+
+        #region Native Win32 MinMax Interop for WorkArea Taskbar Adjustment
+        private const int WM_GETMINMAXINFO = 0x0024;
+        private const uint MONITOR_DEFAULTTONEAREST = 0x00000002;
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr MonitorFromWindow(IntPtr handle, uint flags);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT { public int x; public int y; }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MINMAXINFO
+        {
+            public POINT ptReserved;
+            public POINT ptMaxSize;
+            public POINT ptMaxPosition;
+            public POINT ptMinTrackSize;
+            public POINT ptMaxTrackSize;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct MONITORINFO
+        {
+            public int cbSize;
+            public RECT rcMonitor;
+            public RECT rcWork;
+            public int dwFlags;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT { public int left; public int top; public int right; public int bottom; }
+        #endregion
     }
 }
