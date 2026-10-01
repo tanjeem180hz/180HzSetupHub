@@ -708,7 +708,7 @@
                         <!-- Action Buttons: Pause/Resume, Skip, Cancel All, Queue List Toggle, Open Downloads -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                             <Button x:Name="PopupPauseResumeButton" Tag="Pause"
-                                    Style="{StaticResource ExpandableAccentButton}"
+                                    Style="{StaticResource ExpandableOutlineButton}"
                                     Click="PopupPauseResume_Click">
                                 <lottie:LottieAnimationView Width="14" Height="14" AutoPlay="True" RepeatCount="-1"
                                                             services:LottieHelper.AssetName="pause.json"/>

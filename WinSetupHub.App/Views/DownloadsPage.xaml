@@ -270,7 +270,7 @@
 
                                 <!-- Hero Controls -->
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button x:Name="BtnActivePauseResume" Tag="Pause" Style="{StaticResource ExpandableAccentButton}"
+                                    <Button x:Name="BtnActivePauseResume" Tag="Pause" Style="{StaticResource ExpandableOutlineButton}"
                                             Margin="0,0,6,0" Click="BtnActivePauseResume_Click">
                                         <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
                                                                     services:LottieHelper.AssetName="pause.json"/>
