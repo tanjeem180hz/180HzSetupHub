@@ -39,12 +39,18 @@
 
                     <!-- Top Action Controls -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button x:Name="BtnPauseAll" Content="⏸" Tag="Pause All" Style="{StaticResource ExpandableOutlineButton}"
-                                Margin="0,0,8,0" Click="BtnPauseAll_Click"/>
+                        <Button x:Name="BtnPauseAll" Tag="Pause All" Style="{StaticResource ExpandableOutlineButton}"
+                                Margin="0,0,8,0" Click="BtnPauseAll_Click">
+                            <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                        services:LottieHelper.AssetName="pause.json"/>
+                        </Button>
                         <Button x:Name="BtnClearCompleted" Content="🧹" Tag="Clear Completed" Style="{StaticResource ExpandableOutlineButton}"
                                 Margin="0,0,8,0" Click="BtnClearCompleted_Click"/>
-                        <Button x:Name="BtnCancelAll" Content="✕" Tag="Cancel Queue" Style="{StaticResource ExpandableDangerButton}"
-                                Margin="0,0,8,0" Click="BtnCancelAll_Click"/>
+                        <Button x:Name="BtnCancelAll" Tag="Cancel Queue" Style="{StaticResource ExpandableDangerButton}"
+                                Margin="0,0,8,0" Click="BtnCancelAll_Click">
+                            <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                        services:LottieHelper.AssetName="cancel.json"/>
+                        </Button>
                         <Button x:Name="BtnBrowseApps" Content="⚡" Tag="Browse Apps" Style="{StaticResource ExpandableAccentButton}"
                                 Click="BtnBrowseApps_Click"/>
                     </StackPanel>
@@ -264,14 +270,26 @@
 
                                 <!-- Hero Controls -->
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button x:Name="BtnActivePauseResume" Content="⏸" Tag="Pause" Style="{StaticResource ExpandableAccentButton}"
-                                            Margin="0,0,6,0" Click="BtnActivePauseResume_Click"/>
-                                    <Button x:Name="BtnActiveSkip" Content="⏭" Tag="Skip" Style="{StaticResource ExpandableOutlineButton}"
-                                            Margin="0,0,6,0" Click="BtnActiveSkip_Click"/>
-                                    <Button x:Name="BtnActiveCancel" Content="✕" Tag="Cancel" Style="{StaticResource ExpandableDangerButton}"
-                                            Margin="0,0,6,0" Click="BtnActiveCancel_Click"/>
-                                    <Button x:Name="BtnActiveWebsite" Content="🌐" Tag="Website" Style="{StaticResource ExpandableOutlineButton}"
-                                            Click="BtnActiveWebsite_Click"/>
+                                    <Button x:Name="BtnActivePauseResume" Tag="Pause" Style="{StaticResource ExpandableAccentButton}"
+                                            Margin="0,0,6,0" Click="BtnActivePauseResume_Click">
+                                        <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                                    services:LottieHelper.AssetName="pause.json"/>
+                                    </Button>
+                                    <Button x:Name="BtnActiveSkip" Tag="Skip" Style="{StaticResource ExpandableOutlineButton}"
+                                            Margin="0,0,6,0" Click="BtnActiveSkip_Click">
+                                        <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                                    services:LottieHelper.AssetName="skip.json"/>
+                                    </Button>
+                                    <Button x:Name="BtnActiveCancel" Tag="Cancel" Style="{StaticResource ExpandableDangerButton}"
+                                            Margin="0,0,6,0" Click="BtnActiveCancel_Click">
+                                        <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                                    services:LottieHelper.AssetName="cancel.json"/>
+                                    </Button>
+                                    <Button x:Name="BtnActiveWebsite" Tag="Website" Style="{StaticResource ExpandableOutlineButton}"
+                                            Click="BtnActiveWebsite_Click">
+                                        <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                                    services:LottieHelper.AssetName="website.json"/>
+                                    </Button>
                                 </StackPanel>
                             </Grid>
 
@@ -472,11 +490,17 @@
 
                                     <!-- Actions: Official Site, Remove -->
                                     <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button Content="🌐" Tag="Website" Style="{StaticResource ExpandableOutlineButton}"
-                                                Margin="0,0,6,0" Click="HistoryItemWebsite_Click"/>
-                                        <Button Content="✕" Tag="Dismiss" Style="{StaticResource ExpandableOutlineButton}"
+                                        <Button Tag="Website" Style="{StaticResource ExpandableOutlineButton}"
+                                                Margin="0,0,6,0" Click="HistoryItemWebsite_Click">
+                                            <lottie:LottieAnimationView Width="14" Height="14" AutoPlay="True" RepeatCount="-1"
+                                                                        services:LottieHelper.AssetName="website.json"/>
+                                        </Button>
+                                        <Button Tag="Dismiss" Style="{StaticResource ExpandableOutlineButton}"
                                                 ToolTip="Dismiss from history"
-                                                Click="HistoryItemRemove_Click"/>
+                                                Click="HistoryItemRemove_Click">
+                                            <lottie:LottieAnimationView Width="14" Height="14" AutoPlay="True" RepeatCount="-1"
+                                                                        services:LottieHelper.AssetName="cancel.json"/>
+                                        </Button>
                                     </StackPanel>
                                 </Grid>
                             </Border>

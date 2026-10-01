@@ -30,12 +30,18 @@ namespace SetupHub180Hz.Views
 
         public static Button BuildOfficialLinkButton(WingetService winget, AppItem app)
         {
+            var stack = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+            var icon = LottieHelper.CreateIcon("website.json", 13);
+            icon.Margin = new Thickness(0, 0, 5, 0);
+            stack.Children.Add(icon);
+            stack.Children.Add(new TextBlock { Text = "Official Site", VerticalAlignment = VerticalAlignment.Center });
+
             var btn = new Button
             {
-                Content = "🔗 Official Site",
+                Content = stack,
                 FontSize = 11,
                 FontWeight = FontWeights.SemiBold,
-                Padding = new Thickness(10, 4, 10, 4),
+                Padding = new Thickness(8, 4, 10, 4),
                 Cursor = System.Windows.Input.Cursors.Hand,
                 IsEnabled = false,
                 ToolTip = "Opening official website…"

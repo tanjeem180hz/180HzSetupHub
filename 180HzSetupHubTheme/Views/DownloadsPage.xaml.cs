@@ -116,7 +116,7 @@ namespace SetupHub180Hz.Views
                 IdlePlaceholderGrid.Visibility = Visibility.Visible;
                 ActiveDownloadCard.BorderBrush = (SolidColorBrush)FindResource("BrushBorder");
                 SetStatusBadge("IDLE", "BrushTextSecondary");
-                BtnPauseAll.Content = "⏸";
+                LottieHelper.SetButtonIcon(BtnPauseAll, "pause.json", 15);
                 BtnPauseAll.Tag = "Pause All";
                 BtnPauseAll.IsEnabled = false;
             }
@@ -143,20 +143,20 @@ namespace SetupHub180Hz.Views
                 if (dm.IsPaused)
                 {
                     SetStatusBadge("PAUSED", "BrushWarning");
-                    BtnPauseAll.Content = "▶";
+                    LottieHelper.SetButtonIcon(BtnPauseAll, "resume.json", 15);
                     BtnPauseAll.Tag = "Resume All";
                 }
                 else
                 {
                     SetStatusBadge("DOWNLOADING", "BrushSuccess");
-                    BtnPauseAll.Content = "⏸";
+                    LottieHelper.SetButtonIcon(BtnPauseAll, "pause.json", 15);
                     BtnPauseAll.Tag = "Pause All";
                 }
             }
             else
             {
                 SetStatusBadge("IDLE", "BrushTextSecondary");
-                BtnPauseAll.Content = "⏸";
+                LottieHelper.SetButtonIcon(BtnPauseAll, "pause.json", 15);
                 BtnPauseAll.Tag = "Pause All";
                 BtnPauseAll.IsEnabled = false;
             }
@@ -238,7 +238,7 @@ namespace SetupHub180Hz.Views
                     ActiveStateText.Text = "DOWNLOADING";
                     ActiveStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                     ActiveStateText.Foreground = (SolidColorBrush)FindResource("BrushAccent");
-                    BtnActivePauseResume.Content = "⏸";
+                    LottieHelper.SetButtonIcon(BtnActivePauseResume, "pause.json", 15);
                     BtnActivePauseResume.Tag = "Pause";
                     BtnActivePauseResume.IsEnabled = true;
                     break;
@@ -247,7 +247,7 @@ namespace SetupHub180Hz.Views
                     ActiveStateText.Text = "PAUSED";
                     ActiveStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                     ActiveStateText.Foreground = (SolidColorBrush)FindResource("BrushWarning");
-                    BtnActivePauseResume.Content = "▶";
+                    LottieHelper.SetButtonIcon(BtnActivePauseResume, "resume.json", 15);
                     BtnActivePauseResume.Tag = "Resume";
                     BtnActivePauseResume.IsEnabled = true;
                     break;
@@ -263,7 +263,7 @@ namespace SetupHub180Hz.Views
                     ActiveStateText.Text = "CONNECTION ERROR";
                     ActiveStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                     ActiveStateText.Foreground = (SolidColorBrush)FindResource("BrushError");
-                    BtnActivePauseResume.Content = "🔄";
+                    LottieHelper.SetButtonIcon(BtnActivePauseResume, "resume.json", 15);
                     BtnActivePauseResume.Tag = "Retry";
                     BtnActivePauseResume.IsEnabled = true;
                     break;

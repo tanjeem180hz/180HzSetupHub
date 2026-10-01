@@ -707,14 +707,20 @@
 
                         <!-- Action Buttons: Pause/Resume, Skip, Cancel All, Queue List Toggle, Open Downloads -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <Button x:Name="PopupPauseResumeButton" Content="⏸" Tag="Pause"
+                            <Button x:Name="PopupPauseResumeButton" Tag="Pause"
                                     Style="{StaticResource ExpandableAccentButton}"
-                                    Click="PopupPauseResume_Click"/>
+                                    Click="PopupPauseResume_Click">
+                                <lottie:LottieAnimationView Width="14" Height="14" AutoPlay="True" RepeatCount="-1"
+                                                            services:LottieHelper.AssetName="pause.json"/>
+                            </Button>
 
-                            <Button x:Name="PopupSkipButton" Content="⏭" Tag="Skip"
+                            <Button x:Name="PopupSkipButton" Tag="Skip"
                                     Style="{StaticResource ExpandableOutlineButton}"
                                     Margin="6,0,0,0"
-                                    Click="PopupSkip_Click"/>
+                                    Click="PopupSkip_Click">
+                                <lottie:LottieAnimationView Width="14" Height="14" AutoPlay="True" RepeatCount="-1"
+                                                            services:LottieHelper.AssetName="skip.json"/>
+                            </Button>
 
                             <Button x:Name="PopupToggleQueueButton" Content="📋" Tag="Queue List"
                                     Style="{StaticResource ExpandableOutlineButton}"
@@ -727,10 +733,13 @@
                                     Margin="6,0,0,0"
                                     Click="PopupViewDownloads_Click"/>
 
-                            <Button x:Name="PopupCancelButton" Content="✕" Tag="Cancel All"
+                            <Button x:Name="PopupCancelButton" Tag="Cancel All"
                                     Style="{StaticResource ExpandableDangerButton}"
                                     Margin="6,0,0,0"
-                                    Click="PopupCancel_Click"/>
+                                    Click="PopupCancel_Click">
+                                <lottie:LottieAnimationView Width="14" Height="14" AutoPlay="True" RepeatCount="-1"
+                                                            services:LottieHelper.AssetName="cancel.json"/>
+                            </Button>
                         </StackPanel>
                     </Grid>
 

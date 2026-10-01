@@ -118,11 +118,34 @@ namespace SetupHub180Hz.Services
                         view.FileName = path;
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    System.Diagnostics.Debug.WriteLine($"Failed to bind Lottie '{assetName}': {ex.Message}");
                 }
             }
+        }
+
+        public static LottieAnimationView CreateIcon(string assetName, double size = 15)
+        {
+            var view = new LottieAnimationView
+            {
+                Width = size,
+                Height = size,
+                AutoPlay = true,
+                RepeatCount = -1,
+                IsHitTestVisible = false
+            };
+            SetAssetName(view, assetName);
+            return view;
+        }
+
+        public static void SetButtonIcon(System.Windows.Controls.Button? btn, string assetName, double size = 15)
+        {
+            if (btn == null) return;
+            if (btn.Content is LottieAnimationView currentView && GetAssetName(currentView) == assetName)
+            {
+                return;
+            }
+            btn.Content = CreateIcon(assetName, size);
         }
     }
 }

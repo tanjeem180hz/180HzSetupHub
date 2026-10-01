@@ -1038,11 +1038,13 @@ namespace SetupHub180Hz.Views
             AppsListBox.Margin = new Thickness(0, 0, 0, 110);
 
             PopupPauseResumeButton.Visibility = Visibility.Visible;
-            PopupPauseResumeButton.Content = "⏸";
+            LottieHelper.SetButtonIcon(PopupPauseResumeButton, "pause.json", 14);
             PopupPauseResumeButton.Tag = "Pause";
             PopupPauseResumeButton.IsEnabled = true;
             PopupSkipButton.Visibility = Visibility.Visible;
+            LottieHelper.SetButtonIcon(PopupSkipButton, "skip.json", 14);
             PopupCancelButton.Visibility = Visibility.Visible;
+            LottieHelper.SetButtonIcon(PopupCancelButton, "cancel.json", 14);
             PopupDismissButton.Visibility = Visibility.Collapsed;
 
             DownloadManagerService.Instance.EnqueueRange(list);
@@ -1101,7 +1103,7 @@ namespace SetupHub180Hz.Views
                         PopupStateText.Text = "DOWNLOADING";
                         PopupStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                         PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushAccent");
-                        PopupPauseResumeButton.Content = "⏸";
+                        LottieHelper.SetButtonIcon(PopupPauseResumeButton, "pause.json", 14);
                         PopupPauseResumeButton.Tag = "Pause";
                         PopupPauseResumeButton.IsEnabled = true;
                         break;
@@ -1110,7 +1112,7 @@ namespace SetupHub180Hz.Views
                         PopupStateText.Text = "PAUSED";
                         PopupStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                         PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushWarning");
-                        PopupPauseResumeButton.Content = "▶";
+                        LottieHelper.SetButtonIcon(PopupPauseResumeButton, "resume.json", 14);
                         PopupPauseResumeButton.Tag = "Resume";
                         PopupPauseResumeButton.IsEnabled = true;
                         break;
@@ -1126,7 +1128,7 @@ namespace SetupHub180Hz.Views
                         PopupStateText.Text = "CONNECTION ERROR";
                         PopupStateBadge.Background = (Brush)FindResource("BrushSurfaceHover");
                         PopupStateText.Foreground = (SolidColorBrush)FindResource("BrushError");
-                        PopupPauseResumeButton.Content = "🔄";
+                        LottieHelper.SetButtonIcon(PopupPauseResumeButton, "resume.json", 14);
                         PopupPauseResumeButton.Tag = "Resume";
                         PopupPauseResumeButton.IsEnabled = true;
                         break;
