@@ -616,7 +616,7 @@
                                     <Button x:Name="BtnCleanRam" Style="{StaticResource OutlineButton}"
                                             Height="24" Padding="8,2" Margin="0,0,6,0"
                                             Click="BtnCleanRam_Click"
-                                            ToolTip="Purge process working sets &amp; reclaim physical RAM">
+                                            ToolTip="Maximum RAM Clear + Purge Standby Cache + Flush System Working Sets for Peak Performance">
                                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                             <TextBlock Text="⚡" FontSize="10" Foreground="{DynamicResource BrushAccent}" Margin="0,0,4,0" VerticalAlignment="Center"/>
                                             <TextBlock x:Name="TxtCleanRamBtn" Text="CLEAR" FontSize="10" FontWeight="Bold"

@@ -9,70 +9,153 @@ namespace SetupHub180Hz.Services
 {
     public class CleanupService
     {
-        public Task<List<CleanupTarget>> ScanAsync()
+        private static readonly Lazy<CleanupService> _instance = new(() => new CleanupService());
+        public static CleanupService Instance => _instance.Value;
+
+        private readonly object _cacheLock = new();
+        private List<CleanupTarget>? _cachedTargets;
+        private Task<List<CleanupTarget>>? _activeScanTask;
+
+        public event Action<List<CleanupTarget>>? ScanCompleted;
+
+        public bool IsScanning
         {
-            return Task.Run(() =>
+            get
             {
-                long totalMem = MemoryCleaner.GetTotalMemoryBytes();
-                long availMem = MemoryCleaner.GetAvailableMemoryBytes();
-                long usedMem = Math.Max(0, totalMem - availMem);
-                long estimatedReclaimableRam = usedMem > 0 ? (long)(usedMem * 0.25) : 512L * 1024L * 1024L;
-
-                var targets = new List<CleanupTarget>
+                lock (_cacheLock)
                 {
-                    new() { Name = "User Temp Files", Path = Path.GetTempPath() },
-                    new() { Name = "Windows Temp", Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\Temp") },
-                    new() { Name = "Windows Update Cache", Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\SoftwareDistribution\Download") },
-                    new() { Name = "Prefetch Cache", Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\Prefetch") },
-                    new() { Name = "Recent Items", Path = Environment.GetFolderPath(Environment.SpecialFolder.Recent) },
-
-                    // C: Drive System Cleanup target
-                    new()
-                    {
-                        Name = "C: Drive Cleanup",
-                        Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\Logs"),
-                        AdditionalPaths = new List<string>
-                        {
-                            Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\CrashDumps"),
-                            Environment.ExpandEnvironmentVariables(@"%ProgramData%\Microsoft\Windows\WER"),
-                            Environment.ExpandEnvironmentVariables(@"%WINDIR%\System32\LogFiles"),
-                            Environment.ExpandEnvironmentVariables(@"%WINDIR%\Downloaded Program Files"),
-                            Environment.ExpandEnvironmentVariables(@"%WINDIR%\Minidump"),
-                            Environment.ExpandEnvironmentVariables(@"%WINDIR%\ServiceProfiles\NetworkService\AppData\Local\Temp"),
-                            Environment.ExpandEnvironmentVariables(@"%WINDIR%\ServiceProfiles\LocalService\AppData\Local\Temp"),
-                        }
-                    },
-
-                    // System RAM Working Set Cache target
-                    new()
-                    {
-                        Name = "System Memory (RAM Cache)",
-                        Path = "Process Working Sets & RAM Cache",
-                        IsRamTarget = true,
-                        SizeBytes = estimatedReclaimableRam
-                    }
-                };
-
-                foreach (var t in targets)
-                {
-                    if (t.IsRamTarget) continue;
-
-                    long total = GetDirectorySize(t.Path);
-                    if (t.AdditionalPaths != null)
-                    {
-                        foreach (var ap in t.AdditionalPaths)
-                            total += GetDirectorySize(ap);
-                    }
-                    t.SizeBytes = total;
+                    return _activeScanTask != null && !_activeScanTask.IsCompleted;
                 }
-
-                return targets;
-            });
+            }
         }
 
-        public Task<long> CleanAsync(CleanupTarget target, Action<string>? onFile = null)
+        public List<CleanupTarget>? CachedTargets
         {
-            return Task.Run(() =>
+            get
+            {
+                lock (_cacheLock)
+                {
+                    return _cachedTargets != null ? CloneTargets(_cachedTargets) : null;
+                }
+            }
+        }
+
+        private static List<CleanupTarget> CloneTargets(List<CleanupTarget> source)
+        {
+            var list = new List<CleanupTarget>(source.Count);
+            foreach (var t in source)
+            {
+                list.Add(new CleanupTarget
+                {
+                    Name = t.Name,
+                    Path = t.Path,
+                    AdditionalPaths = t.AdditionalPaths != null ? new List<string>(t.AdditionalPaths) : null,
+                    SizeBytes = t.SizeBytes,
+                    IsRamTarget = t.IsRamTarget
+                });
+            }
+            return list;
+        }
+
+        public void StartBackgroundScan()
+        {
+            _ = ScanAsync(force: false);
+        }
+
+        public Task<List<CleanupTarget>> ScanAsync(bool force = false)
+        {
+            lock (_cacheLock)
+            {
+                if (!force && _cachedTargets != null)
+                {
+                    return Task.FromResult(CloneTargets(_cachedTargets));
+                }
+
+                if (_activeScanTask != null && !_activeScanTask.IsCompleted)
+                {
+                    return _activeScanTask;
+                }
+
+                _activeScanTask = Task.Run(() => PerformScan());
+                return _activeScanTask;
+            }
+        }
+
+        private List<CleanupTarget> PerformScan()
+        {
+            long totalMem = MemoryCleaner.GetTotalMemoryBytes();
+            long availMem = MemoryCleaner.GetAvailableMemoryBytes();
+            long usedMem = Math.Max(0, totalMem - availMem);
+            long estimatedReclaimableRam = usedMem > 0 ? (long)(usedMem * 0.25) : 512L * 1024L * 1024L;
+
+            var targets = new List<CleanupTarget>
+            {
+                new() { Name = "User Temp Files", Path = Path.GetTempPath() },
+                new() { Name = "Windows Temp", Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\Temp") },
+                new() { Name = "Windows Update Cache", Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\SoftwareDistribution\Download") },
+                new() { Name = "Prefetch Cache", Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\Prefetch") },
+                new() { Name = "Recent Items", Path = Environment.GetFolderPath(Environment.SpecialFolder.Recent) },
+
+                // C: Drive System Cleanup target
+                new()
+                {
+                    Name = "C: Drive Cleanup",
+                    Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\Logs"),
+                    AdditionalPaths = new List<string>
+                    {
+                        Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\CrashDumps"),
+                        Environment.ExpandEnvironmentVariables(@"%ProgramData%\Microsoft\Windows\WER"),
+                        Environment.ExpandEnvironmentVariables(@"%WINDIR%\System32\LogFiles"),
+                        Environment.ExpandEnvironmentVariables(@"%WINDIR%\Downloaded Program Files"),
+                        Environment.ExpandEnvironmentVariables(@"%WINDIR%\Minidump"),
+                        Environment.ExpandEnvironmentVariables(@"%WINDIR%\ServiceProfiles\NetworkService\AppData\Local\Temp"),
+                        Environment.ExpandEnvironmentVariables(@"%WINDIR%\ServiceProfiles\LocalService\AppData\Local\Temp"),
+                    }
+                },
+
+                // System RAM Working Set Cache target
+                new()
+                {
+                    Name = "System Memory (RAM Cache)",
+                    Path = "Process Working Sets & RAM Cache",
+                    IsRamTarget = true,
+                    SizeBytes = estimatedReclaimableRam
+                }
+            };
+
+            // Scan directory sizes in parallel using all available cores
+            Parallel.ForEach(targets, t =>
+            {
+                if (t.IsRamTarget) return;
+
+                long total = GetDirectorySize(t.Path);
+                if (t.AdditionalPaths != null)
+                {
+                    foreach (var ap in t.AdditionalPaths)
+                    {
+                        total += GetDirectorySize(ap);
+                    }
+                }
+                t.SizeBytes = total;
+            });
+
+            lock (_cacheLock)
+            {
+                _cachedTargets = targets;
+            }
+
+            try
+            {
+                ScanCompleted?.Invoke(CloneTargets(targets));
+            }
+            catch { }
+
+            return targets;
+        }
+
+        public async Task<long> CleanAsync(CleanupTarget target, Action<string>? onFile = null)
+        {
+            long freed = await Task.Run(() =>
             {
                 if (target.IsRamTarget)
                 {
@@ -81,45 +164,19 @@ namespace SetupHub180Hz.Services
                     return ramFreed;
                 }
 
-                long freed = CleanDirectory(target.Path, onFile);
+                long totalFreed = CleanDirectory(target.Path, onFile);
 
                 if (target.AdditionalPaths != null)
                 {
                     foreach (var ap in target.AdditionalPaths)
-                        freed += CleanDirectory(ap, onFile);
+                        totalFreed += CleanDirectory(ap, onFile);
                 }
 
-                return freed;
+                return totalFreed;
             });
-        }
 
-        private static long CleanDirectory(string path, Action<string>? onFile = null)
-        {
-            long freed = 0;
-            if (!Directory.Exists(path)) return freed;
-
-            foreach (var file in SafeEnumerateFiles(path))
-            {
-                try
-                {
-                    var info = new FileInfo(file);
-                    long size = info.Length;
-                    info.Delete();
-                    freed += size;
-                    onFile?.Invoke(file);
-                }
-                catch { }
-            }
-
-            foreach (var dir in SafeEnumerateDirectories(path).OrderByDescending(d => d.Length))
-            {
-                try
-                {
-                    if (!Directory.EnumerateFileSystemEntries(dir).Any())
-                        Directory.Delete(dir);
-                }
-                catch { }
-            }
+            // Rescan immediately in background to update cache
+            _ = ScanAsync(force: true);
 
             return freed;
         }
@@ -134,26 +191,72 @@ namespace SetupHub180Hz.Services
 
         private static long GetDirectorySize(string path)
         {
-            if (!Directory.Exists(path)) return 0;
-            long size = 0;
-            foreach (var file in SafeEnumerateFiles(path))
+            if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return 0;
+            try
             {
-                try { size += new FileInfo(file).Length; }
-                catch { }
+                var di = new DirectoryInfo(path);
+                var options = new EnumerationOptions
+                {
+                    IgnoreInaccessible = true,
+                    RecurseSubdirectories = true,
+                    AttributesToSkip = FileAttributes.ReparsePoint
+                };
+
+                long size = 0;
+                foreach (var fi in di.EnumerateFiles("*", options))
+                {
+                    try { size += fi.Length; }
+                    catch { }
+                }
+                return size;
             }
-            return size;
+            catch
+            {
+                return 0;
+            }
         }
 
-        private static IEnumerable<string> SafeEnumerateFiles(string path)
+        private static long CleanDirectory(string path, Action<string>? onFile = null)
         {
-            try { return Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories); }
-            catch { return Enumerable.Empty<string>(); }
-        }
+            long freed = 0;
+            if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return freed;
 
-        private static IEnumerable<string> SafeEnumerateDirectories(string path)
-        {
-            try { return Directory.EnumerateDirectories(path, "*", SearchOption.AllDirectories); }
-            catch { return Enumerable.Empty<string>(); }
+            var options = new EnumerationOptions
+            {
+                IgnoreInaccessible = true,
+                RecurseSubdirectories = true,
+                AttributesToSkip = FileAttributes.ReparsePoint
+            };
+
+            try
+            {
+                var di = new DirectoryInfo(path);
+
+                foreach (var fi in di.EnumerateFiles("*", options))
+                {
+                    try
+                    {
+                        long size = fi.Length;
+                        fi.Delete();
+                        freed += size;
+                        onFile?.Invoke(fi.FullName);
+                    }
+                    catch { }
+                }
+
+                foreach (var subDir in di.EnumerateDirectories("*", options).OrderByDescending(d => d.FullName.Length))
+                {
+                    try
+                    {
+                        if (!subDir.EnumerateFileSystemInfos().Any())
+                            subDir.Delete();
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+
+            return freed;
         }
     }
 }

@@ -14,8 +14,10 @@ using SetupHub180Hz.Services;
 
 namespace SetupHub180Hz.Views
 {
-    public partial class SetupAppsPage : UserControl
+    public partial class SetupAppsPage : UserControl, IRealtimeRefreshable
     {
+        public void RefreshRealtime() => SyncDownloadPopupState();
+
         private readonly PackageCatalogService _catalog = new();
         private readonly WingetService _winget = new();
         private readonly BundleService _bundleService = new();

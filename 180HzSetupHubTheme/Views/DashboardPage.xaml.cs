@@ -9,12 +9,12 @@ using SetupHub180Hz.Services;
 
 namespace SetupHub180Hz.Views
 {
-    public partial class DashboardPage : UserControl
+    public partial class DashboardPage : UserControl, IRealtimeRefreshable
     {
         private readonly MainWindow _mainWindow;
         private readonly WingetService _winget = new();
         private readonly SystemStatsService _stats = new();
-        private readonly CleanupService _cleanup = new();
+        private readonly CleanupService _cleanup = CleanupService.Instance;
         private readonly DispatcherTimer _statsTimer;
         private bool _isBoosting = false;
 
@@ -46,6 +46,16 @@ namespace SetupHub180Hz.Views
             {
                 _statsTimer.Stop();
             };
+        }
+
+        public void RefreshRealtime()
+        {
+            if (!_statsTimer.IsEnabled)
+            {
+                _statsTimer.Start();
+            }
+            UpdateStats();
+            UpdateSummary();
         }
 
         private void AdaptLayout()
@@ -252,11 +262,14 @@ namespace SetupHub180Hz.Views
             // Immediately refresh live stats gauge
             UpdateStats();
 
+            // Refresh CleanupService RAM target in background
+            CleanupService.Instance.StartBackgroundScan();
+
             string freedDisplay = FormatBytes(freed);
             TxtCleanRamBtn.Text = $"✓ {freedDisplay}";
 
-            ActivityLogger.Instance.Log($"RAM Cleared: Reclaimed {freedDisplay} physical memory.", ActivityType.Success);
-            NotificationService.Notify("RAM Cleaned", $"Successfully reclaimed {freedDisplay} of RAM.");
+            ActivityLogger.Instance.Log($"Maximum RAM Clear & Cache Purged: Reclaimed {freedDisplay} physical memory with peak performance tuning.", ActivityType.Success);
+            NotificationService.Notify("Maximum RAM & Cache Purged", $"Successfully freed {freedDisplay} RAM. System cache cleared & memory performance maximized.");
 
             await Task.Delay(2500);
             TxtCleanRamBtn.Text = "CLEAR";

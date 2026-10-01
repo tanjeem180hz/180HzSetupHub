@@ -7,35 +7,89 @@ using SetupHub180Hz.Services;
 
 namespace SetupHub180Hz.Views
 {
-    public partial class CleanupPage : UserControl
+    public partial class CleanupPage : UserControl, IRealtimeRefreshable
     {
-        private readonly CleanupService _cleanup = new();
+        private readonly CleanupService _cleanup = CleanupService.Instance;
         private readonly Dictionary<CheckBox, CleanupTarget> _rowMap = new();
 
         public CleanupPage()
         {
             InitializeComponent();
-            Loaded += async (_, _) => await ScanAsync();
+
+            Loaded += (_, _) =>
+            {
+                _cleanup.ScanCompleted -= OnScanCompleted;
+                _cleanup.ScanCompleted += OnScanCompleted;
+
+                if (_cleanup.CachedTargets is { } cached && cached.Count > 0)
+                {
+                    UpdateDisplay(cached);
+                }
+                else
+                {
+                    SummaryText.Text = "Scanning…";
+                    CleanSelectedButton.IsEnabled = false;
+                    _ = _cleanup.ScanAsync(force: false);
+                }
+            };
+
+            Unloaded += (_, _) =>
+            {
+                _cleanup.ScanCompleted -= OnScanCompleted;
+            };
         }
 
-        private async System.Threading.Tasks.Task ScanAsync()
+        public void RefreshRealtime()
         {
+            if (_cleanup.CachedTargets is { } cached && cached.Count > 0)
+            {
+                UpdateDisplay(cached);
+            }
+            else if (!_cleanup.IsScanning)
+            {
+                _ = _cleanup.ScanAsync(force: false);
+            }
+        }
+
+        private void OnScanCompleted(List<CleanupTarget> targets)
+        {
+            Dispatcher.InvokeAsync(() => UpdateDisplay(targets));
+        }
+
+        private void UpdateDisplay(List<CleanupTarget> targets)
+        {
+            // Preserve user selections if items are currently loaded
+            var checkedStates = new Dictionary<string, bool>();
+            foreach (var kv in _rowMap)
+            {
+                checkedStates[kv.Value.Name] = kv.Key.IsChecked ?? true;
+            }
+
             TargetsList.Items.Clear();
             _rowMap.Clear();
-            SummaryText.Text = "Scanning…";
-            CleanSelectedButton.IsEnabled = false;
 
-            var targets = await _cleanup.ScanAsync();
             long totalBytes = targets.Sum(t => t.SizeBytes);
-
             SummaryText.Text = $"{FormatSize(totalBytes)} can potentially be freed.";
             CleanSelectedButton.IsEnabled = true;
 
             foreach (var target in targets)
-                TargetsList.Items.Add(BuildRow(target));
+            {
+                bool isChecked = true;
+                if (checkedStates.TryGetValue(target.Name, out bool wasChecked))
+                {
+                    isChecked = wasChecked;
+                }
+                TargetsList.Items.Add(BuildRow(target, isChecked));
+            }
         }
 
-        private async void Rescan_Click(object sender, RoutedEventArgs e) => await ScanAsync();
+        private async void Rescan_Click(object sender, RoutedEventArgs e)
+        {
+            SummaryText.Text = "Scanning…";
+            CleanSelectedButton.IsEnabled = false;
+            var targets = await _cleanup.ScanAsync(force: true);
+            UpdateDisplay(targets);
+        }
 
         private async void CleanSelected_Click(object sender, RoutedEventArgs e)
         {
@@ -52,12 +106,15 @@ namespace SetupHub180Hz.Views
 
             CleanSelectedButton.Tag = "Clean Selected";
             CleanSelectedButton.IsEnabled = true;
-            await ScanAsync();
+
+            SummaryText.Text = "Updating sizes…";
+            var targets = await _cleanup.ScanAsync(force: true);
+            UpdateDisplay(targets);
         }
 
-        private Border BuildRow(CleanupTarget target)
+        private Border BuildRow(CleanupTarget target, bool isChecked = true)
         {
-            var checkBox = new CheckBox { IsChecked = true, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 12, 0) };
+            var checkBox = new CheckBox { IsChecked = isChecked, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 12, 0) };
             _rowMap[checkBox] = target;
 
             var nameText = new TextBlock

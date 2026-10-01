@@ -7,7 +7,7 @@ using SetupHub180Hz.Services;
 
 namespace SetupHub180Hz.Views
 {
-    public partial class StoragePage : UserControl
+    public partial class StoragePage : UserControl, IRealtimeRefreshable
     {
         private readonly StorageService _storage = new();
 
@@ -16,6 +16,11 @@ namespace SetupHub180Hz.Views
             InitializeComponent();
             PathText.Text = StorageService.AppDataFolder;
             Loaded += async (_, _) => await RefreshSizeAsync();
+        }
+
+        public void RefreshRealtime()
+        {
+            _ = RefreshSizeAsync();
         }
 
         private async void Refresh_Click(object sender, RoutedEventArgs e) => await RefreshSizeAsync();

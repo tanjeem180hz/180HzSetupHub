@@ -12,9 +12,11 @@ using SetupHub180Hz.Services;
 
 namespace SetupHub180Hz.Views
 {
-    public partial class DownloadsPage : UserControl
+    public partial class DownloadsPage : UserControl, IRealtimeRefreshable
     {
         private readonly MainWindow? _mainWindow;
+
+        public void RefreshRealtime() => RefreshAllUI();
 
         public DownloadsPage() : this(null)
         {

@@ -60,6 +60,12 @@ namespace SetupHub180Hz
             // Initialize sidebar in collapsed compact mode
             CollapseSidebar(animate: false);
 
+            // Automatically start cleanup background scan immediately when app opens
+            CleanupService.Instance.StartBackgroundScan();
+
+            // Real-time refresh on user interaction
+            PreviewMouseDown += MainWindow_PreviewMouseDown;
+
             NavigateTo("Dashboard");
         }
 
@@ -277,6 +283,38 @@ namespace SetupHub180Hz
 
             ContentHost.Content = page;
             PlayEnterAnimation(ContentHost);
+
+            // Real-time refresh of navigated page without redirects
+            if (page is IRealtimeRefreshable refreshable)
+            {
+                refreshable.RefreshRealtime();
+            }
+        }
+
+        private DateTime _lastClickRefresh = DateTime.MinValue;
+
+        private void MainWindow_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if ((DateTime.UtcNow - _lastClickRefresh).TotalMilliseconds < 1500)
+            {
+                return;
+            }
+            _lastClickRefresh = DateTime.UtcNow;
+
+            TriggerRealtimeRefresh();
+        }
+
+        public void TriggerRealtimeRefresh()
+        {
+            try
+            {
+                if (ContentHost?.Content is IRealtimeRefreshable refreshable)
+                {
+                    refreshable.RefreshRealtime();
+                }
+                UpdateDownloadsBadge();
+            }
+            catch { }
         }
 
         public void SetStatus(string text)

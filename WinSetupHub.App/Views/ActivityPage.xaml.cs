@@ -4,8 +4,10 @@ using SetupHub180Hz.Services;
 
 namespace SetupHub180Hz.Views
 {
-    public partial class ActivityPage : UserControl
+    public partial class ActivityPage : UserControl, IRealtimeRefreshable
     {
+        public void RefreshRealtime() => UpdateCount();
+
         public ActivityPage()
         {
             InitializeComponent();

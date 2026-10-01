@@ -8,9 +8,11 @@ using SetupHub180Hz.Services;
 
 namespace SetupHub180Hz.Views
 {
-    public partial class UpdateCenterPage : UserControl
+    public partial class UpdateCenterPage : UserControl, IRealtimeRefreshable
     {
         private readonly WingetService _winget = new();
+
+        public void RefreshRealtime() => UpdateSummary();
 
         public UpdateCenterPage()
         {
