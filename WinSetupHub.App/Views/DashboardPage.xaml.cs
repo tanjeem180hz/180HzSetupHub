@@ -238,5 +238,6 @@ namespace SetupHub180Hz.Views
         private void TileCleanup_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Cleanup");
         private void TileActivity_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Activity");
         private void TileStorage_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Storage");
+        private void TileOptimization_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Optimization");
     }
 }

@@ -268,6 +268,7 @@ namespace SetupHub180Hz
                     "Activity" => new ActivityPage(),
                     "Storage" => new StoragePage(),
                     "Settings" => new SettingsPage(),
+                    "Optimization" => new OptimizationPage(),
                     _ => new DashboardPage(this),
                 };
                 _pageCache[pageKey] = page;
@@ -296,6 +297,7 @@ namespace SetupHub180Hz
                 "Activity" => NavActivity,
                 "Storage" => NavStorage,
                 "Settings" => NavSettings,
+                "Optimization" => NavOptimization,
                 _ => null,
             };
             if (target != null) target.IsChecked = true;

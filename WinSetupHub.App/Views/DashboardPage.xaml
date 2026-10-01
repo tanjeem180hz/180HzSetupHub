@@ -843,6 +843,29 @@
                                        Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Button>
+
+                    <!-- 09 Optimization -->
+                    <Button x:Name="TileOptimization" Style="{StaticResource DashboardTile}" Margin="6" Click="TileOptimization_Click">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
+                                        <TextBlock Text="09" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
+                                    </Border>
+                                    <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
+                                                                services:LottieHelper.AssetName="startup_boost.json"
+                                                                VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+                            <TextBlock Grid.Row="1" Text="Optimization" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
+                        </Grid>
+                    </Button>
                 </UniformGrid>
             </StackPanel>
         </Grid>
