@@ -21,8 +21,10 @@ namespace SetupHub180Hz.Services
             PropertyNameCaseInsensitive = true
         };
 
+        // Recommended tweaks curated category-wise
         private static readonly HashSet<string> RecommendedIds = new(StringComparer.OrdinalIgnoreCase)
         {
+            // Essential Tweaks (WinUtil Standard Preset)
             "WPFTweaksActivity",
             "WPFTweaksConsumerFeatures",
             "WPFTweaksDisableExplorerAutoDiscovery",
@@ -34,7 +36,27 @@ namespace SetupHub180Hz.Services
             "WPFTweaksDiskCleanup",
             "WPFTweaksDeleteTempFiles",
             "WPFTweaksEndTaskOnTaskbar",
-            "WPFTweaksRestorePoint"
+            "WPFTweaksRestorePoint",
+
+            // Customize Preferences (Standard desktop responsiveness & productivity)
+            "WPFToggleDarkMode",
+            "WPFToggleShowExt",
+            "WPFToggleLongPaths",
+            "WPFToggleBingSearch",
+            "WPFToggleStartMenuRecommendations",
+            "WPFToggleGameMode",
+            "WPFToggleNumLock",
+            "WPFToggleDetailedBSoD",
+
+            // Performance Plans
+            "WPFAddUltPerf",
+
+            // Advanced Tweaks (Safe popular optimizations)
+            "WPFTweaksRightClickMenu",
+            "WPFTweaksWindowsAI",
+            "WPFTweaksLogiBlock",
+            "WPFTweaksRazerBlock",
+            "WPFTweaksDisplay"
         };
 
         private List<TweakItem>? _cache;
@@ -110,24 +132,18 @@ namespace SetupHub180Hz.Services
             }
         }
 
-        // ───────────────────────────────────────────────
-        // Apply a tweak
-        // ───────────────────────────────────────────────
         public async Task ApplyAsync(TweakItem tweak)
         {
-            // 1. Registry entries
             foreach (var reg in tweak.Registry)
             {
                 ApplyRegistryEntry(reg, undo: false);
             }
 
-            // 2. Service entries
             foreach (var svc in tweak.Service)
             {
                 await SetServiceStartupAsync(svc.Name, svc.StartupType);
             }
 
-            // 3. Invoke scripts
             foreach (var script in tweak.InvokeScript)
             {
                 if (!string.IsNullOrWhiteSpace(script))
@@ -135,25 +151,19 @@ namespace SetupHub180Hz.Services
             }
         }
 
-        // ───────────────────────────────────────────────
-        // Undo a tweak (restore original values)
-        // ───────────────────────────────────────────────
         public async Task UndoAsync(TweakItem tweak)
         {
-            // 1. Registry – restore originals
             foreach (var reg in tweak.Registry)
             {
                 ApplyRegistryEntry(reg, undo: true);
             }
 
-            // 2. Service – restore original startup type
             foreach (var svc in tweak.Service)
             {
                 if (!string.IsNullOrWhiteSpace(svc.OriginalType))
                     await SetServiceStartupAsync(svc.Name, svc.OriginalType);
             }
 
-            // 3. Undo scripts
             foreach (var script in tweak.UndoScript)
             {
                 if (!string.IsNullOrWhiteSpace(script))
@@ -161,9 +171,6 @@ namespace SetupHub180Hz.Services
             }
         }
 
-        // ───────────────────────────────────────────────
-        // Registry helpers
-        // ───────────────────────────────────────────────
         private static void ApplyRegistryEntry(TweakRegistryEntry reg, bool undo)
         {
             try
@@ -239,9 +246,6 @@ namespace SetupHub180Hz.Services
             return (hive, subKey);
         }
 
-        // ───────────────────────────────────────────────
-        // Service helpers
-        // ───────────────────────────────────────────────
         private static async Task SetServiceStartupAsync(string serviceName, string startupType)
         {
             string psCmd = startupType.ToLowerInvariant() switch
@@ -256,9 +260,6 @@ namespace SetupHub180Hz.Services
             await RunPowerShellAsync(psCmd);
         }
 
-        // ───────────────────────────────────────────────
-        // PowerShell runner
-        // ───────────────────────────────────────────────
         private static Task RunPowerShellAsync(string script)
         {
             return Task.Run(() =>

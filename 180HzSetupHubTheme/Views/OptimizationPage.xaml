@@ -251,7 +251,7 @@
                 </Border>
 
                 <!-- Tweak List -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                <ScrollViewer x:Name="TweaksScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto"
                               HorizontalScrollBarVisibility="Disabled"
                               Padding="24,16,24,24">
                     <StackPanel>

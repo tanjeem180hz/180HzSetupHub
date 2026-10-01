@@ -30,7 +30,6 @@ namespace SetupHub180Hz.Views
         {
             _allTweaks = await _tweakService.GetAllAsync();
 
-            // Build category chips
             var categories = _allTweaks
                 .Select(t => t.Category)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -76,12 +75,29 @@ namespace SetupHub180Hz.Views
             TweaksItemsControl.ItemsSource = list;
             EmptyState.Visibility = list.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
+            // Reset scroll position to top whenever category is changed
+            TweaksScrollViewer?.ScrollToTop();
+            TweaksScrollViewer?.ScrollToVerticalOffset(0);
+
             bool hasAdvanced = list.Any(t => t.IsAdvanced);
             AdvancedWarningBanner.Visibility = hasAdvanced ? Visibility.Visible : Visibility.Collapsed;
 
             int total = _allTweaks.Count;
-            int recCount = _allTweaks.Count(t => t.IsRecommended);
-            TxtSubtitle.Text = $"{total} tweaks available • {recCount} recommended safe";
+            int currentCount = list.Count;
+            int currentRec = list.Count(t => t.IsRecommended);
+
+            if (string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            {
+                TxtSubtitle.Text = $"{total} tweaks available • {_allTweaks.Count(t => t.IsRecommended)} recommended safe";
+                BtnSelectRecommended.ToolTip = "Select recommended tweaks across all categories";
+                BtnApplyRecommendation.ToolTip = "Apply all recommended optimizations instantly";
+            }
+            else
+            {
+                TxtSubtitle.Text = $"{_activeCategory} • {currentCount} tweaks ({currentRec} recommended)";
+                BtnSelectRecommended.ToolTip = $"Select recommended tweaks in {_activeCategory}";
+                BtnApplyRecommendation.ToolTip = $"Apply recommended optimizations for {_activeCategory}";
+            }
         }
 
         private void BtnSelectAll_Click(object sender, RoutedEventArgs e)
@@ -92,27 +108,68 @@ namespace SetupHub180Hz.Views
 
         private void BtnDeselectAll_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var t in _allTweaks)
-                t.IsSelected = false;
+            // Category-wise deselect if in a category, otherwise all
+            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            {
+                foreach (var t in GetCurrentItems())
+                    t.IsSelected = false;
+            }
+            else
+            {
+                foreach (var t in _allTweaks)
+                    t.IsSelected = false;
+            }
         }
 
         private void BtnSelectRecommended_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var t in _allTweaks)
-                t.IsSelected = t.IsRecommended;
+            var currentItems = GetCurrentItems().ToList();
+            var recItems = currentItems.Where(t => t.IsRecommended).ToList();
+
+            if (recItems.Count > 0)
+            {
+                foreach (var t in currentItems)
+                    t.IsSelected = t.IsRecommended;
+            }
+            else
+            {
+                // If a category has no items specifically tagged, select non-advanced safe items
+                foreach (var t in currentItems)
+                    t.IsSelected = !t.IsAdvanced;
+            }
         }
 
         private void BtnApplyRecommendation_Click(object sender, RoutedEventArgs e)
         {
-            var recommended = _allTweaks.Where(t => t.IsRecommended).ToList();
-            if (recommended.Count == 0) return;
+            List<TweakItem> recommended;
+            string categoryLabel = "";
 
-            foreach (var t in _allTweaks)
-                t.IsSelected = t.IsRecommended;
+            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            {
+                var currentItems = GetCurrentItems().ToList();
+                recommended = currentItems.Where(t => t.IsRecommended).ToList();
+                if (recommended.Count == 0)
+                    recommended = currentItems.Where(t => !t.IsAdvanced).ToList();
+                categoryLabel = $" ({_activeCategory})";
+            }
+            else
+            {
+                recommended = _allTweaks.Where(t => t.IsRecommended).ToList();
+            }
+
+            if (recommended.Count == 0)
+            {
+                MessageBox.Show("No recommended tweaks found for the current selection.",
+                    "180Hz Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            foreach (var t in GetCurrentItems())
+                t.IsSelected = recommended.Contains(t);
 
             var dialog = new OptimizationDialog(
-                title: "Apply Recommended Optimizations",
-                subtitle: $"This will apply {recommended.Count} recommended optimizations for peak desktop velocity & system cleanliness:",
+                title: $"Apply Recommended Optimizations{categoryLabel}",
+                subtitle: $"This will apply {recommended.Count} recommended optimizations for {(_activeCategory == "All" ? "peak system velocity & responsiveness" : _activeCategory)}:",
                 tweaks: recommended,
                 isUndo: false,
                 tweakService: _tweakService)
@@ -130,10 +187,24 @@ namespace SetupHub180Hz.Views
 
         private void BtnRestoreDefault_Click(object sender, RoutedEventArgs e)
         {
+            List<TweakItem> targetTweaks;
+            string scopeText;
+
+            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            {
+                targetTweaks = GetCurrentItems().ToList();
+                scopeText = $"these {targetTweaks.Count} tweaks in {_activeCategory}";
+            }
+            else
+            {
+                targetTweaks = _allTweaks;
+                scopeText = $"all {_allTweaks.Count} system tweaks";
+            }
+
             var dialog = new OptimizationDialog(
                 title: "Restore Default Settings",
-                subtitle: $"This will revert all {_allTweaks.Count} system tweaks and restore standard Windows defaults:",
-                tweaks: _allTweaks,
+                subtitle: $"This will revert {scopeText} back to standard Windows factory defaults:",
+                tweaks: targetTweaks,
                 isUndo: true,
                 tweakService: _tweakService)
             {
@@ -142,20 +213,34 @@ namespace SetupHub180Hz.Views
 
             if (dialog.ShowDialog() == true)
             {
-                foreach (var t in _allTweaks)
+                foreach (var t in targetTweaks)
                     t.IsSelected = false;
 
-                TxtStatus.Text = $"✓ Restored all {_allTweaks.Count} tweaks to Windows defaults.";
+                TxtStatus.Text = $"✓ Restored {targetTweaks.Count} tweak(s) to Windows defaults.";
                 StatusBar.Visibility = Visibility.Visible;
             }
         }
 
         private void BtnApplyAll_Click(object sender, RoutedEventArgs e)
         {
+            List<TweakItem> targetTweaks;
+            string scopeText;
+
+            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            {
+                targetTweaks = GetCurrentItems().ToList();
+                scopeText = $"all {targetTweaks.Count} tweaks in {_activeCategory}";
+            }
+            else
+            {
+                targetTweaks = _allTweaks;
+                scopeText = $"all {_allTweaks.Count} optimizations across all categories";
+            }
+
             var dialog = new OptimizationDialog(
-                title: "Apply All Optimizations",
-                subtitle: $"This will apply all {_allTweaks.Count} optimizations across all categories to your system:",
-                tweaks: _allTweaks,
+                title: "Apply Optimizations",
+                subtitle: $"This will apply {scopeText} to your system:",
+                tweaks: targetTweaks,
                 isUndo: false,
                 tweakService: _tweakService)
             {
@@ -164,12 +249,12 @@ namespace SetupHub180Hz.Views
 
             if (dialog.ShowDialog() == true)
             {
-                foreach (var t in _allTweaks)
+                foreach (var t in targetTweaks)
                     t.IsSelected = true;
 
-                TxtStatus.Text = $"✓ Applied all {_allTweaks.Count} optimizations successfully.";
+                TxtStatus.Text = $"✓ Applied {targetTweaks.Count} optimization(s) successfully.";
                 StatusBar.Visibility = Visibility.Visible;
-                CheckRebootNeeded(_allTweaks);
+                CheckRebootNeeded(targetTweaks);
             }
         }
 

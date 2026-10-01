@@ -1,9 +1,12 @@
+using System.Collections.Generic;
+
 namespace SetupHub180Hz.Models
 {
     public class CleanupTarget
     {
         public string Name { get; set; } = "";
         public string Path { get; set; } = "";
+        public List<string>? AdditionalPaths { get; set; }
         public long SizeBytes { get; set; }
         public bool IsSelected { get; set; } = true;
 

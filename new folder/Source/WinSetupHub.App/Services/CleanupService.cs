@@ -20,10 +20,35 @@ namespace SetupHub180Hz.Services
                     new() { Name = "Windows Update Cache", Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\SoftwareDistribution\Download") },
                     new() { Name = "Prefetch Cache", Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\Prefetch") },
                     new() { Name = "Recent Items", Path = Environment.GetFolderPath(Environment.SpecialFolder.Recent) },
+
+                    // C: Drive System Cleanup target
+                    new()
+                    {
+                        Name = "C: Drive Cleanup",
+                        Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\Logs"),
+                        AdditionalPaths = new List<string>
+                        {
+                            Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\CrashDumps"),
+                            Environment.ExpandEnvironmentVariables(@"%ProgramData%\Microsoft\Windows\WER"),
+                            Environment.ExpandEnvironmentVariables(@"%WINDIR%\System32\LogFiles"),
+                            Environment.ExpandEnvironmentVariables(@"%WINDIR%\Downloaded Program Files"),
+                            Environment.ExpandEnvironmentVariables(@"%WINDIR%\Minidump"),
+                            Environment.ExpandEnvironmentVariables(@"%WINDIR%\ServiceProfiles\NetworkService\AppData\Local\Temp"),
+                            Environment.ExpandEnvironmentVariables(@"%WINDIR%\ServiceProfiles\LocalService\AppData\Local\Temp"),
+                        }
+                    }
                 };
 
                 foreach (var t in targets)
-                    t.SizeBytes = GetDirectorySize(t.Path);
+                {
+                    long total = GetDirectorySize(t.Path);
+                    if (t.AdditionalPaths != null)
+                    {
+                        foreach (var ap in t.AdditionalPaths)
+                            total += GetDirectorySize(ap);
+                    }
+                    t.SizeBytes = total;
+                }
 
                 return targets;
             });
@@ -33,39 +58,50 @@ namespace SetupHub180Hz.Services
         {
             return Task.Run(() =>
             {
-                long freed = 0;
-                if (!Directory.Exists(target.Path)) return freed;
+                long freed = CleanDirectory(target.Path, onFile);
 
-                foreach (var file in SafeEnumerateFiles(target.Path))
+                if (target.AdditionalPaths != null)
                 {
-                    try
-                    {
-                        var info = new FileInfo(file);
-                        long size = info.Length;
-                        info.Delete();
-                        freed += size;
-                        onFile?.Invoke(file);
-                    }
-                    catch
-                    {
-                        // File is in use or access is denied — skip it and keep sweeping
-                        // the rest, rather than aborting the whole cleanup.
-                    }
-                }
-
-                // Remove now-empty subfolders, deepest first, best-effort.
-                foreach (var dir in SafeEnumerateDirectories(target.Path).OrderByDescending(d => d.Length))
-                {
-                    try
-                    {
-                        if (!Directory.EnumerateFileSystemEntries(dir).Any())
-                            Directory.Delete(dir);
-                    }
-                    catch { /* not empty or locked — leave it */ }
+                    foreach (var ap in target.AdditionalPaths)
+                        freed += CleanDirectory(ap, onFile);
                 }
 
                 return freed;
             });
+        }
+
+        private static long CleanDirectory(string path, Action<string>? onFile = null)
+        {
+            long freed = 0;
+            if (!Directory.Exists(path)) return freed;
+
+            foreach (var file in SafeEnumerateFiles(path))
+            {
+                try
+                {
+                    var info = new FileInfo(file);
+                    long size = info.Length;
+                    info.Delete();
+                    freed += size;
+                    onFile?.Invoke(file);
+                }
+                catch
+                {
+                    // File is locked or in use — skip and proceed with the rest
+                }
+            }
+
+            foreach (var dir in SafeEnumerateDirectories(path).OrderByDescending(d => d.Length))
+            {
+                try
+                {
+                    if (!Directory.EnumerateFileSystemEntries(dir).Any())
+                        Directory.Delete(dir);
+                }
+                catch { }
+            }
+
+            return freed;
         }
 
         public async Task<long> CleanAllAsync(IEnumerable<CleanupTarget> targets, Action<string>? onFile = null)
@@ -83,7 +119,7 @@ namespace SetupHub180Hz.Services
             foreach (var file in SafeEnumerateFiles(path))
             {
                 try { size += new FileInfo(file).Length; }
-                catch { /* skip locked/inaccessible files during size scan */ }
+                catch { }
             }
             return size;
         }
