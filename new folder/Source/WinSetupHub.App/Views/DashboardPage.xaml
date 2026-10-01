@@ -494,29 +494,10 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
-                                <!-- Top Header: Engine Status & Health Index -->
-                                <Grid Grid.Row="0" Margin="0,0,0,10">
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Border Width="8" Height="8" CornerRadius="4" Background="{DynamicResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center">
-                                            <Border.Effect>
-                                                <DropShadowEffect Color="#00FF66" BlurRadius="6" ShadowDepth="0" Opacity="0.9"/>
-                                            </Border.Effect>
-                                        </Border>
-                                        <TextBlock Text="TELEMETRY HUB" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"
-                                                   FontFamily="{StaticResource AppFont}" VerticalAlignment="Center"/>
-                                    </StackPanel>
-
-                                    <Border HorizontalAlignment="Right" Background="{DynamicResource BrushSurfaceHover}"
-                                            BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2">
-                                        <TextBlock Text="100% HEALTH" FontSize="9.5" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" FontFamily="{StaticResource AppFont}"/>
-                                    </Border>
-                                </Grid>
-
-                                <!-- Middle Row: Animated Lottie Visual + Active Modules Info -->
-                                <Grid Grid.Row="1" Margin="0,0,0,12">
+                                <!-- Top Row: Animated Lottie Visual + Active Modules Info -->
+                                <Grid Grid.Row="0" Margin="0,0,0,14">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
@@ -548,8 +529,8 @@
                                     </StackPanel>
                                 </Grid>
 
-                                <!-- Bottom Row: 1-Click Quick Boost Button -->
-                                <Button Grid.Row="2" x:Name="BtnQuickBoost" Style="{StaticResource AccentButton}" Click="BtnQuickBoost_Click"
+                                <!-- Bottom Row: Quick Boost Button -->
+                                <Button Grid.Row="1" x:Name="BtnQuickBoost" Style="{StaticResource AccentButton}" Click="BtnQuickBoost_Click"
                                         Height="34" Padding="12,0"
                                         ToolTip="Instantly sweep temporary junk files and refresh telemetry">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
