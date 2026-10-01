@@ -519,7 +519,10 @@
             </Grid>
 
             <!-- Search Catalog Action -->
-            <Button Grid.Column="1" Content="🔍" Tag="Filter" Style="{StaticResource ExpandableAccentButton}" Margin="8,0,0,0" Click="Search_Click"/>
+            <Button Grid.Column="1" Tag="Filter" Style="{StaticResource ExpandableOutlineButton}" Margin="8,0,0,0" Click="Search_Click">
+                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                            services:LottieHelper.AssetName="filter.json"/>
+            </Button>
 
             <!-- Winget Live Web Search Action -->
             <Button x:Name="WingetSearchButton" Grid.Column="2" Tag="Deep Web Search"
@@ -527,7 +530,7 @@
                     ToolTip="Search winget's full online repository for any software outside preset list"
                     Click="WingetSearch_Click">
                 <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
-                                            services:LottieHelper.AssetName="scan.json"/>
+                                            services:LottieHelper.AssetName="deep_web_search.json"/>
             </Button>
 
             <!-- Import & Install Action -->
