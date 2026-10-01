@@ -44,15 +44,21 @@
                             <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
                                                         services:LottieHelper.AssetName="pause.json"/>
                         </Button>
-                        <Button x:Name="BtnClearCompleted" Content="🧹" Tag="Clear Completed" Style="{StaticResource ExpandableOutlineButton}"
-                                Margin="0,0,8,0" Click="BtnClearCompleted_Click"/>
+                        <Button x:Name="BtnClearCompleted" Tag="Clear Completed" Style="{StaticResource ExpandableOutlineButton}"
+                                Margin="0,0,8,0" Click="BtnClearCompleted_Click">
+                            <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                        services:LottieHelper.AssetName="clear_completed.json"/>
+                        </Button>
                         <Button x:Name="BtnCancelAll" Tag="Cancel Queue" Style="{StaticResource ExpandableDangerButton}"
                                 Margin="0,0,8,0" Click="BtnCancelAll_Click">
                             <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
                                                         services:LottieHelper.AssetName="cancel.json"/>
                         </Button>
-                        <Button x:Name="BtnBrowseApps" Content="⚡" Tag="Browse Apps" Style="{StaticResource ExpandableAccentButton}"
-                                Click="BtnBrowseApps_Click"/>
+                        <Button x:Name="BtnBrowseApps" Tag="Browse Apps" Style="{StaticResource ExpandableOutlineButton}"
+                                Click="BtnBrowseApps_Click">
+                            <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                        services:LottieHelper.AssetName="browse_apps.json"/>
+                        </Button>
                     </StackPanel>
                 </Grid>
 
@@ -329,8 +335,11 @@
                                            Foreground="{DynamicResource BrushTextPrimary}" HorizontalAlignment="Center"/>
                                 <TextBlock Text="Head over to Setup Apps or search software to install packages with one-click deployment."
                                            FontSize="12" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Center" Margin="0,4,0,14"/>
-                                <Button Content="⚡" Tag="Open Setup Apps" Style="{StaticResource ExpandableAccentButton}" HorizontalAlignment="Center"
-                                        Click="BtnBrowseApps_Click"/>
+                                <Button Tag="Open Setup Apps" Style="{StaticResource ExpandableOutlineButton}" HorizontalAlignment="Center"
+                                        Click="BtnBrowseApps_Click">
+                                    <lottie:LottieAnimationView Width="15" Height="15" AutoPlay="True" RepeatCount="-1"
+                                                                services:LottieHelper.AssetName="browse_apps.json"/>
+                                </Button>
                             </StackPanel>
                         </Grid>
                     </Grid>
