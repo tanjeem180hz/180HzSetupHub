@@ -13,7 +13,7 @@
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="MinHeight" Value="136"/>
+            <Setter Property="MinHeight" Value="92"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="VerticalContentAlignment" Value="Stretch"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
@@ -663,7 +663,6 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
@@ -671,16 +670,14 @@
                                     <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="01" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
-                                    <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
+                                    <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="gears.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Setup Apps" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
-                            <TextBlock Grid.Row="2" Text="Search winget catalog and install essential applications with one click."
-                                       Style="{StaticResource TextBody}" FontSize="12"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Button>
 
@@ -689,7 +686,6 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
@@ -697,16 +693,14 @@
                                     <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="02" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
-                                    <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
+                                    <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="download_flow.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Downloads" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
-                            <TextBlock Grid.Row="2" Text="Real-time bandwidth monitoring, concurrent queue manager, and speed charts."
-                                       Style="{StaticResource TextBody}" FontSize="12"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Button>
 
@@ -715,7 +709,6 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
@@ -723,16 +716,14 @@
                                     <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="03" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
-                                    <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
+                                    <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="update_sync.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Update Center" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
-                            <TextBlock Grid.Row="2" Text="Detect out-of-date apps and upgrade them individually or all at once."
-                                       Style="{StaticResource TextBody}" FontSize="12"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Button>
 
@@ -741,7 +732,6 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
@@ -749,16 +739,14 @@
                                     <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="04" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
-                                    <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
+                                    <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="uninstaller_bin.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Uninstaller" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
-                            <TextBlock Grid.Row="2" Text="View all installed applications and cleanly uninstall unwanted software."
-                                       Style="{StaticResource TextBody}" FontSize="12"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Button>
 
@@ -767,7 +755,6 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
@@ -775,16 +762,14 @@
                                     <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="05" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
-                                    <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
+                                    <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="startup_boost.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Startup Apps" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
-                            <TextBlock Grid.Row="2" Text="Inspect and control apps configured to launch automatically with Windows."
-                                       Style="{StaticResource TextBody}" FontSize="12"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Button>
 
@@ -793,7 +778,6 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
@@ -801,16 +785,14 @@
                                     <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="06" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
-                                    <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
+                                    <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="cleanup_sparkle.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Cleanup" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
-                            <TextBlock Grid.Row="2" Text="Scan and safely purge temporary files, caches, and prefetch items."
-                                       Style="{StaticResource TextBody}" FontSize="12"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Button>
 
@@ -819,7 +801,6 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
@@ -827,16 +808,14 @@
                                     <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="07" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
-                                    <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
+                                    <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="activity_pulse.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Activity" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
-                            <TextBlock Grid.Row="2" Text="Live event log and telemetry history for installs, updates and cleanups."
-                                       Style="{StaticResource TextBody}" FontSize="12"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Button>
 
@@ -845,7 +824,6 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0">
@@ -853,16 +831,14 @@
                                     <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                         <TextBlock Text="08" Foreground="{DynamicResource BrushAccent}" FontSize="10" FontWeight="Bold"/>
                                     </Border>
-                                    <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
+                                    <lottie:LottieAnimationView Width="20" Height="20" AutoPlay="True" RepeatCount="-1"
                                                                 services:LottieHelper.AssetName="scan.json"
                                                                 VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <TextBlock Text="→" Foreground="{DynamicResource BrushAccent}" FontSize="15" FontWeight="Bold" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                             </Grid>
                             <TextBlock Grid.Row="1" Text="Storage" FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,12,0,4"/>
-                            <TextBlock Grid.Row="2" Text="View disk footprint and open the local application data directory."
-                                       Style="{StaticResource TextBody}" FontSize="12"/>
+                                       Foreground="{DynamicResource BrushTextPrimary}" Margin="0,16,0,2" VerticalAlignment="Bottom"/>
                         </Grid>
                     </Button>
                 </UniformGrid>
