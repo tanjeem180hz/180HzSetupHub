@@ -214,24 +214,10 @@ namespace SetupHub180Hz.Views
 
                 UpdateStats();
 
-                double freedMb = Math.Round((double)freedBytes / (1024 * 1024), 1);
-                if (freedMb > 0)
-                {
-                    TxtBoostStatus.Text = $"✓ +{freedMb} MB Freed! Peak Mode";
-                    TxtBoostStatus.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
-                }
-                else
-                {
-                    TxtBoostStatus.Text = "✓ System 100% Optimized";
-                    TxtBoostStatus.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
-                }
-
                 TxtQuickBoostBtn.Text = "BOOSTED!";
 
                 await Task.Delay(2500);
                 TxtQuickBoostBtn.Text = "OPTIMIZE";
-                TxtBoostStatus.Text = "✓ All Systems Nominal";
-                TxtBoostStatus.Foreground = (System.Windows.Media.Brush)FindResource("BrushTextSecondary");
             }
             catch
             {
