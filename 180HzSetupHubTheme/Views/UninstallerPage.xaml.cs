@@ -18,7 +18,6 @@ namespace SetupHub180Hz.Views
         private readonly PackageCatalogService _catalog = new();
         private readonly DeepUninstallService _deepUninstall = new();
         private List<AppItem> _allApps = new();
-        private AppItem? _targetApp;
         private readonly DispatcherTimer _filterDebounceTimer;
 
         public UninstallerPage()
@@ -197,139 +196,27 @@ namespace SetupHub180Hz.Views
         {
             if (sender is Button btn && btn.DataContext is AppItem app)
             {
-                ShowUninstallWarning(app);
-            }
-        }
-
-        private void ShowUninstallWarning(AppItem app)
-        {
-            _targetApp = app;
-
-            DialogAppNameText.Text = app.Name;
-            DialogVersionText.Text = app.FormattedVersion;
-            DialogSizeText.Text = app.FormattedSize;
-            DialogIdText.Text = app.Id;
-
-            DialogLogoGrid.Children.Clear();
-
-            if (app.IconImageSource != null)
-            {
-                var img = new Image
+                var wizard = new RevoUninstallWizardDialog(app)
                 {
-                    Source = app.IconImageSource,
-                    Width = 32,
-                    Height = 32,
-                    Stretch = System.Windows.Media.Stretch.Uniform,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
+                    Owner = Window.GetWindow(this)
                 };
-                DialogLogoGrid.Children.Add(img);
-            }
-            else
-            {
-                var fallback = new TextBlock
+                wizard.ShowDialog();
+
+                if (wizard.IsUninstalled)
                 {
-                    Text = "📦",
-                    FontSize = 18,
-                    Foreground = (System.Windows.Media.Brush)FindResource("BrushTextSecondary"),
-                    Opacity = 0.5,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                DialogLogoGrid.Children.Add(fallback);
-            }
+                    ActivityLogger.Instance.Log($"Revo engine successfully removed {app.Name}.", ActivityType.Success);
+                    _allApps.Remove(app);
+                    ApplyFilter();
+                    InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
 
-            WarningOverlay.Visibility = Visibility.Visible;
-        }
-
-        private void CancelUninstall_Click(object sender, RoutedEventArgs e)
-        {
-            WarningOverlay.Visibility = Visibility.Collapsed;
-            _targetApp = null;
-        }
-
-        private async void ConfirmUninstall_Click(object sender, RoutedEventArgs e)
-        {
-            if (_targetApp == null) return;
-
-            var appToUninstall = _targetApp;
-            WarningOverlay.Visibility = Visibility.Collapsed;
-
-            ConfirmUninstallButton.IsEnabled = false;
-
-            ActivityLogger.Instance.Log($"Initiated uninstallation for {appToUninstall.Name}…", ActivityType.Info);
-
-            // Phase 1: Pre-terminate any active processes that might be locking the app's files
-            KillProcessesForApp(appToUninstall);
-
-            // Phase 2: Try Winget multi-tier uninstaller (by exact ID, partial ID, and Name)
-            var success = await _winget.UninstallAsync(appToUninstall.Id, appToUninstall.Name);
-
-            // Phase 3: Fallback to native registry UninstallString if Winget was unable to uninstall
-            if (!success)
-            {
-                var uninstStr = appToUninstall.UninstallString ?? FindRegistryUninstallString(appToUninstall);
-                if (!string.IsNullOrWhiteSpace(uninstStr))
-                {
-                    ActivityLogger.Instance.Log($"Attempting native uninstaller for {appToUninstall.Name}…", ActivityType.Info);
-                    success = await RunNativeUninstallStringAsync(uninstStr);
+                    // Invalidate cached registry data and notify all components that this app is now uninstalled!
+                    AppMetadataHelper.InvalidateCache();
+                    PackageCatalogService.NotifyStatusChanged(app.Id, false);
+                    PackageCatalogService.NotifyStatusChanged(app.Name, false);
+                    UpdateMonitorService.Instance.UnmarkUpdated(app.Id);
+                    UpdateMonitorService.Instance.UnmarkUpdated(app.Name);
                 }
             }
-
-            // Phase 4: Fallback to MSIExec Product Code if ID is a GUID
-            if (!success && !string.IsNullOrWhiteSpace(appToUninstall.Id) && appToUninstall.Id.StartsWith("{") && appToUninstall.Id.EndsWith("}"))
-            {
-                ActivityLogger.Instance.Log($"Attempting MSI package uninstallation for {appToUninstall.Name}…", ActivityType.Info);
-                success = await RunNativeUninstallStringAsync($"msiexec.exe /X {appToUninstall.Id} /quiet /norestart");
-            }
-
-            // Phase 5: Ultimate Guaranteed Finisher — Force Removal
-            // If standard uninstallers failed, are corrupted, or the package was already partially gone:
-            // Force removal purges locked processes, install folders, AppData, registry keys, and shortcuts.
-            if (!success)
-            {
-                ActivityLogger.Instance.Log($"Executing guaranteed Force Removal for {appToUninstall.Name}…", ActivityType.Warning);
-                await ExecuteForceRemovalAsync(appToUninstall);
-                success = true;
-            }
-
-            ConfirmUninstallButton.IsEnabled = true;
-
-            if (success)
-            {
-                ActivityLogger.Instance.Log($"Successfully uninstalled and removed {appToUninstall.Name}.", ActivityType.Success);
-                NotificationService.Notify("App Removed", $"{appToUninstall.Name} has been completely uninstalled and removed.");
-                _allApps.Remove(appToUninstall);
-                ApplyFilter();
-                InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
-
-                // Crucial: Invalidate cached registry data and notify all components that this app is now uninstalled!
-                AppMetadataHelper.InvalidateCache();
-                PackageCatalogService.NotifyStatusChanged(appToUninstall.Id, false);
-                PackageCatalogService.NotifyStatusChanged(appToUninstall.Name, false);
-                UpdateMonitorService.Instance.UnmarkUpdated(appToUninstall.Id);
-                UpdateMonitorService.Instance.UnmarkUpdated(appToUninstall.Name);
-
-                // Universal heuristic scan for leftover registry keys and folders
-                try
-                {
-                    var leftovers = await _deepUninstall.ScanAsync(appToUninstall);
-                    if (leftovers.Count > 0)
-                    {
-                        var dialog = new LeftoverCleanupDialog(appToUninstall, leftovers)
-                        {
-                            Owner = Window.GetWindow(this)
-                        };
-                        dialog.ShowDialog();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ActivityLogger.Instance.Log($"Leftover scan warning: {ex.Message}", ActivityType.Warning);
-                }
-            }
-
-            _targetApp = null;
         }
 
         private static readonly HashSet<string> ProtectedProcessNames = new(StringComparer.OrdinalIgnoreCase)
