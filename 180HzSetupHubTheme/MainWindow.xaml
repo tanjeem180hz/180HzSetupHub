@@ -197,7 +197,7 @@
                         </RadioButton>
 
                         <RadioButton x:Name="NavCleanup" Style="{StaticResource SidebarItem}"
-                                     Checked="NavItem_Checked" Tag="Cleanup" Margin="0,0,0,4" ToolTip="Disk Cleanup">
+                                     Checked="NavItem_Checked" Tag="Cleanup" Margin="0,0,0,4" ToolTip="Cleanup &amp; RAM Optimizer">
                             <Grid Width="180">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="36"/>

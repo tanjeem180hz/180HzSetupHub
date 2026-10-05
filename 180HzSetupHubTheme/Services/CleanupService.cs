@@ -90,6 +90,14 @@ namespace SetupHub180Hz.Services
 
             var targets = new List<CleanupTarget>
             {
+                // System RAM Working Set & Standby Cache target
+                new()
+                {
+                    Name = "RAM Cache & Working Sets",
+                    Path = "Process Working Sets, Standby Memory & CLR Heap",
+                    IsRamTarget = true,
+                    SizeBytes = estimatedReclaimableRam
+                },
                 new() { Name = "User Temp Files", Path = Path.GetTempPath() },
                 new() { Name = "Windows Temp", Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\Temp") },
                 new() { Name = "Windows Update Cache", Path = Environment.ExpandEnvironmentVariables(@"%WINDIR%\SoftwareDistribution\Download") },
@@ -111,15 +119,6 @@ namespace SetupHub180Hz.Services
                         Environment.ExpandEnvironmentVariables(@"%WINDIR%\ServiceProfiles\NetworkService\AppData\Local\Temp"),
                         Environment.ExpandEnvironmentVariables(@"%WINDIR%\ServiceProfiles\LocalService\AppData\Local\Temp"),
                     }
-                },
-
-                // System RAM Working Set Cache target
-                new()
-                {
-                    Name = "System Memory (RAM Cache)",
-                    Path = "Process Working Sets & RAM Cache",
-                    IsRamTarget = true,
-                    SizeBytes = estimatedReclaimableRam
                 }
             };
 
@@ -153,7 +152,7 @@ namespace SetupHub180Hz.Services
             return targets;
         }
 
-        public async Task<long> CleanAsync(CleanupTarget target, Action<string>? onFile = null)
+        public async Task<long> CleanAsync(CleanupTarget target, Action<string>? onFile = null, bool rescan = true)
         {
             long freed = await Task.Run(() =>
             {
@@ -175,8 +174,11 @@ namespace SetupHub180Hz.Services
                 return totalFreed;
             });
 
-            // Rescan immediately in background to update cache
-            _ = ScanAsync(force: true);
+            // Rescan in background to update cache if requested
+            if (rescan)
+            {
+                _ = ScanAsync(force: true);
+            }
 
             return freed;
         }
@@ -185,7 +187,9 @@ namespace SetupHub180Hz.Services
         {
             long total = 0;
             foreach (var target in targets)
-                total += await CleanAsync(target, onFile);
+                total += await CleanAsync(target, onFile, rescan: false);
+
+            _ = ScanAsync(force: true);
             return total;
         }
 

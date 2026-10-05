@@ -7,20 +7,95 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- 1. Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,18">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
                                             services:LottieHelper.AssetName="cleanup_sparkle.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                <TextBlock Text="Cleanup" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
+                <TextBlock Text="Cleanup &amp; RAM Optimizer" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
             </StackPanel>
-            <TextBlock Text="Identify and safely purge temporary directories, application caches, and leftover staging files."
+            <TextBlock Text="Purge system caches, temporary files, and optimize RAM by trimming process working sets and memory standby lists."
                        Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
         </StackPanel>
 
-        <Grid Grid.Row="1" Margin="0,0,0,16">
+        <!-- 2. Dedicated RAM Cleaner & Memory Optimizer Card -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,18" Padding="20,16" Background="{DynamicResource BrushSurface}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Top Row: Icon, Title, Badge, Description, and Quick Clean RAM Button -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="38" Height="38" CornerRadius="8" Background="{DynamicResource BrushBackground}"
+                                BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" Margin="0,0,14,0">
+                            <lottie:LottieAnimationView Width="22" Height="22" AutoPlay="True" RepeatCount="-1"
+                                                        services:LottieHelper.AssetName="gears.json"
+                                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="RAM OPTIMIZER &amp; CACHE PURGE" FontSize="13" FontWeight="Bold"
+                                           Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                                <Border Background="#1A00FF66" BorderBrush="#3300FF66" BorderThickness="1" CornerRadius="4"
+                                        Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="REALTIME" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                                </Border>
+                            </StackPanel>
+                            <TextBlock Text="Trims process working sets, purges standby lists &amp; flushes system memory cache."
+                                       Style="{StaticResource TextBody}" FontSize="12" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button x:Name="QuickCleanRamButton" Grid.Column="1" Tag="Clean RAM" Style="{StaticResource ExpandableAccentButton}"
+                            Height="36" Padding="14,0" VerticalAlignment="Center" Click="QuickCleanRam_Click"
+                            ToolTip="Trim working sets, purge standby cache, and reclaim physical memory immediately">
+                        <lottie:LottieAnimationView Width="18" Height="18" AutoPlay="True" RepeatCount="-1"
+                                                    services:LottieHelper.AssetName="rocket.json"/>
+                    </Button>
+                </Grid>
+
+                <!-- Bottom Row: Realtime Memory Gauge & Progress Bar -->
+                <Grid Grid.Row="1" Margin="0,14,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock x:Name="RamUsageDisplay" Text="Memory Load: Calculating…"
+                                       FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource BrushTextPrimary}"/>
+                            <TextBlock x:Name="RamPercentDisplay" Text=""
+                                       FontSize="13" Foreground="{DynamicResource BrushTextSecondary}" Margin="4,0,0,0"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" x:Name="RamAvailableDisplay" Text="-- Available"
+                                   FontSize="12" Foreground="{DynamicResource BrushAccent}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <ProgressBar Grid.Row="1" x:Name="RamProgressBar" Style="{StaticResource FlatProgressBar}"
+                                 Height="6" Minimum="0" Maximum="100" Value="0"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- 3. Disk & Leftovers Section Header & Actions -->
+        <Grid Grid.Row="2" Margin="0,0,0,14">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -37,7 +112,8 @@
             </Button>
         </Grid>
 
-        <ScrollViewer Grid.Row="2" Style="{StaticResource CleanScrollViewer}">
+        <!-- 4. Target Items List -->
+        <ScrollViewer Grid.Row="3" Style="{StaticResource CleanScrollViewer}" services:SmoothScrollHelper.IsSmoothScrollEnabled="True">
             <ItemsControl x:Name="TargetsList"/>
         </ScrollViewer>
     </Grid>
