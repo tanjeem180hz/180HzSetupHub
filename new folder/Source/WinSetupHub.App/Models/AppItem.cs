@@ -77,6 +77,7 @@ namespace SetupHub180Hz.Models
                     _availableVersion = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(HasUpdate));
+                    OnPropertyChanged(nameof(FormattedVersion));
                 }
             }
         }
@@ -170,7 +171,18 @@ namespace SetupHub180Hz.Models
         public bool HasWebUrl => !string.IsNullOrWhiteSpace(WebUrl);
         public bool HasSource => !string.IsNullOrWhiteSpace(Source);
         public string SourceTag => Source?.ToUpperInvariant() ?? "WINGET";
-        public string FormattedVersion => string.IsNullOrWhiteSpace(Version) ? "-" : $"🏷️ {Version}";
+        public string FormattedVersion
+        {
+            get
+            {
+                if (HasUpdate && !string.IsNullOrWhiteSpace(AvailableVersion))
+                {
+                    string current = string.IsNullOrWhiteSpace(Version) ? "Installed" : Version;
+                    return $"🏷️ {current} ➔ {AvailableVersion}";
+                }
+                return string.IsNullOrWhiteSpace(Version) ? "🏷️ Latest" : $"🏷️ {Version}";
+            }
+        }
         public string FormattedSize => string.IsNullOrWhiteSpace(Size) ? "-" : $"💾 {Size}";
         public string Initial => !string.IsNullOrWhiteSpace(Name) ? Name[0].ToString().ToUpperInvariant() : "•";
 

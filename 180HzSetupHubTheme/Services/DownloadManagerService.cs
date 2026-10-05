@@ -671,6 +671,18 @@ namespace SetupHub180Hz.Services
                 var installerInfo = await _winget.GetInstallerInfoAsync(app.Id);
                 if (installerInfo != null)
                 {
+                    if (!string.IsNullOrWhiteSpace(installerInfo.Version))
+                    {
+                        if (app.IsInstalled)
+                        {
+                            app.AvailableVersion = installerInfo.Version;
+                        }
+                        else
+                        {
+                            app.Version = installerInfo.Version;
+                        }
+                    }
+
                     // Ensure the app is linked directly to its authentic official website without mismatch
                     string? officialLink = installerInfo.Homepage ?? installerInfo.PublisherUrl;
                     if (string.IsNullOrWhiteSpace(officialLink) && !string.IsNullOrWhiteSpace(installerInfo.Url))
@@ -689,7 +701,7 @@ namespace SetupHub180Hz.Services
 
                     if (!string.IsNullOrWhiteSpace(installerInfo.Url) && installerInfo.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                     {
-                        bool downloaded = await DownloadWithResumeAsync(app, installerInfo.Url, installerInfo.Type, queueIndex, queueTotal);
+                        bool downloaded = await DownloadWithResumeAsync(app, installerInfo.Url, installerInfo.Type, installerInfo.Version, installerInfo.Sha256, queueIndex, queueTotal);
                         if (downloaded)
                         {
                             await InstallDownloadedPackageAsync(app, installerInfo, queueIndex, queueTotal);
@@ -709,12 +721,72 @@ namespace SetupHub180Hz.Services
             await InstallViaWingetDirectAsync(app, queueIndex, queueTotal);
         }
 
-        private async Task<bool> DownloadWithResumeAsync(AppItem app, string url, string? installerType, int queueIndex, int queueTotal)
+        private async Task<bool> DownloadWithResumeAsync(
+            AppItem app,
+            string url,
+            string? installerType,
+            string? version,
+            string? sha256,
+            int queueIndex,
+            int queueTotal)
         {
             string ext = GetExtensionForType(installerType, url);
             string safeId = MakeSafeFilename(app.Id);
-            string partPath = Path.Combine(_downloadDir, $"{safeId}_setup.part");
-            string finalPath = Path.Combine(_downloadDir, $"{safeId}_setup{ext}");
+            string versionTag = !string.IsNullOrWhiteSpace(version)
+                ? MakeSafeFilename(version)
+                : (!string.IsNullOrWhiteSpace(sha256) && sha256.Length >= 8 ? sha256.Substring(0, 8) : "latest");
+
+            string finalPath = Path.Combine(_downloadDir, $"{safeId}_{versionTag}_setup{ext}");
+            string partPath = Path.Combine(_downloadDir, $"{safeId}_{versionTag}_setup.part");
+
+            // Clean up any stale or older version installers for this app
+            try
+            {
+                var existingFiles = Directory.GetFiles(_downloadDir, $"{safeId}_*_setup.*");
+                foreach (var f in existingFiles)
+                {
+                    if (!f.Equals(finalPath, StringComparison.OrdinalIgnoreCase) && !f.Equals(partPath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        try { File.Delete(f); } catch { }
+                    }
+                }
+                string legacyPath = Path.Combine(_downloadDir, $"{safeId}_setup{ext}");
+                if (File.Exists(legacyPath))
+                {
+                    try { File.Delete(legacyPath); } catch { }
+                }
+            }
+            catch { }
+
+            // If the verified latest installer is already complete on disk, verify SHA256, skip download and proceed to install
+            if (File.Exists(finalPath) && new FileInfo(finalPath).Length > 1024 * 50)
+            {
+                if (!string.IsNullOrWhiteSpace(sha256) && !VerifyFileSha256(finalPath, sha256))
+                {
+                    try { File.Delete(finalPath); } catch { }
+                }
+                else
+                {
+                    long cachedFileSize = new FileInfo(finalPath).Length;
+                    app.DownloadProgress = 100;
+                    app.Status = "Installing…";
+                    Notify(new DownloadProgressInfo
+                    {
+                        App = app,
+                        QueueIndex = queueIndex,
+                        QueueTotal = queueTotal,
+                        State = DownloadState.Installing,
+                        BytesDownloaded = cachedFileSize,
+                        TotalBytes = cachedFileSize,
+                        Percentage = 100,
+                        SpeedFormatted = "Instant",
+                        EtaFormatted = "Installing…",
+                        SizeFormatted = $"({FormatBytes(cachedFileSize)} / {FormatBytes(cachedFileSize)})",
+                        StatusMessage = $"Verifying authentic latest {app.Name} (v{versionTag})…"
+                    });
+                    return true;
+                }
+            }
 
             while (!_isCancelled && !_isSkipping)
             {
@@ -863,6 +935,13 @@ namespace SetupHub180Hz.Services
                     // Download completed successfully
                     if (File.Exists(finalPath)) File.Delete(finalPath);
                     File.Move(partPath, finalPath);
+
+                    if (!string.IsNullOrWhiteSpace(sha256) && !VerifyFileSha256(finalPath, sha256))
+                    {
+                        ActivityLogger.Instance.Log($"Hash verification failed for {app.Name}. Deleting corrupt file and falling back to Winget.", ActivityType.Warning);
+                        try { File.Delete(finalPath); } catch { }
+                        return false;
+                    }
                     long finalFileSize = new FileInfo(finalPath).Length;
                     app.DownloadProgress = 100;
                     app.Status = "Installing…";
@@ -950,12 +1029,24 @@ namespace SetupHub180Hz.Services
         {
             string ext = GetExtensionForType(info.Type, info.Url ?? "");
             string safeId = MakeSafeFilename(app.Id);
-            string finalPath = Path.Combine(_downloadDir, $"{safeId}_setup{ext}");
+            string versionTag = !string.IsNullOrWhiteSpace(info.Version)
+                ? MakeSafeFilename(info.Version)
+                : (!string.IsNullOrWhiteSpace(info.Sha256) && info.Sha256.Length >= 8 ? info.Sha256.Substring(0, 8) : "latest");
+
+            string finalPath = Path.Combine(_downloadDir, $"{safeId}_{versionTag}_setup{ext}");
 
             if (!File.Exists(finalPath))
             {
-                await InstallViaWingetDirectAsync(app, queueIndex, queueTotal);
-                return;
+                string legacyPath = Path.Combine(_downloadDir, $"{safeId}_setup{ext}");
+                if (File.Exists(legacyPath))
+                {
+                    finalPath = legacyPath;
+                }
+                else
+                {
+                    await InstallViaWingetDirectAsync(app, queueIndex, queueTotal);
+                    return;
+                }
             }
 
             app.Status = "Installing…";
@@ -1434,6 +1525,23 @@ namespace SetupHub180Hz.Services
             if (ts.TotalHours >= 1) return $"{ts.Hours}h {ts.Minutes}m remaining";
             if (ts.TotalMinutes >= 1) return $"{ts.Minutes}m {ts.Seconds}s remaining";
             return $"{ts.Seconds}s remaining";
+        }
+
+        private static bool VerifyFileSha256(string filePath, string expectedSha256)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(expectedSha256) || !File.Exists(filePath)) return true;
+                using var sha256 = System.Security.Cryptography.SHA256.Create();
+                using var stream = File.OpenRead(filePath);
+                byte[] hashBytes = sha256.ComputeHash(stream);
+                string computed = Convert.ToHexString(hashBytes);
+                return computed.Equals(expectedSha256.Trim(), StringComparison.OrdinalIgnoreCase);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
