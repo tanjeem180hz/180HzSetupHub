@@ -236,7 +236,10 @@ namespace SetupHub180Hz.Services
             }
         }
 
-        public async Task<bool> InstallAsync(string id, string? source = null, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default)
+        public Task<bool> InstallAsync(string id, string? source = null, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default)
+            => InstallAsync(id, source, name: null, onOutputLine, ct);
+
+        public async Task<bool> InstallAsync(string id, string? source, string? name, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default)
         {
             if (id.Equals("Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))
             {
@@ -252,16 +255,64 @@ namespace SetupHub180Hz.Services
                 }
             }
 
-            var srcArg = !string.IsNullOrWhiteSpace(source) && !source.Equals("winget", StringComparison.OrdinalIgnoreCase)
-                ? $"--source \"{source}\" "
-                : "";
-
-            var success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-            if (!success && !ct.IsCancellationRequested)
+            // Detect source if missing
+            bool isMsStoreId = (id.Length == 12 || id.Length == 14) && !id.Contains('.') && !id.Contains('-');
+            string effectiveSource = source ?? "";
+            if (string.IsNullOrWhiteSpace(effectiveSource) && isMsStoreId)
             {
-                success = await RunActionAsync($"install \"{id}\" {srcArg}--silent --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                effectiveSource = "msstore";
             }
-            return success;
+
+            var srcArg = !string.IsNullOrWhiteSpace(effectiveSource) && !effectiveSource.Equals("winget", StringComparison.OrdinalIgnoreCase)
+                ? $"--source \"{effectiveSource}\" "
+                : (!string.IsNullOrWhiteSpace(effectiveSource) ? "--source winget " : "");
+
+            // Tier 1: Exact ID match with silent & force
+            var success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+            if (success || ct.IsCancellationRequested) return success;
+
+            // Tier 2: Non-exact ID match with silent & force
+            success = await RunActionAsync($"install \"{id}\" {srcArg}--silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+            if (success || ct.IsCancellationRequested) return success;
+
+            // Tier 3: Source fallback (if specific source was specified, try without source restriction or opposite source)
+            if (!string.IsNullOrWhiteSpace(effectiveSource))
+            {
+                // Try with no source restriction
+                success = await RunActionAsync($"install --id \"{id}\" -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+
+                if (!effectiveSource.Equals("msstore", StringComparison.OrdinalIgnoreCase) && isMsStoreId)
+                {
+                    success = await RunActionAsync($"install --id \"{id}\" --source msstore -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    if (success || ct.IsCancellationRequested) return success;
+                }
+            }
+
+            // Tier 4: Interactive / Unattended fallback without --silent (in case silent mode is unsupported by installer)
+            success = await RunActionAsync($"install --id \"{id}\" {srcArg}--force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+            if (success || ct.IsCancellationRequested) return success;
+
+            // Tier 5: Fallback search and install by Name
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                // Exact Name
+                success = await RunActionAsync($"install --name \"{name}\" -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+
+                // Fuzzy Name
+                success = await RunActionAsync($"install --name \"{name}\" --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+            }
+
+            // Tier 6: Final check - verify if app is already installed on the machine
+            if (AppMetadataHelper.IsAppInstalled(new AppItem { Id = id, Name = name ?? id, Source = source ?? "" }))
+            {
+                onOutputLine?.Invoke($"Verified {name ?? id} is installed on system.");
+                return true;
+            }
+
+            return false;
         }
 
         public Task<bool> UpgradeAsync(string id, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default) =>
@@ -303,24 +354,36 @@ namespace SetupHub180Hz.Services
         {
             var (exitCode, output) = await RunWingetWithCodeAsync(arguments, onOutputLine, timeoutMs: 240000, ct: ct);
 
-            // 0 = Success, 3010 = Reboot required / Success, 0x8A15002B = Already installed / up to date
-            if (exitCode == 0 || exitCode == 3010 || unchecked((uint)exitCode) == 0x8A15002B)
+            uint uExitCode = unchecked((uint)exitCode);
+            // 0 = Success, 3010 = Reboot required / Success, 1641 = Reboot initiated
+            // 0x8A15002B = Already installed / up to date, 0x8A15002C = No applicable update
+            if (exitCode == 0 || exitCode == 3010 || exitCode == 1641 || uExitCode == 0x8A15002B || uExitCode == 0x8A15002C)
             {
                 return true;
             }
 
+            bool isUninstall = arguments.TrimStart().StartsWith("uninstall", StringComparison.OrdinalIgnoreCase);
+
             if (output.Contains("Successfully installed", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("Successfully upgraded", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("Successfully uninstalled", StringComparison.OrdinalIgnoreCase) ||
-                output.Contains("No installed package found", StringComparison.OrdinalIgnoreCase) ||
-                output.Contains("No package found matching", StringComparison.OrdinalIgnoreCase) ||
-                output.Contains("0x8a150014", StringComparison.OrdinalIgnoreCase) ||
-                output.Contains("0x8a150056", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("No applicable update found", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("No available upgrade found", StringComparison.OrdinalIgnoreCase) ||
-                output.Contains("already installed", StringComparison.OrdinalIgnoreCase))
+                output.Contains("already installed", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("Found an existing package already installed", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
+            }
+
+            if (isUninstall)
+            {
+                if (output.Contains("No installed package found", StringComparison.OrdinalIgnoreCase) ||
+                    output.Contains("No package found matching", StringComparison.OrdinalIgnoreCase) ||
+                    output.Contains("0x8a150014", StringComparison.OrdinalIgnoreCase) ||
+                    output.Contains("0x8a150056", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
             }
 
             return false;
