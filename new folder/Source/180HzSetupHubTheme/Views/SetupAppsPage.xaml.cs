@@ -1449,7 +1449,7 @@ namespace SetupHub180Hz.Views
                         StatusText.Text = $"Installing imported app {i + 1}/{total}: {app.Name}…";
                         ActivityLogger.Instance.Log($"Import installing [{i + 1}/{total}]: {app.Name} ({app.Id})", ActivityType.Info);
 
-                        bool success = await _winget.InstallAsync(app.Id);
+                        bool success = await _winget.InstallAsync(app.Id, app.Source, app.Name);
                         if (success)
                         {
                             ok++;
@@ -1480,94 +1480,7 @@ namespace SetupHub180Hz.Views
 
         private bool CheckIfAppAlreadyInstalled(AppItem app)
         {
-            // 1. Windows Registry uninstall check (covers 99% of win32/x64 software)
-            var reg = AppMetadataHelper.GetRegistryInfo(app.Name, app.Id);
-            if (reg != null)
-            {
-                if (!string.IsNullOrWhiteSpace(reg.DisplayVersion))
-                {
-                    app.Version = reg.DisplayVersion;
-                }
-                if (!string.IsNullOrWhiteSpace(reg.InstallLocation) && Directory.Exists(reg.InstallLocation))
-                {
-                    app.InstallLocation = reg.InstallLocation;
-                }
-                return true;
-            }
-
-            // 2. Check local icon path if it points to an installed executable
-            if (!string.IsNullOrWhiteSpace(app.LocalIconPath) && app.LocalIconPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && File.Exists(app.LocalIconPath))
-            {
-                return true;
-            }
-
-            // 3. Check App InstallLocation if present (must contain executable)
-            if (!string.IsNullOrWhiteSpace(app.InstallLocation) && Directory.Exists(app.InstallLocation))
-            {
-                try
-                {
-                    if (Directory.EnumerateFiles(app.InstallLocation, "*.exe", SearchOption.TopDirectoryOnly).Any())
-                    {
-                        return true;
-                    }
-                }
-                catch { }
-            }
-
-            // 4. Check standard program directories (strictly requiring an executable)
-            string normName = AppMetadataHelper.NormalizeAppName(app.Name);
-            string[] baseDirs = {
-                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs")
-            };
-
-            foreach (var b in baseDirs)
-            {
-                if (string.IsNullOrWhiteSpace(b) || !Directory.Exists(b)) continue;
-                string dir1 = Path.Combine(b, app.Name);
-                string dir2 = Path.Combine(b, normName);
-                if (DirectoryContainsExe(dir1) || DirectoryContainsExe(dir2))
-                {
-                    return true;
-                }
-            }
-
-            // 5. Start Menu shortcuts
-            string[] startDirs = {
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
-            };
-            foreach (var dir in startDirs)
-            {
-                if (Directory.Exists(dir))
-                {
-                    try
-                    {
-                        var lnks = Directory.GetFiles(dir, $"*{normName}*.lnk", SearchOption.AllDirectories);
-                        if (lnks.Length > 0)
-                        {
-                            return true;
-                        }
-                    }
-                    catch { }
-                }
-            }
-
-            return false;
-        }
-
-        private static bool DirectoryContainsExe(string dir)
-        {
-            if (!Directory.Exists(dir)) return false;
-            try
-            {
-                return Directory.EnumerateFiles(dir, "*.exe", SearchOption.TopDirectoryOnly).Any();
-            }
-            catch
-            {
-                return false;
-            }
+            return AppMetadataHelper.IsAppInstalled(app);
         }
 
         private void ShowAlreadyInstalledModal(AppItem app)
