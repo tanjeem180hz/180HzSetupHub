@@ -102,6 +102,13 @@ public partial class InstallerWindow : Window
             _isCompleted = true;
             _isInstalling = false;
 
+            if (ChkLaunchWhenReady.IsChecked == true)
+            {
+                LaunchInstalledApp();
+                Close();
+                return;
+            }
+
             TxtStatus.Text = "Installation complete! Click Launch to open.";
             InstallProgressBar.Value = 100;
             BtnInstall.Content = "Launch";

@@ -328,8 +328,7 @@
                 <CheckBox x:Name="ChkLaunchWhenReady"
                           Style="{StaticResource WinCheckBox}"
                           Content="Launch when ready"
-                          IsChecked="False"
-                          Visibility="Collapsed"
+                          IsChecked="True"
                           HorizontalAlignment="Left"
                           VerticalAlignment="Center" />
 
