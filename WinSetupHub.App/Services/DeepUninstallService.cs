@@ -28,12 +28,31 @@ namespace SetupHub180Hz.Services
         // Directories directly under Program Files, AppData, or ProgramData that are vendor/shared roots
         private static readonly HashSet<string> ProtectedVendorNames = new(StringComparer.OrdinalIgnoreCase)
         {
+            // Windows / Microsoft Core
             "Microsoft", "Windows", "Windows Defender", "WindowsApps", "WindowsPowerShell",
             "Common Files", "Internet Explorer", "dotnet", "Packages", "Temp", "Programs",
-            "LocalLow", "VirtualStore", "Google", "Adobe", "Intel", "AMD", "NVIDIA",
-            "NVIDIA Corporation", "Apple", "Apple Computer", "Mozilla", "Oracle", "Java",
-            "Steam", "Valve", "Epic Games", "Ubisoft", "Origin", "Electronic Arts",
-            "Dropbox", "Spotify", "Discord", "GitHub", "Git", "JetBrains", "CanonicalGroupLimited"
+            "LocalLow", "VirtualStore", "Microsoft.NET", "Windows NT", "Windows Mail",
+            "Windows Media Player", "Windows Photo Viewer", "Windows Security",
+
+            // Major Ecosystem Platforms & Vendors
+            "Google", "Adobe", "Intel", "AMD", "NVIDIA", "NVIDIA Corporation",
+            "Apple", "Apple Computer", "Apple Inc.", "Mozilla", "Oracle", "Java", "JavaSoft",
+            "Steam", "Valve", "Epic Games", "Ubisoft", "Origin", "Electronic Arts", "EA Games",
+            "Dropbox", "Spotify", "Discord", "GitHub", "Git", "JetBrains", "CanonicalGroupLimited",
+
+            // Peripherals & Hardware Vendors
+            "Logitech", "Razer", "Corsair", "SteelSeries", "ASUS", "MSI", "Gigabyte",
+            "Sony", "Samsung", "Dell", "HP", "Lenovo", "Acer", "Huawei", "Realtek",
+
+            // Gaming & Graphics Platforms
+            "Blizzard", "Battle.net", "Riot Games", "GOG.com", "GOG Galaxy", "Unity", "Autodesk",
+
+            // Development & Virtualization
+            "Docker", "VMware", "VirtualBox", "Python", "Python3", "Nodejs", "PostgreSQL", "MySQL",
+
+            // Media & Web Browsers
+            "OBS Studio", "Blackmagic Design", "Wondershare", "CyberLink", "Corel", "TechSmith",
+            "BraveSoftware", "Opera Software", "Vivaldi Technologies"
         };
 
         // Top-level registry keys that must NEVER be deleted
@@ -68,7 +87,9 @@ namespace SetupHub180Hz.Services
             "Microsoft", "Classes", "Policies", "Clients", "RegisteredApplications",
             "Windows", "Windows NT", "DirectX", ".NETFramework", "Google", "Adobe",
             "Intel", "AMD", "NVIDIA", "NVIDIA Corporation", "Apple Inc.", "Apple Computer",
-            "Mozilla", "Oracle", "JavaSoft", "Valve", "Epic Games", "Electronic Arts"
+            "Mozilla", "Oracle", "JavaSoft", "Valve", "Epic Games", "Electronic Arts",
+            "Logitech", "Razer", "Corsair", "SteelSeries", "ASUS", "MSI", "Gigabyte",
+            "Blizzard", "Riot Games", "Docker", "VMware", "Python", "Realtek"
         };
 
         // Words that must NEVER be isolated as standalone search tokens
@@ -240,36 +261,72 @@ namespace SetupHub180Hz.Services
             {
                 var full = NormalizePath(path);
 
-                if (full.Length < 7) return false;
+                // 1. Minimum path length check (e.g. C:\Abc is only 6 chars)
+                if (full.Length < 8) return false;
 
+                // 2. Drive root check (e.g. C:\, D:\, E:\)
                 var root = Path.GetPathRoot(full);
                 if (string.IsNullOrEmpty(root)) return false;
                 if (string.Equals(full, NormalizePath(root), StringComparison.OrdinalIgnoreCase)) return false;
 
+                // 3. Exact protected paths check
                 if (ProtectedExactPaths.Contains(full)) return false;
 
+                // 4. Windows directory & all subdirectories check
                 var winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
                 if (!string.IsNullOrEmpty(winDir) && full.StartsWith(NormalizePath(winDir), StringComparison.OrdinalIgnoreCase))
                     return false;
 
+                // 5. System drive top-level folders check (e.g. C:\Users, C:\Windows, C:\ProgramData)
+                var sysDrive = Path.GetPathRoot(Environment.SystemDirectory);
+                if (!string.IsNullOrEmpty(sysDrive))
+                {
+                    var normSysDrive = NormalizePath(sysDrive);
+                    var parentOfFull = NormalizePath(Path.GetDirectoryName(full) ?? "");
+                    if (string.Equals(parentOfFull, normSysDrive, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+                }
+
+                // 6. User profile root check (e.g. C:\Users\Username)
+                var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                if (!string.IsNullOrEmpty(userProfile))
+                {
+                    var normUserProfile = NormalizePath(userProfile);
+                    if (string.Equals(full, normUserProfile, StringComparison.OrdinalIgnoreCase))
+                        return false;
+
+                    var appDataParent = NormalizePath(Path.Combine(userProfile, "AppData"));
+                    if (string.Equals(full, appDataParent, StringComparison.OrdinalIgnoreCase))
+                        return false;
+                }
+
+                // 7. User special folders check (Documents, Desktop, Downloads, Pictures, etc.)
                 foreach (var special in UserSpecialFolders)
                 {
                     if (string.Equals(full, special, StringComparison.OrdinalIgnoreCase))
                         return false;
                 }
 
+                // 8. AppData roots check (Local, Roaming, LocalLow)
                 foreach (var appDataRoot in AppDataRoots)
                 {
                     if (string.Equals(full, appDataRoot, StringComparison.OrdinalIgnoreCase))
                         return false;
                 }
 
+                // 9. Program Files roots check (Program Files, Program Files (x86), ProgramData)
                 foreach (var progRoot in ProgramFilesRoots)
                 {
                     if (string.Equals(full, progRoot, StringComparison.OrdinalIgnoreCase))
                         return false;
                 }
 
+                // 10. Multi-app Vendor parent folder check:
+                // If the folder is directly inside Program Files, Program Files (x86), ProgramData,
+                // AppData\Local, AppData\Roaming, or AppData\Local\Programs, and its name is a vendor folder,
+                // NEVER delete it!
                 var dirName = Path.GetFileName(full);
                 var parentDir = Path.GetDirectoryName(full);
                 if (!string.IsNullOrEmpty(parentDir))
@@ -301,6 +358,7 @@ namespace SetupHub180Hz.Services
             {
                 var trimmed = fullKeyPath.Trim().TrimEnd('\\', '/');
 
+                // 1. Root hives check
                 if (trimmed.Equals(@"HKEY_CURRENT_USER", StringComparison.OrdinalIgnoreCase) ||
                     trimmed.Equals(@"HKEY_LOCAL_MACHINE", StringComparison.OrdinalIgnoreCase) ||
                     trimmed.Equals(@"HKEY_CLASSES_ROOT", StringComparison.OrdinalIgnoreCase) ||
@@ -310,8 +368,10 @@ namespace SetupHub180Hz.Services
                     return false;
                 }
 
+                // 2. Exact protected keys check
                 if (ProtectedRegistryExactKeys.Contains(trimmed)) return false;
 
+                // 3. Protected Software roots check
                 if (trimmed.Equals(@"HKEY_CURRENT_USER\Software", StringComparison.OrdinalIgnoreCase) ||
                     trimmed.Equals(@"HKEY_LOCAL_MACHINE\Software", StringComparison.OrdinalIgnoreCase) ||
                     trimmed.Equals(@"HKEY_LOCAL_MACHINE\Software\WOW6432Node", StringComparison.OrdinalIgnoreCase))
@@ -319,17 +379,32 @@ namespace SetupHub180Hz.Services
                     return false;
                 }
 
-                var parts = trimmed.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length <= 3 && parts.Length >= 2)
+                // 4. Uninstall root keys check
+                if (trimmed.Equals(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Equals(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Equals(@"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall", StringComparison.OrdinalIgnoreCase))
                 {
-                    var leaf = parts.Last();
-                    if (ProtectedTopLevelRegistryNames.Contains(leaf))
+                    return false;
+                }
+
+                // 5. Protected vendor & top-level keys check
+                var parts = trimmed.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
+
+                // Needs to have at least hive + Software + SubKey (e.g. HKCU\Software\App = 3 parts)
+                if (parts.Length < 3) return false;
+
+                // If it's directly under Software (e.g. HKCU\Software\Vendor), check if it's a protected vendor
+                if (parts.Length == 3 && string.Equals(parts[1], "Software", StringComparison.OrdinalIgnoreCase))
+                {
+                    var leaf = parts[2];
+                    if (ProtectedTopLevelRegistryNames.Contains(leaf) || ProtectedVendorNames.Contains(leaf))
                         return false;
                 }
-                else if (parts.Length == 4 && string.Equals(parts[2], "WOW6432Node", StringComparison.OrdinalIgnoreCase))
+                // If it's under WOW6432Node (e.g. HKLM\Software\WOW6432Node\Vendor)
+                else if (parts.Length == 4 && string.Equals(parts[1], "Software", StringComparison.OrdinalIgnoreCase) && string.Equals(parts[2], "WOW6432Node", StringComparison.OrdinalIgnoreCase))
                 {
-                    var leaf = parts.Last();
-                    if (ProtectedTopLevelRegistryNames.Contains(leaf))
+                    var leaf = parts[3];
+                    if (ProtectedTopLevelRegistryNames.Contains(leaf) || ProtectedVendorNames.Contains(leaf))
                         return false;
                 }
 
@@ -565,36 +640,51 @@ namespace SetupHub180Hz.Services
         {
             if (string.IsNullOrWhiteSpace(targetName)) return false;
 
-            if (BlacklistedTokens.Contains(targetName)) return false;
+            if (targetName.Length < 3) return false;
 
+            if (BlacklistedTokens.Contains(targetName)) return false;
+            if (ProtectedVendorNames.Contains(targetName)) return false;
+
+            // 1. Exact match on clean name or full name
             if (string.Equals(targetName, sig.CleanName, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(targetName, sig.FullName, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
+            // 2. Exact match on distinct product name (e.g. "Chrome" for "Google Chrome")
             if (!string.IsNullOrWhiteSpace(sig.DistinctProductName) &&
                 string.Equals(targetName, sig.DistinctProductName, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
+            // 3. Exact match on Winget ID product part (e.g. "VLC" for "VideoLAN.VLC")
             if (!string.IsNullOrWhiteSpace(sig.IdProductPart) &&
                 string.Equals(targetName, sig.IdProductPart, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            if (sig.CleanName.Length >= 4 && targetName.StartsWith(sig.CleanName + " ", StringComparison.OrdinalIgnoreCase))
+            // 4. Specific prefix matching with delimiter check (' ', '-', '_')
+            if (sig.CleanName.Length >= 5)
             {
-                return true;
+                if (targetName.StartsWith(sig.CleanName + " ", StringComparison.OrdinalIgnoreCase) ||
+                    targetName.StartsWith(sig.CleanName + "-", StringComparison.OrdinalIgnoreCase) ||
+                    targetName.StartsWith(sig.CleanName + "_", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
             }
 
-            if (!string.IsNullOrWhiteSpace(sig.DistinctProductName) &&
-                sig.DistinctProductName.Length >= 4 &&
-                targetName.StartsWith(sig.DistinctProductName + " ", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(sig.DistinctProductName) && sig.DistinctProductName.Length >= 5)
             {
-                return true;
+                if (targetName.StartsWith(sig.DistinctProductName + " ", StringComparison.OrdinalIgnoreCase) ||
+                    targetName.StartsWith(sig.DistinctProductName + "-", StringComparison.OrdinalIgnoreCase) ||
+                    targetName.StartsWith(sig.DistinctProductName + "_", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
             }
 
             return false;

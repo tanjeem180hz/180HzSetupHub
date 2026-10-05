@@ -76,12 +76,7 @@ namespace SetupHub180Hz.Views
             RegistryListBox.ItemsSource = _registryViewModels;
             FilesListBox.ItemsSource = _filesViewModels;
 
-            Loaded += RevoUninstallWizardDialog_Loaded;
-        }
-
-        private async void RevoUninstallWizardDialog_Loaded(object sender, RoutedEventArgs e)
-        {
-            await RunPhase1PreparationAsync();
+            SetStep(1);
         }
 
         private void TitleBar_MouseDown(object sender, MouseButtonEventArgs e)
@@ -224,11 +219,17 @@ namespace SetupHub180Hz.Views
 
             PrepProgressBar.IsIndeterminate = false;
             PrepProgressBar.Value = 100;
-            BtnProceedToUninstaller.IsEnabled = true;
+            await Task.Delay(400);
         }
 
         private async void BtnProceedToUninstaller_Click(object sender, RoutedEventArgs e)
         {
+            BtnProceedToUninstaller.IsEnabled = false;
+            PrepProgressBar.Visibility = Visibility.Visible;
+            PrepProgressBar.IsIndeterminate = true;
+
+            await RunPhase1PreparationAsync();
+
             SetStep(2);
             await RunPhase2BuiltInUninstallerAsync();
         }
@@ -409,30 +410,54 @@ namespace SetupHub180Hz.Views
         {
             if (_isDeleting) return;
             int total = _registryViewModels.Count;
-            int selected = _registryViewModels.Count(v => v.IsSelected);
-            RegistryCountText.Text = $"{selected} of {total} registry key(s) selected for deletion";
-            BtnDeleteRegistry.Content = selected > 0 ? $"🗑️ Delete Selected ({selected})" : "🗑️ Delete Selected";
-            BtnDeleteRegistry.IsEnabled = selected > 0;
+            int unDeleted = _registryViewModels.Count(v => !v.IsDeleted);
+            int selected = _registryViewModels.Count(v => v.IsSelected && !v.IsDeleted);
+
+            if (unDeleted == 0)
+            {
+                RegistryCountText.Text = $"All {total} detected residual registry key(s) have been deleted.";
+                BtnDeleteRegistry.IsEnabled = false;
+                BtnDeleteRegistry.Content = "🗑️ Delete Selected";
+            }
+            else
+            {
+                RegistryCountText.Text = $"{selected} of {unDeleted} remaining registry key(s) selected for deletion";
+                BtnDeleteRegistry.Content = selected > 0 ? $"🗑️ Delete Selected ({selected})" : "🗑️ Delete Selected";
+                BtnDeleteRegistry.IsEnabled = selected > 0;
+            }
         }
 
         private void SelectAllRegistry_Click(object sender, RoutedEventArgs e)
         {
             if (_isDeleting) return;
-            foreach (var vm in _registryViewModels) vm.IsSelected = true;
+            foreach (var vm in _registryViewModels)
+            {
+                if (!vm.IsDeleted) vm.IsSelected = true;
+            }
             UpdateRegistryCounts();
         }
 
         private void DeselectAllRegistry_Click(object sender, RoutedEventArgs e)
         {
             if (_isDeleting) return;
-            foreach (var vm in _registryViewModels) vm.IsSelected = false;
+            foreach (var vm in _registryViewModels)
+            {
+                vm.IsSelected = false;
+            }
             UpdateRegistryCounts();
         }
 
         private async void BtnDeleteRegistry_Click(object sender, RoutedEventArgs e)
         {
-            var selected = _registryViewModels.Where(v => v.IsSelected).ToList();
+            var selected = _registryViewModels.Where(v => v.IsSelected && !v.IsDeleted).ToList();
             if (selected.Count == 0 || _isDeleting) return;
+
+            var confirm = MessageBox.Show(
+                $"Are you sure you want to permanently delete the {selected.Count} selected leftover registry key(s)?",
+                "Confirm Registry Removal — 180Hz Setup Hub",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+            if (confirm != MessageBoxResult.Yes) return;
 
             _isDeleting = true;
             WindowCloseBtn.IsEnabled = false;
@@ -463,15 +488,19 @@ namespace SetupHub180Hz.Views
             _purgedRegistryCount += deleted;
             IsUninstalled = true;
 
-            RegistryProgressStatusText.Text = $"Eradicated {deleted} registry trace(s). Proceeding to leftover files…";
-            await Task.Delay(600);
+            foreach (var vm in selected)
+            {
+                if (vm.IsDeleted) vm.IsSelected = false;
+            }
+
+            RegistryProgressStatusText.Text = $"Eradicated {deleted} registry trace(s).";
+            await Task.Delay(400);
 
             _isDeleting = false;
             WindowCloseBtn.IsEnabled = true;
             RegistryProgressPanel.Visibility = Visibility.Collapsed;
             RegistryActionsPanel.Visibility = Visibility.Visible;
-
-            BtnNextToFiles_Click(sender, e);
+            UpdateRegistryCounts();
         }
 
         private void BtnNextToFiles_Click(object sender, RoutedEventArgs e)
@@ -485,6 +514,7 @@ namespace SetupHub180Hz.Views
             {
                 DeepUninstallService.RemoveRegistryUninstallKeys(_app);
                 DeepUninstallService.RemoveShortcutsForApp(_app);
+                IsUninstalled = true;
                 ShowCompleteSummary();
             }
         }
@@ -497,33 +527,57 @@ namespace SetupHub180Hz.Views
         {
             if (_isDeleting) return;
             int total = _filesViewModels.Count;
-            int selected = _filesViewModels.Count(v => v.IsSelected);
-            long totalBytes = _filesViewModels.Where(v => v.IsSelected).Sum(v => v.SizeBytes ?? 0);
+            int unDeleted = _filesViewModels.Count(v => !v.IsDeleted);
+            int selected = _filesViewModels.Count(v => v.IsSelected && !v.IsDeleted);
+            long selectedBytes = _filesViewModels.Where(v => v.IsSelected && !v.IsDeleted).Sum(v => v.SizeBytes ?? 0);
 
-            string sizeFormatted = FormatBytes(totalBytes);
-            FilesCountText.Text = $"{selected} of {total} item(s) selected ({sizeFormatted})";
-            BtnDeleteFiles.Content = selected > 0 ? $"🗑️ Delete Selected ({selected})" : "🗑️ Delete Selected";
-            BtnDeleteFiles.IsEnabled = selected > 0;
+            if (unDeleted == 0)
+            {
+                FilesCountText.Text = $"All {total} detected residual file(s) and folder(s) have been purged.";
+                BtnDeleteFiles.IsEnabled = false;
+                BtnDeleteFiles.Content = "🗑️ Delete Selected";
+            }
+            else
+            {
+                string sizeFormatted = FormatBytes(selectedBytes);
+                FilesCountText.Text = $"{selected} of {unDeleted} remaining item(s) selected ({sizeFormatted})";
+                BtnDeleteFiles.Content = selected > 0 ? $"🗑️ Delete Selected ({selected})" : "🗑️ Delete Selected";
+                BtnDeleteFiles.IsEnabled = selected > 0;
+            }
         }
 
         private void SelectAllFiles_Click(object sender, RoutedEventArgs e)
         {
             if (_isDeleting) return;
-            foreach (var vm in _filesViewModels) vm.IsSelected = true;
+            foreach (var vm in _filesViewModels)
+            {
+                if (!vm.IsDeleted) vm.IsSelected = true;
+            }
             UpdateFilesCounts();
         }
 
         private void DeselectAllFiles_Click(object sender, RoutedEventArgs e)
         {
             if (_isDeleting) return;
-            foreach (var vm in _filesViewModels) vm.IsSelected = false;
+            foreach (var vm in _filesViewModels)
+            {
+                vm.IsSelected = false;
+            }
             UpdateFilesCounts();
         }
 
         private async void BtnDeleteFiles_Click(object sender, RoutedEventArgs e)
         {
-            var selected = _filesViewModels.Where(v => v.IsSelected).ToList();
+            var selected = _filesViewModels.Where(v => v.IsSelected && !v.IsDeleted).ToList();
             if (selected.Count == 0 || _isDeleting) return;
+
+            long totalBytes = selected.Sum(v => v.SizeBytes ?? 0);
+            var confirm = MessageBox.Show(
+                $"Are you sure you want to permanently delete the {selected.Count} selected leftover file(s) and folder(s)?\nTotal size: {FormatBytes(totalBytes)}",
+                "Confirm Leftovers Deletion — 180Hz Setup Hub",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+            if (confirm != MessageBoxResult.Yes) return;
 
             _isDeleting = true;
             WindowCloseBtn.IsEnabled = false;
@@ -555,15 +609,19 @@ namespace SetupHub180Hz.Views
             _purgedBytes += selected.Where(v => v.IsDeleted).Sum(v => v.SizeBytes ?? 0);
             IsUninstalled = true;
 
-            FilesProgressStatusText.Text = $"Purged {deleted} residual directory/file trace(s). Concluding…";
-            await Task.Delay(600);
+            foreach (var vm in selected)
+            {
+                if (vm.IsDeleted) vm.IsSelected = false;
+            }
+
+            FilesProgressStatusText.Text = $"Purged {deleted} residual directory/file trace(s).";
+            await Task.Delay(400);
 
             _isDeleting = false;
             WindowCloseBtn.IsEnabled = true;
             FilesProgressPanel.Visibility = Visibility.Collapsed;
             FilesActionsPanel.Visibility = Visibility.Visible;
-
-            BtnFinishFiles_Click(sender, e);
+            UpdateFilesCounts();
         }
 
         private void BtnFinishFiles_Click(object sender, RoutedEventArgs e)
