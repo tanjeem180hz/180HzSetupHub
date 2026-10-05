@@ -989,6 +989,14 @@ namespace SetupHub180Hz.Services
                     psi.FileName = "msiexec.exe";
                     psi.Arguments = $"/i \"{finalPath}\" /quiet /norestart";
                 }
+                else if (ext.Equals(".msix", StringComparison.OrdinalIgnoreCase) ||
+                         ext.Equals(".appx", StringComparison.OrdinalIgnoreCase) ||
+                         ext.Equals(".msixbundle", StringComparison.OrdinalIgnoreCase) ||
+                         ext.Equals(".appxbundle", StringComparison.OrdinalIgnoreCase))
+                {
+                    psi.FileName = "powershell.exe";
+                    psi.Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"Add-AppxPackage -Path '{finalPath}' -ForceApplicationShutdown\"";
+                }
                 else if (lowerType == "inno")
                 {
                     psi.FileName = finalPath;
@@ -1007,14 +1015,19 @@ namespace SetupHub180Hz.Services
                 else
                 {
                     psi.FileName = finalPath;
-                    psi.Arguments = "/silent /verysilent /quiet /qn /s";
+                    psi.Arguments = DetectInstallerArguments(finalPath);
                 }
 
                 using var proc = Process.Start(psi);
                 if (proc != null)
                 {
                     await proc.WaitForExitAsync();
-                    success = (proc.ExitCode == 0 || proc.ExitCode == 3010);
+                    success = (proc.ExitCode == 0 || proc.ExitCode == 3010 || proc.ExitCode == 1641);
+                }
+
+                if (!success && AppMetadataHelper.IsAppInstalled(app))
+                {
+                    success = true;
                 }
             }
             catch (Exception ex)
@@ -1027,10 +1040,44 @@ namespace SetupHub180Hz.Services
                 // Fallback to winget install or upgrade command
                 success = (app.IsUpgrade || app.HasUpdate)
                     ? await _winget.UpgradeAsync(app.Id)
-                    : await _winget.InstallAsync(app.Id, app.Source);
+                    : await _winget.InstallAsync(app.Id, app.Source, app.Name);
             }
 
             FinalizeAppStatus(app, success, queueIndex, queueTotal);
+        }
+
+        private static string DetectInstallerArguments(string filePath)
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                {
+                    using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    byte[] buffer = new byte[Math.Min(fs.Length, 4 * 1024 * 1024)];
+                    int read = fs.Read(buffer, 0, buffer.Length);
+                    string header = System.Text.Encoding.ASCII.GetString(buffer, 0, read);
+
+                    if (header.Contains("Inno Setup", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-";
+                    }
+                    if (header.Contains("NullsoftInst", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "/S";
+                    }
+                    if (header.Contains("WixBurn", StringComparison.OrdinalIgnoreCase) || header.Contains("Burn", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "/quiet /norestart";
+                    }
+                    if (header.Contains("InstallShield", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "/s /v\"/qn\"";
+                    }
+                }
+            }
+            catch { }
+
+            return "/VERYSILENT /NORESTART /S /quiet";
         }
 
         private async Task InstallViaWingetDirectAsync(AppItem app, int queueIndex, int queueTotal)
@@ -1166,7 +1213,7 @@ namespace SetupHub180Hz.Services
 
             bool success = (app.IsUpgrade || app.HasUpdate)
                 ? await _winget.UpgradeAsync(app.Id, onOutputLine, ct)
-                : await _winget.InstallAsync(app.Id, app.Source, onOutputLine, ct);
+                : await _winget.InstallAsync(app.Id, app.Source, app.Name, onOutputLine, ct);
 
             smoothTimer.Stop();
 
@@ -1185,6 +1232,11 @@ namespace SetupHub180Hz.Services
 
         private void FinalizeAppStatus(AppItem app, bool success, int queueIndex, int queueTotal)
         {
+            if (!success && AppMetadataHelper.IsAppInstalled(app))
+            {
+                success = true;
+            }
+
             app.IsBusy = false;
             app.DownloadSpeed = "";
             app.DownloadEta = "";
