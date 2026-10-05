@@ -285,7 +285,7 @@ public sealed class InstallerService
             return;
         }
 
-        // Perform online download
+        // Perform online download with retry and verification
         var downloadUrl = Environment.GetEnvironmentVariable("WINSETUPHUB_DOWNLOAD_URL");
         if (string.IsNullOrWhiteSpace(downloadUrl))
         {
@@ -295,107 +295,164 @@ public sealed class InstallerService
         detailLog?.Invoke($"Downloading 180Hz Setup Hub from: {downloadUrl}");
         progress?.Invoke("Connecting to download server...", 30);
 
-        // Enable modern TLS protocols
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | (SecurityProtocolType)3072;
 
         var tempTarget = $"{destinationExe}.download.tmp";
 
-        try
-        {
-            using (var handler = new HttpClientHandler { AllowAutoRedirect = true })
-            using (var client = new HttpClient(handler) { Timeout = TimeSpan.FromMinutes(10) })
-            {
-                client.DefaultRequestHeaders.Add("User-Agent", "180Hz-SetupHub-Bootstrapper/1.0");
+        const int maxRetries = 3;
+        Exception? lastEx = null;
 
-                using (var response = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
+        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        {
+            try
+            {
+                if (File.Exists(tempTarget))
                 {
-                    if (!response.IsSuccessStatusCode)
+                    try { File.Delete(tempTarget); } catch { }
+                }
+
+                using (var handler = new HttpClientHandler { AllowAutoRedirect = true })
+                using (var client = new HttpClient(handler) { Timeout = TimeSpan.FromMinutes(10) })
+                {
+                    client.DefaultRequestHeaders.Add("User-Agent", "180Hz-SetupHub-Bootstrapper/1.0");
+
+                    using (var response = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
                     {
-                        // Check if a local fallback is available before failing
-                        var emergencyLocal = FindLocalPackage();
-                        if (emergencyLocal is not null && File.Exists(emergencyLocal))
+                        if (!response.IsSuccessStatusCode)
                         {
-                            detailLog?.Invoke($"Online download returned {response.StatusCode}. Falling back to local file.");
-                            await CopyWithProgressAsync(emergencyLocal, destinationExe, progress, 35, 85, cancellationToken);
-                            return;
+                            var emergencyLocal = FindLocalPackage();
+                            if (emergencyLocal is not null && File.Exists(emergencyLocal))
+                            {
+                                detailLog?.Invoke($"Online download returned {response.StatusCode}. Falling back to local file.");
+                                await CopyWithProgressAsync(emergencyLocal, destinationExe, progress, 35, 85, cancellationToken);
+                                return;
+                            }
+
+                            throw new HttpRequestException($"Download server returned HTTP {(int)response.StatusCode} ({response.ReasonPhrase}). URL: {downloadUrl}");
                         }
 
-                        throw new HttpRequestException($"Download server returned HTTP {(int)response.StatusCode} ({response.ReasonPhrase}). URL: {downloadUrl}");
-                    }
-
-                    var totalBytes = response.Content.Headers.ContentLength ?? -1L;
-                    using (var contentStream = await response.Content.ReadAsStreamAsync())
-                    using (var fileStream = new FileStream(tempTarget, FileMode.Create, FileAccess.Write, FileShare.None, 65536, useAsync: true))
-                    {
-                        var buffer = new byte[65536];
-                        long totalRead = 0;
-                        int bytesRead;
-
-                        var stopwatch = Stopwatch.StartNew();
-                        var lastSampleMs = stopwatch.ElapsedMilliseconds;
-                        var lastSampleBytes = 0L;
-                        var currentSpeedFormatted = "0 KB/s";
-
-                        while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+                        var totalBytes = response.Content.Headers.ContentLength ?? -1L;
+                        using (var contentStream = await response.Content.ReadAsStreamAsync())
+                        using (var fileStream = new FileStream(tempTarget, FileMode.Create, FileAccess.Write, FileShare.None, 65536, useAsync: true))
                         {
-                            await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
-                            totalRead += bytesRead;
+                            var buffer = new byte[65536];
+                            long totalRead = 0;
+                            int bytesRead;
 
-                            var elapsedMs = stopwatch.ElapsedMilliseconds;
-                            if (elapsedMs - lastSampleMs >= 200)
+                            var stopwatch = Stopwatch.StartNew();
+                            var lastSampleMs = stopwatch.ElapsedMilliseconds;
+                            var lastSampleBytes = 0L;
+                            var currentSpeedFormatted = "0 KB/s";
+
+                            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
                             {
-                                var deltaSec = (elapsedMs - lastSampleMs) / 1000.0;
-                                var deltaBytes = totalRead - lastSampleBytes;
-                                if (deltaSec > 0)
+                                await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
+                                totalRead += bytesRead;
+
+                                var elapsedMs = stopwatch.ElapsedMilliseconds;
+                                if (elapsedMs - lastSampleMs >= 200)
                                 {
-                                    var bytesPerSec = deltaBytes / deltaSec;
-                                    currentSpeedFormatted = FormatDynamicSpeed(bytesPerSec);
+                                    var deltaSec = (elapsedMs - lastSampleMs) / 1000.0;
+                                    var deltaBytes = totalRead - lastSampleBytes;
+                                    if (deltaSec > 0)
+                                    {
+                                        var bytesPerSec = deltaBytes / deltaSec;
+                                        currentSpeedFormatted = FormatDynamicSpeed(bytesPerSec);
+                                    }
+                                    lastSampleMs = elapsedMs;
+                                    lastSampleBytes = totalRead;
                                 }
-                                lastSampleMs = elapsedMs;
-                                lastSampleBytes = totalRead;
+
+                                if (totalBytes > 0)
+                                {
+                                    var pct = 30.0 + ((double)totalRead / totalBytes) * 55.0; // 30% to 85%
+                                    progress?.Invoke($"Installing app package {(int)pct}% ({currentSpeedFormatted})...", pct);
+                                }
+                                else
+                                {
+                                    var mbRead = totalRead / (1024.0 * 1024.0);
+                                    var pseudoPct = Math.Min(84.0, 30.0 + mbRead * 0.7);
+                                    progress?.Invoke($"Downloading app package ({mbRead:F1} MB • {currentSpeedFormatted})...", pseudoPct);
+                                }
                             }
 
-                            if (totalBytes > 0)
+                            // Verify complete stream received
+                            if (totalBytes > 0 && totalRead < totalBytes)
                             {
-                                var pct = 30.0 + ((double)totalRead / totalBytes) * 55.0; // 30% to 85%
-                                progress?.Invoke($"Installing app package {(int)pct}% ({currentSpeedFormatted})...", pct);
-                            }
-                            else
-                            {
-                                var mbRead = totalRead / (1024.0 * 1024.0);
-                                var pseudoPct = Math.Min(84.0, 30.0 + mbRead * 0.7);
-                                progress?.Invoke($"Downloading app package ({mbRead:F1} MB • {currentSpeedFormatted})...", pseudoPct);
+                                throw new IOException($"Incomplete download stream. Expected {totalBytes} bytes, received {totalRead} bytes.");
                             }
                         }
                     }
                 }
-            }
 
-            if (File.Exists(destinationExe))
-            {
-                File.Delete(destinationExe);
-            }
-            File.Move(tempTarget, destinationExe);
-            detailLog?.Invoke("Application package downloaded and staged successfully.");
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            if (File.Exists(tempTarget))
-            {
-                try { File.Delete(tempTarget); } catch { }
-            }
+                // Verify file validity
+                var fileInfo = new FileInfo(tempTarget);
+                if (!fileInfo.Exists || fileInfo.Length < 10_000_000)
+                {
+                    throw new InvalidOperationException($"Downloaded binary is invalid or incomplete (Size: {fileInfo.Length} bytes).");
+                }
 
-            // Check emergency local fallback
-            var emergencyLocal = FindLocalPackage();
-            if (emergencyLocal is not null && File.Exists(emergencyLocal))
-            {
-                detailLog?.Invoke("Download failed, using local package fallback...");
-                await CopyWithProgressAsync(emergencyLocal, destinationExe, progress, 35, 85, cancellationToken);
+                // Verify PE header (MZ)
+                using (var fs = new FileStream(tempTarget, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    byte[] header = new byte[2];
+                    if (fs.Read(header, 0, 2) != 2 || header[0] != 0x4D || header[1] != 0x5A)
+                    {
+                        throw new InvalidDataException("Downloaded package is not a valid Windows executable binary.");
+                    }
+                }
+
+                // Move into destination with retry against locks
+                for (int r = 0; r < 5; r++)
+                {
+                    try
+                    {
+                        if (File.Exists(destinationExe))
+                        {
+                            File.Delete(destinationExe);
+                        }
+                        File.Move(tempTarget, destinationExe);
+                        break;
+                    }
+                    catch (IOException) when (r < 4)
+                    {
+                        StopExistingApp(destinationExe);
+                        Thread.Sleep(500);
+                    }
+                }
+
+                detailLog?.Invoke("Application package downloaded, verified, and staged successfully.");
                 return;
             }
-
-            throw new InvalidOperationException($"Failed to download 180Hz Setup Hub: {ex.Message}. Please check your internet connection or place '{InstalledExeName}' in the same folder as the installer.", ex);
+            catch (Exception ex) when (attempt < maxRetries && ex is not OperationCanceledException)
+            {
+                lastEx = ex;
+                detailLog?.Invoke($"Download attempt {attempt} failed: {ex.Message}. Retrying...");
+                progress?.Invoke($"Connection interrupted. Retrying download ({attempt}/{maxRetries})...", 30);
+                await Task.Delay(1500 * attempt, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                lastEx = ex;
+                break;
+            }
         }
+
+        if (File.Exists(tempTarget))
+        {
+            try { File.Delete(tempTarget); } catch { }
+        }
+
+        // Check emergency local fallback
+        var emergency = FindLocalPackage();
+        if (emergency is not null && File.Exists(emergency))
+        {
+            detailLog?.Invoke("Online download failed, falling back to local package...");
+            await CopyWithProgressAsync(emergency, destinationExe, progress, 35, 85, cancellationToken);
+            return;
+        }
+
+        throw new InvalidOperationException($"Failed to deploy 180Hz Setup Hub: {lastEx?.Message ?? "Download error"}. Please check your internet connection or place '{InstalledExeName}' next to the installer.", lastEx);
     }
 
     private static string? FindLocalPackage()
@@ -407,30 +464,48 @@ public sealed class InstallerService
             return envPkg;
         }
 
-        // 2. Adjacent to running installer
+        // 2. Adjacent to running installer or current process directory
         var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        var adjacent = Path.Combine(baseDir, InstalledExeName);
-        if (File.Exists(adjacent) && new FileInfo(adjacent).Length > 10_000_000)
+        var procDir = Path.GetDirectoryName(Program.GetCurrentProcessPath()) ?? "";
+
+        var searchDirs = new List<string> { baseDir };
+        if (!string.IsNullOrWhiteSpace(procDir) && !searchDirs.Contains(procDir, StringComparer.OrdinalIgnoreCase))
         {
-            return adjacent;
+            searchDirs.Add(procDir);
         }
 
-        // 3. Search local directories in development/portable folder structures
-        var testPaths = new[]
+        foreach (var dir in searchDirs)
         {
-            Path.Combine(baseDir, "StandaloneApp", InstalledExeName),
-            Path.Combine(baseDir, "..", "StandaloneApp", InstalledExeName),
-            Path.Combine(baseDir, "..", "publish", "win-x64", InstalledExeName),
-            Path.Combine(baseDir, "..", "artifacts", "publish", "win-x64", InstalledExeName),
-            Path.Combine(baseDir, "..", "..", "artifacts", "publish", "win-x64", InstalledExeName),
-            Path.Combine(baseDir, "..", "..", "..", "artifacts", "publish", "win-x64", InstalledExeName),
-            Path.Combine(baseDir, "artifacts", "publish", "win-x64", InstalledExeName),
-            Path.Combine(baseDir, "new folder", "StandaloneApp", InstalledExeName),
-            Path.Combine(baseDir, "..", "new folder", "StandaloneApp", InstalledExeName),
-            Path.Combine(baseDir, "..", "..", "new folder", "StandaloneApp", InstalledExeName),
-            @"C:\Users\PSYCHOPATH\Downloads\WinSetupHub\artifacts\publish\win-x64\180HzSetupHub.exe",
-            @"C:\Users\PSYCHOPATH\Downloads\WinSetupHub\new folder\StandaloneApp\180HzSetupHub.exe"
-        };
+            var adjacent = Path.Combine(dir, InstalledExeName);
+            if (File.Exists(adjacent) && new FileInfo(adjacent).Length > 10_000_000)
+            {
+                return adjacent;
+            }
+        }
+
+        // 3. Search local directories in development/portable folder structures dynamically
+        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var testPaths = new List<string>();
+
+        foreach (var dir in searchDirs)
+        {
+            testPaths.Add(Path.Combine(dir, "StandaloneApp", InstalledExeName));
+            testPaths.Add(Path.Combine(dir, "..", "StandaloneApp", InstalledExeName));
+            testPaths.Add(Path.Combine(dir, "..", "publish", "win-x64", InstalledExeName));
+            testPaths.Add(Path.Combine(dir, "..", "artifacts", "publish", "win-x64", InstalledExeName));
+            testPaths.Add(Path.Combine(dir, "..", "..", "artifacts", "publish", "win-x64", InstalledExeName));
+            testPaths.Add(Path.Combine(dir, "..", "..", "..", "artifacts", "publish", "win-x64", InstalledExeName));
+            testPaths.Add(Path.Combine(dir, "artifacts", "publish", "win-x64", InstalledExeName));
+            testPaths.Add(Path.Combine(dir, "new folder", "StandaloneApp", InstalledExeName));
+            testPaths.Add(Path.Combine(dir, "..", "new folder", "StandaloneApp", InstalledExeName));
+            testPaths.Add(Path.Combine(dir, "..", "..", "new folder", "StandaloneApp", InstalledExeName));
+        }
+
+        if (!string.IsNullOrWhiteSpace(userProfile))
+        {
+            testPaths.Add(Path.Combine(userProfile, "Downloads", "WinSetupHub", "artifacts", "publish", "win-x64", InstalledExeName));
+            testPaths.Add(Path.Combine(userProfile, "Downloads", "WinSetupHub", "new folder", "StandaloneApp", InstalledExeName));
+        }
 
         foreach (var p in testPaths)
         {
@@ -506,20 +581,28 @@ public sealed class InstallerService
     public static void StopExistingApp(string installedExe)
     {
         var procName = Path.GetFileNameWithoutExtension(installedExe);
-        for (var retry = 0; retry < 3; retry++)
-        {
-            var processes = Process.GetProcessesByName(procName);
-            if (processes.Length == 0) break;
+        var targetNames = new[] { procName, "180HzSetupHub", "180HzSetupHubSetup" };
+        var currentPid = Process.GetCurrentProcess().Id;
 
-            foreach (var process in processes)
+        for (var retry = 0; retry < 5; retry++)
+        {
+            bool anyKilled = false;
+            foreach (var name in targetNames.Distinct(StringComparer.OrdinalIgnoreCase))
             {
-                try
+                if (string.IsNullOrWhiteSpace(name)) continue;
+                var processes = Process.GetProcessesByName(name);
+                foreach (var process in processes)
                 {
-                    process.Kill();
-                    process.WaitForExit(1000);
+                    try
+                    {
+                        if (process.Id == currentPid) continue;
+                        process.Kill();
+                        anyKilled = true;
+                    }
+                    catch { }
                 }
-                catch { }
             }
+            if (!anyKilled) break;
             Thread.Sleep(300);
         }
     }
@@ -588,6 +671,43 @@ public sealed class InstallerService
 
     public static void CreateShortcuts(string targetExe, string workingDir, bool createDesktopShortcut)
     {
+        // 1. Try instantaneous native COM WScript.Shell
+        try
+        {
+            var shellType = Type.GetTypeFromProgID("WScript.Shell");
+            if (shellType != null)
+            {
+                dynamic shell = Activator.CreateInstance(shellType);
+                var startDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs");
+                Directory.CreateDirectory(startDir);
+                var startMenuLnk = Path.Combine(startDir, $"{AppName}.lnk");
+                dynamic sMenu = shell.CreateShortcut(startMenuLnk);
+                sMenu.TargetPath = targetExe;
+                sMenu.WorkingDirectory = workingDir;
+                sMenu.IconLocation = $"{targetExe},0";
+                sMenu.Description = AppName;
+                sMenu.Save();
+                SetShortcutRunAsAdmin(startMenuLnk);
+
+                if (createDesktopShortcut)
+                {
+                    var deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                    Directory.CreateDirectory(deskDir);
+                    var deskLnk = Path.Combine(deskDir, $"{AppName}.lnk");
+                    dynamic sDesk = shell.CreateShortcut(deskLnk);
+                    sDesk.TargetPath = targetExe;
+                    sDesk.WorkingDirectory = workingDir;
+                    sDesk.IconLocation = $"{targetExe},0";
+                    sDesk.Description = AppName;
+                    sDesk.Save();
+                    SetShortcutRunAsAdmin(deskLnk);
+                }
+                return;
+            }
+        }
+        catch { }
+
+        // 2. Fallback to PowerShell
         var escapedTarget = targetExe.Replace("'", "''");
         var escapedDir = workingDir.Replace("'", "''");
         var escapedName = AppName.Replace("'", "''");
@@ -630,7 +750,6 @@ public sealed class InstallerService
                 p?.WaitForExit(10000);
             }
 
-            // Set "Run as Administrator" flag (SLDF_RUNAS_USER at offset 0x15) on created shortcuts
             var startDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs");
             var startMenuLnk = Path.Combine(startDir, $"{AppName}.lnk");
             SetShortcutRunAsAdmin(startMenuLnk);
@@ -642,10 +761,7 @@ public sealed class InstallerService
                 SetShortcutRunAsAdmin(desktopLnk);
             }
         }
-        catch
-        {
-            // Non-critical fallback
-        }
+        catch { }
     }
 
     private static void SetShortcutRunAsAdmin(string shortcutPath)
@@ -673,7 +789,9 @@ public sealed class InstallerService
             Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
             Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory),
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"),
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", AppName),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs", AppName)
         };
 
         foreach (var dir in candidateDirs)
@@ -682,9 +800,14 @@ public sealed class InstallerService
             {
                 if (string.IsNullOrEmpty(dir) || !Directory.Exists(dir)) continue;
                 var lnk = Path.Combine(dir, $"{AppName}.lnk");
-                if (File.Exists(lnk))
+                if (File.Exists(lnk)) File.Delete(lnk);
+
+                var lnk2 = Path.Combine(dir, "180Hz Setup Hub.lnk");
+                if (File.Exists(lnk2)) File.Delete(lnk2);
+
+                if (dir.EndsWith(AppName, StringComparison.OrdinalIgnoreCase) && Directory.GetFileSystemEntries(dir).Length == 0)
                 {
-                    File.Delete(lnk);
+                    try { Directory.Delete(dir); } catch { }
                 }
             }
             catch { }
@@ -701,7 +824,22 @@ public sealed class InstallerService
 
             var uninstallerPath = Path.Combine(installRoot, UninstallerExeName);
             key.SetValue("DisplayName", AppName);
-            key.SetValue("DisplayVersion", "1.0.0");
+
+            string displayVersion = "1.0.0";
+            if (File.Exists(targetExe))
+            {
+                try
+                {
+                    var vi = FileVersionInfo.GetVersionInfo(targetExe);
+                    if (!string.IsNullOrWhiteSpace(vi.FileVersion))
+                    {
+                        displayVersion = vi.FileVersion;
+                    }
+                }
+                catch { }
+            }
+
+            key.SetValue("DisplayVersion", displayVersion);
             key.SetValue("Publisher", "180Hz");
             key.SetValue("DisplayIcon", $"{targetExe},0");
             key.SetValue("InstallLocation", installRoot);
@@ -725,14 +863,12 @@ public sealed class InstallerService
                 compatKey.SetValue(uninstallerPath, "~ RUNASADMIN");
             }
         }
-        catch
-        {
-            // Non-critical
-        }
+        catch { }
     }
 
     public static void UnregisterUninstall()
     {
+        // 1. Uninstall entries
         try
         {
             using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64);
@@ -746,6 +882,123 @@ public sealed class InstallerService
             baseKey32.DeleteSubKeyTree(RegistryKeyPath, throwOnMissingSubKey: false);
         }
         catch { }
+
+        // 2. Startup Run key
+        try
+        {
+            using var runKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", writable: true);
+            runKey?.DeleteValue("180HzSetupHub", throwOnMissingValue: false);
+            runKey?.DeleteValue(AppName, throwOnMissingValue: false);
+        }
+        catch { }
+
+        // 3. AppCompatFlags entries
+        try
+        {
+            using var compatKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", writable: true);
+            if (compatKey != null)
+            {
+                var valueNames = compatKey.GetValueNames();
+                foreach (var val in valueNames)
+                {
+                    if (val.IndexOf("180HzSetupHub", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        val.IndexOf(AppName, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        try { compatKey.DeleteValue(val, throwOnMissingValue: false); } catch { }
+                    }
+                }
+            }
+        }
+        catch { }
+
+        // 4. HKCU\Software\180HzSetupHub
+        try
+        {
+            using var softKey = Registry.CurrentUser.OpenSubKey("Software", writable: true);
+            softKey?.DeleteSubKeyTree("180HzSetupHub", throwOnMissingSubKey: false);
+        }
+        catch { }
+    }
+
+    public static void CleanAppDataResidues()
+    {
+        // 1. AppData\Local\180HzSetupHub
+        var localAppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "180HzSetupHub");
+        if (Directory.Exists(localAppDataDir))
+        {
+            try { Directory.Delete(localAppDataDir, recursive: true); } catch { }
+        }
+
+        // 2. AppData\Roaming\180HzSetupHub
+        var roamingAppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "180HzSetupHub");
+        if (Directory.Exists(roamingAppDataDir))
+        {
+            try { Directory.Delete(roamingAppDataDir, recursive: true); } catch { }
+        }
+
+        // 3. Temp uninstaller/installer workers
+        try
+        {
+            var tempDir = Path.GetTempPath();
+            var tempFiles = Directory.GetFiles(tempDir, "180HzSetupHub*.*", SearchOption.TopDirectoryOnly);
+            foreach (var f in tempFiles)
+            {
+                try { File.Delete(f); } catch { }
+            }
+        }
+        catch { }
+    }
+
+    public static void PerformFullCleanUninstall(string installRoot, Action<string, double>? progress = null)
+    {
+        progress?.Invoke("Terminating active application processes...", 10);
+        StopExistingApp(Path.Combine(installRoot, InstalledExeName));
+        Thread.Sleep(300);
+
+        progress?.Invoke("Removing shortcuts and desktop links...", 25);
+        RemoveShortcuts();
+
+        progress?.Invoke("Purging Windows Add/Remove programs registry keys...", 45);
+        UnregisterUninstall();
+
+        progress?.Invoke("Cleaning application cache, downloads and logs...", 65);
+        CleanAppDataResidues();
+
+        progress?.Invoke("Removing application installation directories...", 85);
+        for (var retry = 0; retry < 5; retry++)
+        {
+            try
+            {
+                if (Directory.Exists(installRoot))
+                {
+                    Directory.Delete(installRoot, recursive: true);
+                }
+                break;
+            }
+            catch (IOException)
+            {
+                StopExistingApp(Path.Combine(installRoot, InstalledExeName));
+                Thread.Sleep(500);
+            }
+            catch { }
+        }
+
+        if (Directory.Exists(installRoot))
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    Arguments = $"/c timeout /t 2 & rmdir /s /q \"{installRoot}\"",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                });
+            }
+            catch { }
+        }
+
+        progress?.Invoke("Uninstallation complete. All files cleanly removed.", 100);
     }
 
     public static async Task<bool> IsWingetAvailableAsync(CancellationToken cancellationToken = default)
