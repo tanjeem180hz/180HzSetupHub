@@ -46,19 +46,63 @@ namespace SetupHub180Hz.Services
             return ParseTable(output);
         }
 
-        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, AppMetadata?> _metadataCache =
+        private class CacheEntry<T>
+        {
+            public T Value { get; }
+            public DateTime CachedAt { get; } = DateTime.UtcNow;
+            public CacheEntry(T value) => Value = value;
+            public bool IsExpired(double minutes = 30) => (DateTime.UtcNow - CachedAt).TotalMinutes > minutes;
+        }
+
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, CacheEntry<AppMetadata?>> _metadataCache =
             new(StringComparer.OrdinalIgnoreCase);
         private static readonly System.Threading.SemaphoreSlim _metadataSemaphore = new(2, 2);
+
+        private static DateTime _lastSourceUpdate = DateTime.MinValue;
+        private static readonly System.Threading.SemaphoreSlim _sourceUpdateSemaphore = new(1, 1);
+
+        public async Task<bool> EnsureSourcesUpdatedAsync(bool force = false, Action<string>? onOutputLine = null)
+        {
+            if (!force && (DateTime.UtcNow - _lastSourceUpdate).TotalMinutes < 60)
+            {
+                return true;
+            }
+
+            if (!await _sourceUpdateSemaphore.WaitAsync(0))
+            {
+                return false;
+            }
+
+            try
+            {
+                onOutputLine?.Invoke("Updating repository sources to latest releases…");
+                var (exitCode, _) = await RunWingetWithCodeAsync("source update", onOutputLine, timeoutMs: 90000);
+                if (exitCode == 0)
+                {
+                    _lastSourceUpdate = DateTime.UtcNow;
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                _sourceUpdateSemaphore.Release();
+            }
+        }
 
         public async Task<AppMetadata?> GetMetadataAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) return null;
-            if (_metadataCache.TryGetValue(id, out var cached)) return cached;
+            if (_metadataCache.TryGetValue(id, out var cached) && !cached.IsExpired(30)) return cached.Value;
 
             await _metadataSemaphore.WaitAsync();
             try
             {
-                if (_metadataCache.TryGetValue(id, out cached)) return cached;
+                if (_metadataCache.TryGetValue(id, out cached) && !cached.IsExpired(30)) return cached.Value;
 
                 var output = await RunWingetAsync($"show --id \"{id}\" --exact --accept-source-agreements");
                 if (string.IsNullOrWhiteSpace(output))
@@ -71,6 +115,7 @@ namespace SetupHub180Hz.Services
                 string? supportUrl = null;
                 string? licenseUrl = null;
                 string? installerUrl = null;
+                string? version = null;
 
                 using var reader = new System.IO.StringReader(output);
                 string? line;
@@ -107,6 +152,11 @@ namespace SetupHub180Hz.Services
                         var val = trimmed.Substring("Installer Url:".Length).Trim();
                         if (!string.IsNullOrWhiteSpace(val)) installerUrl = val;
                     }
+                    else if (trimmed.StartsWith("Version:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Version:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) version = val;
+                    }
                 }
 
                 // If no direct site found, extract root domain from Installer Url
@@ -126,12 +176,12 @@ namespace SetupHub180Hz.Services
 
                 var chosen = homepage ?? publisherUrl ?? supportUrl ?? licenseUrl ?? derivedInstallerDomain;
                 var result = chosen != null
-                    ? new AppMetadata(homepage ?? chosen, publisherUrl, supportUrl)
+                    ? new AppMetadata(homepage ?? chosen, publisherUrl, supportUrl, version)
                     : null;
 
                 if (result != null)
                 {
-                    _metadataCache[id] = result;
+                    _metadataCache[id] = new CacheEntry<AppMetadata?>(result);
                 }
                 return result;
             }
@@ -151,20 +201,21 @@ namespace SetupHub180Hz.Services
             string? Sha256,
             string? Homepage = null,
             string? PublisherUrl = null,
-            string? Publisher = null);
+            string? Publisher = null,
+            string? Version = null);
 
-        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, WingetInstallerInfo?> _installerInfoCache =
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, CacheEntry<WingetInstallerInfo?>> _installerInfoCache =
             new(StringComparer.OrdinalIgnoreCase);
 
         public async Task<WingetInstallerInfo?> GetInstallerInfoAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) return null;
-            if (_installerInfoCache.TryGetValue(id, out var cached)) return cached;
+            if (_installerInfoCache.TryGetValue(id, out var cached) && !cached.IsExpired(30)) return cached.Value;
 
             await _metadataSemaphore.WaitAsync();
             try
             {
-                if (_installerInfoCache.TryGetValue(id, out cached)) return cached;
+                if (_installerInfoCache.TryGetValue(id, out cached) && !cached.IsExpired(30)) return cached.Value;
 
                 var output = await RunWingetAsync($"show --id \"{id}\" --exact --accept-source-agreements");
                 if (string.IsNullOrWhiteSpace(output))
@@ -178,6 +229,7 @@ namespace SetupHub180Hz.Services
                 string? homepage = null;
                 string? publisherUrl = null;
                 string? publisher = null;
+                string? version = null;
 
                 using var reader = new System.IO.StringReader(output);
                 string? line;
@@ -214,15 +266,20 @@ namespace SetupHub180Hz.Services
                         var val = trimmed.Substring("Publisher:".Length).Trim();
                         if (!string.IsNullOrWhiteSpace(val)) publisher = val;
                     }
+                    else if (trimmed.StartsWith("Version:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Version:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) version = val;
+                    }
                 }
 
                 var result = !string.IsNullOrWhiteSpace(installerUrl)
-                    ? new WingetInstallerInfo(installerUrl, installerType, sha256, homepage, publisherUrl, publisher)
+                    ? new WingetInstallerInfo(installerUrl, installerType, sha256, homepage, publisherUrl, publisher, version)
                     : null;
 
                 if (result != null)
                 {
-                    _installerInfoCache[id] = result;
+                    _installerInfoCache[id] = new CacheEntry<WingetInstallerInfo?>(result);
                 }
                 return result;
             }
@@ -241,6 +298,7 @@ namespace SetupHub180Hz.Services
 
         public async Task<bool> InstallAsync(string id, string? source, string? name, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default)
         {
+            _ = Task.Run(() => EnsureSourcesUpdatedAsync());
             if (id.Equals("Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))
             {
                 try
@@ -315,8 +373,21 @@ namespace SetupHub180Hz.Services
             return false;
         }
 
-        public Task<bool> UpgradeAsync(string id, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default) =>
-            RunActionAsync($"upgrade --id \"{id}\" -e --silent --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+        public async Task<bool> UpgradeAsync(string id, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default)
+        {
+            _ = Task.Run(() => EnsureSourcesUpdatedAsync());
+            // Tier 1: Exact ID upgrade with force & include-unknown
+            var success = await RunActionAsync($"upgrade --id \"{id}\" -e --silent --force --include-unknown --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+            if (success || ct.IsCancellationRequested) return success;
+
+            // Tier 2: Non-exact ID upgrade
+            success = await RunActionAsync($"upgrade \"{id}\" --silent --force --include-unknown --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+            if (success || ct.IsCancellationRequested) return success;
+
+            // Tier 3: Fallback to install with --force (Winget will pull latest version and overwrite)
+            success = await InstallAsync(id, source: null, name: null, onOutputLine, ct);
+            return success;
+        }
 
         public Task<bool> UpgradeAllAsync(Action<string>? onOutputLine = null) =>
             RunActionAsync("upgrade --all --silent --accept-package-agreements --accept-source-agreements", onOutputLine);
