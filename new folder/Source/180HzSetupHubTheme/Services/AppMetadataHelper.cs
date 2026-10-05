@@ -23,10 +23,13 @@ namespace SetupHub180Hz.Services
         }
 
         private static Dictionary<string, RegistryAppInfo>? _registryCache;
+        private static HashSet<string>? _appxPackageCache;
+        private static DateTime _appxCacheTime = DateTime.MinValue;
 
         public static void InvalidateCache()
         {
             _registryCache = null;
+            _appxPackageCache = null;
         }
 
         public static void EnrichAppItem(AppItem app, IEnumerable<AppItem>? catalog = null)
@@ -173,6 +176,166 @@ namespace SetupHub180Hz.Services
                     app.IconImageSource = localImg;
                 }
             }
+        }
+
+        public static bool IsAppInstalled(AppItem app)
+        {
+            if (app == null) return false;
+
+            // Special case for Microsoft Store itself
+            if (string.Equals(app.Id, "Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // 1. Windows Registry uninstall check (covers Win32 / x64 / x86 software)
+            var reg = GetRegistryInfo(app.Name, app.Id);
+            if (reg != null)
+            {
+                if (!string.IsNullOrWhiteSpace(reg.DisplayVersion) && (string.IsNullOrWhiteSpace(app.Version) || app.Version == "Latest"))
+                {
+                    app.Version = reg.DisplayVersion;
+                }
+                if (!string.IsNullOrWhiteSpace(reg.InstallLocation) && Directory.Exists(reg.InstallLocation))
+                {
+                    app.InstallLocation = reg.InstallLocation;
+                }
+                if (!string.IsNullOrWhiteSpace(reg.DisplayIcon) && string.IsNullOrWhiteSpace(app.LocalIconPath))
+                {
+                    var cleaned = CleanIconPath(reg.DisplayIcon);
+                    if (File.Exists(cleaned)) app.LocalIconPath = cleaned;
+                }
+                return true;
+            }
+
+            // 2. Check registered App Paths
+            var appPathExe = ResolveFromAppPaths(app.Name) ?? ResolveFromAppPaths(CleanPackageId(app.Id));
+            if (!string.IsNullOrWhiteSpace(appPathExe) && File.Exists(appPathExe))
+            {
+                if (string.IsNullOrWhiteSpace(app.LocalIconPath)) app.LocalIconPath = appPathExe;
+                return true;
+            }
+
+            // 3. Check local icon path if it points to an installed executable
+            if (!string.IsNullOrWhiteSpace(app.LocalIconPath) && app.LocalIconPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && File.Exists(app.LocalIconPath))
+            {
+                return true;
+            }
+
+            // 4. Check App InstallLocation if present
+            if (!string.IsNullOrWhiteSpace(app.InstallLocation) && Directory.Exists(app.InstallLocation))
+            {
+                if (DirectoryContainsExe(app.InstallLocation))
+                {
+                    return true;
+                }
+            }
+
+            // 5. Check standard program directories
+            string normName = NormalizeAppName(app.Name);
+            string cleanAlphaName = Regex.Replace(normName, @"[\s\W]", "");
+            string[] baseDirs = {
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs"),
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+            };
+
+            foreach (var b in baseDirs)
+            {
+                if (string.IsNullOrWhiteSpace(b) || !Directory.Exists(b)) continue;
+                string dir1 = Path.Combine(b, app.Name);
+                string dir2 = Path.Combine(b, normName);
+                if (DirectoryContainsExe(dir1) || DirectoryContainsExe(dir2))
+                {
+                    return true;
+                }
+            }
+
+            // 6. Check Start Menu shortcuts
+            string[] startDirs = {
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
+            };
+            foreach (var dir in startDirs)
+            {
+                if (Directory.Exists(dir))
+                {
+                    try
+                    {
+                        var lnks = Directory.GetFiles(dir, $"*{normName}*.lnk", SearchOption.AllDirectories);
+                        if (lnks.Length > 0)
+                        {
+                            return true;
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            // 7. Check AppModel / Store / Appx packages
+            if (IsAppxInstalled(app.Id, app.Name, normName, cleanAlphaName))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool DirectoryContainsExe(string dir)
+        {
+            if (string.IsNullOrWhiteSpace(dir) || !Directory.Exists(dir)) return false;
+            try
+            {
+                return Directory.EnumerateFiles(dir, "*.exe", SearchOption.TopDirectoryOnly)
+                    .Any(f => !Path.GetFileName(f).StartsWith("unins", StringComparison.OrdinalIgnoreCase));
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool IsAppxInstalled(string id, string name, string normName, string cleanAlphaName)
+        {
+            try
+            {
+                if (_appxPackageCache == null || (DateTime.UtcNow - _appxCacheTime).TotalSeconds > 30)
+                {
+                    var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    using var key = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages");
+                    if (key != null)
+                    {
+                        foreach (var sub in key.GetSubKeyNames())
+                        {
+                            set.Add(sub);
+                        }
+                    }
+                    _appxPackageCache = set;
+                    _appxCacheTime = DateTime.UtcNow;
+                }
+
+                if (_appxPackageCache == null || _appxPackageCache.Count == 0) return false;
+
+                var tokens = new List<string>();
+                if (!string.IsNullOrWhiteSpace(id)) tokens.Add(id);
+                if (!string.IsNullOrWhiteSpace(cleanAlphaName) && cleanAlphaName.Length >= 4) tokens.Add(cleanAlphaName);
+                if (!string.IsNullOrWhiteSpace(normName) && normName.Length >= 4) tokens.Add(normName);
+
+                foreach (var pkg in _appxPackageCache)
+                {
+                    foreach (var token in tokens)
+                    {
+                        if (pkg.Contains(token, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch { }
+            return false;
         }
 
         public static AppItem? FindCatalogMatch(AppItem app, IEnumerable<AppItem> catalog)
