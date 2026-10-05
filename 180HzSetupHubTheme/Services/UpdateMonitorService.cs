@@ -123,6 +123,8 @@ namespace SetupHub180Hz.Services
             {
                 if (!await _winget.IsAvailableAsync()) return;
 
+                await _winget.EnsureSourcesUpdatedAsync();
+
                 var rawUpgradable = await _winget.GetUpgradableAppsAsync();
                 _catalogCache ??= await _catalogService.GetAllAsync();
 
@@ -181,6 +183,7 @@ namespace SetupHub180Hz.Services
                     });
                 }
 
+                PackageCatalogService.NotifyUpdatesRefreshed();
                 _lastRefresh = DateTime.UtcNow;
 
                 // Asynchronously fetch missing icons and websites in parallel

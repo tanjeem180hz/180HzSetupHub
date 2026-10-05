@@ -67,6 +67,17 @@ namespace SetupHub180Hz.Views
                 });
             };
 
+            PackageCatalogService.AppUpdatesRefreshed += () =>
+            {
+                Dispatcher.InvokeAsync(async () =>
+                {
+                    if (_allPackages.Count > 0)
+                    {
+                        await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
+                    }
+                });
+            };
+
             Loaded += async (_, _) =>
             {
                 SyncDownloadPopupState();
@@ -884,11 +895,27 @@ namespace SetupHub180Hz.Views
 
                 if (app.IsBusy) return;
 
+                // If user clicks Update for an app with a newer version available
+                if (app.HasUpdate || app.IsUpgrade || app.Status == "Update")
+                {
+                    app.IsUpgrade = true;
+                    app.Status = "Update";
+                    StartSequentialQueue(new[] { app });
+                    return;
+                }
+
                 // 1. Check if already installed on system
                 bool isInstalled = CheckIfAppAlreadyInstalled(app);
                 if (isInstalled)
                 {
                     app.IsInstalled = true;
+                    if (app.HasUpdate || app.IsUpgrade)
+                    {
+                        app.IsUpgrade = true;
+                        app.Status = "Update";
+                        StartSequentialQueue(new[] { app });
+                        return;
+                    }
                     app.Status = "Installed";
                     ShowAlreadyInstalledModal(app);
                     return;
@@ -961,7 +988,13 @@ namespace SetupHub180Hz.Views
 
             foreach (var app in selected)
             {
-                if (CheckIfAppAlreadyInstalled(app))
+                if (app.HasUpdate || app.IsUpgrade || app.Status == "Update")
+                {
+                    app.IsUpgrade = true;
+                    app.Status = "Update";
+                    uninstalled.Add(app);
+                }
+                else if (CheckIfAppAlreadyInstalled(app))
                 {
                     app.IsInstalled = true;
                     app.Status = "Installed";
@@ -1385,7 +1418,13 @@ namespace SetupHub180Hz.Views
                     {
                         app = new AppItem { Id = id, Name = id };
                     }
-                    if (CheckIfAppAlreadyInstalled(app))
+                    if (app.HasUpdate || app.IsUpgrade || app.Status == "Update")
+                    {
+                        app.IsUpgrade = true;
+                        app.Status = "Update";
+                        targetApps.Add(app);
+                    }
+                    else if (CheckIfAppAlreadyInstalled(app))
                     {
                         app.IsInstalled = true;
                         app.Status = "Installed";
@@ -1495,13 +1534,22 @@ namespace SetupHub180Hz.Views
             ModalCategory.Text = !string.IsNullOrWhiteSpace(app.Category) ? app.Category : "General";
 
             var reg = AppMetadataHelper.GetRegistryInfo(app.Name, app.Id);
-            if (reg != null && !string.IsNullOrWhiteSpace(reg.DisplayVersion))
+            if (app.HasUpdate || app.IsUpgrade)
             {
-                ModalStatusMessage.Text = $"{app.Name} (v{reg.DisplayVersion}) is verified and ready to use on this PC.";
+                ModalReinstallButton.Content = $"⚡ Update to Latest ({app.AvailableVersion ?? "Latest"})";
+                ModalStatusMessage.Text = $"{app.Name} has a newer version available: v{app.AvailableVersion} (Installed: v{reg?.DisplayVersion ?? "Installed"}). Click Update to fetch and install the latest release.";
             }
             else
             {
-                ModalStatusMessage.Text = $"{app.Name} is verified and ready to use on this PC.";
+                ModalReinstallButton.Content = "🔄 Reinstall Anyway";
+                if (reg != null && !string.IsNullOrWhiteSpace(reg.DisplayVersion))
+                {
+                    ModalStatusMessage.Text = $"{app.Name} (v{reg.DisplayVersion}) is verified and ready to use on this PC.";
+                }
+                else
+                {
+                    ModalStatusMessage.Text = $"{app.Name} is verified and ready to use on this PC.";
+                }
             }
 
             AlreadyInstalledOverlay.Visibility = Visibility.Visible;
@@ -1536,8 +1584,17 @@ namespace SetupHub180Hz.Views
             AlreadyInstalledOverlay.Visibility = Visibility.Collapsed;
             if (_currentModalApp != null)
             {
-                _currentModalApp.IsInstalled = false;
-                _currentModalApp.Status = "Install";
+                if (_currentModalApp.HasUpdate || _currentModalApp.IsUpgrade)
+                {
+                    _currentModalApp.IsUpgrade = true;
+                    _currentModalApp.Status = "Update";
+                }
+                else
+                {
+                    _currentModalApp.IsUpgrade = true; // force reinstall will fetch the latest version
+                    _currentModalApp.IsInstalled = false;
+                    _currentModalApp.Status = "Install";
+                }
                 StartSequentialQueue(new[] { _currentModalApp });
             }
         }

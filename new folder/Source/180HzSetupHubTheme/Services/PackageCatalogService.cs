@@ -13,6 +13,13 @@ namespace SetupHub180Hz.Services
     {
         public static event Action<string, bool>? AppInstallationStatusChanged;
 
+        public static event Action? AppUpdatesRefreshed;
+
+        public static void NotifyUpdatesRefreshed()
+        {
+            AppUpdatesRefreshed?.Invoke();
+        }
+
         public static void NotifyStatusChanged(string idOrName, bool isInstalled)
         {
             if (string.IsNullOrWhiteSpace(idOrName)) return;
@@ -72,7 +79,7 @@ namespace SetupHub180Hz.Services
             return query.ToList();
         }
 
-        public async Task CheckInstalledStatusAsync(WingetService winget, IEnumerable<AppItem> items)
+        public Task CheckInstalledStatusAsync(WingetService winget, IEnumerable<AppItem> items)
         {
             try
             {
@@ -81,42 +88,40 @@ namespace SetupHub180Hz.Services
 
                 var itemList = items.ToList();
 
-                // 1. Instant check via Windows Registry and local executable presence
+                // 1. Instant check via AppMetadataHelper
                 foreach (var item in itemList)
                 {
-                    var reg = AppMetadataHelper.GetRegistryInfo(item.Name, item.Id);
-                    if (reg != null)
-                    {
-                        item.IsInstalled = true;
-                        item.Status = "Installed";
-                        if (!string.IsNullOrWhiteSpace(reg.DisplayVersion))
-                        {
-                            item.Version = reg.DisplayVersion;
-                        }
-                    }
-                    else if (CheckLocalExeExists(item))
-                    {
-                        item.IsInstalled = true;
-                        item.Status = "Installed";
-                    }
-                    else
-                    {
-                        item.IsInstalled = false;
-                        item.Status = "Install";
-                    }
+                    bool isInst = AppMetadataHelper.IsAppInstalled(item);
+                    item.IsInstalled = isInst;
+                    item.Status = isInst ? "Installed" : "Install";
                 }
 
-                // 2. Background check via winget for store packages and packages not in standard registry
-                var installed = await winget.GetInstalledAppsAsync();
-                var installedMap = new HashSet<string>(installed.Select(i => i.Id), StringComparer.OrdinalIgnoreCase);
-                var installedNames = new HashSet<string>(installed.Select(i => i.Name), StringComparer.OrdinalIgnoreCase);
-
-                foreach (var item in itemList)
+                // 2. Correlate with detected updates from UpdateMonitorService
+                var upgradable = UpdateMonitorService.Instance.UpgradableApps.ToList();
+                if (upgradable.Count > 0)
                 {
-                    if (installedMap.Contains(item.Id) || installedNames.Contains(item.Name))
+                    var upMap = upgradable.ToDictionary(u => u.Id, StringComparer.OrdinalIgnoreCase);
+                    foreach (var item in itemList)
                     {
-                        item.IsInstalled = true;
-                        item.Status = "Installed";
+                        if (item.IsInstalled)
+                        {
+                            AppItem? match = null;
+                            if (upMap.TryGetValue(item.Id, out var up))
+                            {
+                                match = up;
+                            }
+                            else
+                            {
+                                match = upgradable.FirstOrDefault(u => string.Equals(u.Name, item.Name, StringComparison.OrdinalIgnoreCase));
+                            }
+
+                            if (match != null && !string.IsNullOrWhiteSpace(match.AvailableVersion))
+                            {
+                                item.AvailableVersion = match.AvailableVersion;
+                                item.IsUpgrade = true;
+                                item.Status = "Update";
+                            }
+                        }
                     }
                 }
             }
@@ -124,6 +129,8 @@ namespace SetupHub180Hz.Services
             {
                 // Best effort check
             }
+
+            return Task.CompletedTask;
         }
 
         private static bool CheckLocalExeExists(AppItem item)
