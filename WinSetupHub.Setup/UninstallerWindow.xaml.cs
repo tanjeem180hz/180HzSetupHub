@@ -179,58 +179,19 @@ public partial class UninstallerWindow : Window
         {
             await Task.Run(() =>
             {
-                Dispatcher.Invoke(() =>
+                InstallerService.PerformFullCleanUninstall(installRoot, (status, percent) =>
                 {
-                    TxtUninstallStatus.Text = "Removing app package 25%...";
-                    UninstallProgressBar.Value = 25;
-                });
-                InstallerService.StopExistingApp(Path.Combine(installRoot, InstallerService.InstalledExeName));
-                Thread.Sleep(400);
-
-                Dispatcher.Invoke(() =>
-                {
-                    TxtUninstallStatus.Text = "Removing app package 55%...";
-                    UninstallProgressBar.Value = 55;
-                });
-                InstallerService.RemoveShortcuts();
-                Thread.Sleep(300);
-
-                Dispatcher.Invoke(() =>
-                {
-                    TxtUninstallStatus.Text = "Removing app package 80%...";
-                    UninstallProgressBar.Value = 80;
-                });
-                InstallerService.UnregisterUninstall();
-                Thread.Sleep(300);
-
-                Dispatcher.Invoke(() =>
-                {
-                    TxtUninstallStatus.Text = "Removing app package 95%...";
-                    UninstallProgressBar.Value = 95;
-                });
-
-                if (Directory.Exists(installRoot))
-                {
-                    try
+                    Dispatcher.Invoke(() =>
                     {
-                        Directory.Delete(installRoot, recursive: true);
-                    }
-                    catch
-                    {
-                        Process.Start(new ProcessStartInfo
-                        {
-                            FileName = "cmd.exe",
-                            Arguments = $"/c timeout /t 2 & rmdir /s /q \"{installRoot}\"",
-                            CreateNoWindow = true,
-                            UseShellExecute = false
-                        });
-                    }
-                }
+                        TxtUninstallStatus.Text = status;
+                        UninstallProgressBar.Value = percent;
+                    });
+                });
             });
 
             _isUninstallCompleted = true;
             _isUninstalling = false;
-            TxtUninstallStatus.Text = "Uninstallation complete";
+            TxtUninstallStatus.Text = "Uninstallation complete! All files and registry keys removed.";
             UninstallProgressBar.Value = 100;
             BtnCancel.Content = "Close";
         }

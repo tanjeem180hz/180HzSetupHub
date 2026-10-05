@@ -36,6 +36,12 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        try
+        {
+            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12 | (System.Net.SecurityProtocolType)3072;
+        }
+        catch { }
+
         if (!IsRunningAsAdministrator())
         {
             if (TryRestartAsAdministrator(args))
@@ -131,15 +137,7 @@ internal static class Program
                 return 0;
             }
 
-            InstallerService.StopExistingApp(Path.Combine(installRoot, InstallerService.InstalledExeName));
-            InstallerService.RemoveShortcuts();
-            InstallerService.UnregisterUninstall();
-
-            if (Directory.Exists(installRoot))
-            {
-                Directory.Delete(installRoot, recursive: true);
-            }
-
+            InstallerService.PerformFullCleanUninstall(installRoot);
             return 0;
         }
         catch
@@ -155,25 +153,7 @@ internal static class Program
             // Give parent process time to terminate
             Thread.Sleep(1500);
 
-            InstallerService.StopExistingApp(Path.Combine(installRoot, InstallerService.InstalledExeName));
-            InstallerService.RemoveShortcuts();
-            InstallerService.UnregisterUninstall();
-
-            for (var retry = 0; retry < 5; retry++)
-            {
-                try
-                {
-                    if (Directory.Exists(installRoot))
-                    {
-                        Directory.Delete(installRoot, recursive: true);
-                    }
-                    break;
-                }
-                catch
-                {
-                    Thread.Sleep(1000);
-                }
-            }
+            InstallerService.PerformFullCleanUninstall(installRoot);
 
             if (!isSilent)
             {
