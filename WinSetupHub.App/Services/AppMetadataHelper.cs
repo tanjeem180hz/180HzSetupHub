@@ -909,7 +909,8 @@ namespace SetupHub180Hz.Services
                                 var sizeObj = appKey.GetValue("EstimatedSize");
                                 var installLoc = appKey.GetValue("InstallLocation") as string;
                                 var dispIcon = appKey.GetValue("DisplayIcon") as string;
-                                var uninstStr = appKey.GetValue("UninstallString") as string;
+                                var uninstStr = (appKey.GetValue("UninstallString") as string)
+                                             ?? (appKey.GetValue("QuietUninstallString") as string);
                                 var webUrl = (appKey.GetValue("URLInfoAbout") as string)
                                              ?? (appKey.GetValue("HelpLink") as string)
                                              ?? (appKey.GetValue("URLUpdateInfo") as string);

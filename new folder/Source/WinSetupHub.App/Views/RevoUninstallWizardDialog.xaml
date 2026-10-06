@@ -222,15 +222,31 @@
                     </Grid.RowDefinitions>
 
                     <Border Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="8" Padding="24" VerticalAlignment="Center">
-                        <StackPanel HorizontalAlignment="Center" MaxWidth="560">
-                            <Border Width="56" Height="56" CornerRadius="28" Background="#2000FF66" HorizontalAlignment="Center" Margin="0,0,0,16">
-                                <TextBlock Text="🚀" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <StackPanel HorizontalAlignment="Center" MaxWidth="580">
+                            <!-- Animated Status Icon -->
+                            <Border x:Name="UninstallerStatusIconBorder" Width="56" Height="56" CornerRadius="28" Background="#2000FF66" HorizontalAlignment="Center" Margin="0,0,0,16">
+                                <TextBlock x:Name="UninstallerStatusIconText" Text="🚀" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
 
-                            <TextBlock Text="BUILT-IN UNINSTALLER LAUNCHED" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                            <TextBlock Text="The official publisher uninstaller for this program has been invoked." FontSize="13" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,16"/>
+                            <TextBlock x:Name="UninstallerTitleText" Text="BUILT-IN UNINSTALLER LAUNCHED" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                            <TextBlock x:Name="UninstallerSubtextText" Text="The official publisher uninstaller for this program has been invoked." FontSize="13" Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,14" TextWrapping="Wrap"/>
 
-                            <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="16,14" Margin="0,0,0,18">
+                            <!-- Command details pill -->
+                            <Border x:Name="UninstallerCommandBorder" Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,14">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="⚙️" FontSize="13" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="UninstallerCommandText" Grid.Column="1" Text="Locating official uninstaller…" FontSize="11" Foreground="{DynamicResource BrushAccent}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Live Running Progress Bar -->
+                            <ProgressBar x:Name="UninstallerLiveProgressBar" Height="4" IsIndeterminate="True" Foreground="{DynamicResource BrushAccent}" Margin="0,0,0,14" Visibility="Visible"/>
+
+                            <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="16,12" Margin="0,0,0,16">
                                 <StackPanel>
                                     <TextBlock Text="💡 What to do now:" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource BrushAccent}" Margin="0,0,0,6"/>
                                     <TextBlock Text="1. Follow and complete any uninstallation prompts shown on your screen." FontSize="11" Foreground="{DynamicResource BrushTextPrimary}" LineHeight="18"/>
@@ -246,7 +262,7 @@
                     <!-- Footer -->
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
                         <Button Content="Skip to Scan Modes" Style="{StaticResource OutlineButton}" Padding="16,6" Margin="0,0,10,0" Click="BtnProceedToScanMode_Click"/>
-                        <Button Content="Scan for Leftovers ➔" Style="{StaticResource PrimaryButton}" Padding="22,6" Click="BtnProceedToScanMode_Click"/>
+                        <Button x:Name="BtnProceedToScanFromBuiltIn" Content="Scan for Leftovers ➔" Style="{StaticResource PrimaryButton}" Padding="22,6" Click="BtnProceedToScanMode_Click"/>
                     </StackPanel>
                 </Grid>
 

@@ -90,7 +90,7 @@ namespace SetupHub180Hz.Views
         private void WindowCloseBtn_Click(object sender, RoutedEventArgs e)
         {
             if (_isDeleting) return;
-            DialogResult = IsUninstalled;
+            try { DialogResult = IsUninstalled; } catch { }
             Close();
         }
 
@@ -238,54 +238,201 @@ namespace SetupHub180Hz.Views
 
         #region Phase 2: Built-in Uninstaller
 
+        private System.Diagnostics.Process? _activeUninstallerProcess;
+
         private async Task RunPhase2BuiltInUninstallerAsync()
         {
             ActivityLogger.Instance.Log($"Phase 2: Executing official uninstaller for {_app.Name}…", ActivityType.Info);
 
-            // Step A: Pre-terminate running processes inside install location
+            // Step A: Pre-terminate running processes inside install location (protecting uninstaller processes)
             DeepUninstallService.KillProcessesForApp(_app);
 
-            // Step B: Try official uninstaller
+            // Update UI to indicate searching/preparing uninstaller
+            UninstallerStatusIconText.Text = "⏳";
+            UninstallerTitleText.Text = "LAUNCHING OFFICIAL UNINSTALLER";
+            UninstallerSubtextText.Text = $"Locating and invoking official publisher uninstaller for {_app.Name}…";
+            UninstallerCommandText.Text = "Locating uninstaller command…";
+            UninstallerLiveProgressBar.Visibility = Visibility.Visible;
+            BtnProceedToScanFromBuiltIn.Content = "Skip to Scan ➔";
+
             bool launched = false;
+            string? launchCommand = null;
 
-            // Priority 1: Winget
-            if (!string.IsNullOrWhiteSpace(_app.Id) && !_app.Id.StartsWith("{"))
+            // Priority 1: Check if it's an MSIX / AppX Package (e.g. from Microsoft Store or MSIX package)
+            if (!string.IsNullOrWhiteSpace(_app.Id) && _app.Id.StartsWith("MSIX\\", StringComparison.OrdinalIgnoreCase))
             {
-                var wingetTask = _winget.UninstallAsync(_app.Id, _app.Name);
-                launched = true;
-                _ = wingetTask.ContinueWith(t =>
-                {
-                    if (t.Result) IsUninstalled = true;
-                });
-            }
+                var cleanPackageName = AppMetadataHelper.CleanPackageId(_app.Id);
+                launchCommand = $"powershell Remove-AppxPackage -Package \"{cleanPackageName}\"";
+                UninstallerCommandText.Text = launchCommand;
+                UninstallerSubtextText.Text = "Removing Windows AppX package via PowerShell…";
 
-            // Priority 2: Native uninstall string
-            if (!launched)
-            {
-                var uninstStr = _app.UninstallString ?? DeepUninstallService.FindRegistryUninstallString(_app);
-                if (!string.IsNullOrWhiteSpace(uninstStr))
+                try
                 {
-                    var nativeTask = DeepUninstallService.RunNativeUninstallStringAsync(uninstStr);
-                    launched = true;
-                    _ = nativeTask.ContinueWith(t =>
+                    var psi = new System.Diagnostics.ProcessStartInfo
                     {
-                        if (t.Result) IsUninstalled = true;
-                    });
+                        FileName = "powershell.exe",
+                        Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"Get-AppxPackage -Name '*{cleanPackageName}*' | Remove-AppxPackage -ErrorAction SilentlyContinue\"",
+                        UseShellExecute = true,
+                        Verb = "runas",
+                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                    };
+                    var p = System.Diagnostics.Process.Start(psi);
+                    if (p != null)
+                    {
+                        launched = true;
+                        _activeUninstallerProcess = p;
+                        MonitorUninstallerProcess(p);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ActivityLogger.Instance.Log($"AppX removal failed: {ex.Message}", ActivityType.Warning);
                 }
             }
 
-            // Priority 3: MSIExec Product code
-            if (!launched && !string.IsNullOrWhiteSpace(_app.Id) && _app.Id.StartsWith("{") && _app.Id.EndsWith("}"))
+            // Priority 2: Native Windows Registry UninstallString (Win32 exe/msi/bat/Inno/NSIS)
+            if (!launched)
             {
-                var msiTask = DeepUninstallService.RunNativeUninstallStringAsync($"msiexec.exe /X {_app.Id} /quiet /norestart");
-                launched = true;
-                _ = msiTask.ContinueWith(t =>
+                var uninstStr = _app.UninstallString ?? DeepUninstallService.FindRegistryUninstallString(_app);
+                if (string.IsNullOrWhiteSpace(uninstStr))
                 {
-                    if (t.Result) IsUninstalled = true;
-                });
+                    // Also check AppMetadataHelper cached registry
+                    uninstStr = AppMetadataHelper.GetRegistryInfo(_app.Name, _app.Id)?.UninstallString;
+                }
+
+                if (!string.IsNullOrWhiteSpace(uninstStr))
+                {
+                    var (fileName, arguments) = DeepUninstallService.ParseUninstallString(uninstStr);
+                    if (!string.IsNullOrWhiteSpace(fileName))
+                    {
+                        launchCommand = string.IsNullOrWhiteSpace(arguments) ? fileName : $"\"{fileName}\" {arguments}";
+                        UninstallerCommandText.Text = launchCommand;
+                        UninstallerSubtextText.Text = $"Running official uninstaller: {System.IO.Path.GetFileName(fileName)}";
+
+                        var p = DeepUninstallService.LaunchNativeUninstallProcess(uninstStr, _app.InstallLocation);
+                        if (p != null)
+                        {
+                            launched = true;
+                            _activeUninstallerProcess = p;
+                            MonitorUninstallerProcess(p);
+                        }
+                    }
+                }
             }
 
-            await Task.Delay(500);
+            // Priority 3: MSI Product Code (GUID)
+            if (!launched && !string.IsNullOrWhiteSpace(_app.Id) && _app.Id.StartsWith("{") && _app.Id.EndsWith("}"))
+            {
+                launchCommand = $"msiexec.exe /X {_app.Id}";
+                UninstallerCommandText.Text = launchCommand;
+                UninstallerSubtextText.Text = "Running Windows Installer (MSI) uninstallation…";
+
+                try
+                {
+                    var psi = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "msiexec.exe",
+                        Arguments = $"/X {_app.Id}",
+                        UseShellExecute = true,
+                        Verb = "runas"
+                    };
+                    var p = System.Diagnostics.Process.Start(psi);
+                    if (p != null)
+                    {
+                        launched = true;
+                        _activeUninstallerProcess = p;
+                        MonitorUninstallerProcess(p);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ActivityLogger.Instance.Log($"MSI uninstaller error: {ex.Message}", ActivityType.Warning);
+                }
+            }
+
+            // Priority 4: Winget Package (Only if authentic Winget ID, not ARP\ or MSIX\)
+            if (!launched && !string.IsNullOrWhiteSpace(_app.Id) &&
+                !_app.Id.StartsWith("ARP\\", StringComparison.OrdinalIgnoreCase) &&
+                !_app.Id.StartsWith("MSIX\\", StringComparison.OrdinalIgnoreCase) &&
+                !_app.Id.StartsWith("{"))
+            {
+                launchCommand = $"winget uninstall --id \"{_app.Id}\"";
+                UninstallerCommandText.Text = launchCommand;
+                UninstallerSubtextText.Text = "Invoking Windows Package Manager (Winget) uninstaller…";
+
+                try
+                {
+                    var psi = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "winget.exe",
+                        Arguments = $"uninstall --id \"{_app.Id}\" -e --force --accept-source-agreements",
+                        UseShellExecute = true,
+                        Verb = "runas"
+                    };
+                    var p = System.Diagnostics.Process.Start(psi);
+                    if (p != null)
+                    {
+                        launched = true;
+                        _activeUninstallerProcess = p;
+                        MonitorUninstallerProcess(p);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ActivityLogger.Instance.Log($"Winget uninstaller error: {ex.Message}", ActivityType.Warning);
+                }
+            }
+
+            // If no official uninstaller was found or could be launched:
+            if (!launched)
+            {
+                UninstallerStatusIconText.Text = "ℹ️";
+                UninstallerStatusIconBorder.Background = new SolidColorBrush(Color.FromArgb(0x26, 0x2F, 0xB6, 0xFF));
+                UninstallerTitleText.Text = "BUILT-IN UNINSTALLER NOT FOUND";
+                UninstallerSubtextText.Text = $"No official uninstaller was registered for {_app.Name}. Revo engine will perform a clean deep removal of all residual registry entries and disk files.";
+                UninstallerCommandText.Text = "Ready for heuristic leftover scan.";
+                UninstallerLiveProgressBar.Visibility = Visibility.Collapsed;
+                BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
+                BtnProceedToScanFromBuiltIn.Focus();
+            }
+
+            await Task.Delay(200);
+        }
+
+        private void MonitorUninstallerProcess(System.Diagnostics.Process proc)
+        {
+            UninstallerStatusIconText.Text = "⏳";
+            UninstallerTitleText.Text = "OFFICIAL UNINSTALLER RUNNING";
+            UninstallerSubtextText.Text = $"Please complete any uninstallation prompts shown on your screen for {_app.Name}…";
+            UninstallerLiveProgressBar.Visibility = Visibility.Visible;
+            BtnProceedToScanFromBuiltIn.Content = "Skip to Scan ➔";
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await proc.WaitForExitAsync();
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        IsUninstalled = true;
+                        UninstallerLiveProgressBar.Visibility = Visibility.Collapsed;
+                        UninstallerStatusIconText.Text = "✓";
+                        UninstallerStatusIconBorder.Background = new SolidColorBrush(Color.FromArgb(0x26, 0x3F, 0xCB, 0x7E));
+                        UninstallerTitleText.Text = "BUILT-IN UNINSTALLER COMPLETED";
+                        UninstallerSubtextText.Text = $"Official uninstaller has finished (Exit code: {proc.ExitCode}). Click 'Scan for Leftovers' below to remove residual traces.";
+                        BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
+                        BtnProceedToScanFromBuiltIn.Focus();
+                    });
+                }
+                catch
+                {
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        UninstallerLiveProgressBar.Visibility = Visibility.Collapsed;
+                        BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
+                    });
+                }
+            });
         }
 
         private async void BtnRerunUninstaller_Click(object sender, RoutedEventArgs e)

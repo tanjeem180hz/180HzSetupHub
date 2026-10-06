@@ -768,6 +768,9 @@ namespace SetupHub180Hz.Services
                 (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\Uninstall", @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall")
             };
 
+            var cleanId = AppMetadataHelper.CleanPackageId(app.Id);
+            var cleanName = app.Name?.Trim() ?? string.Empty;
+
             foreach (var target in uninstallTargets)
             {
                 try
@@ -784,6 +787,14 @@ namespace SetupHub180Hz.Services
                         {
                             isMatch = true;
                         }
+                        else if (!string.IsNullOrWhiteSpace(cleanId) && string.Equals(subName, cleanId, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isMatch = true;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(cleanName) && string.Equals(subName, cleanName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isMatch = true;
+                        }
                         else
                         {
                             try
@@ -791,8 +802,9 @@ namespace SetupHub180Hz.Services
                                 using var sub = uninstKey.OpenSubKey(subName, false);
                                 var disp = sub?.GetValue("DisplayName") as string;
                                 if (!string.IsNullOrWhiteSpace(disp) &&
-                                    (string.Equals(disp.Trim(), app.Name?.Trim(), StringComparison.OrdinalIgnoreCase) ||
-                                     string.Equals(disp.Trim(), sig.CleanName, StringComparison.OrdinalIgnoreCase)))
+                                    (string.Equals(disp.Trim(), cleanName, StringComparison.OrdinalIgnoreCase) ||
+                                     string.Equals(disp.Trim(), sig.CleanName, StringComparison.OrdinalIgnoreCase) ||
+                                     (!string.IsNullOrWhiteSpace(sig.DistinctProductName) && string.Equals(disp.Trim(), sig.DistinctProductName, StringComparison.OrdinalIgnoreCase))))
                                 {
                                     isMatch = true;
                                 }
@@ -864,9 +876,9 @@ namespace SetupHub180Hz.Services
                             }
                             else
                             {
-                                DeleteRegistryKey(item.Path);
-                                deleted++;
-                                ok = true;
+                                bool okReg = DeleteRegistryKey(item.Path);
+                                if (okReg) { deleted++; ok = true; }
+                                else { failed++; }
                             }
                         }
                         else if (item.Type == LeftoverType.Folder)
@@ -878,12 +890,9 @@ namespace SetupHub180Hz.Services
                             }
                             else
                             {
-                                if (Directory.Exists(item.Path))
-                                {
-                                    Directory.Delete(item.Path, recursive: true);
-                                }
-                                deleted++;
-                                ok = true;
+                                bool okDir = DeleteFolderSafe(item.Path);
+                                if (okDir) { deleted++; ok = true; }
+                                else { failed++; }
                             }
                         }
                         else if (item.Type == LeftoverType.File)
@@ -895,12 +904,9 @@ namespace SetupHub180Hz.Services
                             }
                             else
                             {
-                                if (File.Exists(item.Path))
-                                {
-                                    File.Delete(item.Path);
-                                }
-                                deleted++;
-                                ok = true;
+                                bool okFile = DeleteFileSafe(item.Path);
+                                if (okFile) { deleted++; ok = true; }
+                                else { failed++; }
                             }
                         }
                     }
@@ -912,8 +918,7 @@ namespace SetupHub180Hz.Services
                     }
 
                     progress?.Report(new LeftoverDeleteProgress(i + 1, total, item, ok));
-
-                    System.Threading.Thread.Sleep(30);
+                    System.Threading.Thread.Sleep(25);
                 }
 
                 ActivityLogger.Instance.Log($"Deep clean finished: removed {deleted}, skipped {failed}.", ActivityType.Info);
@@ -921,32 +926,148 @@ namespace SetupHub180Hz.Services
             });
         }
 
-        private static void DeleteRegistryKey(string fullPath)
+        public static bool DeleteRegistryKey(string fullPath)
         {
-            if (fullPath.StartsWith(@"HKEY_CURRENT_USER\", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(fullPath)) return false;
+
+            try
             {
-                var subPath = fullPath.Substring(@"HKEY_CURRENT_USER\".Length);
-                Registry.CurrentUser.DeleteSubKeyTree(subPath, throwOnMissingSubKey: false);
+                if (fullPath.StartsWith(@"HKEY_CURRENT_USER\", StringComparison.OrdinalIgnoreCase))
+                {
+                    var subPath = fullPath.Substring(@"HKEY_CURRENT_USER\".Length);
+                    Registry.CurrentUser.DeleteSubKeyTree(subPath, throwOnMissingSubKey: false);
+                    return true;
+                }
+                else if (fullPath.StartsWith(@"HKEY_LOCAL_MACHINE\", StringComparison.OrdinalIgnoreCase))
+                {
+                    var subPath = fullPath.Substring(@"HKEY_LOCAL_MACHINE\".Length);
+                    bool deleted = false;
+
+                    try
+                    {
+                        if (subPath.StartsWith(@"Software\WOW6432Node\", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var wowPath = subPath.Substring(@"Software\WOW6432Node\".Length);
+                            using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+                            using var swKey = baseKey.OpenSubKey("Software", true);
+                            swKey?.DeleteSubKeyTree(wowPath, throwOnMissingSubKey: false);
+                            deleted = true;
+                        }
+                        else
+                        {
+                            using var base64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+                            base64.DeleteSubKeyTree(subPath, throwOnMissingSubKey: false);
+
+                            using var base32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+                            base32.DeleteSubKeyTree(subPath, throwOnMissingSubKey: false);
+                            deleted = true;
+                        }
+                    }
+                    catch
+                    {
+                        // In-process failed due to UAC permissions: fallback to elevated reg.exe delete!
+                        var regPsi = new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = "reg.exe",
+                            Arguments = $"delete \"{fullPath}\" /f",
+                            UseShellExecute = true,
+                            Verb = "runas",
+                            WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                        };
+                        using var p = System.Diagnostics.Process.Start(regPsi);
+                        p?.WaitForExit(3000);
+                        deleted = p != null && p.ExitCode == 0;
+                    }
+
+                    return deleted;
+                }
             }
-            else if (fullPath.StartsWith(@"HKEY_LOCAL_MACHINE\", StringComparison.OrdinalIgnoreCase))
+            catch (Exception ex)
             {
-                var subPath = fullPath.Substring(@"HKEY_LOCAL_MACHINE\".Length);
+                ActivityLogger.Instance.Log($"Registry delete error for {fullPath}: {ex.Message}", ActivityType.Warning);
+                return false;
+            }
+            return false;
+        }
 
-                if (subPath.StartsWith(@"Software\WOW6432Node\", StringComparison.OrdinalIgnoreCase))
-                {
-                    var wowPath = subPath.Substring(@"Software\WOW6432Node\".Length);
-                    using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-                    using var swKey = baseKey.OpenSubKey("Software", true);
-                    swKey?.DeleteSubKeyTree(wowPath, throwOnMissingSubKey: false);
-                }
-                else
-                {
-                    using var base64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-                    base64.DeleteSubKeyTree(subPath, throwOnMissingSubKey: false);
+        public static bool DeleteFolderSafe(string folderPath)
+        {
+            if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath)) return true;
+            if (!IsSafePathToDelete(folderPath)) return false;
 
-                    using var base32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-                    base32.DeleteSubKeyTree(subPath, throwOnMissingSubKey: false);
+            try
+            {
+                // Normalize attributes on files to remove ReadOnly flags
+                try
+                {
+                    var di = new DirectoryInfo(folderPath);
+                    foreach (var fi in di.EnumerateFiles("*", SearchOption.AllDirectories))
+                    {
+                        try { fi.Attributes = FileAttributes.Normal; } catch { }
+                    }
                 }
+                catch { }
+
+                try
+                {
+                    Directory.Delete(folderPath, recursive: true);
+                    return true;
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // Fallback to elevated rd /s /q
+                    var psi = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = $"/c rd /s /q \"{folderPath}\"",
+                        UseShellExecute = true,
+                        Verb = "runas",
+                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                    };
+                    using var p = System.Diagnostics.Process.Start(psi);
+                    p?.WaitForExit(5000);
+                    return !Directory.Exists(folderPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Folder delete error for {folderPath}: {ex.Message}", ActivityType.Warning);
+                return false;
+            }
+        }
+
+        public static bool DeleteFileSafe(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath)) return true;
+            if (!IsSafePathToDelete(filePath)) return false;
+
+            try
+            {
+                try { File.SetAttributes(filePath, FileAttributes.Normal); } catch { }
+                try
+                {
+                    File.Delete(filePath);
+                    return true;
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    var psi = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = $"/c del /f /q \"{filePath}\"",
+                        UseShellExecute = true,
+                        Verb = "runas",
+                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                    };
+                    using var p = System.Diagnostics.Process.Start(psi);
+                    p?.WaitForExit(3000);
+                    return !File.Exists(filePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"File delete error for {filePath}: {ex.Message}", ActivityType.Warning);
+                return false;
             }
         }
 
@@ -1031,6 +1152,14 @@ namespace SetupHub180Hz.Services
                         var procName = p.ProcessName;
                         if (ProtectedProcessNames.Contains(procName)) continue;
 
+                        // Never terminate uninstallation processes or helpers!
+                        if (procName.Contains("unins", StringComparison.OrdinalIgnoreCase) ||
+                            procName.Contains("setup", StringComparison.OrdinalIgnoreCase) ||
+                            procName.Equals("msiexec", StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
                         bool shouldKill = false;
 
                         if (!string.IsNullOrWhiteSpace(app.InstallLocation) &&
@@ -1081,6 +1210,10 @@ namespace SetupHub180Hz.Services
                 (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\Uninstall")
             };
 
+            var cleanId = AppMetadataHelper.CleanPackageId(app.Id);
+            var cleanName = app.Name?.Trim() ?? string.Empty;
+            var normName = AppMetadataHelper.NormalizeAppName(app.Name);
+
             foreach (var target in targets)
             {
                 try
@@ -1091,63 +1224,156 @@ namespace SetupHub180Hz.Services
 
                     foreach (var subName in uninst.GetSubKeyNames())
                     {
-                        if (subName.Equals(app.Id, StringComparison.OrdinalIgnoreCase) ||
-                            subName.Equals(app.Name, StringComparison.OrdinalIgnoreCase))
+                        bool isKeyMatch = false;
+
+                        if (!string.IsNullOrWhiteSpace(app.Id) && subName.Equals(app.Id, StringComparison.OrdinalIgnoreCase))
                         {
-                            using var sub = uninst.OpenSubKey(subName);
-                            var qStr = sub?.GetValue("QuietUninstallString") as string;
-                            if (!string.IsNullOrWhiteSpace(qStr)) return qStr;
-                            var uStr = sub?.GetValue("UninstallString") as string;
+                            isKeyMatch = true;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(cleanId) && subName.Equals(cleanId, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isKeyMatch = true;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(cleanName) && subName.Equals(cleanName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isKeyMatch = true;
+                        }
+
+                        using var sub = uninst.OpenSubKey(subName);
+                        if (sub == null) continue;
+
+                        if (!isKeyMatch)
+                        {
+                            var disp = sub.GetValue("DisplayName") as string;
+                            if (!string.IsNullOrWhiteSpace(disp))
+                            {
+                                var cleanDisp = disp.Trim();
+                                if (string.Equals(cleanDisp, cleanName, StringComparison.OrdinalIgnoreCase) ||
+                                    (!string.IsNullOrWhiteSpace(normName) && string.Equals(cleanDisp, normName, StringComparison.OrdinalIgnoreCase)) ||
+                                    (!string.IsNullOrWhiteSpace(cleanName) && cleanName.Length >= 4 && cleanDisp.Contains(cleanName, StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    isKeyMatch = true;
+                                }
+                            }
+                        }
+
+                        if (isKeyMatch)
+                        {
+                            var uStr = sub.GetValue("UninstallString") as string;
+                            var qStr = sub.GetValue("QuietUninstallString") as string;
                             if (!string.IsNullOrWhiteSpace(uStr)) return uStr;
+                            if (!string.IsNullOrWhiteSpace(qStr)) return qStr;
                         }
                     }
                 }
                 catch { }
             }
+
+            // Fallback: check cached registry info
+            var regInfo = AppMetadataHelper.GetRegistryInfo(app.Name ?? string.Empty, app.Id ?? string.Empty);
+            if (!string.IsNullOrWhiteSpace(regInfo?.UninstallString))
+            {
+                return regInfo.UninstallString;
+            }
+
             return null;
         }
 
-        public static async Task<bool> RunNativeUninstallStringAsync(string uninstallString)
+        public static (string fileName, string arguments) ParseUninstallString(string uninstallString)
+        {
+            if (string.IsNullOrWhiteSpace(uninstallString)) return ("", "");
+            string raw = uninstallString.Trim();
+
+            // 1. Quoted executable
+            if (raw.StartsWith("\""))
+            {
+                int endQuote = raw.IndexOf('\"', 1);
+                if (endQuote > 0)
+                {
+                    string file = raw.Substring(1, endQuote - 1).Trim();
+                    string args = raw.Substring(endQuote + 1).Trim();
+                    return NormalizeParsedCommand(file, args);
+                }
+            }
+
+            // 2. msiexec /X or /I
+            if (raw.StartsWith("msiexec", StringComparison.OrdinalIgnoreCase))
+            {
+                int space = raw.IndexOf(' ');
+                if (space > 0)
+                {
+                    return NormalizeParsedCommand("msiexec.exe", raw.Substring(space + 1).Trim());
+                }
+                return ("msiexec.exe", "");
+            }
+
+            // 3. Unquoted executable with .exe extension
+            int exeIdx = raw.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+            if (exeIdx > 0)
+            {
+                string file = raw.Substring(0, exeIdx + 4).Trim('\"', ' ');
+                string args = raw.Substring(exeIdx + 4).Trim();
+                return NormalizeParsedCommand(file, args);
+            }
+
+            // 4. Unquoted script (.bat / .cmd)
+            int batIdx = raw.IndexOf(".bat", StringComparison.OrdinalIgnoreCase);
+            if (batIdx < 0) batIdx = raw.IndexOf(".cmd", StringComparison.OrdinalIgnoreCase);
+            if (batIdx > 0)
+            {
+                string file = raw.Substring(0, batIdx + 4).Trim('\"', ' ');
+                string args = raw.Substring(batIdx + 4).Trim();
+                return NormalizeParsedCommand(file, args);
+            }
+
+            // 5. Existing file check
+            if (File.Exists(raw))
+            {
+                return NormalizeParsedCommand(raw, "");
+            }
+
+            // 6. First space fallback
+            int firstSpace = raw.IndexOf(' ');
+            if (firstSpace > 0)
+            {
+                return NormalizeParsedCommand(raw.Substring(0, firstSpace).Trim('\"'), raw.Substring(firstSpace + 1).Trim());
+            }
+
+            return NormalizeParsedCommand(raw.Trim('\"'), "");
+        }
+
+        private static (string fileName, string arguments) NormalizeParsedCommand(string fileName, string arguments)
+        {
+            var cleanFile = fileName.Trim('\"', ' ');
+            var cleanArgs = arguments.Trim();
+
+            if (cleanFile.Contains("msiexec", StringComparison.OrdinalIgnoreCase))
+            {
+                cleanFile = "msiexec.exe";
+                cleanArgs = cleanArgs.Replace("/I", "/X", StringComparison.OrdinalIgnoreCase);
+                if (!cleanArgs.Contains("/X", StringComparison.OrdinalIgnoreCase) && !cleanArgs.Contains("/package", StringComparison.OrdinalIgnoreCase))
+                {
+                    cleanArgs = $"/X {cleanArgs}".Trim();
+                }
+            }
+
+            return (cleanFile, cleanArgs);
+        }
+
+        public static System.Diagnostics.Process? LaunchNativeUninstallProcess(string uninstallString, string? workingDir = null)
         {
             try
             {
-                string raw = uninstallString.Trim();
-                string fileName;
-                string arguments = "";
+                var (fileName, arguments) = ParseUninstallString(uninstallString);
+                if (string.IsNullOrWhiteSpace(fileName)) return null;
 
-                if (raw.StartsWith("\""))
+                // Resolve relative path if possible
+                if (!Path.IsPathRooted(fileName) && !fileName.Equals("msiexec.exe", StringComparison.OrdinalIgnoreCase))
                 {
-                    int closingQuote = raw.IndexOf('\"', 1);
-                    if (closingQuote > 0)
+                    if (!string.IsNullOrWhiteSpace(workingDir))
                     {
-                        fileName = raw.Substring(1, closingQuote - 1);
-                        arguments = raw.Substring(closingQuote + 1).Trim();
-                    }
-                    else
-                    {
-                        fileName = raw.Trim('\"');
-                    }
-                }
-                else
-                {
-                    int spaceIdx = raw.IndexOf(' ');
-                    if (spaceIdx > 0)
-                    {
-                        fileName = raw.Substring(0, spaceIdx);
-                        arguments = raw.Substring(spaceIdx + 1).Trim();
-                    }
-                    else
-                    {
-                        fileName = raw;
-                    }
-                }
-
-                if (fileName.Contains("msiexec", StringComparison.OrdinalIgnoreCase))
-                {
-                    arguments = arguments.Replace("/I", "/X", StringComparison.OrdinalIgnoreCase);
-                    if (!arguments.Contains("/X", StringComparison.OrdinalIgnoreCase))
-                    {
-                        arguments = $"/X {arguments}";
+                        var candidate = Path.Combine(workingDir, fileName);
+                        if (File.Exists(candidate)) fileName = candidate;
                     }
                 }
 
@@ -1159,11 +1385,29 @@ namespace SetupHub180Hz.Services
                     Verb = "runas"
                 };
 
-                using var proc = System.Diagnostics.Process.Start(psi);
+                if (!string.IsNullOrWhiteSpace(workingDir) && Directory.Exists(workingDir))
+                {
+                    psi.WorkingDirectory = workingDir;
+                }
+
+                return System.Diagnostics.Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Native uninstaller launch error: {ex.Message}", ActivityType.Warning);
+                return null;
+            }
+        }
+
+        public static async Task<bool> RunNativeUninstallStringAsync(string uninstallString, string? workingDir = null)
+        {
+            try
+            {
+                using var proc = LaunchNativeUninstallProcess(uninstallString, workingDir);
                 if (proc != null)
                 {
                     await proc.WaitForExitAsync();
-                    return proc.ExitCode == 0 || proc.ExitCode == 3010;
+                    return proc.ExitCode == 0 || proc.ExitCode == 3010 || proc.ExitCode == 1641 || proc.ExitCode == 1605;
                 }
             }
             catch (Exception ex)
@@ -1175,13 +1419,14 @@ namespace SetupHub180Hz.Services
 
         public static void RemoveRegistryUninstallKeys(AppItem app)
         {
-            var targets = new (RegistryHive Hive, RegistryView View, string SubKey)[]
+            var targets = new (RegistryHive Hive, RegistryView View, string SubKey, string Prefix)[]
             {
-                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
-                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
-                (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\Uninstall")
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Microsoft\Windows\CurrentVersion\Uninstall", "HKEY_CURRENT_USER"),
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Microsoft\Windows\CurrentVersion\Uninstall", "HKEY_LOCAL_MACHINE"),
+                (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\Uninstall", "HKEY_LOCAL_MACHINE")
             };
 
+            var cleanId = AppMetadataHelper.CleanPackageId(app.Id);
             var cleanName = app.Name?.Trim() ?? string.Empty;
 
             foreach (var target in targets)
@@ -1189,7 +1434,7 @@ namespace SetupHub180Hz.Services
                 try
                 {
                     using var baseKey = RegistryKey.OpenBaseKey(target.Hive, target.View);
-                    using var uninst = baseKey.OpenSubKey(target.SubKey, true);
+                    using var uninst = baseKey.OpenSubKey(target.SubKey, false);
                     if (uninst == null) continue;
 
                     foreach (var subName in uninst.GetSubKeyNames())
@@ -1199,30 +1444,97 @@ namespace SetupHub180Hz.Services
                         {
                             isMatch = true;
                         }
+                        else if (!string.IsNullOrWhiteSpace(cleanId) && subName.Equals(cleanId, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isMatch = true;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(cleanName) && subName.Equals(cleanName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isMatch = true;
+                        }
                         else
                         {
-                            using var sub = uninst.OpenSubKey(subName);
-                            var disp = sub?.GetValue("DisplayName") as string;
-                            if (!string.IsNullOrWhiteSpace(disp) &&
-                                (string.Equals(disp.Trim(), cleanName, StringComparison.OrdinalIgnoreCase) ||
-                                 string.Equals(disp.Trim(), app.Name?.Trim(), StringComparison.OrdinalIgnoreCase)))
+                            try
                             {
-                                isMatch = true;
+                                using var sub = uninst.OpenSubKey(subName);
+                                var disp = sub?.GetValue("DisplayName") as string;
+                                if (!string.IsNullOrWhiteSpace(disp) &&
+                                    (string.Equals(disp.Trim(), cleanName, StringComparison.OrdinalIgnoreCase) ||
+                                     string.Equals(disp.Trim(), app.Name?.Trim(), StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    isMatch = true;
+                                }
                             }
+                            catch { }
                         }
 
                         if (isMatch)
                         {
-                            try
+                            var fullKey = $@"{target.Prefix}\{target.SubKey}\{subName}";
+                            if (IsSafeRegistryKeyToDelete(fullKey))
                             {
-                                uninst.DeleteSubKeyTree(subName, throwOnMissingSubKey: false);
+                                DeleteRegistryKey(fullKey);
                             }
-                            catch { }
                         }
                     }
                 }
                 catch { }
             }
+
+            CleanStartupLeftovers(app);
+        }
+
+        public static void CleanStartupLeftovers(AppItem app)
+        {
+            try
+            {
+                var runKeys = new[]
+                {
+                    (Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run"),
+                    (Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\RunOnce"),
+                    (Registry.LocalMachine, @"Software\Microsoft\Windows\CurrentVersion\Run"),
+                    (Registry.LocalMachine, @"Software\Microsoft\Windows\CurrentVersion\RunOnce"),
+                    (Registry.LocalMachine, @"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run")
+                };
+
+                var sig = new DeepUninstallService().BuildSearchSignature(app);
+                var cleanName = sig.CleanName;
+                var installLoc = app.InstallLocation;
+
+                foreach (var (hive, path) in runKeys)
+                {
+                    try
+                    {
+                        using var key = hive.OpenSubKey(path, true);
+                        if (key == null) continue;
+
+                        foreach (var valName in key.GetValueNames())
+                        {
+                            bool shouldDelete = false;
+                            if (string.Equals(valName, cleanName, StringComparison.OrdinalIgnoreCase) ||
+                                (!string.IsNullOrWhiteSpace(sig.DistinctProductName) && string.Equals(valName, sig.DistinctProductName, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                shouldDelete = true;
+                            }
+                            else if (!string.IsNullOrWhiteSpace(installLoc))
+                            {
+                                var valData = key.GetValue(valName) as string;
+                                if (!string.IsNullOrWhiteSpace(valData) && valData.Contains(installLoc, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    shouldDelete = true;
+                                }
+                            }
+
+                            if (shouldDelete)
+                            {
+                                try { key.DeleteValue(valName, false); } catch { }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
         }
 
         public static void RemoveShortcutsForApp(AppItem app)
