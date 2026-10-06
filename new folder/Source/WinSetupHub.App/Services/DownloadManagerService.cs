@@ -1128,10 +1128,9 @@ namespace SetupHub180Hz.Services
 
             if (!success)
             {
-                // Fallback to winget install or upgrade command
-                success = (app.IsUpgrade || app.HasUpdate)
-                    ? await _winget.UpgradeAsync(app.Id)
-                    : await _winget.InstallAsync(app.Id, app.Source, app.Name);
+                ActivityLogger.Instance.Log($"Direct installer execution returned failure for {app.Name}. Running Winget direct engine fallback.", ActivityType.Info);
+                await InstallViaWingetDirectAsync(app, queueIndex, queueTotal);
+                return;
             }
 
             FinalizeAppStatus(app, success, queueIndex, queueTotal);

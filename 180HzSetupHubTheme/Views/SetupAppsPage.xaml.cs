@@ -1553,6 +1553,36 @@ namespace SetupHub180Hz.Views
             }
 
             AlreadyInstalledOverlay.Visibility = Visibility.Visible;
+
+            if (!app.HasUpdate && !app.IsUpgrade && !string.IsNullOrWhiteSpace(app.Id))
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var info = await _winget.GetInstallerInfoAsync(app.Id);
+                        if (info != null && !string.IsNullOrWhiteSpace(info.Version))
+                        {
+                            var installedVer = reg?.DisplayVersion;
+                            if (!string.IsNullOrWhiteSpace(installedVer) &&
+                                !string.Equals(installedVer.Trim(), info.Version.Trim(), StringComparison.OrdinalIgnoreCase))
+                            {
+                                await Dispatcher.InvokeAsync(() =>
+                                {
+                                    if (_currentModalApp == app && AlreadyInstalledOverlay.Visibility == Visibility.Visible)
+                                    {
+                                        app.AvailableVersion = info.Version;
+                                        app.IsUpgrade = true;
+                                        ModalReinstallButton.Content = $"⚡ Update to Latest ({info.Version})";
+                                        ModalStatusMessage.Text = $"{app.Name} has a newer version available: v{info.Version} (Installed: v{installedVer}). Click Update to fetch and install the latest release.";
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    catch { }
+                });
+            }
         }
 
         private void ModalClose_Click(object sender, RoutedEventArgs e)
