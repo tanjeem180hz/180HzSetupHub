@@ -18,24 +18,27 @@
 
 ---
 
-## ⚡ 1-Click Direct Download
+## ⚡ 1-Click Direct Download & Installation
 
-Click the button below to download the official installer:
+Choose your preferred way to install 180Hz Setup Hub:
 
 <p align="center">
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe">
-    <img src="https://img.shields.io/badge/Download-180Hz%20Setup%20Hub%20(v1.0.0)-0078D7?style=for-the-badge&logo=windows&logoColor=white" alt="Download 180Hz Setup Hub" height="48">
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe">
+    <img src="https://img.shields.io/badge/Download-Official%20Installer%20(~2%20MB)-0078D7?style=for-the-badge&logo=windows&logoColor=white" alt="Download 180Hz Setup Hub Installer" height="48">
   </a>
 </p>
 
-<p align="center">
-  👉 <strong><a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe">Direct Download Link: 180HzSetupHubSetup.exe (~2 MB)</a></strong><br>
-  <em>(Official 1-Click Installer • Windows 10 &amp; 11 • Live Speed Meter • Automatic Prerequisites &amp; Self-Repair)</em>
-</p>
+### 📥 Download Options
+
+| Package | Size | Description | Link |
+| :--- | :--- | :--- | :--- |
+| **Official Bootstrapper (In-Repo)** | **~2 MB** | Fast web bootstrapper installer with live speed meter & self-repair | [📥 Download 180HzSetupHubSetup.exe (Raw)](https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe) • [View in Repo](installer/180HzSetupHubSetup.exe) |
+| **Official GitHub Release** | **~2 MB** | GitHub Releases hosted bootstrapper | [🚀 Release v1.0.0 Asset](https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe) |
+| **Standalone Full App Package** | **~80 MB** | Offline single-file desktop application (No installation required) | [📦 Download Standalone 180HzSetupHub.exe](https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHub.exe) |
 
 ### 💻 1-Click PowerShell Install (No Browser Needed)
 
-If you prefer installing directly from the terminal, open **PowerShell** and run this single command:
+If you prefer installing directly from the terminal, open **PowerShell** and run:
 
 ```powershell
 irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/install.ps1 | iex

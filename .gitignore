@@ -9,6 +9,11 @@ restore/
 *.dll
 *.pdb
 
+# Allow official lightweight bootstrapper installers in Git repo
+!installer/180HzSetupHubSetup.exe
+!new folder/180HzSetupHubSetup.exe
+!new folder/Installer/180HzSetupHubSetup.exe
+
 # Visual Studio / IDE cache
 .vs/
 .vscode/
