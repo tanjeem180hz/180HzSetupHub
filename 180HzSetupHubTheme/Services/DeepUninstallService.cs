@@ -34,25 +34,9 @@ namespace SetupHub180Hz.Services
             "LocalLow", "VirtualStore", "Microsoft.NET", "Windows NT", "Windows Mail",
             "Windows Media Player", "Windows Photo Viewer", "Windows Security",
 
-            // Major Ecosystem Platforms & Vendors
+            // Major Ecosystem Platforms & Multi-Product Vendors
             "Google", "Adobe", "Intel", "AMD", "NVIDIA", "NVIDIA Corporation",
-            "Apple", "Apple Computer", "Apple Inc.", "Mozilla", "Oracle", "Java", "JavaSoft",
-            "Steam", "Valve", "Epic Games", "Ubisoft", "Origin", "Electronic Arts", "EA Games",
-            "Dropbox", "Spotify", "Discord", "GitHub", "Git", "JetBrains", "CanonicalGroupLimited",
-
-            // Peripherals & Hardware Vendors
-            "Logitech", "Razer", "Corsair", "SteelSeries", "ASUS", "MSI", "Gigabyte",
-            "Sony", "Samsung", "Dell", "HP", "Lenovo", "Acer", "Huawei", "Realtek",
-
-            // Gaming & Graphics Platforms
-            "Blizzard", "Battle.net", "Riot Games", "GOG.com", "GOG Galaxy", "Unity", "Autodesk",
-
-            // Development & Virtualization
-            "Docker", "VMware", "VirtualBox", "Python", "Python3", "Nodejs", "PostgreSQL", "MySQL",
-
-            // Media & Web Browsers
-            "OBS Studio", "Blackmagic Design", "Wondershare", "CyberLink", "Corel", "TechSmith",
-            "BraveSoftware", "Opera Software", "Vivaldi Technologies"
+            "Apple", "Apple Computer", "Apple Inc.", "Mozilla", "Oracle", "Java", "JavaSoft"
         };
 
         // Top-level registry keys that must NEVER be deleted
@@ -61,24 +45,36 @@ namespace SetupHub180Hz.Services
             @"HKEY_CURRENT_USER\Software",
             @"HKEY_CURRENT_USER\Software\Microsoft",
             @"HKEY_CURRENT_USER\Software\Classes",
+            @"HKEY_CURRENT_USER\Software\Classes\Applications",
             @"HKEY_CURRENT_USER\Software\Policies",
             @"HKEY_CURRENT_USER\Software\Clients",
             @"HKEY_CURRENT_USER\Software\RegisteredApplications",
             @"HKEY_LOCAL_MACHINE\Software",
             @"HKEY_LOCAL_MACHINE\Software\Microsoft",
             @"HKEY_LOCAL_MACHINE\Software\Classes",
+            @"HKEY_LOCAL_MACHINE\Software\Classes\Applications",
             @"HKEY_LOCAL_MACHINE\Software\Policies",
             @"HKEY_LOCAL_MACHINE\Software\Clients",
             @"HKEY_LOCAL_MACHINE\Software\RegisteredApplications",
             @"HKEY_LOCAL_MACHINE\Software\WOW6432Node",
             @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft",
             @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Classes",
+            @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Classes\Applications",
             @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Policies",
             @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Clients",
             @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\RegisteredApplications",
             @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall",
             @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall",
-            @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+            @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall",
+            @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\App Paths",
+            @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths",
+            @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths",
+            @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run",
+            @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run",
+            @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run",
+            @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce",
+            @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce",
+            @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\RunOnce"
         };
 
         // Registry vendor keys directly under Software or WOW6432Node that hold multiple applications
@@ -87,9 +83,7 @@ namespace SetupHub180Hz.Services
             "Microsoft", "Classes", "Policies", "Clients", "RegisteredApplications",
             "Windows", "Windows NT", "DirectX", ".NETFramework", "Google", "Adobe",
             "Intel", "AMD", "NVIDIA", "NVIDIA Corporation", "Apple Inc.", "Apple Computer",
-            "Mozilla", "Oracle", "JavaSoft", "Valve", "Epic Games", "Electronic Arts",
-            "Logitech", "Razer", "Corsair", "SteelSeries", "ASUS", "MSI", "Gigabyte",
-            "Blizzard", "Riot Games", "Docker", "VMware", "Python", "Realtek"
+            "Mozilla", "Oracle", "JavaSoft"
         };
 
         // Words that must NEVER be isolated as standalone search tokens
@@ -118,7 +112,7 @@ namespace SetupHub180Hz.Services
             "smss", "wininit", "fontdrvhost", "dwm", "taskmgr", "powershell", "cmd", "conhost",
             "runtimebroker", "sihost", "ctfmon", "startmenuexperiencehost", "shellexperiencehost",
             "searchhost", "searchindexer", "applicationframehost", "audiodg", "spoolsv", "wlanext",
-            "smartscreen", "securityhealthservice", "antigravity", "code", "180hzsetuphub", "devenv"
+            "smartscreen", "securityhealthservice", "180hzsetuphub"
         };
 
         private static readonly List<string> AppDataRoots = new();
@@ -433,27 +427,60 @@ namespace SetupHub180Hz.Services
             var cleanName = CleanAppName(rawName);
 
             string? distinctProductName = null;
-            string? publisherPart = null;
+            string? publisherPart = app.Publisher?.Trim();
             string? idProductPart = null;
 
-            var vendorPrefixes = new[] { "Google ", "Mozilla ", "Microsoft ", "Adobe ", "Intel ", "NVIDIA ", "AMD ", "VideoLAN " };
-            foreach (var prefix in vendorPrefixes)
+            // Strip publisher prefix if name starts with publisher
+            if (!string.IsNullOrWhiteSpace(publisherPart) &&
+                cleanName.StartsWith(publisherPart + " ", StringComparison.OrdinalIgnoreCase))
             {
-                if (cleanName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                var remainder = cleanName.Substring(publisherPart.Length).Trim();
+                if (remainder.Length >= 3 && !BlacklistedTokens.Contains(remainder))
                 {
-                    var remainder = cleanName.Substring(prefix.Length).Trim();
-                    if (remainder.Length >= 3 && !BlacklistedTokens.Contains(remainder))
+                    distinctProductName = remainder;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(distinctProductName))
+            {
+                var vendorPrefixes = new[] { "Google ", "Mozilla ", "Microsoft ", "Adobe ", "Intel ", "NVIDIA ", "AMD ", "VideoLAN ", "Valve ", "Epic Games " };
+                foreach (var prefix in vendorPrefixes)
+                {
+                    if (cleanName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                     {
-                        distinctProductName = remainder;
-                        publisherPart = prefix.Trim();
-                        break;
+                        var remainder = cleanName.Substring(prefix.Length).Trim();
+                        if (remainder.Length >= 3 && !BlacklistedTokens.Contains(remainder))
+                        {
+                            distinctProductName = remainder;
+                            if (string.IsNullOrWhiteSpace(publisherPart)) publisherPart = prefix.Trim();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Strip common software suffixes if distinctProductName is still not isolated
+            if (string.IsNullOrWhiteSpace(distinctProductName))
+            {
+                var genericSuffixes = new[] { " media player", " Client", " Desktop", " Software", " Edition", " Community", " Professional", " Browser" };
+                foreach (var suffix in genericSuffixes)
+                {
+                    if (cleanName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var remainder = cleanName.Substring(0, cleanName.Length - suffix.Length).Trim();
+                        if (remainder.Length >= 3 && !BlacklistedTokens.Contains(remainder))
+                        {
+                            distinctProductName = remainder;
+                            break;
+                        }
                     }
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(app.Id))
             {
-                var idParts = app.Id.Split('.', StringSplitOptions.RemoveEmptyEntries);
+                var cleanId = AppMetadataHelper.CleanPackageId(app.Id);
+                var idParts = cleanId.Split(new[] { '.', '\\' }, StringSplitOptions.RemoveEmptyEntries);
                 if (idParts.Length >= 2)
                 {
                     var last = idParts.Last();
@@ -462,6 +489,10 @@ namespace SetupHub180Hz.Services
                         idProductPart = last;
                         if (publisherPart == null) publisherPart = idParts[0];
                     }
+                }
+                else if (idParts.Length == 1 && idParts[0].Length >= 3 && !BlacklistedTokens.Contains(idParts[0]))
+                {
+                    idProductPart = idParts[0];
                 }
             }
 
@@ -517,22 +548,44 @@ namespace SetupHub180Hz.Services
             {
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs")
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs"),
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) // C:\ProgramData
             };
 
             if (mode >= UninstallScanMode.Moderate)
             {
-                candidateRoots.Add(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
-                candidateRoots.Add(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
-            }
-
-            if (mode == UninstallScanMode.Advanced)
-            {
-                candidateRoots.Add(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData));
                 var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 if (!string.IsNullOrEmpty(userProfile))
                 {
                     candidateRoots.Add(Path.Combine(userProfile, "AppData", "LocalLow"));
+                    candidateRoots.Add(Path.Combine(userProfile, "Saved Games"));
+                    candidateRoots.Add(Path.Combine(userProfile, "Documents"));
+                }
+            }
+
+            if (mode == UninstallScanMode.Advanced)
+            {
+                var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                if (!string.IsNullOrEmpty(userProfile))
+                {
+                    try
+                    {
+                        var dotName = $".{sig.CleanName}";
+                        var dotDir = Path.Combine(userProfile, dotName);
+                        if (Directory.Exists(dotDir) && IsSafePathToDelete(dotDir))
+                        {
+                            results.Add(new LeftoverItem(LeftoverType.Folder, dotDir, CalculateDirectorySizeSafe(dotDir), dotName, IsHighConfidence: true));
+                        }
+                    }
+                    catch { }
+                }
+
+                var tempPath = Path.GetTempPath();
+                if (!string.IsNullOrEmpty(tempPath) && Directory.Exists(tempPath))
+                {
+                    candidateRoots.Add(tempPath);
                 }
             }
 
@@ -551,8 +604,17 @@ namespace SetupHub180Hz.Services
                         var dirName = Path.GetFileName(dir);
                         if (string.IsNullOrWhiteSpace(dirName)) continue;
 
-                        if (ProtectedVendorNames.Contains(dirName))
+                        if (IsMatch(dirName, sig))
                         {
+                            if (IsSafePathToDelete(dir))
+                            {
+                                long size = CalculateDirectorySizeSafe(dir);
+                                results.Add(new LeftoverItem(LeftoverType.Folder, dir, size, dirName, IsHighConfidence: true));
+                            }
+                        }
+                        else
+                        {
+                            // If dirName didn't match directly, it could be a publisher/vendor container (e.g. VideoLAN, Google, Epic Games)
                             try
                             {
                                 var vendorChildren = Directory.GetDirectories(dir);
@@ -571,35 +633,39 @@ namespace SetupHub180Hz.Services
                             }
                             catch { }
                         }
-                        else
-                        {
-                            if (IsMatch(dirName, sig))
-                            {
-                                if (IsSafePathToDelete(dir))
-                                {
-                                    long size = CalculateDirectorySizeSafe(dir);
-                                    results.Add(new LeftoverItem(LeftoverType.Folder, dir, size, dirName, IsHighConfidence: true));
-                                }
-                            }
-                        }
                     }
                 }
                 catch { }
             }
 
-            if (!string.IsNullOrWhiteSpace(app.InstallLocation) && Directory.Exists(app.InstallLocation))
+            var installLocation = app.InstallLocation;
+            if (string.IsNullOrWhiteSpace(installLocation))
             {
-                if (IsSafePathToDelete(app.InstallLocation))
+                var uninst = app.UninstallString ?? FindRegistryUninstallString(app);
+                if (!string.IsNullOrWhiteSpace(uninst))
                 {
-                    long size = CalculateDirectorySizeSafe(app.InstallLocation);
-                    results.Add(new LeftoverItem(LeftoverType.Folder, app.InstallLocation, size, "Install Location", IsHighConfidence: true));
+                    var (fn, _) = ParseUninstallString(uninst);
+                    if (Path.IsPathRooted(fn))
+                    {
+                        var dir = Path.GetDirectoryName(fn);
+                        if (!string.IsNullOrWhiteSpace(dir) && Directory.Exists(dir))
+                        {
+                            installLocation = dir;
+                        }
+                    }
                 }
             }
 
-            if (mode >= UninstallScanMode.Moderate)
+            if (!string.IsNullOrWhiteSpace(installLocation) && Directory.Exists(installLocation))
             {
-                ScanShortcuts(sig, results);
+                if (IsSafePathToDelete(installLocation))
+                {
+                    long size = CalculateDirectorySizeSafe(installLocation);
+                    results.Add(new LeftoverItem(LeftoverType.Folder, installLocation, size, "Install Location", IsHighConfidence: true));
+                }
             }
+
+            ScanShortcuts(sig, results);
 
             return results;
         }
@@ -639,35 +705,35 @@ namespace SetupHub180Hz.Services
         private static bool IsMatch(string targetName, AppSearchSignature sig)
         {
             if (string.IsNullOrWhiteSpace(targetName)) return false;
+            if (targetName.Length < 2) return false;
 
-            if (targetName.Length < 3) return false;
-
-            if (BlacklistedTokens.Contains(targetName)) return false;
-            if (ProtectedVendorNames.Contains(targetName)) return false;
-
-            // 1. Exact match on clean name or full name
+            // 1. Direct match on clean name or full name (Always valid!)
             if (string.Equals(targetName, sig.CleanName, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(targetName, sig.FullName, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            // 2. Exact match on distinct product name (e.g. "Chrome" for "Google Chrome")
+            // 2. Direct match on distinct product name (e.g. "Chrome" for "Google Chrome", "VLC" for "VLC media player")
             if (!string.IsNullOrWhiteSpace(sig.DistinctProductName) &&
                 string.Equals(targetName, sig.DistinctProductName, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            // 3. Exact match on Winget ID product part (e.g. "VLC" for "VideoLAN.VLC")
+            // 3. Direct match on Winget/Package ID product part (e.g. "VLC" for "VideoLAN.VLC")
             if (!string.IsNullOrWhiteSpace(sig.IdProductPart) &&
                 string.Equals(targetName, sig.IdProductPart, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            // 4. Specific prefix matching with delimiter check (' ', '-', '_')
-            if (sig.CleanName.Length >= 5)
+            // 4. Blacklist guard: only apply to prevent generic fuzzy/prefix matching
+            if (BlacklistedTokens.Contains(targetName)) return false;
+            if (ProtectedVendorNames.Contains(targetName)) return false;
+
+            // 5. Specific prefix matching with delimiter check (' ', '-', '_')
+            if (sig.CleanName.Length >= 4)
             {
                 if (targetName.StartsWith(sig.CleanName + " ", StringComparison.OrdinalIgnoreCase) ||
                     targetName.StartsWith(sig.CleanName + "-", StringComparison.OrdinalIgnoreCase) ||
@@ -677,7 +743,7 @@ namespace SetupHub180Hz.Services
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(sig.DistinctProductName) && sig.DistinctProductName.Length >= 5)
+            if (!string.IsNullOrWhiteSpace(sig.DistinctProductName) && sig.DistinctProductName.Length >= 4)
             {
                 if (targetName.StartsWith(sig.DistinctProductName + " ", StringComparison.OrdinalIgnoreCase) ||
                     targetName.StartsWith(sig.DistinctProductName + "-", StringComparison.OrdinalIgnoreCase) ||
@@ -695,17 +761,15 @@ namespace SetupHub180Hz.Services
             var results = new List<LeftoverItem>();
 
             ScanUninstallRegistryKeys(app, sig, results);
+            ScanAppPaths(sig, results);
+            ScanClassesApplications(sig, results);
 
             var targets = new List<(RegistryHive Hive, RegistryView View, string SubKeyPath, string DisplayPrefix)>
             {
                 (RegistryHive.CurrentUser, RegistryView.Default, @"Software", @"HKEY_CURRENT_USER\Software"),
-                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software", @"HKEY_LOCAL_MACHINE\Software")
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software", @"HKEY_LOCAL_MACHINE\Software"),
+                (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software", @"HKEY_LOCAL_MACHINE\Software\WOW6432Node")
             };
-
-            if (mode >= UninstallScanMode.Moderate)
-            {
-                targets.Add((RegistryHive.LocalMachine, RegistryView.Registry32, @"Software", @"HKEY_LOCAL_MACHINE\Software\WOW6432Node"));
-            }
 
             foreach (var target in targets)
             {
@@ -718,8 +782,17 @@ namespace SetupHub180Hz.Services
                     var subKeyNames = subKey.GetSubKeyNames();
                     foreach (var name in subKeyNames)
                     {
-                        if (ProtectedTopLevelRegistryNames.Contains(name))
+                        if (IsMatch(name, sig))
                         {
+                            var fullPath = $@"{target.DisplayPrefix}\{name}";
+                            if (IsSafeRegistryKeyToDelete(fullPath))
+                            {
+                                results.Add(new LeftoverItem(LeftoverType.RegistryKey, fullPath, null, name, IsHighConfidence: true));
+                            }
+                        }
+                        else
+                        {
+                            // Check subkeys under publisher/vendor keys (e.g. VideoLAN\VLC, Valve\Steam)
                             try
                             {
                                 using var vendorKey = subKey.OpenSubKey(name, false);
@@ -740,23 +813,79 @@ namespace SetupHub180Hz.Services
                             }
                             catch { }
                         }
-                        else
-                        {
-                            if (IsMatch(name, sig))
-                            {
-                                var fullPath = $@"{target.DisplayPrefix}\{name}";
-                                if (IsSafeRegistryKeyToDelete(fullPath))
-                                {
-                                    results.Add(new LeftoverItem(LeftoverType.RegistryKey, fullPath, null, name, IsHighConfidence: true));
-                                }
-                            }
-                        }
                     }
                 }
                 catch { }
             }
 
             return results;
+        }
+
+        private static void ScanAppPaths(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            var targets = new[]
+            {
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Microsoft\Windows\CurrentVersion\App Paths", @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\App Paths"),
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Microsoft\Windows\CurrentVersion\App Paths", @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths"),
+                (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\App Paths", @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths")
+            };
+
+            foreach (var (hive, view, subKeyPath, displayPrefix) in targets)
+            {
+                try
+                {
+                    using var baseKey = RegistryKey.OpenBaseKey(hive, view);
+                    using var key = baseKey.OpenSubKey(subKeyPath, false);
+                    if (key == null) continue;
+
+                    foreach (var subName in key.GetSubKeyNames())
+                    {
+                        var nameWithoutExt = Path.GetFileNameWithoutExtension(subName);
+                        if (IsMatch(nameWithoutExt, sig) || IsMatch(subName, sig))
+                        {
+                            var fullPath = $@"{displayPrefix}\{subName}";
+                            if (IsSafeRegistryKeyToDelete(fullPath))
+                            {
+                                results.Add(new LeftoverItem(LeftoverType.RegistryKey, fullPath, null, $"App Path ({subName})", IsHighConfidence: true));
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void ScanClassesApplications(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            var targets = new[]
+            {
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Classes\Applications", @"HKEY_CURRENT_USER\Software\Classes\Applications"),
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Classes\Applications", @"HKEY_LOCAL_MACHINE\Software\Classes\Applications")
+            };
+
+            foreach (var (hive, view, subKeyPath, displayPrefix) in targets)
+            {
+                try
+                {
+                    using var baseKey = RegistryKey.OpenBaseKey(hive, view);
+                    using var key = baseKey.OpenSubKey(subKeyPath, false);
+                    if (key == null) continue;
+
+                    foreach (var subName in key.GetSubKeyNames())
+                    {
+                        var nameWithoutExt = Path.GetFileNameWithoutExtension(subName);
+                        if (IsMatch(nameWithoutExt, sig) || IsMatch(subName, sig))
+                        {
+                            var fullPath = $@"{displayPrefix}\{subName}";
+                            if (IsSafeRegistryKeyToDelete(fullPath))
+                            {
+                                results.Add(new LeftoverItem(LeftoverType.RegistryKey, fullPath, null, $"Shell Association ({subName})", IsHighConfidence: true));
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
         }
 
         private static void ScanUninstallRegistryKeys(AppItem app, AppSearchSignature sig, List<LeftoverItem> results)
@@ -926,6 +1055,12 @@ namespace SetupHub180Hz.Services
             });
         }
 
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true, CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static extern bool MoveFileEx(string lpExistingFileName, string? lpNewFileName, int dwFlags);
+
+        private const int MOVEFILE_DELAY_UNTIL_REBOOT = 0x00000004;
+
         public static bool DeleteRegistryKey(string fullPath)
         {
             if (string.IsNullOrWhiteSpace(fullPath)) return false;
@@ -977,6 +1112,21 @@ namespace SetupHub180Hz.Services
                         using var p = System.Diagnostics.Process.Start(regPsi);
                         p?.WaitForExit(3000);
                         deleted = p != null && p.ExitCode == 0;
+
+                        if (!deleted && (fullPath.Contains("WOW6432Node", StringComparison.OrdinalIgnoreCase) || Environment.Is64BitOperatingSystem))
+                        {
+                            var regPsi32 = new System.Diagnostics.ProcessStartInfo
+                            {
+                                FileName = "reg.exe",
+                                Arguments = $"delete \"{fullPath}\" /f /reg:32",
+                                UseShellExecute = true,
+                                Verb = "runas",
+                                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                            };
+                            using var p32 = System.Diagnostics.Process.Start(regPsi32);
+                            p32?.WaitForExit(3000);
+                            deleted = p32 != null && p32.ExitCode == 0;
+                        }
                     }
 
                     return deleted;
@@ -997,7 +1147,7 @@ namespace SetupHub180Hz.Services
 
             try
             {
-                // Normalize attributes on files to remove ReadOnly flags
+                // Normalize attributes on files to remove ReadOnly/Hidden/System flags
                 try
                 {
                     var di = new DirectoryInfo(folderPath);
@@ -1013,19 +1163,43 @@ namespace SetupHub180Hz.Services
                     Directory.Delete(folderPath, recursive: true);
                     return true;
                 }
-                catch (UnauthorizedAccessException)
+                catch
                 {
-                    // Fallback to elevated rd /s /q
-                    var psi = new System.Diagnostics.ProcessStartInfo
+                    // Fallback 1: elevated rd /s /q
+                    try
                     {
-                        FileName = "cmd.exe",
-                        Arguments = $"/c rd /s /q \"{folderPath}\"",
-                        UseShellExecute = true,
-                        Verb = "runas",
-                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-                    };
-                    using var p = System.Diagnostics.Process.Start(psi);
-                    p?.WaitForExit(5000);
+                        var psi = new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = "cmd.exe",
+                            Arguments = $"/c rd /s /q \"{folderPath}\"",
+                            UseShellExecute = true,
+                            Verb = "runas",
+                            WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                        };
+                        using var p = System.Diagnostics.Process.Start(psi);
+                        p?.WaitForExit(5000);
+                    }
+                    catch { }
+
+                    if (!Directory.Exists(folderPath)) return true;
+
+                    // Fallback 2: Schedule deletion on reboot for locked files/DLLs via MoveFileEx
+                    try
+                    {
+                        var di = new DirectoryInfo(folderPath);
+                        foreach (var fi in di.EnumerateFiles("*", SearchOption.AllDirectories))
+                        {
+                            MoveFileEx(fi.FullName, null, MOVEFILE_DELAY_UNTIL_REBOOT);
+                        }
+                        foreach (var sub in di.EnumerateDirectories("*", SearchOption.AllDirectories).OrderByDescending(d => d.FullName.Length))
+                        {
+                            MoveFileEx(sub.FullName, null, MOVEFILE_DELAY_UNTIL_REBOOT);
+                        }
+                        MoveFileEx(folderPath, null, MOVEFILE_DELAY_UNTIL_REBOOT);
+                        return true;
+                    }
+                    catch { }
+
                     return !Directory.Exists(folderPath);
                 }
             }
@@ -1049,19 +1223,28 @@ namespace SetupHub180Hz.Services
                     File.Delete(filePath);
                     return true;
                 }
-                catch (UnauthorizedAccessException)
+                catch
                 {
-                    var psi = new System.Diagnostics.ProcessStartInfo
+                    try
                     {
-                        FileName = "cmd.exe",
-                        Arguments = $"/c del /f /q \"{filePath}\"",
-                        UseShellExecute = true,
-                        Verb = "runas",
-                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-                    };
-                    using var p = System.Diagnostics.Process.Start(psi);
-                    p?.WaitForExit(3000);
-                    return !File.Exists(filePath);
+                        var psi = new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = "cmd.exe",
+                            Arguments = $"/c del /f /q /a \"{filePath}\"",
+                            UseShellExecute = true,
+                            Verb = "runas",
+                            WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                        };
+                        using var p = System.Diagnostics.Process.Start(psi);
+                        p?.WaitForExit(3000);
+                    }
+                    catch { }
+
+                    if (!File.Exists(filePath)) return true;
+
+                    // Fallback: Schedule deletion on reboot via Windows Session Manager
+                    bool scheduled = MoveFileEx(filePath, null, MOVEFILE_DELAY_UNTIL_REBOOT);
+                    return scheduled;
                 }
             }
             catch (Exception ex)
@@ -1191,8 +1374,28 @@ namespace SetupHub180Hz.Services
 
                         if (shouldKill)
                         {
-                            p.Kill();
-                            p.WaitForExit(1500);
+                            try
+                            {
+                                p.Kill();
+                                p.WaitForExit(1500);
+                            }
+                            catch
+                            {
+                                // Elevated fallback to taskkill if in-process kill fails due to permissions
+                                try
+                                {
+                                    var psi = new System.Diagnostics.ProcessStartInfo
+                                    {
+                                        FileName = "taskkill.exe",
+                                        Arguments = $"/F /PID {p.Id}",
+                                        UseShellExecute = false,
+                                        CreateNoWindow = true
+                                    };
+                                    using var tk = System.Diagnostics.Process.Start(psi);
+                                    tk?.WaitForExit(1500);
+                                }
+                                catch { }
+                            }
                         }
                     }
                     catch { }
@@ -1269,12 +1472,35 @@ namespace SetupHub180Hz.Services
                 catch { }
             }
 
-            // Fallback: check cached registry info
+            // Fallback 1: check cached registry info
             var regInfo = AppMetadataHelper.GetRegistryInfo(app.Name ?? string.Empty, app.Id ?? string.Empty);
             if (!string.IsNullOrWhiteSpace(regInfo?.UninstallString))
             {
                 return regInfo.UninstallString;
             }
+
+            // Fallback 2: Check for uninstaller executables inside InstallLocation
+            if (!string.IsNullOrWhiteSpace(app.InstallLocation) && Directory.Exists(app.InstallLocation))
+            {
+                var candidates = new[] { "unins000.exe", "uninstall.exe", "unins001.exe", "uninst.exe", "uninstaller.exe" };
+                foreach (var c in candidates)
+                {
+                    var p = Path.Combine(app.InstallLocation, c);
+                    if (File.Exists(p)) return $"\"{p}\"";
+                }
+            }
+
+            // Fallback 3: Check Squirrel Electron app uninstaller (e.g. Discord, Slack, GitHub Desktop)
+            try
+            {
+                var localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var squirrelUpdate = Path.Combine(localApp, cleanName, "Update.exe");
+                if (File.Exists(squirrelUpdate))
+                {
+                    return $"\"{squirrelUpdate}\" --uninstall";
+                }
+            }
+            catch { }
 
             return null;
         }
@@ -1377,13 +1603,27 @@ namespace SetupHub180Hz.Services
                     }
                 }
 
-                var psi = new System.Diagnostics.ProcessStartInfo
+                if (string.IsNullOrWhiteSpace(workingDir) && Path.IsPathRooted(fileName) && File.Exists(fileName))
                 {
-                    FileName = fileName,
-                    Arguments = arguments,
-                    UseShellExecute = true,
-                    Verb = "runas"
-                };
+                    workingDir = Path.GetDirectoryName(fileName);
+                }
+
+                var psi = new System.Diagnostics.ProcessStartInfo();
+
+                if (fileName.EndsWith(".bat", StringComparison.OrdinalIgnoreCase) ||
+                    fileName.EndsWith(".cmd", StringComparison.OrdinalIgnoreCase))
+                {
+                    psi.FileName = "cmd.exe";
+                    psi.Arguments = $"/c \"\"{fileName}\" {arguments}\"";
+                }
+                else
+                {
+                    psi.FileName = fileName;
+                    psi.Arguments = arguments;
+                }
+
+                psi.UseShellExecute = true;
+                psi.Verb = "runas";
 
                 if (!string.IsNullOrWhiteSpace(workingDir) && Directory.Exists(workingDir))
                 {

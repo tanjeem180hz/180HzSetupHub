@@ -358,29 +358,42 @@ namespace SetupHub180Hz.Views
             {
                 launchCommand = $"winget uninstall --id \"{_app.Id}\"";
                 UninstallerCommandText.Text = launchCommand;
-                UninstallerSubtextText.Text = "Invoking Windows Package Manager (Winget) uninstaller…";
+                UninstallerSubtextText.Text = "Running Windows Package Manager (Winget) uninstaller…";
+                UninstallerLiveProgressBar.Visibility = Visibility.Visible;
+                BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
 
-                try
+                launched = true;
+                _ = Task.Run(async () =>
                 {
-                    var psi = new System.Diagnostics.ProcessStartInfo
+                    try
                     {
-                        FileName = "winget.exe",
-                        Arguments = $"uninstall --id \"{_app.Id}\" -e --force --accept-source-agreements",
-                        UseShellExecute = true,
-                        Verb = "runas"
-                    };
-                    var p = System.Diagnostics.Process.Start(psi);
-                    if (p != null)
-                    {
-                        launched = true;
-                        _activeUninstallerProcess = p;
-                        MonitorUninstallerProcess(p);
+                        bool ok = await _winget.UninstallAsync(_app.Id, _app.Name, line =>
+                        {
+                            Dispatcher.InvokeAsync(() => UninstallerSubtextText.Text = line);
+                        });
+
+                        await Dispatcher.InvokeAsync(() =>
+                        {
+                            IsUninstalled = true;
+                            UninstallerLiveProgressBar.Visibility = Visibility.Collapsed;
+                            UninstallerStatusIconText.Text = ok ? "✓" : "ℹ️";
+                            UninstallerStatusIconBorder.Background = new SolidColorBrush(ok ? Color.FromArgb(0x26, 0x3F, 0xCB, 0x7E) : Color.FromArgb(0x26, 0x2F, 0xB6, 0xFF));
+                            UninstallerTitleText.Text = ok ? "WINGET UNINSTALLER COMPLETED" : "WINGET UNINSTALLATION FINISHED";
+                            UninstallerSubtextText.Text = "Click 'Scan for Leftovers' below to remove residual registry traces and disk files.";
+                            BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
+                            BtnProceedToScanFromBuiltIn.Focus();
+                        });
                     }
-                }
-                catch (Exception ex)
-                {
-                    ActivityLogger.Instance.Log($"Winget uninstaller error: {ex.Message}", ActivityType.Warning);
-                }
+                    catch (Exception ex)
+                    {
+                        ActivityLogger.Instance.Log($"Winget uninstaller error: {ex.Message}", ActivityType.Warning);
+                        await Dispatcher.InvokeAsync(() =>
+                        {
+                            UninstallerLiveProgressBar.Visibility = Visibility.Collapsed;
+                            BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
+                        });
+                    }
+                });
             }
 
             // If no official uninstaller was found or could be launched:
@@ -405,13 +418,27 @@ namespace SetupHub180Hz.Views
             UninstallerTitleText.Text = "OFFICIAL UNINSTALLER RUNNING";
             UninstallerSubtextText.Text = $"Please complete any uninstallation prompts shown on your screen for {_app.Name}…";
             UninstallerLiveProgressBar.Visibility = Visibility.Visible;
-            BtnProceedToScanFromBuiltIn.Content = "Skip to Scan ➔";
+            BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
 
             _ = Task.Run(async () =>
             {
                 try
                 {
+                    var parentName = proc.ProcessName;
                     await proc.WaitForExitAsync();
+
+                    // If parent process exited quickly, check if child/temp uninstaller is still active
+                    var startTime = DateTime.UtcNow;
+                    while ((DateTime.UtcNow - startTime).TotalSeconds < 180)
+                    {
+                        var activeUninsts = FindActiveUninstallerProcesses(_app, parentName);
+                        if (activeUninsts.Count == 0)
+                        {
+                            break;
+                        }
+                        await Task.Delay(1000);
+                    }
+
                     await Dispatcher.InvokeAsync(() =>
                     {
                         IsUninstalled = true;
@@ -419,7 +446,7 @@ namespace SetupHub180Hz.Views
                         UninstallerStatusIconText.Text = "✓";
                         UninstallerStatusIconBorder.Background = new SolidColorBrush(Color.FromArgb(0x26, 0x3F, 0xCB, 0x7E));
                         UninstallerTitleText.Text = "BUILT-IN UNINSTALLER COMPLETED";
-                        UninstallerSubtextText.Text = $"Official uninstaller has finished (Exit code: {proc.ExitCode}). Click 'Scan for Leftovers' below to remove residual traces.";
+                        UninstallerSubtextText.Text = $"Official uninstaller has finished. Click 'Scan for Leftovers' below to remove residual traces.";
                         BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
                         BtnProceedToScanFromBuiltIn.Focus();
                     });
@@ -433,6 +460,48 @@ namespace SetupHub180Hz.Views
                     });
                 }
             });
+        }
+
+        private static List<System.Diagnostics.Process> FindActiveUninstallerProcesses(AppItem app, string? parentProcName)
+        {
+            var list = new List<System.Diagnostics.Process>();
+            try
+            {
+                var procs = System.Diagnostics.Process.GetProcesses();
+                foreach (var p in procs)
+                {
+                    try
+                    {
+                        var name = p.ProcessName;
+                        if (DeepUninstallService.ProtectedProcessNames.Contains(name)) continue;
+
+                        if (name.Contains("unins", StringComparison.OrdinalIgnoreCase) ||
+                            name.Contains("setup", StringComparison.OrdinalIgnoreCase) ||
+                            name.Equals("msiexec", StringComparison.OrdinalIgnoreCase) ||
+                            (!string.IsNullOrWhiteSpace(parentProcName) && string.Equals(name, parentProcName, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            list.Add(p);
+                            continue;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(app.InstallLocation) && Directory.Exists(app.InstallLocation))
+                        {
+                            try
+                            {
+                                var mod = p.MainModule?.FileName;
+                                if (!string.IsNullOrEmpty(mod) && mod.StartsWith(app.InstallLocation, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    list.Add(p);
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+            return list;
         }
 
         private async void BtnRerunUninstaller_Click(object sender, RoutedEventArgs e)

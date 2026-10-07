@@ -49,6 +49,7 @@ namespace SetupHub180Hz.Models
 
         public string Name { get; set; } = "";
         public string Id { get; set; } = "";
+        public string? Publisher { get; set; }
         public string Category { get; set; } = "General";
         public string Description { get; set; } = "";
         public List<string>? DetectionNames { get; set; }

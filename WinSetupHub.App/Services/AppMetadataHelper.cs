@@ -18,6 +18,7 @@ namespace SetupHub180Hz.Services
             public string? InstallLocation { get; set; }
             public string? DisplayIcon { get; set; }
             public string? UninstallString { get; set; }
+            public string? Publisher { get; set; }
             public string? WebUrl { get; set; }
             public DateTime? InstallDate { get; set; }
         }
@@ -104,6 +105,11 @@ namespace SetupHub180Hz.Services
                 if (!string.IsNullOrWhiteSpace(regInfo.UninstallString))
                 {
                     app.UninstallString = regInfo.UninstallString;
+                }
+
+                if (string.IsNullOrWhiteSpace(app.Publisher) && !string.IsNullOrWhiteSpace(regInfo.Publisher))
+                {
+                    app.Publisher = regInfo.Publisher;
                 }
 
                 if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(regInfo.WebUrl))
@@ -911,6 +917,7 @@ namespace SetupHub180Hz.Services
                                 var dispIcon = appKey.GetValue("DisplayIcon") as string;
                                 var uninstStr = (appKey.GetValue("UninstallString") as string)
                                              ?? (appKey.GetValue("QuietUninstallString") as string);
+                                var pubStr = appKey.GetValue("Publisher") as string;
                                 var webUrl = (appKey.GetValue("URLInfoAbout") as string)
                                              ?? (appKey.GetValue("HelpLink") as string)
                                              ?? (appKey.GetValue("URLUpdateInfo") as string);
@@ -946,6 +953,7 @@ namespace SetupHub180Hz.Services
                                     InstallLocation = installLoc,
                                     DisplayIcon = dispIcon,
                                     UninstallString = uninstStr,
+                                    Publisher = pubStr,
                                     WebUrl = webUrl,
                                     InstallDate = installDate
                                 };
