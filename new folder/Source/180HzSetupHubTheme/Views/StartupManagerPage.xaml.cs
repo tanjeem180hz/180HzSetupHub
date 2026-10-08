@@ -23,7 +23,13 @@ namespace SetupHub180Hz.Views
         public StartupManagerPage()
         {
             InitializeComponent();
-            Loaded += async (_, _) => await LoadItemsAsync();
+            Loaded += async (_, _) =>
+            {
+                if (_items.Count == 0)
+                {
+                    await LoadItemsAsync();
+                }
+            };
         }
 
         private async Task LoadItemsAsync()
@@ -42,7 +48,7 @@ namespace SetupHub180Hz.Views
             {
                 _catalogCache ??= await _catalogService.GetAllAsync();
 
-                await Parallel.ForEachAsync(_items, new ParallelOptions { MaxDegreeOfParallelism = 8 }, async (item, ct) =>
+                await Parallel.ForEachAsync(_items, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (item, ct) =>
                 {
                     ImageSource? icon = null;
 

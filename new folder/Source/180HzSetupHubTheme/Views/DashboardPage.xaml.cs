@@ -26,9 +26,9 @@ namespace SetupHub180Hz.Views
 
             _statsTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(2)
+                Interval = TimeSpan.FromSeconds(2.5)
             };
-            _statsTimer.Tick += (_, _) => UpdateStats();
+            _statsTimer.Tick += (_, _) => _ = UpdateStatsAsync();
 
             UpdateMonitorService.Instance.UpgradableApps.CollectionChanged += (_, _) => UpdateSummary();
 
@@ -37,7 +37,7 @@ namespace SetupHub180Hz.Views
             Loaded += async (_, _) =>
             {
                 AdaptLayout();
-                UpdateStats();
+                _ = UpdateStatsAsync();
                 _statsTimer.Start();
                 await CheckEngineAsync();
                 UpdateSummary();
@@ -47,16 +47,32 @@ namespace SetupHub180Hz.Views
             {
                 _statsTimer.Stop();
             };
+
+            IsVisibleChanged += (_, e) =>
+            {
+                if ((bool)e.NewValue)
+                {
+                    if (!_statsTimer.IsEnabled) _statsTimer.Start();
+                    _ = UpdateStatsAsync();
+                }
+                else
+                {
+                    _statsTimer.Stop();
+                }
+            };
         }
 
         public void RefreshRealtime()
         {
-            if (!_statsTimer.IsEnabled)
+            if (Visibility == Visibility.Visible)
             {
-                _statsTimer.Start();
+                if (!_statsTimer.IsEnabled)
+                {
+                    _statsTimer.Start();
+                }
+                _ = UpdateStatsAsync();
+                UpdateSummary();
             }
-            UpdateStats();
-            UpdateSummary();
         }
 
         private void AdaptLayout()
@@ -119,27 +135,37 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private void UpdateStats()
+        private bool _isUpdatingStats = false;
+
+        private async Task UpdateStatsAsync()
         {
+            if (_isUpdatingStats || Visibility != Visibility.Visible) return;
+            _isUpdatingStats = true;
+
             try
             {
-                var snap = _stats.GetSnapshot();
+                var snap = await Task.Run(() => _stats.GetSnapshot());
+                if (Visibility != Visibility.Visible) return;
 
                 // CPU
-                CpuPercentText.Text = $"{snap.CpuPercent:0.0}%";
-                CpuProgressBar.Value = Math.Clamp(snap.CpuPercent, 0, 100);
+                if (CpuPercentText != null) CpuPercentText.Text = $"{snap.CpuPercent:0.0}%";
+                if (CpuProgressBar != null) CpuProgressBar.Value = Math.Clamp(snap.CpuPercent, 0, 100);
 
                 // RAM
-                RamUsageText.Text = $"{snap.RamUsedGb:0.0} / {snap.RamTotalGb:0.0} GB";
-                RamPercentText.Text = $" ({snap.RamPercent:0}%)";
-                RamProgressBar.Value = Math.Clamp(snap.RamPercent, 0, 100);
+                if (RamUsageText != null) RamUsageText.Text = $"{snap.RamUsedGb:0.0} / {snap.RamTotalGb:0.0} GB";
+                if (RamPercentText != null) RamPercentText.Text = $" ({snap.RamPercent:0}%)";
+                if (RamProgressBar != null) RamProgressBar.Value = Math.Clamp(snap.RamPercent, 0, 100);
 
                 // Disk (C:)
-                DiskUsageText.Text = $"{snap.DiskFreeGb:0.0} GB Free";
-                DiskTotalText.Text = $" of {snap.DiskTotalGb:0.0} GB";
-                DiskProgressBar.Value = Math.Clamp(snap.DiskPercent, 0, 100);
+                if (DiskUsageText != null) DiskUsageText.Text = $"{snap.DiskFreeGb:0.0} GB Free";
+                if (DiskTotalText != null) DiskTotalText.Text = $" of {snap.DiskTotalGb:0.0} GB";
+                if (DiskProgressBar != null) DiskProgressBar.Value = Math.Clamp(snap.DiskPercent, 0, 100);
             }
             catch { }
+            finally
+            {
+                _isUpdatingStats = false;
+            }
         }
 
         private void UpdateSummary()
@@ -224,7 +250,7 @@ namespace SetupHub180Hz.Views
                     freedBytes += await _cleanup.CleanAsync(t);
                 }
 
-                UpdateStats();
+                _ = UpdateStatsAsync();
 
                 TxtQuickBoostBtn.Text = "BOOSTED!";
 
@@ -270,7 +296,7 @@ namespace SetupHub180Hz.Views
             long freed = await Task.Run(() => MemoryCleaner.CleanRam());
 
             // Immediately refresh live stats gauge
-            UpdateStats();
+            _ = UpdateStatsAsync();
 
             // Refresh CleanupService RAM target in background
             CleanupService.Instance.StartBackgroundScan();

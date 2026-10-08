@@ -197,5 +197,20 @@ namespace SetupHub180Hz.Services
             catch { }
             return 0;
         }
+
+        /// <summary>
+        /// Instantly trims unneeded working set memory for the current process, returning RAM to Windows.
+        /// </summary>
+        public static void TrimCurrentProcessMemory()
+        {
+            try
+            {
+                GC.Collect(2, GCCollectionMode.Optimized, false);
+                GC.WaitForPendingFinalizers();
+                using var cur = Process.GetCurrentProcess();
+                EmptyWorkingSet(cur.Handle);
+            }
+            catch { }
+        }
     }
 }

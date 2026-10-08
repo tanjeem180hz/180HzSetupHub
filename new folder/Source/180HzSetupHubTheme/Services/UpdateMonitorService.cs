@@ -189,7 +189,7 @@ namespace SetupHub180Hz.Services
                 // Asynchronously fetch missing icons and websites in parallel
                 _ = Task.Run(async () =>
                 {
-                    await Parallel.ForEachAsync(latestUpgradable, new ParallelOptions { MaxDegreeOfParallelism = 8 }, async (app, ct) =>
+                    await Parallel.ForEachAsync(latestUpgradable, new ParallelOptions { MaxDegreeOfParallelism = 2 }, async (app, ct) =>
                     {
                         if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id))
                         {

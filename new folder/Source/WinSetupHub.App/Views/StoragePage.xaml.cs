@@ -11,19 +11,30 @@ namespace SetupHub180Hz.Views
     {
         private readonly StorageService _storage = new();
 
+        private DateTime _lastCalculation = DateTime.MinValue;
+
         public StoragePage()
         {
             InitializeComponent();
             PathText.Text = StorageService.AppDataFolder;
-            Loaded += async (_, _) => await RefreshSizeAsync();
+            Loaded += async (_, _) =>
+            {
+                if ((DateTime.UtcNow - _lastCalculation).TotalSeconds > 30)
+                {
+                    await RefreshSizeAsync();
+                }
+            };
         }
 
         public void RefreshRealtime()
         {
-            _ = RefreshSizeAsync();
+            if ((DateTime.UtcNow - _lastCalculation).TotalSeconds > 30)
+            {
+                _ = RefreshSizeAsync();
+            }
         }
 
-        private async void Refresh_Click(object sender, RoutedEventArgs e) => await RefreshSizeAsync();
+        private async void Refresh_Click(object sender, RoutedEventArgs e) => await RefreshSizeAsync(force: true);
 
         private void OpenStorage_Click(object sender, RoutedEventArgs e) => _storage.OpenInExplorer();
 
@@ -35,8 +46,10 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private async Task RefreshSizeAsync()
+        private async Task RefreshSizeAsync(bool force = false)
         {
+            if (!force && (DateTime.UtcNow - _lastCalculation).TotalSeconds < 30) return;
+            _lastCalculation = DateTime.UtcNow;
             SizeText.Text = "Calculating…";
             StorageSummaryText.Text = "Analyzing storage metrics…";
 

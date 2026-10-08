@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using SetupHub180Hz.Services;
 using SetupHub180Hz.Views;
 
@@ -34,9 +35,9 @@ namespace SetupHub180Hz
                 {
                     RootGrid.Margin = new Thickness(0);
                 }
-                if (ContentHost != null)
+                if (_pageCache.TryGetValue(_currentPageKey, out var cur) && cur != null)
                 {
-                    PlayEnterAnimation(ContentHost);
+                    PlayEnterAnimation(cur);
                 }
             };
 
@@ -63,9 +64,6 @@ namespace SetupHub180Hz
             // Automatically start cleanup background scan immediately when app opens
             CleanupService.Instance.StartBackgroundScan();
 
-            // Real-time refresh on user interaction
-            PreviewMouseDown += MainWindow_PreviewMouseDown;
-
             NavigateTo("Dashboard");
         }
 
@@ -82,6 +80,7 @@ namespace SetupHub180Hz
                 SidebarBorder.BorderBrush = (Brush)Application.Current.FindResource("BrushBorder");
 
                 // Clear page cache and re-navigate so views cleanly rehydrate under the new theme
+                PagesHost.Children.Clear();
                 _pageCache.Clear();
                 if (!string.IsNullOrWhiteSpace(_currentPageKey))
                 {
@@ -257,6 +256,8 @@ namespace SetupHub180Hz
                 NavigateTo(tag);
         }
 
+        private DispatcherTimer? _memoryTrimDebounceTimer;
+
         private void NavigateTo(string pageKey)
         {
             _currentPageKey = pageKey;
@@ -279,36 +280,62 @@ namespace SetupHub180Hz
                     _ => new DashboardPage(this),
                 };
                 _pageCache[pageKey] = page;
+                PagesHost.Children.Add(page);
             }
 
-            ContentHost.Content = page;
-            PlayEnterAnimation(ContentHost);
-
-            // Real-time refresh of navigated page without redirects
-            if (page is IRealtimeRefreshable refreshable)
+            // Zero-latency instant visibility toggle across all cached pages (0ms visual tree rebuild)
+            foreach (UIElement child in PagesHost.Children)
             {
-                refreshable.RefreshRealtime();
+                if (ReferenceEquals(child, page))
+                {
+                    if (child.Visibility != Visibility.Visible)
+                    {
+                        child.Visibility = Visibility.Visible;
+                        PlayEnterAnimation((FrameworkElement)child);
+
+                        if (child is IRealtimeRefreshable refreshable)
+                        {
+                            refreshable.RefreshRealtime();
+                        }
+                    }
+                }
+                else
+                {
+                    if (child.Visibility != Visibility.Collapsed)
+                    {
+                        child.Visibility = Visibility.Collapsed;
+                    }
+                }
             }
+
+            ScheduleBackgroundMemoryTrim();
         }
 
-        private DateTime _lastClickRefresh = DateTime.MinValue;
-
-        private void MainWindow_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void ScheduleBackgroundMemoryTrim()
         {
-            if ((DateTime.UtcNow - _lastClickRefresh).TotalMilliseconds < 1500)
+            if (_memoryTrimDebounceTimer == null)
             {
-                return;
+                _memoryTrimDebounceTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(2.5)
+                };
+                _memoryTrimDebounceTimer.Tick += (_, _) =>
+                {
+                    _memoryTrimDebounceTimer.Stop();
+                    Task.Run(() => MemoryCleaner.TrimCurrentProcessMemory());
+                };
             }
-            _lastClickRefresh = DateTime.UtcNow;
-
-            TriggerRealtimeRefresh();
+            _memoryTrimDebounceTimer.Stop();
+            _memoryTrimDebounceTimer.Start();
         }
 
         public void TriggerRealtimeRefresh()
         {
             try
             {
-                if (ContentHost?.Content is IRealtimeRefreshable refreshable)
+                if (_pageCache.TryGetValue(_currentPageKey, out var activePage) &&
+                    activePage is IRealtimeRefreshable refreshable &&
+                    activePage.Visibility == Visibility.Visible)
                 {
                     refreshable.RefreshRealtime();
                 }

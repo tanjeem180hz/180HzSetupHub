@@ -72,7 +72,7 @@ namespace SetupHub180Hz.Views
             // Background async icon extraction & website discovery in parallel
             _ = Task.Run(async () =>
             {
-                await Parallel.ForEachAsync(_allApps, new ParallelOptions { MaxDegreeOfParallelism = 10 }, async (app, ct) =>
+                await Parallel.ForEachAsync(_allApps, new ParallelOptions { MaxDegreeOfParallelism = 2 }, async (app, ct) =>
                 {
                     // If WebUrl is still missing, query winget metadata manifest in background
                     if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id) && !app.Id.StartsWith("ARP\\", StringComparison.OrdinalIgnoreCase))

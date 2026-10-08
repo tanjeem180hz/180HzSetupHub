@@ -87,14 +87,16 @@ namespace SetupHub180Hz.Views
                 }
             };
 
+            DateTime lastInstalledCheck = DateTime.MinValue;
             IsVisibleChanged += async (_, e) =>
             {
                 if ((bool)e.NewValue)
                 {
                     SyncDownloadPopupState();
-                    if (_allPackages.Count > 0)
+                    if (_allPackages.Count > 0 && (DateTime.UtcNow - lastInstalledCheck).TotalMinutes >= 5)
                     {
-                        await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
+                        lastInstalledCheck = DateTime.UtcNow;
+                        await Task.Run(async () => await _catalog.CheckInstalledStatusAsync(_winget, _allPackages));
                     }
                 }
             };
@@ -206,7 +208,7 @@ namespace SetupHub180Hz.Views
             _ = Task.Run(async () =>
             {
                 // 1. Fetch high-res icons in parallel immediately
-                _ = Parallel.ForEachAsync(_allPackages, new ParallelOptions { MaxDegreeOfParallelism = 12 }, async (pkg, ct) =>
+                _ = Parallel.ForEachAsync(_allPackages, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (pkg, ct) =>
                 {
                     if (pkg.IconImageSource == null)
                     {

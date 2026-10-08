@@ -5,6 +5,111 @@
              xmlns:lottie="clr-namespace:LottieSharp.WPF;assembly=LottieSharp"
              xmlns:services="clr-namespace:SetupHub180Hz.Services">
 
+    <UserControl.Resources>
+        <Style x:Key="CleanListBoxItem" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0,0,0,6"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <ContentPresenter/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="StartupItemTemplate" DataType="{x:Type models:StartupItem}">
+            <Border Style="{StaticResource ListRow}" Padding="16,12" Margin="0,0,0,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="54"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 1. Logo / Monogram -->
+                    <Border Width="44" Height="44" CornerRadius="8"
+                            Background="{StaticResource BrushBackground}"
+                            BorderBrush="{StaticResource BrushBorder}"
+                            BorderThickness="1"
+                            HorizontalAlignment="Left" VerticalAlignment="Center"
+                            ClipToBounds="True">
+                        <Grid>
+                            <!-- Neutral Loading/Fallback Placeholder: ONLY visible when HasIconImage is False -->
+                            <Border Background="{StaticResource BrushSurface}" CornerRadius="7">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasIconImage}" Value="False">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="📦"
+                                           FontSize="16"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Opacity="0.4"/>
+                            </Border>
+
+                            <!-- Authentic Software Logo: Displayed cleanly with NO text behind it -->
+                            <Image Source="{Binding IconImageSource}"
+                                   Width="32" Height="32"
+                                   Stretch="Uniform"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 2. Details -->
+                    <StackPanel Grid.Column="1" Margin="12,0,16,0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="{Binding Name}"
+                                       FontFamily="{StaticResource AppFont}"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushTextPrimary}"
+                                       VerticalAlignment="Center"/>
+
+                            <Border Background="{StaticResource BrushSurfaceHover}"
+                                    BorderBrush="{StaticResource BrushBorder}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="6,2"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Source}"
+                                           FontSize="10"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource BrushTextSecondary}"/>
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding Command}"
+                                   Style="{StaticResource TextBody}"
+                                   FontSize="12"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+
+                    <!-- 3. Actions: Official Site & Toggle Switch -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <ContentControl Loaded="OfficialLinkContainer_Loaded" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                        <ToggleButton Style="{StaticResource ToggleSwitch}"
+                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                      VerticalAlignment="Center"
+                                      Click="Toggle_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
     <Grid Margin="28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -40,99 +145,18 @@
             </Button>
         </Grid>
 
-        <!-- Startup Items List -->
-        <ScrollViewer Grid.Row="2" Style="{StaticResource CleanScrollViewer}">
-            <ItemsControl x:Name="StartupList">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models:StartupItem}">
-                        <Border Style="{StaticResource ListRow}" Padding="16,12" Margin="0,0,0,8">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="54"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <!-- 1. Logo / Monogram -->
-                                <Border Width="44" Height="44" CornerRadius="8"
-                                        Background="{StaticResource BrushBackground}"
-                                        BorderBrush="{StaticResource BrushBorder}"
-                                        BorderThickness="1"
-                                        HorizontalAlignment="Left" VerticalAlignment="Center"
-                                        ClipToBounds="True">
-                                    <Grid>
-                                        <!-- Neutral Loading/Fallback Placeholder: ONLY visible when HasIconImage is False -->
-                                        <Border Background="{StaticResource BrushSurface}" CornerRadius="7">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding HasIconImage}" Value="False">
-                                                            <Setter Property="Visibility" Value="Visible"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                            <TextBlock Text="📦"
-                                                       FontSize="16"
-                                                       HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"
-                                                       Opacity="0.4"/>
-                                        </Border>
-
-                                        <!-- Authentic Software Logo: Displayed cleanly with NO text behind it -->
-                                        <Image Source="{Binding IconImageSource}"
-                                               Width="32" Height="32"
-                                               Stretch="Uniform"
-                                               RenderOptions.BitmapScalingMode="HighQuality"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
-                                    </Grid>
-                                </Border>
-
-                                <!-- 2. Details -->
-                                <StackPanel Grid.Column="1" Margin="12,0,16,0" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                        <TextBlock Text="{Binding Name}"
-                                                   FontFamily="{StaticResource AppFont}"
-                                                   FontSize="14"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{StaticResource BrushTextPrimary}"
-                                                   VerticalAlignment="Center"/>
-
-                                        <Border Background="{StaticResource BrushSurfaceHover}"
-                                                BorderBrush="{StaticResource BrushBorder}"
-                                                BorderThickness="1"
-                                                CornerRadius="4"
-                                                Padding="6,2"
-                                                Margin="8,0,0,0"
-                                                VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Source}"
-                                                       FontSize="10"
-                                                       FontWeight="SemiBold"
-                                                       Foreground="{StaticResource BrushTextSecondary}"/>
-                                        </Border>
-                                    </StackPanel>
-
-                                    <TextBlock Text="{Binding Command}"
-                                               Style="{StaticResource TextBody}"
-                                               FontSize="12"
-                                               TextTrimming="CharacterEllipsis"/>
-                                </StackPanel>
-
-                                <!-- 3. Actions: Official Site & Toggle Switch -->
-                                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <ContentControl Loaded="OfficialLinkContainer_Loaded" Margin="0,0,12,0" VerticalAlignment="Center"/>
-                                    <ToggleButton Style="{StaticResource ToggleSwitch}"
-                                                  IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                                                  VerticalAlignment="Center"
-                                                  Click="Toggle_Click"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
-    </Grid>
+        <!-- Startup Items List (Virtualized for 0-lag scrolling & instant rendering) -->
+        <ListBox x:Name="StartupList"
+                 Grid.Row="2"
+                 VirtualizingPanel.IsVirtualizing="True"
+                 VirtualizingPanel.VirtualizationMode="Recycling"
+                 VirtualizingPanel.ScrollUnit="Pixel"
+                 ScrollViewer.CanContentScroll="True"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 ItemContainerStyle="{StaticResource CleanListBoxItem}"
+                 ItemTemplate="{StaticResource StartupItemTemplate}"/>
+</Grid>
 </UserControl>

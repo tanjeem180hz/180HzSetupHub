@@ -889,16 +889,10 @@
         <Setter Property="services:SmoothScrollHelper.IsSmoothScrollEnabled" Value="True"/>
     </Style>
 
-    <!-- ============ PAGE ENTER TRANSITION (motion design: smooth organic glide + bloom) ============ -->
+    <!-- ============ PAGE ENTER TRANSITION (ultra-lightweight instant fade: 0% lag) ============ -->
     <Storyboard x:Key="PageEnterAnimation">
         <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                         From="0.0" To="1.0" Duration="0:0:0.24">
-            <DoubleAnimation.EasingFunction>
-                <QuarticEase EasingMode="EaseOut"/>
-            </DoubleAnimation.EasingFunction>
-        </DoubleAnimation>
-        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
-                         From="12" To="0" Duration="0:0:0.28">
+                         From="0.85" To="1.0" Duration="0:0:0.08">
             <DoubleAnimation.EasingFunction>
                 <QuarticEase EasingMode="EaseOut"/>
             </DoubleAnimation.EasingFunction>

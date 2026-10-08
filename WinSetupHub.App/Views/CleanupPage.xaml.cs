@@ -48,6 +48,19 @@ namespace SetupHub180Hz.Views
                 _ramTimer.Stop();
                 _ramTimer.Tick -= OnRamTimerTick;
             };
+
+            IsVisibleChanged += (_, e) =>
+            {
+                if ((bool)e.NewValue)
+                {
+                    if (!_ramTimer.IsEnabled) _ramTimer.Start();
+                    UpdateRamStats();
+                }
+                else
+                {
+                    _ramTimer.Stop();
+                }
+            };
         }
 
         private void OnRamTimerTick(object? sender, EventArgs e)
