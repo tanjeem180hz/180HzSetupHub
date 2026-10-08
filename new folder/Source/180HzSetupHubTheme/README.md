@@ -6,9 +6,9 @@ color, flat surfaces, 120–180ms GPU-cheap animations only (Opacity/RenderTrans
 
 ## ⚡ 1-Click Installer Download
 
-- **Direct In-Repo Installer:** [180HzSetupHubSetup.exe](https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe) (~2 MB)
+- **Direct In-Repo Installer:** [180HzSetupHubSetup.exe](https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe) (~2 MB)
 - **PowerShell 1-Click Install:** `irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/install.ps1 | iex`
-- **GitHub Release (v1.0.0):** [Download 180HzSetupHubSetup.exe](https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe)
+- **Official Repo Artifact:** [artifacts/installer/180HzSetupHubSetup.exe](https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe) (~2 MB)
 - **Standalone App Binary:** [Download 180HzSetupHub.exe](https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHub.exe) (~80 MB)
 
 ## Requirements

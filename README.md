@@ -9,11 +9,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D7?style=for-the-badge&logo=windows" alt="Platform"></a>
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Installer%20Size-~2%20MB-107C10?style=for-the-badge&logo=speedtest" alt="Installer Size"></a>
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Runtime-.NET%208%20%2B%204.8-512BD4?style=for-the-badge&logo=dotnet" alt=".NET"></a>
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Architecture-x64-555555?style=for-the-badge" alt="Architecture"></a>
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/blob/main/SECURITY.md"><img src="https://img.shields.io/badge/Security-Hardened-0078D7?style=for-the-badge&logo=shield" alt="Security"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-00FF66?style=for-the-badge&logo=windows&logoColor=050B06" alt="Platform"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Installer%20Size-~2%20MB-00FF66?style=for-the-badge&logo=speedtest&logoColor=050B06" alt="Installer Size"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Runtime-.NET%208%20%2B%204.8-162919?style=for-the-badge&logo=dotnet&logoColor=00FF66" alt=".NET"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Architecture-x64-162919?style=for-the-badge&logoColor=00FF66" alt="Architecture"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/blob/main/SECURITY.md"><img src="https://img.shields.io/badge/Security-Hardened-00FF66?style=for-the-badge&logo=shield&logoColor=050B06" alt="Security"></a>
 </p>
 
 ---
@@ -23,8 +23,8 @@
 Choose your preferred way to install 180Hz Setup Hub:
 
 <p align="center">
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe">
-    <img src="https://img.shields.io/badge/Download-Official%20Installer%20(~2%20MB)-0078D7?style=for-the-badge&logo=windows&logoColor=white" alt="Download 180Hz Setup Hub Installer" height="48">
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe">
+    <img src="https://img.shields.io/badge/Download-Official%20Installer%20(~2%20MB)-00FF66?style=for-the-badge&logo=windows&logoColor=050B06" alt="Download 180Hz Setup Hub Installer" height="48">
   </a>
 </p>
 
@@ -32,8 +32,8 @@ Choose your preferred way to install 180Hz Setup Hub:
 
 | Package | Size | Description | Link |
 | :--- | :--- | :--- | :--- |
-| **Official Bootstrapper (In-Repo)** | **~2 MB** | Fast web bootstrapper installer with live speed meter & self-repair | [📥 Download 180HzSetupHubSetup.exe (Raw)](https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe) • [View in Repo](installer/180HzSetupHubSetup.exe) |
-| **Official GitHub Release** | **~2 MB** | GitHub Releases hosted bootstrapper | [🚀 Release v1.0.0 Asset](https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe) |
+| **Official Bootstrapper (In-Repo)** | **~2 MB** | Fast web bootstrapper installer with live speed meter & self-repair | [📥 Download 180HzSetupHubSetup.exe (Raw)](https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe) • [View in Repo](artifacts/installer/180HzSetupHubSetup.exe) |
+| **Official Direct Binary** | **~2 MB** | Permanent repo artifact bootstrapper | [⚡ Direct Artifact Link](https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe) |
 | **Standalone Full App Package** | **~80 MB** | Offline single-file desktop application (No installation required) | [📦 Download Standalone 180HzSetupHub.exe](https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHub.exe) |
 
 ### 💻 1-Click PowerShell Install (No Browser Needed)
@@ -48,8 +48,8 @@ irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/in
 
 ## 🌟 Key Highlights
 
-### 🎨 Windows 10/11 Native App Installer Experience
-* **Native Design:** Modeled after the official Windows App Installer with a clean Segoe UI layout, verified **Trusted App** badge, and standard titlebar controls.
+### 🎨 Cyber Carbon & Toxic Neon App Installer Experience
+* **High-Tech Cyber Aesthetic:** Precision Cyber Carbon (`#080B08`) and Toxic Neon (`#00FF66`) interface matching the 180Hz Setup Hub theme with verified **PRO** and **Verified Safe** badges.
 * **Launch When Ready:** Automatically starts 180Hz Setup Hub once installation finishes.
 * **Instant Startup:** Runs on native .NET Framework 4.8 pre-built into Windows 10 & 11, starting in milliseconds without demanding extra runtimes or external popups.
 

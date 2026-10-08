@@ -176,7 +176,7 @@ export default function App() {
               <ExternalLink className="w-3 h-3" />
             </a>
             <motion.a
-              href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe"
+              href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe"
               whileHover={interactiveHover}
               whileTap={interactiveTap}
               className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#00D26A] to-[#38BDF8] text-black font-bold text-xs shadow-lg shadow-[#00D26A]/25 cursor-pointer"

@@ -1,7 +1,7 @@
 # 180Hz Setup Hub - 1-Click PowerShell Web Installer
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13
 
-$primaryUrl = "https://github.com/tanjeem180hz/180HzSetupHub/releases/download/v1.0.0/180HzSetupHubSetup.exe"
+$primaryUrl = "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe"
 $fallbackUrl = "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe"
 $installerPath = Join-Path $env:TEMP "180HzSetupHubSetup.exe"
 

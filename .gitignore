@@ -1,7 +1,11 @@
 # Build output and packages
 [Bb]in/
 [Oo]bj/
-artifacts/
+artifacts/*
+!artifacts/installer/
+artifacts/installer/*
+!artifacts/installer/180HzSetupHubSetup.exe
+!artifacts/installer/180HzSetupHubSetup.exe.config
 restore/
 
 # Compiled binaries
@@ -10,6 +14,7 @@ restore/
 *.pdb
 
 # Allow official lightweight bootstrapper installers in Git repo
+!artifacts/installer/180HzSetupHubSetup.exe
 !installer/180HzSetupHubSetup.exe
 !new folder/180HzSetupHubSetup.exe
 !new folder/Installer/180HzSetupHubSetup.exe
