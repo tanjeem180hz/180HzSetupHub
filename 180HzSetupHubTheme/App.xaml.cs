@@ -35,7 +35,6 @@ namespace SetupHub180Hz
 
             ActivityLogger.Instance.Log("Application started (Administrator).", ActivityType.Info);
             ThemeService.ApplyTheme(SettingsService.Instance.Current.DarkTheme);
-            LottieService.Initialize();
 
             if (Array.Exists(e.Args, a => string.Equals(a, "--auto-check", StringComparison.OrdinalIgnoreCase)))
             {
@@ -43,15 +42,69 @@ namespace SetupHub180Hz
                 return;
             }
 
-            UpdateMonitorService.Instance.Start();
+            // Set shutdown mode to OnMainWindowClose so closing SplashScreen doesn't terminate process
+            ShutdownMode = ShutdownMode.OnMainWindowClose;
 
+            // Launch futuristic Cyber Toxic Splash Screen immediately
+            SplashScreenWindow? splash = null;
             try
             {
-                var mainWindow = new MainWindow();
-                mainWindow.Show();
+                splash = new SplashScreenWindow();
+                splash.Show();
             }
             catch (Exception ex)
             {
+                ActivityLogger.Instance.Log($"Could not display splash screen: {ex.Message}", ActivityType.Warning);
+            }
+
+            _ = InitializeAndLaunchAppAsync(splash);
+        }
+
+        private async Task InitializeAndLaunchAppAsync(SplashScreenWindow? splash)
+        {
+            try
+            {
+                // Stage 1: Core System & Lottie initialization (15%)
+                splash?.UpdateProgress(15, "INITIALIZING 180Hz SYSTEM CORE...");
+                LottieService.Initialize();
+                await Task.Delay(160);
+
+                // Stage 2: Hardware & Latency Profiles (40%)
+                splash?.UpdateProgress(40, "CONFIGURING LATENCY & PERFORMANCE PROFILES...");
+                UpdateMonitorService.Instance.Start();
+                await Task.Delay(180);
+
+                // Stage 3: Package Catalog & Winget Engine (65%)
+                splash?.UpdateProgress(65, "INDEXING WINGET PACKAGES & REPOSITORIES...");
+                await Task.Delay(200);
+
+                // Stage 4: Revo Deep Uninstaller Engine & Cache Calibration (88%)
+                splash?.UpdateProgress(88, "CALIBRATING REVO UNINSTALLER ENGINE...");
+                await Task.Delay(180);
+
+                // Stage 5: Finalization (100%)
+                splash?.UpdateProgress(100, "READY // LAUNCHING 180Hz SETUP HUB...");
+                await Task.Delay(140);
+
+                // Create and reveal MainWindow
+                var mainWindow = new MainWindow();
+                MainWindow = mainWindow;
+                mainWindow.Opacity = 0;
+                mainWindow.Show();
+
+                // Smoothly fade in MainWindow
+                var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(220));
+                mainWindow.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+
+                // Smoothly fade out and close splash screen
+                if (splash != null)
+                {
+                    await splash.FadeOutAndCloseAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                splash?.Close();
                 ActivityLogger.Instance.Log($"Startup error: {ex}", ActivityType.Error);
                 ThemedMessageBox.Show(
                     $"180Hz Setup Hub encountered a startup error:\n\n{ex.Message}\n\n{ex.InnerException?.Message}",
