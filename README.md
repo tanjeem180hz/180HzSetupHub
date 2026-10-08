@@ -42,10 +42,14 @@ Choose your preferred way to install or run 180Hz Setup Hub:
 
 ### 💻 1-Click PowerShell Install (No Browser Needed)
 
-If you prefer installing directly from the terminal, open **PowerShell** and run:
+If you prefer installing or running directly from the terminal, open **PowerShell** and run:
 
 ```powershell
+# Recommended: Official Web Installer (~3.6 MB)
 irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/install.ps1 | iex
+
+# Alternative: Standalone Full Offline Package (~81 MB)
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/install.ps1))) -Standalone
 ```
 
 ---
