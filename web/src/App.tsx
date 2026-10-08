@@ -179,12 +179,20 @@ export default function App() {
               href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe"
               whileHover={interactiveHover}
               whileTap={interactiveTap}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#00D26A] to-[#38BDF8] text-black font-bold text-xs shadow-lg shadow-[#00D26A]/25 cursor-pointer"
+              className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#00D26A] to-[#38BDF8] text-black font-bold text-xs shadow-lg shadow-[#00D26A]/25 cursor-pointer"
             >
               <div className="w-4 h-4 flex items-center justify-center">
                 <Lottie src={rocketAnim} loop autoplay />
               </div>
-              <span>Get Installer (2 MB)</span>
+              <span>Get Installer (~3.6 MB)</span>
+            </motion.a>
+            <motion.a
+              href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe"
+              whileHover={interactiveHover}
+              whileTap={interactiveTap}
+              className="hidden sm:flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium text-xs border border-white/10 transition-all cursor-pointer"
+            >
+              <span>Standalone (~81 MB)</span>
             </motion.a>
           </div>
         </div>
@@ -219,7 +227,7 @@ export default function App() {
           <motion.div variants={fadeInUp} className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
             <div className="glass-panel p-4 rounded-2xl text-left border border-white/5">
               <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">Installer Size</span>
-              <span className="text-2xl font-bold text-white mt-1 block">2.0 MB</span>
+              <span className="text-2xl font-bold text-white mt-1 block">3.6 MB</span>
               <span className="text-[10px] text-[#00D26A] flex items-center gap-1 mt-0.5">⚡ Web Bootstrapper</span>
             </div>
             <div className="glass-panel p-4 rounded-2xl text-left border border-white/5">

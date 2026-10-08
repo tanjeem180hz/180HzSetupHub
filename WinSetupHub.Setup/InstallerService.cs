@@ -19,7 +19,8 @@ public sealed class InstallerService
     public const string UninstallerExeName = "Uninstall.exe";
     public const string RegistryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\180HzSetupHub";
 
-    public const string DefaultDownloadUrl = "https://github.com/tanjeem180hz/180HzSetupHub/releases/latest/download/180HzSetupHub.exe";
+    public const string DefaultDownloadUrl = "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe";
+    public const string FallbackDownloadUrl = "https://github.com/tanjeem180hz/180HzSetupHub/releases/latest/download/180HzSetupHub.exe";
 
     private const string PayloadPackages = "packages.default.json";
     private const string PayloadAppSettings = "appsettings.default.json";

@@ -6,6 +6,13 @@ artifacts/*
 artifacts/installer/*
 !artifacts/installer/180HzSetupHubSetup.exe
 !artifacts/installer/180HzSetupHubSetup.exe.config
+
+!artifacts/publish/
+artifacts/publish/*
+!artifacts/publish/win-x64/
+artifacts/publish/win-x64/*
+!artifacts/publish/win-x64/180HzSetupHub.exe
+
 restore/
 
 # Compiled binaries
@@ -13,11 +20,13 @@ restore/
 *.dll
 *.pdb
 
-# Allow official lightweight bootstrapper installers in Git repo
+# Allow official bootstrapper installers and standalone app in Git repo
 !artifacts/installer/180HzSetupHubSetup.exe
 !installer/180HzSetupHubSetup.exe
 !new folder/180HzSetupHubSetup.exe
 !new folder/Installer/180HzSetupHubSetup.exe
+!artifacts/publish/win-x64/180HzSetupHub.exe
+!new folder/StandaloneApp/180HzSetupHub.exe
 
 # Visual Studio / IDE cache
 .vs/

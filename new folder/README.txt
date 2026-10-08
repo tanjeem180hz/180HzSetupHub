@@ -16,7 +16,7 @@ FOLDER STRUCTURE & CONTENTS:
    - 180HzSetupHubSetup.exe.config   : Configuration
 
 3. StandaloneApp\
-   - 180HzSetupHub.exe (79.92 MB)    : Standalone full Windows WPF Desktop app
+   - 180HzSetupHub.exe (81.74 MB)    : Standalone full Windows WPF Desktop app
 
 4. Assets\
    - AppIcon.ico                     : High-resolution multi-size Windows icon
