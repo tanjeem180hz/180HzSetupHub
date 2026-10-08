@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="180Hz Setup Hub"
-        Height="360"
-        Width="560"
+        Height="250"
+        Width="380"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -13,177 +13,69 @@
         ResizeMode="NoResize"
         FontFamily="Bahnschrift, Segoe UI Variable Display, Segoe UI, Arial, sans-serif">
 
-    <!-- Outer Container with Ambient Toxic Neon Glow -->
-    <Border Background="#080B08"
-            BorderBrush="#212C23"
-            BorderThickness="1.5"
-            CornerRadius="14"
+    <!-- Minimal, distraction-free floating card -->
+    <Border Background="#090E0A"
+            BorderBrush="#18241A"
+            BorderThickness="1"
+            CornerRadius="16"
             Margin="16"
             MouseLeftButtonDown="Window_MouseDown">
         <Border.Effect>
-            <DropShadowEffect Color="#00FF66"
+            <DropShadowEffect Color="#000000"
                               BlurRadius="28"
-                              ShadowDepth="0"
-                              Opacity="0.25"/>
+                              ShadowDepth="4"
+                              Opacity="0.75"/>
         </Border.Effect>
 
-        <Grid ClipToBounds="True">
-            <!-- Background Radial Glow behind Logo -->
-            <Ellipse Width="340" Height="220"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Top"
-                     Margin="0,-20,0,0"
-                     IsHitTestVisible="False">
-                <Ellipse.Fill>
-                    <RadialGradientBrush Center="0.5,0.5" GradientOrigin="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
-                        <GradientStop Color="#1A00FF66" Offset="0.0"/>
-                        <GradientStop Color="#0A00FF66" Offset="0.5"/>
-                        <GradientStop Color="#00000000" Offset="1.0"/>
-                    </RadialGradientBrush>
-                </Ellipse.Fill>
-            </Ellipse>
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
 
-            <!-- Subtle Cyber Grid Overlay -->
-            <Canvas IsHitTestVisible="False" Opacity="0.05">
-                <Line X1="0" Y1="42" X2="540" Y2="42" Stroke="#00FF66" StrokeThickness="1"/>
-                <Line X1="0" Y1="230" X2="540" Y2="230" Stroke="#00FF66" StrokeThickness="1"/>
-            </Canvas>
+            <!-- Center Brand Logo with subtle toxic ambient glow -->
+            <Border Width="76"
+                    Height="76"
+                    CornerRadius="14"
+                    Background="#0F1611"
+                    BorderBrush="#213024"
+                    BorderThickness="1"
+                    HorizontalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect Color="#00FF66"
+                                      BlurRadius="18"
+                                      ShadowDepth="0"
+                                      Opacity="0.35"/>
+                </Border.Effect>
+                <Image Source="pack://application:,,,/Assets/AppIcon-1024.png"
+                       Width="62"
+                       Height="62"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+            </Border>
 
-            <Grid Margin="28,20,28,22">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>  <!-- Top Status Bar -->
-                    <RowDefinition Height="*"/>     <!-- Center Logo & Branding -->
-                    <RowDefinition Height="Auto"/>  <!-- Bottom Progress & Phase -->
-                </Grid.RowDefinitions>
+            <!-- Minimal App Title -->
+            <TextBlock Text="180Hz Setup Hub"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       Foreground="#FFFFFF"
+                       HorizontalAlignment="Center"
+                       Margin="0,14,0,16"/>
 
-                <!-- Top Status Header -->
-                <Grid Grid.Row="0">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- Pulsing Neon Dot Indicator -->
-                        <Border Width="8" Height="8" CornerRadius="4" Background="#00FF66" Margin="0,0,10,0">
-                            <Border.Effect>
-                                <DropShadowEffect Color="#00FF66" BlurRadius="8" ShadowDepth="0" Opacity="0.9"/>
-                            </Border.Effect>
-                        </Border>
-                        <TextBlock Text="180Hz SETUP HUB // SYSTEM INITIALIZER"
-                                   FontSize="11"
-                                   FontWeight="Bold"
-                                   Foreground="#7A8E7D"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
-
-                    <!-- Tactical Pro Badge -->
-                    <Border HorizontalAlignment="Right"
-                            Background="#112314"
-                            BorderBrush="#00FF66"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="8,3">
-                        <TextBlock Text="PRO EDITION // 180Hz"
-                                   FontSize="10"
-                                   FontWeight="Bold"
-                                   Foreground="#00FF66"/>
-                    </Border>
-                </Grid>
-
-                <!-- Center Logo, Title, and Badges -->
-                <StackPanel Grid.Row="1"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            Margin="0,10,0,14">
-
-                    <!-- High-Tech Square Emblem -->
-                    <Border Width="88"
-                            Height="88"
-                            Background="#0F1410"
-                            BorderBrush="#00FF66"
-                            BorderThickness="1.5"
-                            CornerRadius="14"
-                            HorizontalAlignment="Center"
-                            Margin="0,0,0,14">
-                        <Border.Effect>
-                            <DropShadowEffect Color="#00FF66" BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
-                        </Border.Effect>
-                        <Grid>
-                            <Image Source="pack://application:,,,/Assets/AppIcon-1024.png"
-                                   Width="72"
-                                   Height="72"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   RenderOptions.BitmapScalingMode="HighQuality"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- Brand Typography -->
-                    <TextBlock Text="180Hz SETUP HUB"
-                               FontSize="25"
-                               FontWeight="Bold"
-                               Foreground="#FFFFFF"
-                               HorizontalAlignment="Center"
-                               TextAlignment="Center"/>
-
-                    <TextBlock Text="ULTIMATE GAMING OPTIMIZATION &amp; DEEP UNINSTALLER"
-                               FontSize="11"
-                               FontWeight="Bold"
-                               Foreground="#00FF66"
-                               HorizontalAlignment="Center"
-                               Margin="0,4,0,0"
-                               TextAlignment="Center"/>
-                </StackPanel>
-
-                <!-- Bottom Progress, Phase Status & Micro Footer -->
-                <StackPanel Grid.Row="2">
-                    <!-- Progress Status Label & Percentage -->
-                    <Grid Margin="0,0,0,8">
-                        <TextBlock x:Name="TxtStatus"
-                                   Text="INITIALIZING 180Hz SYSTEM CORE..."
-                                   FontSize="11.5"
-                                   FontWeight="SemiBold"
-                                   Foreground="#B6C9B9"
-                                   HorizontalAlignment="Left"/>
-
-                        <TextBlock x:Name="TxtPercent"
-                                   Text="0%"
-                                   FontSize="12"
-                                   FontWeight="Bold"
-                                   Foreground="#00FF66"
-                                   HorizontalAlignment="Right"/>
-                    </Grid>
-
-                    <!-- Futuristic Slim Neon Progress Bar -->
-                    <Border Height="6"
-                            Background="#0F1410"
-                            BorderBrush="#212C23"
-                            BorderThickness="1"
-                            CornerRadius="3"
-                            ClipToBounds="True"
-                            Margin="0,0,0,12">
-                        <ProgressBar x:Name="StartupProgressBar"
-                                     Height="4"
-                                     Minimum="0"
-                                     Maximum="100"
-                                     Value="0"
-                                     Background="Transparent"
-                                     Foreground="#00FF66"
-                                     BorderThickness="0"/>
-                    </Border>
-
-                    <!-- Tactical Micro Footer -->
-                    <Grid>
-                        <TextBlock Text="WINDOWS 10/11 x64  •  REVO DEEP ENGINE  •  ZERO BLOATWARE"
-                                   FontSize="9.5"
-                                   FontWeight="SemiBold"
-                                   Foreground="#526655"
-                                   HorizontalAlignment="Left"/>
-
-                        <TextBlock Text="SECURE KERNEL HOOKS"
-                                   FontSize="9.5"
-                                   FontWeight="Bold"
-                                   Foreground="#3B523F"
-                                   HorizontalAlignment="Right"/>
-                    </Grid>
-                </StackPanel>
-            </Grid>
-        </Grid>
+            <!-- Sleek Minimal Progress Bar (No extra text, no clutter) -->
+            <Border Width="180"
+                    Height="3"
+                    Background="#141E16"
+                    CornerRadius="1.5"
+                    ClipToBounds="True"
+                    HorizontalAlignment="Center">
+                <ProgressBar x:Name="StartupProgressBar"
+                             Height="3"
+                             Minimum="0"
+                             Maximum="100"
+                             Value="0"
+                             Background="Transparent"
+                             Foreground="#00FF66"
+                             BorderThickness="0"/>
+            </Border>
+        </StackPanel>
     </Border>
 </Window>

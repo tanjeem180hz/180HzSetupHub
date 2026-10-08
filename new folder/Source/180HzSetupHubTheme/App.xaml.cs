@@ -64,27 +64,27 @@ namespace SetupHub180Hz
         {
             try
             {
-                // Stage 1: Core System & Lottie initialization (15%)
-                splash?.UpdateProgress(15, "INITIALIZING 180Hz SYSTEM CORE...");
+                // Stage 1: Core System & Lottie initialization (20%)
+                splash?.UpdateProgress(20);
                 LottieService.Initialize();
+                await Task.Delay(140);
+
+                // Stage 2: Hardware & Latency Profiles (45%)
+                splash?.UpdateProgress(45);
+                UpdateMonitorService.Instance.Start();
                 await Task.Delay(160);
 
-                // Stage 2: Hardware & Latency Profiles (40%)
-                splash?.UpdateProgress(40, "CONFIGURING LATENCY & PERFORMANCE PROFILES...");
-                UpdateMonitorService.Instance.Start();
-                await Task.Delay(180);
+                // Stage 3: Package Catalog & Winget Engine (70%)
+                splash?.UpdateProgress(70);
+                await Task.Delay(160);
 
-                // Stage 3: Package Catalog & Winget Engine (65%)
-                splash?.UpdateProgress(65, "INDEXING WINGET PACKAGES & REPOSITORIES...");
-                await Task.Delay(200);
-
-                // Stage 4: Revo Deep Uninstaller Engine & Cache Calibration (88%)
-                splash?.UpdateProgress(88, "CALIBRATING REVO UNINSTALLER ENGINE...");
-                await Task.Delay(180);
+                // Stage 4: Revo Deep Uninstaller Engine & Cache Calibration (90%)
+                splash?.UpdateProgress(90);
+                await Task.Delay(140);
 
                 // Stage 5: Finalization (100%)
-                splash?.UpdateProgress(100, "READY // LAUNCHING 180Hz SETUP HUB...");
-                await Task.Delay(140);
+                splash?.UpdateProgress(100);
+                await Task.Delay(100);
 
                 // Create and reveal MainWindow
                 var mainWindow = new MainWindow();

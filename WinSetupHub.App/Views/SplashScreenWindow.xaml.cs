@@ -24,24 +24,17 @@ public partial class SplashScreenWindow : Window
     }
 
     /// <summary>
-    /// Smoothly updates startup progress percentage and status label.
+    /// Smoothly updates the minimalist progress bar.
     /// </summary>
-    public void UpdateProgress(double targetPercent, string statusText)
+    public void UpdateProgress(double targetPercent, string? statusText = null)
     {
         Dispatcher.Invoke(() =>
         {
-            if (!string.IsNullOrWhiteSpace(statusText))
-            {
-                TxtStatus.Text = statusText;
-            }
-
-            TxtPercent.Text = $"{(int)Math.Min(100, Math.Max(0, targetPercent))}%";
-
             var anim = new DoubleAnimation
             {
                 From = _currentValue,
                 To = targetPercent,
-                Duration = TimeSpan.FromMilliseconds(180),
+                Duration = TimeSpan.FromMilliseconds(160),
                 EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut }
             };
 
@@ -63,7 +56,7 @@ public partial class SplashScreenWindow : Window
             {
                 From = 1.0,
                 To = 0.0,
-                Duration = TimeSpan.FromMilliseconds(220),
+                Duration = TimeSpan.FromMilliseconds(200),
                 EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
             };
 
