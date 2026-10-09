@@ -77,8 +77,12 @@ namespace SetupHub180Hz
                 var mainWindow = new MainWindow();
                 MainWindow = mainWindow;
                 mainWindow.Opacity = 0;
+                mainWindow.Closed += (_, _) =>
+                {
+                    try { Current?.Shutdown(); } catch { }
+                    Environment.Exit(0);
+                };
                 mainWindow.Show();
-                ShutdownMode = ShutdownMode.OnMainWindowClose;
 
                 // Smoothly fade in MainWindow
                 var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(220));
