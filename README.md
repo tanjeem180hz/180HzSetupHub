@@ -81,6 +81,19 @@ irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/in
 * **Developers:** Visual Studio Code, Git, Windows Terminal, Node.js, Python, Docker Desktop, DBeaver.
 * **Productivity & Utilities:** 7-Zip, Everything, Microsoft PowerToys, Notepad++, VLC, Chrome, Firefox.
 
+### ⚡ Dual-Section Optimization Suite & Deep Registry Tuning Engine
+* **Two Dedicated Optimization Modules:** Cleanly partitioned into **⚡ System Tweaks** and **🗃️ Registry Optimization** with instant segmented pill switching, category filters, and real-time search.
+* **System Optimizations:** Fine-tunes high-performance power plans, Windows visual effects, telemetry reduction, and gaming priority presets.
+* **Deep Windows Registry Engine:** Curated catalog of 32+ high-impact registry modifications across 7 performance sectors:
+  * *Gaming & Input Latency:* Disables mouse acceleration, optimizes `CSRSS` thread priority, enables exclusive Game Mode flags, and eliminates fullscreen optimization input lag.
+  * *Network & Ping Optimization:* Disables Windows network throttling index (`NetworkThrottlingIndex`), sets TCP ACK frequency (`TcpAckFrequency`), configures non-delayed TCP delivery (`TCPNoDelay`), and tunes MMCSS gaming QoS.
+  * *CPU & RAM Scheduling:* Maximizes Win32 processor scheduling priority for foreground gaming tasks, disables paging executive (`DisablePagingExecutive`) to keep kernel in RAM, and trims idle memory footprint.
+  * *Windows UI & Shell Responsiveness:* Drops menu show delay to 0ms, disables window animation latency, and minimizes shell hover delays for razor-sharp response.
+  * *GPU & DirectX Acceleration:* Enables Hardware Accelerated GPU Scheduling (HAGS), disables DWM composition delays, and activates DirectX performance flags.
+  * *Privacy & Telemetry:* Eliminates Connected User Experiences diagnostic telemetry, activity tracking, and Cortana background overhead.
+  * *Filesystem & Disk Throughput:* Disables NTFS 8.3 short-name creation and last-access time updates for ultra-fast SSD/NVMe read/write cycles.
+* **Target Path Badges & Instant Checkpoint:** Every registry tweak displays exact registry root paths, keys, and values (`🔑 HKLM\... ➔ Name = Value`) with a 1-click **🛡️ RESTORE POINT** backup generator before applying bulk modifications.
+
 ### 🛡️ Revo-Grade Deep Uninstallation Engine
 * **5-Phase Advanced Methodology:** Creates system protection checkpoints and registry backups, executes official vendor uninstallers with graceful fallback, then performs multi-level heuristic residual scans (Safe, Moderate, Advanced).
 * **Residual Registry & File Eradication:** Scans both 64-bit and 32-bit registry trees, `%AppData%`, `%ProgramData%`, and Program Files roots to safely purge orphaned registry keys, leftover app data, and shortcut remnants with defense-in-depth OS protection.
@@ -115,7 +128,9 @@ irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/in
 ├── 180HzSetupHub.exe          # Main application executable
 ├── Uninstall.exe              # Uninstaller & Repair wizard
 ├── Configuration\
-│   ├── packages.default.json  # Curated default package catalog
+│   ├── packages.default.json        # Curated default package catalog
+│   ├── tweaks.default.json          # Curated system optimization tweaks
+│   ├── registry_tweaks.default.json # Curated Windows registry tuning catalog
 │   └── appsettings.default.json
 └── Data\
     ├── config\                # User-modified catalog & settings

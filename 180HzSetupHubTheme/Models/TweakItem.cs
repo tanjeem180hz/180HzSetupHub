@@ -18,6 +18,21 @@ namespace SetupHub180Hz.Models
         public bool IsRecommended { get; set; }
         public bool RequiresReboot { get; set; }
         public string Link { get; set; } = "";
+        public string Section { get; set; } = "System"; // "System" or "Registry"
+
+        public string FormattedRegistryTarget
+        {
+            get
+            {
+                if (Registry == null || Registry.Count == 0) return string.Empty;
+                var r = Registry[0];
+                string shortPath = r.Path.Replace(":\\", @"\").Replace("HKEY_LOCAL_MACHINE", "HKLM").Replace("HKEY_CURRENT_USER", "HKCU");
+                string extra = Registry.Count > 1 ? $" (+{Registry.Count - 1} more)" : "";
+                return $"{shortPath} ➔ {r.Name} = {r.Value}{extra}";
+            }
+        }
+
+        public bool HasRegistryTarget => Registry != null && Registry.Count > 0;
 
         public List<TweakRegistryEntry> Registry { get; set; } = new();
         public List<TweakServiceEntry> Service { get; set; } = new();

@@ -68,13 +68,50 @@ namespace SetupHub180Hz.Services
             return _cache;
         }
 
+        public async Task<List<TweakItem>> GetSystemTweaksAsync()
+        {
+            var all = await GetAllAsync();
+            return all.Where(t => !string.Equals(t.Section, "Registry", StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        public async Task<List<TweakItem>> GetRegistryTweaksAsync()
+        {
+            var all = await GetAllAsync();
+            return all.Where(t => string.Equals(t.Section, "Registry", StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
         private static async Task<List<TweakItem>> LoadAsync()
+        {
+            var result = new List<TweakItem>();
+
+            // 1. Load System tweaks (tweaks.default.json)
+            var systemTweaks = await LoadJsonFileOrResourceAsync("tweaks.default.json");
+            foreach (var t in systemTweaks)
+            {
+                if (string.IsNullOrWhiteSpace(t.Section))
+                    t.Section = "System";
+            }
+            TagRecommended(systemTweaks);
+            result.AddRange(systemTweaks);
+
+            // 2. Load Registry tweaks (registry_tweaks.default.json)
+            var registryTweaks = await LoadJsonFileOrResourceAsync("registry_tweaks.default.json");
+            foreach (var t in registryTweaks)
+            {
+                t.Section = "Registry";
+            }
+            result.AddRange(registryTweaks);
+
+            return result;
+        }
+
+        private static async Task<List<TweakItem>> LoadJsonFileOrResourceAsync(string fileName)
         {
             var pathsToTry = new[]
             {
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configuration", "tweaks.default.json"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tweaks.default.json"),
-                Path.Combine(Environment.CurrentDirectory, "Configuration", "tweaks.default.json"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configuration", fileName),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName),
+                Path.Combine(Environment.CurrentDirectory, "Configuration", fileName),
             };
 
             foreach (var p in pathsToTry)
@@ -86,7 +123,6 @@ namespace SetupHub180Hz.Services
                     var items = JsonSerializer.Deserialize<List<TweakItem>>(json, JsonOptions);
                     if (items != null && items.Count > 0)
                     {
-                        TagRecommended(items);
                         return items;
                     }
                 }
@@ -98,7 +134,7 @@ namespace SetupHub180Hz.Services
             {
                 var assembly = Assembly.GetExecutingAssembly();
                 var resourceName = assembly.GetManifestResourceNames()
-                    .FirstOrDefault(n => n.EndsWith("tweaks.default.json", StringComparison.OrdinalIgnoreCase));
+                    .FirstOrDefault(n => n.EndsWith(fileName, StringComparison.OrdinalIgnoreCase));
 
                 if (resourceName != null)
                 {
@@ -110,7 +146,6 @@ namespace SetupHub180Hz.Services
                         var items = JsonSerializer.Deserialize<List<TweakItem>>(json, JsonOptions);
                         if (items != null && items.Count > 0)
                         {
-                            TagRecommended(items);
                             return items;
                         }
                     }

@@ -7,6 +7,42 @@
 
     <UserControl.Resources>
 
+        <!-- Top Section Tab Switcher (System Tweaks vs Registry Optimization) -->
+        <Style x:Key="OptimizationSectionTab" TargetType="{x:Type RadioButton}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{DynamicResource BrushTextSecondary}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="18,7"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="GroupName" Value="OptimizationSectionGroup"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushAccent}"/>
+                                <Setter Property="Foreground" Value="#0A0E17"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Category chip radio buttons -->
         <Style x:Key="TweakCategoryChip" TargetType="{x:Type RadioButton}">
             <Setter Property="Background" Value="Transparent"/>
@@ -33,8 +69,8 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource BrushSurfaceHover}"/>
-                                <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{StaticResource BrushSurface}"/>
@@ -174,7 +210,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock Text="Optimization" FontFamily="{StaticResource AppFont}"
+                    <TextBlock x:Name="TxtHeaderTitle" Text="Optimization" FontFamily="{StaticResource AppFont}"
                                FontSize="22" FontWeight="Bold"
                                Foreground="{DynamicResource BrushTextPrimary}"/>
                     <TextBlock x:Name="TxtSubtitle" Margin="0,2,0,0"
@@ -184,20 +220,25 @@
 
                 <!-- Actions WrapPanel -->
                 <WrapPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="12,0,0,0">
+                    <!-- Create Restore Point Safeguard -->
+                    <Button x:Name="BtnCreateRestorePoint" Style="{StaticResource UndoButton}"
+                            Content="🛡️ RESTORE POINT" Padding="10,7" Margin="0,0,8,4"
+                            Click="BtnCreateRestorePoint_Click" ToolTip="Create a Windows System Restore point before applying changes"/>
+
                     <!-- Restore All Default -->
                     <Button x:Name="BtnRestoreDefault" Style="{StaticResource DangerButton}"
                             Content="RESTORE ALL DEFAULT" Padding="12,7" Margin="0,0,8,4"
-                            Click="BtnRestoreDefault_Click" ToolTip="Restore all Windows settings back to factory defaults"/>
+                            Click="BtnRestoreDefault_Click" ToolTip="Restore settings in this section back to factory defaults"/>
 
                     <!-- Deselect All / Clear -->
                     <Button x:Name="BtnDeselectAll" Style="{StaticResource UndoButton}"
                             Content="DESELECT ALL" Padding="10,7" Margin="0,0,8,4"
-                            Click="BtnDeselectAll_Click" ToolTip="Deselect all checkboxes"/>
+                            Click="BtnDeselectAll_Click" ToolTip="Deselect all checkboxes in this section"/>
 
                     <!-- Select All -->
                     <Button x:Name="BtnSelectAll" Style="{StaticResource UndoButton}"
                             Content="SELECT ALL" Padding="10,7" Margin="0,0,8,4"
-                            Click="BtnSelectAll_Click" ToolTip="Select all visible tweaks"/>
+                            Click="BtnSelectAll_Click" ToolTip="Select all visible tweaks in this section"/>
 
                     <!-- Undo Selected -->
                     <Button x:Name="BtnUndoSelected" Style="{StaticResource UndoButton}"
@@ -207,155 +248,241 @@
                     <!-- Apply All -->
                     <Button x:Name="BtnApplyAll" Style="{StaticResource UndoButton}"
                             Content="APPLY ALL" Padding="12,7" Margin="0,0,8,4"
-                            Click="BtnApplyAll_Click" ToolTip="Apply all optimizations across the system"/>
+                            Click="BtnApplyAll_Click" ToolTip="Apply all optimizations in this section"/>
 
                     <!-- Apply Recommendation (Primary Accent) -->
                     <Button x:Name="BtnApplyRecommendation" Style="{StaticResource ApplyButton}"
                             Content="APPLY RECOMMENDATION" Padding="14,7" Margin="0,0,0,4"
-                            Click="BtnApplyRecommendation_Click" ToolTip="Apply 12 recommended safe optimizations instantly"/>
+                            Click="BtnApplyRecommendation_Click" ToolTip="Apply recommended safe optimizations instantly"/>
                 </WrapPanel>
             </Grid>
         </Border>
 
         <!-- ===== BODY ===== -->
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Row 0: Section Switcher & Search Bar -->
+                <RowDefinition Height="Auto"/> <!-- Row 1: Category Filter Bar -->
+                <RowDefinition Height="*"/>    <!-- Row 2: Tweak List ScrollViewer -->
+            </Grid.RowDefinitions>
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+            <!-- Row 0: Section Switcher (System Tweaks vs Registry Optimization) & Live Search Filter -->
+            <Border Grid.Row="0" Padding="24,10,24,10"
+                    BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
+                    Background="{DynamicResource BrushSurface}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <!-- Category Filter Bar + Quick Select Helpers -->
-                <Border Grid.Row="0" Padding="24,10,24,10"
-                        BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
-                        Background="{DynamicResource BrushBackground}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                    <!-- 2-Section Segmented Pill Switcher -->
+                    <Border Grid.Column="0" Background="{DynamicResource BrushBackground}"
+                            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                            CornerRadius="8" Padding="3">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="TabSystemTweaks" Style="{StaticResource OptimizationSectionTab}"
+                                         Content="⚡ System Tweaks" IsChecked="True"
+                                         Checked="SectionTab_Checked" Tag="System"
+                                         ToolTip="Comprehensive Windows system, gaming, and app optimizations"/>
+                            <RadioButton x:Name="TabRegistryTweaks" Style="{StaticResource OptimizationSectionTab}"
+                                         Content="🗃️ Registry Optimization"
+                                         Checked="SectionTab_Checked" Tag="Registry"
+                                         ToolTip="Dedicated Windows Registry tweaks for latency, ping, and hardware speed"/>
+                        </StackPanel>
+                    </Border>
 
-                        <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                            <StackPanel x:Name="CategoryChipsPanel" Orientation="Horizontal"/>
-                        </ScrollViewer>
+                    <!-- Section Description Pill -->
+                    <Border Grid.Column="1" VerticalAlignment="Center" Margin="16,0,16,0">
+                        <TextBlock x:Name="TxtSectionDescription"
+                                   Text="System and general Windows environment optimizations."
+                                   FontFamily="{StaticResource AppFont}" FontSize="12"
+                                   Foreground="{DynamicResource BrushTextSecondary}"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Border>
 
-                        <!-- Quick Select Recommended Helper -->
-                        <Button Grid.Column="1" x:Name="BtnSelectRecommended" Style="{StaticResource UndoButton}"
-                                Content="SELECT RECOMMENDED" Padding="10,5" Margin="8,0,0,0"
-                                Click="BtnSelectRecommended_Click" ToolTip="Check the 12 recommended tweaks"/>
-                    </Grid>
-                </Border>
+                    <!-- Search Filter Box -->
+                    <Border Grid.Column="2" Background="{DynamicResource BrushBackground}"
+                            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                            CornerRadius="6" Width="260" Height="32" Padding="8,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="🔍" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"
+                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox x:Name="FilterBox" Grid.Column="1"
+                                     Background="Transparent" BorderThickness="0"
+                                     Foreground="{DynamicResource BrushTextPrimary}"
+                                     CaretBrush="{DynamicResource BrushAccent}"
+                                     FontFamily="{StaticResource AppFont}" FontSize="12"
+                                     VerticalAlignment="Center"
+                                     TextChanged="FilterBox_TextChanged"/>
+                            <TextBlock Grid.Column="1" Text="Search tweaks or registry keys…"
+                                       FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"
+                                       Opacity="0.5" VerticalAlignment="Center" IsHitTestVisible="False"
+                                       Visibility="{Binding Text.IsEmpty, ElementName=FilterBox, Converter={StaticResource BoolToVis}}"/>
+                            <Button x:Name="ClearFilterButton" Grid.Column="2" Content="✕"
+                                    Background="Transparent" BorderThickness="0"
+                                    Foreground="{DynamicResource BrushTextSecondary}"
+                                    Cursor="Hand" FontSize="10" Padding="4,0"
+                                    VerticalAlignment="Center" Visibility="Collapsed"
+                                    Click="ClearFilter_Click"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
 
-                <!-- Tweak List -->
-                <ScrollViewer x:Name="TweaksScrollViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled"
-                              Padding="24,16,24,24">
-                    <StackPanel>
+            <!-- Row 1: Category Filter Bar + Quick Select Helpers -->
+            <Border Grid.Row="1" Padding="24,10,24,10"
+                    BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
+                    Background="{DynamicResource BrushBackground}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                        <!-- Progress / Status bar -->
-                        <Border x:Name="StatusBar" Margin="0,0,0,14"
-                                Background="{DynamicResource BrushSurface}"
-                                BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                                CornerRadius="8" Padding="14,10" Visibility="Collapsed">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock x:Name="TxtStatus"
-                                           FontFamily="{StaticResource AppFont}" FontSize="13"
-                                           Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
-                                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <lottie:LottieAnimationView x:Name="StatusLottie" Width="22" Height="22"
-                                                                AutoPlay="True" RepeatCount="-1"
-                                                                services:LottieHelper.AssetName="rocket.json"
-                                                                VerticalAlignment="Center" Visibility="Collapsed"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
+                    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <StackPanel x:Name="CategoryChipsPanel" Orientation="Horizontal"/>
+                    </ScrollViewer>
 
-                        <!-- Advanced Tweaks Warning -->
-                        <Border x:Name="AdvancedWarningBanner" Margin="0,0,0,14"
-                                Background="#1A0F00" BorderBrush="#92400E" BorderThickness="1"
-                                CornerRadius="8" Padding="14,10" Visibility="Collapsed">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="⚠" FontSize="16" Margin="0,0,10,0"
-                                           Foreground="#F59E0B" VerticalAlignment="Center"/>
-                                <TextBlock TextWrapping="Wrap" VerticalAlignment="Center"
-                                           FontFamily="{StaticResource AppFont}" FontSize="12"
-                                           Foreground="#F59E0B">
-                                    <Run FontWeight="Bold">Advanced Tweaks (Caution):</Run>
-                                    <Run> These tweaks modify system-level settings. Create a restore point before applying. Use at your own risk.</Run>
-                                </TextBlock>
+                    <!-- Quick Select Recommended Helper -->
+                    <Button Grid.Column="1" x:Name="BtnSelectRecommended" Style="{StaticResource UndoButton}"
+                            Content="SELECT RECOMMENDED" Padding="10,5" Margin="8,0,0,0"
+                            Click="BtnSelectRecommended_Click" ToolTip="Select recommended safe tweaks"/>
+                </Grid>
+            </Border>
+
+            <!-- Row 2: Tweak List -->
+            <ScrollViewer x:Name="TweaksScrollViewer" Grid.Row="2" VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="24,16,24,24">
+                <StackPanel>
+
+                    <!-- Progress / Status bar -->
+                    <Border x:Name="StatusBar" Margin="0,0,0,14"
+                            Background="{DynamicResource BrushSurface}"
+                            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                            CornerRadius="8" Padding="14,10" Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="TxtStatus"
+                                       FontFamily="{StaticResource AppFont}" FontSize="13"
+                                       Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <lottie:LottieAnimationView x:Name="StatusLottie" Width="22" Height="22"
+                                                            AutoPlay="True" RepeatCount="-1"
+                                                            services:LottieHelper.AssetName="rocket.json"
+                                                            VerticalAlignment="Center" Visibility="Collapsed"/>
                             </StackPanel>
-                        </Border>
+                        </Grid>
+                    </Border>
 
-                        <!-- Tweaks ItemsControl -->
-                        <ItemsControl x:Name="TweaksItemsControl">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="{x:Type models:TweakItem}">
-                                    <Border Style="{StaticResource TweakCard}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
+                    <!-- Advanced Tweaks Warning -->
+                    <Border x:Name="AdvancedWarningBanner" Margin="0,0,0,14"
+                            Background="#1A0F00" BorderBrush="#92400E" BorderThickness="1"
+                            CornerRadius="8" Padding="14,10" Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚠" FontSize="16" Margin="0,0,10,0"
+                                       Foreground="#F59E0B" VerticalAlignment="Center"/>
+                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center"
+                                       FontFamily="{StaticResource AppFont}" FontSize="12"
+                                       Foreground="#F59E0B">
+                                <Run FontWeight="Bold">Advanced Optimization (Caution):</Run>
+                                <Run> These tweaks tune deep Windows scheduling, drivers, or kernel configurations. Use recommended tweaks for safe daily operation.</Run>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
 
-                                            <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Name}"
-                                                               FontFamily="{StaticResource AppFont}"
-                                                               FontSize="13" FontWeight="SemiBold"
-                                                               Foreground="{DynamicResource BrushTextPrimary}"
-                                                               VerticalAlignment="Center"/>
-                                                    <!-- Recommended badge -->
-                                                    <Border Style="{StaticResource RecommendedBadge}"
-                                                            Margin="8,0,0,0"
-                                                            Visibility="{Binding IsRecommended, Converter={StaticResource BoolToVis}}">
-                                                        <TextBlock Text="RECOMMENDED" FontSize="9" FontWeight="Bold"
-                                                                   Foreground="{DynamicResource BrushAccent}"/>
-                                                    </Border>
-                                                    <!-- Advanced badge -->
-                                                    <Border Style="{StaticResource AdvancedBadge}"
-                                                            Margin="8,0,0,0"
-                                                            Visibility="{Binding IsAdvanced, Converter={StaticResource BoolToVis}}">
-                                                        <TextBlock Text="CAUTION" FontSize="9" FontWeight="Bold"
-                                                                   Foreground="#F59E0B"/>
-                                                    </Border>
-                                                </StackPanel>
-                                                <TextBlock Text="{Binding Description}"
+                    <!-- Tweaks ItemsControl -->
+                    <ItemsControl x:Name="TweaksItemsControl">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type models:TweakItem}">
+                                <Border Style="{StaticResource TweakCard}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Name}"
                                                            FontFamily="{StaticResource AppFont}"
-                                                           FontSize="11" TextWrapping="Wrap"
-                                                           Foreground="{DynamicResource BrushTextSecondary}"
-                                                           Margin="0,3,0,0" MaxWidth="700"/>
+                                                           FontSize="13" FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource BrushTextPrimary}"
+                                                           VerticalAlignment="Center"/>
+                                                <!-- Recommended badge -->
+                                                <Border Style="{StaticResource RecommendedBadge}"
+                                                        Margin="8,0,0,0"
+                                                        Visibility="{Binding IsRecommended, Converter={StaticResource BoolToVis}}">
+                                                    <TextBlock Text="RECOMMENDED" FontSize="9" FontWeight="Bold"
+                                                               Foreground="{DynamicResource BrushAccent}"/>
+                                                </Border>
+                                                <!-- Advanced badge -->
+                                                <Border Style="{StaticResource AdvancedBadge}"
+                                                        Margin="8,0,0,0"
+                                                        Visibility="{Binding IsAdvanced, Converter={StaticResource BoolToVis}}">
+                                                    <TextBlock Text="CAUTION" FontSize="9" FontWeight="Bold"
+                                                               Foreground="#F59E0B"/>
+                                                </Border>
                                             </StackPanel>
 
-                                            <!-- Toggle -->
-                                            <CheckBox Grid.Column="1" Style="{StaticResource TweakToggle}"
-                                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                      VerticalAlignment="Center"/>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                                            <!-- Description -->
+                                            <TextBlock Text="{Binding Description}"
+                                                       FontFamily="{StaticResource AppFont}"
+                                                       FontSize="11" TextWrapping="Wrap"
+                                                       Foreground="{DynamicResource BrushTextSecondary}"
+                                                       Margin="0,3,0,0" MaxWidth="720"/>
 
-                        <!-- Empty state -->
-                        <StackPanel x:Name="EmptyState" Visibility="Collapsed"
-                                    HorizontalAlignment="Center" Margin="0,60,0,0">
-                            <TextBlock Text="No tweaks in this category" FontSize="16"
-                                       FontFamily="{StaticResource AppFont}"
-                                       Foreground="{DynamicResource BrushTextSecondary}"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
+                                            <!-- Registry target badge (visible when tweak has registry key definitions) -->
+                                            <Border Background="{DynamicResource BrushBackground}"
+                                                    BorderBrush="{DynamicResource BrushBorder}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="4"
+                                                    Padding="6,2"
+                                                    Margin="0,5,0,0"
+                                                    HorizontalAlignment="Left"
+                                                    Visibility="{Binding HasRegistryTarget, Converter={StaticResource BoolToVis}}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="🔑" FontSize="10" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding FormattedRegistryTarget}"
+                                                               FontFamily="Consolas"
+                                                               FontSize="10"
+                                                               Foreground="{DynamicResource BrushAccent}"
+                                                               VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
 
+                                        <!-- Toggle switch -->
+                                        <CheckBox Grid.Column="1" Style="{StaticResource TweakToggle}"
+                                                  IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                  VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Empty state -->
+                    <StackPanel x:Name="EmptyState" Visibility="Collapsed"
+                                HorizontalAlignment="Center" Margin="0,60,0,0">
+                        <TextBlock Text="No tweaks match your filter" FontSize="15"
+                                   FontFamily="{StaticResource AppFont}"
+                                   Foreground="{DynamicResource BrushTextSecondary}"
+                                   HorizontalAlignment="Center"/>
                     </StackPanel>
-                </ScrollViewer>
-            </Grid>
+
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </UserControl>
