@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SetupHub180Hz.Models;
 
@@ -14,6 +16,65 @@ namespace SetupHub180Hz.Services
     /// </summary>
     public class WingetService
     {
+        private static string? _resolvedWingetPath;
+
+        public static string ResolveWingetBinaryPath()
+        {
+            if (!string.IsNullOrWhiteSpace(_resolvedWingetPath) && File.Exists(_resolvedWingetPath))
+                return _resolvedWingetPath;
+
+            // 1. Direct AppData location (User execution alias)
+            var localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var candidate = Path.Combine(localApp, "Microsoft", "WindowsApps", "winget.exe");
+            if (File.Exists(candidate))
+            {
+                _resolvedWingetPath = candidate;
+                return candidate;
+            }
+
+            // 2. Scan ProgramFiles WindowsApps for DesktopAppInstaller
+            try
+            {
+                var progFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+                var winApps = Path.Combine(progFiles, "WindowsApps");
+                if (Directory.Exists(winApps))
+                {
+                    var appInstallerDirs = Directory.GetDirectories(winApps, "Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe");
+                    foreach (var dir in appInstallerDirs)
+                    {
+                        var exe = Path.Combine(dir, "winget.exe");
+                        if (File.Exists(exe))
+                        {
+                            _resolvedWingetPath = exe;
+                            return exe;
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            // 3. Check App Paths in Registry (HKLM and HKCU)
+            try
+            {
+                using var key = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\winget.exe")
+                             ?? Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\winget.exe");
+                if (key != null)
+                {
+                    var p = key.GetValue("") as string;
+                    if (!string.IsNullOrWhiteSpace(p) && File.Exists(p))
+                    {
+                        _resolvedWingetPath = p;
+                        return p;
+                    }
+                }
+            }
+            catch { }
+
+            // 4. Fallback to "winget"
+            _resolvedWingetPath = "winget";
+            return _resolvedWingetPath;
+        }
+
         public async Task<bool> IsAvailableAsync()
         {
             try
@@ -484,7 +545,7 @@ namespace SetupHub180Hz.Services
 
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "winget",
+                    FileName = ResolveWingetBinaryPath(),
                     Arguments = arguments,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -613,6 +674,9 @@ namespace SetupHub180Hz.Services
         {
             var items = new List<AppItem>();
             if (string.IsNullOrWhiteSpace(raw)) return items;
+
+            // Strip ANSI escape sequences (colors, cursor movements)
+            raw = Regex.Replace(raw, @"\x1B\[[^@-~]*[@-~]", "");
 
             var lines = raw.Replace("\r", "").Split('\n');
 

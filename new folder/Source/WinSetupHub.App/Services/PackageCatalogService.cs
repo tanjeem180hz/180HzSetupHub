@@ -81,28 +81,67 @@ namespace SetupHub180Hz.Services
 
         private static readonly Dictionary<string, string[]> KnownPackageAliases = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["Spotify.Spotify"] = new[] { "9NCBCSZSJRSB", "Spotify", "Spotify Music", "Spotify - Music and Podcasts" },
-            ["9NCBCSZSJRSB"] = new[] { "Spotify.Spotify", "Spotify", "Spotify Music" },
-            ["VideoLAN.VLC"] = new[] { "XPDM1ZW6815MQM", "9NBLGGH4VVNH", "VLC media player", "VLC" },
-            ["9NBLGGH4VVNH"] = new[] { "VideoLAN.VLC", "XPDM1ZW6815MQM" },
-            ["Microsoft.VisualStudioCode"] = new[] { "XP9KHM4BK9FZ7Q", "Microsoft.VisualStudioCode", "Visual Studio Code" },
-            ["WhatsApp.WhatsApp"] = new[] { "9NKSQGP7F2NH", "5319275A.WhatsAppDesktop", "WhatsApp" },
-            ["9NKSQGP7F2NH"] = new[] { "WhatsApp.WhatsApp", "5319275A.WhatsAppDesktop", "WhatsApp" },
-            ["Telegram.TelegramDesktop"] = new[] { "9NZTWSQNTD0S", "Telegram" },
-            ["9NZTWSQNTD0S"] = new[] { "Telegram.TelegramDesktop", "Telegram" },
+            ["Spotify.Spotify"] = new[] { "9NCBCSZSJRSB", "Spotify", "Spotify Music", "Spotify - Music and Podcasts", "SpotifyAB.SpotifyMusic" },
+            ["9NCBCSZSJRSB"] = new[] { "Spotify.Spotify", "Spotify", "Spotify Music", "SpotifyAB.SpotifyMusic" },
+            ["VideoLAN.VLC"] = new[] { "XPDM1ZW6815MQM", "9NBLGGH4VVNH", "VLC media player", "VLC", "VideoLAN VLC" },
+            ["9NBLGGH4VVNH"] = new[] { "VideoLAN.VLC", "XPDM1ZW6815MQM", "VLC media player", "VLC" },
+            ["XPDM1ZW6815MQM"] = new[] { "VideoLAN.VLC", "9NBLGGH4VVNH", "VLC media player", "VLC" },
+            ["Microsoft.VisualStudioCode"] = new[] { "XP9KHM4BK9FZ7Q", "Microsoft.VisualStudioCode", "Visual Studio Code", "VS Code", "Code" },
+            ["XP9KHM4BK9FZ7Q"] = new[] { "Microsoft.VisualStudioCode", "Visual Studio Code", "VS Code", "Code" },
+            ["WhatsApp.WhatsApp"] = new[] { "9NKSQGP7F2NH", "5319275A.WhatsAppDesktop", "WhatsApp", "WhatsApp Desktop" },
+            ["9NKSQGP7F2NH"] = new[] { "WhatsApp.WhatsApp", "5319275A.WhatsAppDesktop", "WhatsApp", "WhatsApp Desktop" },
+            ["Telegram.TelegramDesktop"] = new[] { "9NZTWSQNTD0S", "Telegram", "Telegram Desktop" },
+            ["9NZTWSQNTD0S"] = new[] { "Telegram.TelegramDesktop", "Telegram", "Telegram Desktop" },
             ["Discord.Discord"] = new[] { "XPDC2RH70K22MN", "Discord" },
             ["XPDC2RH70K22MN"] = new[] { "Discord.Discord", "Discord" },
-            ["OpenAI.ChatGPT"] = new[] { "9PLM9XGG6VKS", "ChatGPT" },
-            ["9PLM9XGG6VKS"] = new[] { "OpenAI.ChatGPT", "ChatGPT" },
-            ["OpenJS.NodeJS"] = new[] { "OpenJS.NodeJS.LTS", "Node.js", "Node.js LTS" },
-            ["OpenJS.NodeJS.LTS"] = new[] { "OpenJS.NodeJS", "Node.js", "Node.js LTS" },
-            ["Guru3D.Afterburner"] = new[] { "MSI.Afterburner", "Afterburner" },
-            ["MSI.Afterburner"] = new[] { "Guru3D.Afterburner", "Afterburner" },
-            ["Valve.Steam"] = new[] { "Valve.SteamCMD", "Steam" },
+            ["OpenAI.ChatGPT"] = new[] { "9PLM9XGG6VKS", "ChatGPT", "OpenAI.Codex", "OpenAI ChatGPT" },
+            ["9PLM9XGG6VKS"] = new[] { "OpenAI.ChatGPT", "ChatGPT", "OpenAI.Codex" },
+            ["Anthropic.Claude"] = new[] { "Claude", "Claude Desktop" },
+            ["OpenJS.NodeJS"] = new[] { "OpenJS.NodeJS.LTS", "Node.js", "NodeJS", "Node.js LTS", "NodeJS LTS" },
+            ["OpenJS.NodeJS.LTS"] = new[] { "OpenJS.NodeJS", "Node.js", "NodeJS", "Node.js LTS", "NodeJS LTS" },
+            ["Python.Python.3.13"] = new[] { "Python 3.13", "Python", "Python3", "Python 3.13.15 Standard Library" },
+            ["Python.Python.3.14"] = new[] { "Python 3.14", "Python", "Python3" },
+            ["Python.Python.3.12"] = new[] { "Python 3.12", "Python", "Python3" },
+            ["Guru3D.Afterburner"] = new[] { "MSI.Afterburner", "MSI Afterburner", "Afterburner" },
+            ["MSI.Afterburner"] = new[] { "Guru3D.Afterburner", "MSI Afterburner", "Afterburner" },
+            ["Guru3D.RTSS"] = new[] { "RivaTuner Statistics Server", "RTSS", "RivaTuner" },
+            ["Valve.Steam"] = new[] { "Valve.SteamCMD", "Steam", "Steam Client" },
             ["Valve.SteamCMD"] = new[] { "Valve.Steam", "Steam" },
             ["Microsoft.WindowsTerminal"] = new[] { "9N0DX20HK701", "Windows Terminal" },
-            ["Microsoft.PowerToys"] = new[] { "XP89DCGQ3K6VLD", "PowerToys" }
+            ["9N0DX20HK701"] = new[] { "Microsoft.WindowsTerminal", "Windows Terminal" },
+            ["Microsoft.PowerToys"] = new[] { "XP89DCGQ3K6VLD", "PowerToys", "Microsoft PowerToys" },
+            ["XP89DCGQ3K6VLD"] = new[] { "Microsoft.PowerToys", "PowerToys" },
+            ["Google.Chrome"] = new[] { "Google Chrome", "Chrome" },
+            ["Mozilla.Firefox"] = new[] { "Mozilla Firefox", "Firefox" },
+            ["Brave.Brave"] = new[] { "Brave Browser", "Brave", "BraveSoftware.BraveBrowser" },
+            ["Opera.Opera"] = new[] { "Opera Stable", "Opera Browser", "Opera" },
+            ["Opera.OperaGX"] = new[] { "Opera GX Stable", "Opera GX", "OperaGX" },
+            ["Zoom.Zoom"] = new[] { "Zoom Workplace", "Zoom Meetings", "Zoom" },
+            ["7zip.7zip"] = new[] { "7-Zip", "7zip", "7-Zip 26.03 (x64)" },
+            ["RARLab.WinRAR"] = new[] { "WinRAR", "WinRAR archiver" },
+            ["voidtools.Everything"] = new[] { "Everything", "voidtools Everything" },
+            ["Notepad++.Notepad++"] = new[] { "Notepad++" },
+            ["Git.Git"] = new[] { "Git", "Git for Windows" },
+            ["RevoUninstaller.RevoUninstaller"] = new[] { "Revo Uninstaller", "Revo Uninstaller Pro" },
+            ["Razer.Synapse"] = new[] { "Razer Synapse", "Razer Synapse 3" },
+            ["JetBrains.IntelliJIDEA.Community"] = new[] { "IntelliJ IDEA", "IntelliJ IDEA Community Edition" }
         };
+
+        public static bool AreAliases(string a, string b)
+        {
+            if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b)) return false;
+            if (string.Equals(a, b, StringComparison.OrdinalIgnoreCase)) return true;
+
+            if (KnownPackageAliases.TryGetValue(a, out var aliasesA))
+            {
+                if (aliasesA.Any(x => string.Equals(x, b, StringComparison.OrdinalIgnoreCase))) return true;
+            }
+            if (KnownPackageAliases.TryGetValue(b, out var aliasesB))
+            {
+                if (aliasesB.Any(x => string.Equals(x, a, StringComparison.OrdinalIgnoreCase))) return true;
+            }
+            return false;
+        }
 
         public async Task CheckInstalledStatusAsync(WingetService winget, IEnumerable<AppItem> items)
         {
@@ -135,6 +174,7 @@ namespace SetupHub180Hz.Services
                     var instCleanIdSet = new HashSet<string>(installedApps.Select(a => AppMetadataHelper.CleanPackageId(a.Id)), StringComparer.OrdinalIgnoreCase);
                     var instNameSet = new HashSet<string>(installedApps.Select(a => a.Name), StringComparer.OrdinalIgnoreCase);
                     var instNormNameSet = new HashSet<string>(installedApps.Select(a => AppMetadataHelper.NormalizeAppName(a.Name)).Where(s => s.Length >= 3), StringComparer.OrdinalIgnoreCase);
+                    var instStrippedSet = new HashSet<string>(installedApps.Select(a => AppMetadataHelper.StripPublisherPrefix(AppMetadataHelper.NormalizeAppName(a.Name))).Where(s => s.Length >= 3), StringComparer.OrdinalIgnoreCase);
 
                     foreach (var item in itemList)
                     {
@@ -151,7 +191,7 @@ namespace SetupHub180Hz.Services
                         // B. Known alias match
                         if (!matched && !string.IsNullOrWhiteSpace(item.Id) && KnownPackageAliases.TryGetValue(item.Id, out var aliases))
                         {
-                            if (aliases.Any(a => instIdSet.Contains(a) || instCleanIdSet.Contains(a) || instNameSet.Contains(a)))
+                            if (aliases.Any(a => instIdSet.Contains(a) || instCleanIdSet.Contains(a) || instNameSet.Contains(a) || instNormNameSet.Contains(a)))
                             {
                                 matched = true;
                             }
@@ -173,13 +213,61 @@ namespace SetupHub180Hz.Services
                             }
                         }
 
-                        // E. Partial name / id match in installed apps
+                        // E. Stripped Publisher Name match
+                        if (!matched && !string.IsNullOrWhiteSpace(item.Name))
+                        {
+                            var stripped = AppMetadataHelper.StripPublisherPrefix(AppMetadataHelper.NormalizeAppName(item.Name));
+                            if (stripped.Length >= 3 && instStrippedSet.Contains(stripped))
+                            {
+                                matched = true;
+                            }
+                        }
+
+                        // F. Word-bounded or alias matching across all installed apps
                         if (!matched)
                         {
+                            var itemCleanId = AppMetadataHelper.CleanPackageId(item.Id);
+                            var itemNorm = AppMetadataHelper.NormalizeAppName(item.Name);
+                            var itemStripped = AppMetadataHelper.StripPublisherPrefix(itemNorm);
+
                             matched = installedApps.Any(a =>
-                                (!string.IsNullOrWhiteSpace(a.Id) && !string.IsNullOrWhiteSpace(item.Id) && a.Id.Contains(item.Id, StringComparison.OrdinalIgnoreCase)) ||
-                                (!string.IsNullOrWhiteSpace(a.Name) && !string.IsNullOrWhiteSpace(item.Name) &&
-                                 (a.Name.StartsWith(item.Name, StringComparison.OrdinalIgnoreCase) || item.Name.StartsWith(a.Name, StringComparison.OrdinalIgnoreCase))));
+                            {
+                                if (!string.IsNullOrWhiteSpace(a.Id) && !string.IsNullOrWhiteSpace(item.Id))
+                                {
+                                    if (a.Id.Contains(item.Id, StringComparison.OrdinalIgnoreCase) ||
+                                        item.Id.Contains(a.Id, StringComparison.OrdinalIgnoreCase))
+                                        return true;
+
+                                    var cleanA = AppMetadataHelper.CleanPackageId(a.Id);
+                                    if (cleanA.Equals(itemCleanId, StringComparison.OrdinalIgnoreCase) ||
+                                        cleanA.Contains(itemCleanId, StringComparison.OrdinalIgnoreCase) ||
+                                        itemCleanId.Contains(cleanA, StringComparison.OrdinalIgnoreCase))
+                                        return true;
+                                }
+
+                                if (AreAliases(item.Id, a.Id) || AreAliases(item.Name, a.Name))
+                                    return true;
+
+                                if (!string.IsNullOrWhiteSpace(a.Name) && !string.IsNullOrWhiteSpace(itemNorm))
+                                {
+                                    var normA = AppMetadataHelper.NormalizeAppName(a.Name);
+                                    var strippedA = AppMetadataHelper.StripPublisherPrefix(normA);
+
+                                    if (normA.Equals(itemNorm, StringComparison.OrdinalIgnoreCase) ||
+                                        strippedA.Equals(itemStripped, StringComparison.OrdinalIgnoreCase))
+                                        return true;
+
+                                    if (normA.Length >= 4 && (normA.StartsWith(itemNorm + " ") || normA.EndsWith(" " + itemNorm) || normA.Contains(" " + itemNorm + " ")))
+                                        return true;
+                                    if (itemNorm.Length >= 4 && (itemNorm.StartsWith(normA + " ") || itemNorm.EndsWith(" " + normA) || itemNorm.Contains(" " + normA + " ")))
+                                        return true;
+
+                                    if (strippedA.Length >= 4 && (strippedA.StartsWith(itemStripped + " ") || strippedA.EndsWith(" " + itemStripped) || strippedA.Contains(" " + itemStripped + " ")))
+                                        return true;
+                                }
+
+                                return false;
+                            });
                         }
 
                         if (matched)

@@ -55,14 +55,26 @@ namespace SetupHub180Hz.Views
             {
                 Dispatcher.InvokeAsync(() =>
                 {
+                    string normQuery = AppMetadataHelper.NormalizeAppName(idOrName);
+                    string cleanQuery = AppMetadataHelper.CleanPackageId(idOrName);
+
                     var matches = _allPackages.Where(p =>
                         string.Equals(p.Id, idOrName, StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(p.Name, idOrName, StringComparison.OrdinalIgnoreCase)).ToList();
+                        string.Equals(p.Name, idOrName, StringComparison.OrdinalIgnoreCase) ||
+                        (!string.IsNullOrWhiteSpace(cleanQuery) && string.Equals(AppMetadataHelper.CleanPackageId(p.Id), cleanQuery, StringComparison.OrdinalIgnoreCase)) ||
+                        (!string.IsNullOrWhiteSpace(normQuery) && string.Equals(AppMetadataHelper.NormalizeAppName(p.Name), normQuery, StringComparison.OrdinalIgnoreCase)) ||
+                        PackageCatalogService.AreAliases(p.Id, idOrName) ||
+                        PackageCatalogService.AreAliases(p.Name, idOrName)).ToList();
 
                     foreach (var p in matches)
                     {
                         p.IsInstalled = isInstalled;
                         p.Status = isInstalled ? "Installed" : "Install";
+                    }
+
+                    if (matches.Count > 0)
+                    {
+                        ApplyFilter();
                     }
                 });
             };
@@ -1542,7 +1554,14 @@ namespace SetupHub180Hz.Views
         private bool CheckIfAppAlreadyInstalled(AppItem app)
         {
             if (app.IsInstalled) return true;
-            return AppMetadataHelper.IsAppInstalled(app);
+            bool detected = AppMetadataHelper.IsAppInstalled(app);
+            if (detected)
+            {
+                app.IsInstalled = true;
+                app.Status = "Installed";
+                PackageCatalogService.NotifyStatusChanged(app.Id, true);
+            }
+            return detected;
         }
 
         private void ShowAlreadyInstalledModal(AppItem app)

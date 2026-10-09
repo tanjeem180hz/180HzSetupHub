@@ -1322,9 +1322,20 @@ namespace SetupHub180Hz.Services
 
         private void FinalizeAppStatus(AppItem app, bool success, int queueIndex, int queueTotal)
         {
-            if (!success && AppMetadataHelper.IsAppInstalled(app))
+            if (!success)
             {
-                success = true;
+                // Invalidate cache and retry checking IsAppInstalled with small delays to allow registry flush
+                AppMetadataHelper.InvalidateCache();
+                for (int attempt = 0; attempt < 3; attempt++)
+                {
+                    if (AppMetadataHelper.IsAppInstalled(app))
+                    {
+                        success = true;
+                        break;
+                    }
+                    System.Threading.Thread.Sleep(500);
+                    AppMetadataHelper.InvalidateCache();
+                }
             }
 
             app.IsBusy = false;
@@ -1359,6 +1370,16 @@ namespace SetupHub180Hz.Services
                 AppMetadataHelper.InvalidateCache();
                 PackageCatalogService.NotifyStatusChanged(app.Id, true);
                 PackageCatalogService.NotifyStatusChanged(app.Name, true);
+                var cleanId = AppMetadataHelper.CleanPackageId(app.Id);
+                if (!string.IsNullOrWhiteSpace(cleanId) && !string.Equals(cleanId, app.Id, StringComparison.OrdinalIgnoreCase))
+                {
+                    PackageCatalogService.NotifyStatusChanged(cleanId, true);
+                }
+                var normName = AppMetadataHelper.NormalizeAppName(app.Name);
+                if (!string.IsNullOrWhiteSpace(normName) && !string.Equals(normName, app.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    PackageCatalogService.NotifyStatusChanged(normName, true);
+                }
 
                 ActivityLogger.Instance.Log($"Successfully deployed {app.Name}.", ActivityType.Success);
                 Notify(new DownloadProgressInfo
