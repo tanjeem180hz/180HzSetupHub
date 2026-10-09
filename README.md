@@ -81,6 +81,12 @@ irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/in
 * **Developers:** Visual Studio Code, Git, Windows Terminal, Node.js, Python, Docker Desktop, DBeaver.
 * **Productivity & Utilities:** 7-Zip, Everything, Microsoft PowerToys, Notepad++, VLC, Chrome, Firefox.
 
+### 🧭 Universal History Navigation & Hardware Mouse Control
+* **Persistent Title Bar Navigation:** Sleek `[ ‹ Back ]` pill button, `[ › ]` forward button, and dynamic breadcrumbs with glowing status indicator accessible across every section.
+* **Full Hardware Mouse Support:** Seamless backward (`Mouse 4` / `XButton1`) and forward (`Mouse 5` / `XButton2`) navigation compatible with all gaming and productivity mice (Logitech, Razer, Corsair, etc.) via WPF input and Win32 `WM_APPCOMMAND` / `WM_XBUTTONDOWN`.
+* **Keyboard Hotkeys:** Rapid navigation using `Alt + Left Arrow`, `Alt + Right Arrow`, or `Backspace`.
+* **Zero-Latency In-Memory Stack:** Instantaneous page switching with state preservation and background memory trimming.
+
 ---
 
 ## 🖥️ System Requirements

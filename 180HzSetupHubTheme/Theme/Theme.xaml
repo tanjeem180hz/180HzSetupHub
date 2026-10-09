@@ -110,6 +110,84 @@
         </Setter>
     </Style>
 
+    <!-- ============ TITLE BAR NAVIGATION BUTTONS (Back Pill & Forward Icon) ============ -->
+    <Style x:Key="TitleBarNavPillButton" TargetType="Button">
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="8,2"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushBorder}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource BrushAccentHover}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.25"/>
+                            <Setter Property="Cursor" Value="Arrow"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TitleBarNavButton" TargetType="Button">
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushBorder}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource BrushAccentHover}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.25"/>
+                            <Setter Property="Cursor" Value="Arrow"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="TitleBarCloseButton" TargetType="Button" BasedOn="{StaticResource TitleBarButton}">
         <Setter Property="Template">
             <Setter.Value>

@@ -15,13 +15,22 @@ namespace SetupHub180Hz
 {
     public partial class MainWindow : Window
     {
+        public static MainWindow? Instance { get; private set; }
+
         private bool _isSidebarPinned;
         private bool _isSidebarExpanded;
-        private string _currentPageKey = "Dashboard";
+        private string _currentPageKey = "";
         private readonly Dictionary<string, UserControl> _pageCache = new();
+        private readonly Stack<string> _backStack = new();
+        private readonly Stack<string> _forwardStack = new();
+        private bool _isNavigatingHistory = false;
+
+        public bool CanGoBack => _backStack.Count > 0;
+        public bool CanGoForward => _forwardStack.Count > 0;
 
         public MainWindow()
         {
+            Instance = this;
             InitializeComponent();
 
             StateChanged += (_, _) =>
@@ -84,7 +93,9 @@ namespace SetupHub180Hz
                 _pageCache.Clear();
                 if (!string.IsNullOrWhiteSpace(_currentPageKey))
                 {
-                    NavigateTo(_currentPageKey);
+                    string current = _currentPageKey;
+                    _currentPageKey = "";
+                    NavigateTo(current);
                 }
             });
         }
@@ -258,9 +269,170 @@ namespace SetupHub180Hz
 
         private DispatcherTimer? _memoryTrimDebounceTimer;
 
+        public void GoBack()
+        {
+            if (!CanGoBack) return;
+            _isNavigatingHistory = true;
+            try
+            {
+                var target = _backStack.Pop();
+                _forwardStack.Push(_currentPageKey);
+                GoToPage(target);
+            }
+            finally
+            {
+                _isNavigatingHistory = false;
+                UpdateNavButtonsState();
+            }
+        }
+
+        public void GoForward()
+        {
+            if (!CanGoForward) return;
+            _isNavigatingHistory = true;
+            try
+            {
+                var target = _forwardStack.Pop();
+                _backStack.Push(_currentPageKey);
+                GoToPage(target);
+            }
+            finally
+            {
+                _isNavigatingHistory = false;
+                UpdateNavButtonsState();
+            }
+        }
+
+        private void NavBack_Click(object sender, RoutedEventArgs e) => GoBack();
+        private void NavForward_Click(object sender, RoutedEventArgs e) => GoForward();
+
+        private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.XButton1)
+            {
+                if (CanGoBack)
+                {
+                    GoBack();
+                    e.Handled = true;
+                }
+            }
+            else if (e.ChangedButton == MouseButton.XButton2)
+            {
+                if (CanGoForward)
+                {
+                    GoForward();
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+            {
+                if (e.SystemKey == Key.Left || e.Key == Key.Left)
+                {
+                    if (CanGoBack)
+                    {
+                        GoBack();
+                        e.Handled = true;
+                    }
+                }
+                else if (e.SystemKey == Key.Right || e.Key == Key.Right)
+                {
+                    if (CanGoForward)
+                    {
+                        GoForward();
+                        e.Handled = true;
+                    }
+                }
+            }
+            else if (e.Key == Key.Back && !(Keyboard.FocusedElement is TextBox || Keyboard.FocusedElement is PasswordBox))
+            {
+                if (CanGoBack)
+                {
+                    GoBack();
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void UpdateNavButtonsState()
+        {
+            if (BtnNavBack != null)
+            {
+                BtnNavBack.IsEnabled = CanGoBack;
+                BtnNavBack.ToolTip = CanGoBack
+                    ? $"Go Back to {GetPageFriendlyTitle(_backStack.Peek())} (Alt+Left, Mouse 4)"
+                    : "Go Back (Alt+Left, Mouse 4)";
+            }
+
+            if (BtnNavForward != null)
+            {
+                BtnNavForward.IsEnabled = CanGoForward;
+                BtnNavForward.ToolTip = CanGoForward
+                    ? $"Go Forward to {GetPageFriendlyTitle(_forwardStack.Peek())} (Alt+Right, Mouse 5)"
+                    : "Go Forward (Alt+Right, Mouse 5)";
+            }
+
+            if (TxtNavBreadcrumb != null)
+            {
+                TxtNavBreadcrumb.Text = GetPageFriendlyTitle(_currentPageKey);
+            }
+        }
+
+        private static string GetPageFriendlyTitle(string? key) => key switch
+        {
+            "Dashboard" => "Dashboard",
+            "SetupApps" => "Setup Apps",
+            "Downloads" => "Downloads",
+            "UpdateCenter" => "Update Center",
+            "Uninstaller" => "Uninstaller",
+            "Startup" => "Startup Apps",
+            "Cleanup" => "System Cleaner",
+            "Activity" => "Activity Log",
+            "Storage" => "Storage Analysis",
+            "Optimization" => "PC Optimization",
+            "Settings" => "Settings",
+            _ => string.IsNullOrEmpty(key) ? "Dashboard" : key
+        };
+
         private void NavigateTo(string pageKey)
         {
+            if (!string.IsNullOrEmpty(_currentPageKey) && _currentPageKey == pageKey)
+            {
+                UpdateNavButtonsState();
+                return;
+            }
+
+            if (!_isNavigatingHistory && !string.IsNullOrEmpty(_currentPageKey) && _currentPageKey != pageKey)
+            {
+                _backStack.Push(_currentPageKey);
+                _forwardStack.Clear();
+            }
+
             _currentPageKey = pageKey;
+
+            // Keep sidebar active selection synchronized
+            RadioButton? targetRb = pageKey switch
+            {
+                "Dashboard" => NavDashboard,
+                "SetupApps" => NavSetupApps,
+                "Downloads" => NavDownloads,
+                "UpdateCenter" => NavUpdateCenter,
+                "Uninstaller" => NavUninstaller,
+                "Startup" => NavStartup,
+                "Cleanup" => NavCleanup,
+                "Activity" => NavActivity,
+                "Storage" => NavStorage,
+                "Settings" => NavSettings,
+                "Optimization" => NavOptimization,
+                _ => null,
+            };
+            if (targetRb != null && targetRb.IsChecked != true)
+            {
+                targetRb.IsChecked = true;
+            }
 
             if (!_pageCache.TryGetValue(pageKey, out var page))
             {
@@ -308,6 +480,7 @@ namespace SetupHub180Hz
                 }
             }
 
+            UpdateNavButtonsState();
             ScheduleBackgroundMemoryTrim();
         }
 
@@ -366,7 +539,22 @@ namespace SetupHub180Hz
                 "Optimization" => NavOptimization,
                 _ => null,
             };
-            if (target != null) target.IsChecked = true;
+
+            if (target != null)
+            {
+                if (target.IsChecked == true)
+                {
+                    NavigateTo(pageKey);
+                }
+                else
+                {
+                    target.IsChecked = true;
+                }
+            }
+            else
+            {
+                NavigateTo(pageKey);
+            }
         }
 
         private void PlayEnterAnimation(FrameworkElement target)
@@ -419,6 +607,30 @@ namespace SetupHub180Hz
                 WmGetMinMaxInfo(hwnd, lParam);
                 handled = true;
             }
+            else if (msg == WM_APPCOMMAND)
+            {
+                int cmd = HIWORD(lParam) & ~FAPPCOMMAND_MASK;
+                if (cmd == APPCOMMAND_BROWSER_BACKWARD)
+                {
+                    if (CanGoBack) { GoBack(); handled = true; return new IntPtr(1); }
+                }
+                else if (cmd == APPCOMMAND_BROWSER_FORWARD)
+                {
+                    if (CanGoForward) { GoForward(); handled = true; return new IntPtr(1); }
+                }
+            }
+            else if (msg == WM_XBUTTONDOWN)
+            {
+                int button = HIWORD(wParam);
+                if (button == XBUTTON1)
+                {
+                    if (CanGoBack) { GoBack(); handled = true; return new IntPtr(1); }
+                }
+                else if (button == XBUTTON2)
+                {
+                    if (CanGoForward) { GoForward(); handled = true; return new IntPtr(1); }
+                }
+            }
             return IntPtr.Zero;
         }
 
@@ -446,9 +658,25 @@ namespace SetupHub180Hz
             Marshal.StructureToPtr(mmi, lParam, true);
         }
 
-        #region Native Win32 MinMax Interop for WorkArea Taskbar Adjustment
+        #region Native Win32 MinMax & Navigation Interop
         private const int WM_GETMINMAXINFO = 0x0024;
+        private const int WM_APPCOMMAND = 0x0319;
+        private const int WM_XBUTTONDOWN = 0x020B;
+        private const int APPCOMMAND_BROWSER_BACKWARD = 1;
+        private const int APPCOMMAND_BROWSER_FORWARD = 2;
+        private const int FAPPCOMMAND_MASK = 0xF000;
+        private const int XBUTTON1 = 0x0001;
+        private const int XBUTTON2 = 0x0002;
         private const uint MONITOR_DEFAULTTONEAREST = 0x00000002;
+
+        private static int HIWORD(IntPtr ptr)
+        {
+            unchecked
+            {
+                long val = ptr.ToInt64();
+                return (int)((val >> 16) & 0xFFFF);
+            }
+        }
 
         [DllImport("user32.dll")]
         private static extern IntPtr MonitorFromWindow(IntPtr handle, uint flags);
