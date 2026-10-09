@@ -26,11 +26,79 @@ namespace SetupHub180Hz.Services
         private static Dictionary<string, RegistryAppInfo>? _registryCache;
         private static HashSet<string>? _appxPackageCache;
         private static DateTime _appxCacheTime = DateTime.MinValue;
+        private static HashSet<string>? _startMenuLinksCache;
+        private static HashSet<string>? _installedProgramFoldersCache;
+        private static DateTime _diskScanTime = DateTime.MinValue;
 
         public static void InvalidateCache()
         {
             _registryCache = null;
             _appxPackageCache = null;
+            _startMenuLinksCache = null;
+            _installedProgramFoldersCache = null;
+        }
+
+        private static void EnsureDiskFolderCaches()
+        {
+            if (_startMenuLinksCache != null && _installedProgramFoldersCache != null && (DateTime.UtcNow - _diskScanTime).TotalSeconds < 60)
+                return;
+
+            var linkSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            string[] startDirs = {
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
+            };
+            foreach (var dir in startDirs)
+            {
+                if (Directory.Exists(dir))
+                {
+                    try
+                    {
+                        foreach (var lnk in Directory.EnumerateFiles(dir, "*.lnk", SearchOption.AllDirectories))
+                        {
+                            var name = Path.GetFileNameWithoutExtension(lnk);
+                            if (!string.IsNullOrWhiteSpace(name))
+                            {
+                                linkSet.Add(name);
+                                var norm = NormalizeAppName(name);
+                                if (!string.IsNullOrWhiteSpace(norm)) linkSet.Add(norm);
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            _startMenuLinksCache = linkSet;
+
+            var folderSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            string[] baseDirs = {
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs"),
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+            };
+            foreach (var b in baseDirs)
+            {
+                if (Directory.Exists(b))
+                {
+                    try
+                    {
+                        foreach (var sub in Directory.EnumerateDirectories(b))
+                        {
+                            var subName = Path.GetFileName(sub);
+                            if (!string.IsNullOrWhiteSpace(subName))
+                            {
+                                folderSet.Add(subName);
+                                var norm = NormalizeAppName(subName);
+                                if (!string.IsNullOrWhiteSpace(norm)) folderSet.Add(norm);
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            _installedProgramFoldersCache = folderSet;
+            _diskScanTime = DateTime.UtcNow;
         }
 
         public static void EnrichAppItem(AppItem app, IEnumerable<AppItem>? catalog = null)
@@ -237,47 +305,23 @@ namespace SetupHub180Hz.Services
                 }
             }
 
-            // 5. Check standard program directories
+            // 5. Check standard program directories (fast hash set lookup)
             string normName = NormalizeAppName(app.Name);
             string cleanAlphaName = Regex.Replace(normName, @"[\s\W]", "");
-            string[] baseDirs = {
-                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs"),
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
-            };
 
-            foreach (var b in baseDirs)
+            EnsureDiskFolderCaches();
+            if (_installedProgramFoldersCache != null &&
+                (_installedProgramFoldersCache.Contains(app.Name) || _installedProgramFoldersCache.Contains(normName)))
             {
-                if (string.IsNullOrWhiteSpace(b) || !Directory.Exists(b)) continue;
-                string dir1 = Path.Combine(b, app.Name);
-                string dir2 = Path.Combine(b, normName);
-                if (DirectoryContainsExe(dir1) || DirectoryContainsExe(dir2))
-                {
-                    return true;
-                }
+                return true;
             }
 
-            // 6. Check Start Menu shortcuts
-            string[] startDirs = {
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"),
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
-            };
-            foreach (var dir in startDirs)
+            // 6. Check Start Menu shortcuts (fast hash set lookup)
+            if (_startMenuLinksCache != null &&
+                (_startMenuLinksCache.Contains(app.Name) || _startMenuLinksCache.Contains(normName) ||
+                 (!string.IsNullOrWhiteSpace(normName) && normName.Length >= 4 && _startMenuLinksCache.Any(l => l.Contains(normName, StringComparison.OrdinalIgnoreCase)))))
             {
-                if (Directory.Exists(dir))
-                {
-                    try
-                    {
-                        var lnks = Directory.GetFiles(dir, $"*{normName}*.lnk", SearchOption.AllDirectories);
-                        if (lnks.Length > 0)
-                        {
-                            return true;
-                        }
-                    }
-                    catch { }
-                }
+                return true;
             }
 
             // 7. Check AppModel / Store / Appx packages

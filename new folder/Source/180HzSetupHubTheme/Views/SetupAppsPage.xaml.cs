@@ -93,10 +93,14 @@ namespace SetupHub180Hz.Views
                 if ((bool)e.NewValue)
                 {
                     SyncDownloadPopupState();
-                    if (_allPackages.Count > 0 && (DateTime.UtcNow - lastInstalledCheck).TotalMinutes >= 5)
+                    if (_allPackages.Count > 0 && (DateTime.UtcNow - lastInstalledCheck).TotalSeconds >= 10)
                     {
                         lastInstalledCheck = DateTime.UtcNow;
-                        await Task.Run(async () => await _catalog.CheckInstalledStatusAsync(_winget, _allPackages));
+                        await Task.Run(async () =>
+                        {
+                            await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
+                            await Dispatcher.InvokeAsync(() => ApplyFilter());
+                        });
                     }
                 }
             };
@@ -192,6 +196,16 @@ namespace SetupHub180Hz.Views
                     .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
                     .ToList();
 
+                // Instant pass via AppMetadataHelper (takes <20ms) so initial render already has installed apps marked
+                foreach (var item in _allPackages)
+                {
+                    if (AppMetadataHelper.IsAppInstalled(item))
+                    {
+                        item.IsInstalled = true;
+                        item.Status = "Installed";
+                    }
+                }
+
                 CatalogCountText.Text = $"{_allPackages.Count} Packages Ready";
 
                 BuildCategoryChips();
@@ -204,10 +218,19 @@ namespace SetupHub180Hz.Views
                 return;
             }
 
-            // Background async icon fetching (immediate parallel) & installed status check (zero UI thread blocking)
+            // Background async icon fetching & winget comprehensive status check
             _ = Task.Run(async () =>
             {
-                // 1. Fetch high-res icons in parallel immediately
+                // 1. Concurrently check installed status with winget list (covers MS Store / MSIX / Winget / updates)
+                await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
+
+                // 2. Redispatch ApplyFilter on UI thread so all detected apps immediately reflect as Installed
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    ApplyFilter();
+                });
+
+                // 3. Fetch high-res icons in parallel
                 _ = Parallel.ForEachAsync(_allPackages, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (pkg, ct) =>
                 {
                     if (pkg.IconImageSource == null)
@@ -227,9 +250,6 @@ namespace SetupHub180Hz.Views
                         }
                     }
                 });
-
-                // 2. Concurrently check installed status
-                await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
             });
         }
 
@@ -907,7 +927,7 @@ namespace SetupHub180Hz.Views
                 }
 
                 // 1. Check if already installed on system
-                bool isInstalled = CheckIfAppAlreadyInstalled(app);
+                bool isInstalled = app.IsInstalled || CheckIfAppAlreadyInstalled(app);
                 if (isInstalled)
                 {
                     app.IsInstalled = true;
@@ -1521,6 +1541,7 @@ namespace SetupHub180Hz.Views
 
         private bool CheckIfAppAlreadyInstalled(AppItem app)
         {
+            if (app.IsInstalled) return true;
             return AppMetadataHelper.IsAppInstalled(app);
         }
 
