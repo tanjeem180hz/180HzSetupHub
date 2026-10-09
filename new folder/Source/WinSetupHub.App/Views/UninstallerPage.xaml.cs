@@ -195,27 +195,35 @@ namespace SetupHub180Hz.Views
         {
             if (sender is Button btn && btn.DataContext is AppItem app)
             {
-                var wizard = new RevoUninstallWizardDialog(app)
+                try
                 {
-                    Owner = Window.GetWindow(this)
-                };
-                wizard.ShowDialog();
+                    var wizard = new RevoUninstallWizardDialog(app)
+                    {
+                        Owner = Window.GetWindow(this)
+                    };
+                    wizard.ShowDialog();
 
-                if (wizard.IsUninstalled)
+                    if (wizard.IsUninstalled)
+                    {
+                        ActivityLogger.Instance.Log($"Revo engine successfully removed {app.Name}.", ActivityType.Success);
+                        _allApps.RemoveAll(a => a == app ||
+                            (!string.IsNullOrWhiteSpace(a.Id) && string.Equals(a.Id, app.Id, StringComparison.OrdinalIgnoreCase)) ||
+                            (!string.IsNullOrWhiteSpace(a.Name) && string.Equals(a.Name, app.Name, StringComparison.OrdinalIgnoreCase)));
+                        ApplyFilter();
+                        InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
+
+                        // Invalidate cached registry data and notify all components that this app is now uninstalled!
+                        AppMetadataHelper.InvalidateCache();
+                        PackageCatalogService.NotifyStatusChanged(app.Id, false);
+                        PackageCatalogService.NotifyStatusChanged(app.Name, false);
+                        UpdateMonitorService.Instance.UnmarkUpdated(app.Id);
+                        UpdateMonitorService.Instance.UnmarkUpdated(app.Name);
+                    }
+                }
+                catch (Exception ex)
                 {
-                    ActivityLogger.Instance.Log($"Revo engine successfully removed {app.Name}.", ActivityType.Success);
-                    _allApps.RemoveAll(a => a == app ||
-                        (!string.IsNullOrWhiteSpace(a.Id) && string.Equals(a.Id, app.Id, StringComparison.OrdinalIgnoreCase)) ||
-                        (!string.IsNullOrWhiteSpace(a.Name) && string.Equals(a.Name, app.Name, StringComparison.OrdinalIgnoreCase)));
-                    ApplyFilter();
-                    InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
-
-                    // Invalidate cached registry data and notify all components that this app is now uninstalled!
-                    AppMetadataHelper.InvalidateCache();
-                    PackageCatalogService.NotifyStatusChanged(app.Id, false);
-                    PackageCatalogService.NotifyStatusChanged(app.Name, false);
-                    UpdateMonitorService.Instance.UnmarkUpdated(app.Id);
-                    UpdateMonitorService.Instance.UnmarkUpdated(app.Name);
+                    ActivityLogger.Instance.Log($"Failed to open Revo uninstall wizard for {app.Name}: {ex.Message}", ActivityType.Error);
+                    ThemedMessageBox.Show($"Could not open uninstaller for {app.Name}:\n\n{ex.Message}", "Uninstall Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

@@ -81,6 +81,11 @@ irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/in
 * **Developers:** Visual Studio Code, Git, Windows Terminal, Node.js, Python, Docker Desktop, DBeaver.
 * **Productivity & Utilities:** 7-Zip, Everything, Microsoft PowerToys, Notepad++, VLC, Chrome, Firefox.
 
+### 🛡️ Revo-Grade Deep Uninstallation Engine
+* **5-Phase Advanced Methodology:** Creates system protection checkpoints and registry backups, executes official vendor uninstallers with graceful fallback, then performs multi-level heuristic residual scans (Safe, Moderate, Advanced).
+* **Residual Registry & File Eradication:** Scans both 64-bit and 32-bit registry trees, `%AppData%`, `%ProgramData%`, and Program Files roots to safely purge orphaned registry keys, leftover app data, and shortcut remnants with defense-in-depth OS protection.
+* **Instant Invalidation & Live Sync:** Automatically refreshes catalog state and invalidates caches across all sections upon completion so uninstalled apps never remain marked as installed.
+
 ### 🧭 Universal History Navigation & Hardware Mouse Control
 * **Persistent Title Bar Navigation:** Sleek `[ ‹ Back ]` pill button, `[ › ]` forward button, and dynamic breadcrumbs with glowing status indicator accessible across every section.
 * **Full Hardware Mouse Support:** Seamless backward (`Mouse 4` / `XButton1`) and forward (`Mouse 5` / `XButton2`) navigation compatible with all gaming and productivity mice (Logitech, Razer, Corsair, etc.) via WPF input and Win32 `WM_APPCOMMAND` / `WM_XBUTTONDOWN`.

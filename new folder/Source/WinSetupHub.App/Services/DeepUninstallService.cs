@@ -1264,6 +1264,18 @@ namespace SetupHub180Hz.Services
             {
                 try
                 {
+                    // Fast check: If System Restore is disabled in registry, don't stall waiting on PowerShell
+                    try
+                    {
+                        using var srKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore");
+                        if (srKey != null)
+                        {
+                            var disableVal = srKey.GetValue("DisableSR");
+                            if (disableVal is int d && d == 1) return false;
+                        }
+                    }
+                    catch { }
+
                     var cleanDesc = Regex.Replace(appName ?? "App", @"['""`$]", "");
                     var psi = new System.Diagnostics.ProcessStartInfo
                     {
@@ -1276,7 +1288,7 @@ namespace SetupHub180Hz.Services
                     using var p = System.Diagnostics.Process.Start(psi);
                     if (p != null)
                     {
-                        bool exited = p.WaitForExit(12000);
+                        bool exited = p.WaitForExit(4000);
                         return exited && p.ExitCode == 0;
                     }
                     return false;
@@ -1630,7 +1642,23 @@ namespace SetupHub180Hz.Services
                     psi.WorkingDirectory = workingDir;
                 }
 
-                return System.Diagnostics.Process.Start(psi);
+                try
+                {
+                    return System.Diagnostics.Process.Start(psi);
+                }
+                catch (System.ComponentModel.Win32Exception)
+                {
+                    // If elevation was cancelled or app doesn't support runas, retry as normal standard process
+                    try
+                    {
+                        psi.Verb = "";
+                        return System.Diagnostics.Process.Start(psi);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
             }
             catch (Exception ex)
             {
