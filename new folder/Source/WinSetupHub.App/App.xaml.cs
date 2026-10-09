@@ -13,27 +13,14 @@ namespace SetupHub180Hz
         {
             base.OnStartup(e);
 
-            // Automatic Run as Administrator:
-            // Ensure 180Hz Setup Hub always runs with Administrator rights
-            // for system package installation, updates, uninstallation, and cleanup.
-            if (!IsRunningAsAdministrator())
-            {
-                if (TryRestartAsAdministrator(e.Args))
-                {
-                    Shutdown();
-                    return;
-                }
-            }
-
-            // Ensure Windows marks this application to always launch elevated
-            EnsureAppCompatRunAsAdmin();
+            // Check administrator privileges; shortcuts automatically request elevation when needed.
 
             // Don't let one bad Task/UI exception crash the whole app —
             // log it and keep the shell alive.
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
-            ActivityLogger.Instance.Log("Application started (Administrator).", ActivityType.Info);
+            ActivityLogger.Instance.Log(IsRunningAsAdministrator() ? "Application started (Administrator)." : "Application started (Standard User).", ActivityType.Info);
             ThemeService.ApplyTheme(SettingsService.Instance.Current.DarkTheme);
 
             if (Array.Exists(e.Args, a => string.Equals(a, "--auto-check", StringComparison.OrdinalIgnoreCase)))
@@ -42,8 +29,8 @@ namespace SetupHub180Hz
                 return;
             }
 
-            // Set shutdown mode to OnMainWindowClose so closing SplashScreen doesn't terminate process
-            ShutdownMode = ShutdownMode.OnMainWindowClose;
+            // Set shutdown mode to OnExplicitShutdown so closing SplashScreen does not terminate process
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             // Launch futuristic Cyber Toxic Splash Screen immediately
             SplashScreenWindow? splash = null;
@@ -91,6 +78,7 @@ namespace SetupHub180Hz
                 MainWindow = mainWindow;
                 mainWindow.Opacity = 0;
                 mainWindow.Show();
+                ShutdownMode = ShutdownMode.OnMainWindowClose;
 
                 // Smoothly fade in MainWindow
                 var fadeIn = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(220));

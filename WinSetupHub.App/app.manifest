@@ -4,8 +4,8 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <!-- Cleanup (Windows\Temp, SoftwareDistribution) and some winget installs need admin. -->
-        <requestedExecutionLevel level="requireAdministrator" uiAccess="false"/>
+        <!-- Allow flexible launch in any user/automation context; elevation handled gracefully at runtime if needed -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
       </requestedPrivileges>
     </security>
   </trustInfo>
