@@ -30,6 +30,8 @@
     <Resource Include="Assets\BrandArtwork.png" Condition="Exists('Assets\BrandArtwork.png')" />
     <EmbeddedResource Include="Payload\Configuration\packages.default.json" LogicalName="packages.default.json" Condition="Exists('Payload\Configuration\packages.default.json')" />
     <EmbeddedResource Include="Payload\Configuration\appsettings.default.json" LogicalName="appsettings.default.json" Condition="Exists('Payload\Configuration\appsettings.default.json')" />
+    <EmbeddedResource Include="Payload\Configuration\tweaks.default.json" LogicalName="tweaks.default.json" Condition="Exists('Payload\Configuration\tweaks.default.json')" />
+    <EmbeddedResource Include="Payload\Configuration\registry_tweaks.default.json" LogicalName="registry_tweaks.default.json" Condition="Exists('Payload\Configuration\registry_tweaks.default.json')" />
   </ItemGroup>
 
 </Project>

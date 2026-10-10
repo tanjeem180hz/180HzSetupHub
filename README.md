@@ -44,8 +44,8 @@ Choose your preferred way to download, install, or run **180Hz Setup Hub**:
 
 | Executable | Size | SHA-256 Hash |
 | :--- | :--- | :--- |
-| **`180HzSetupHubSetup.exe`** | ~3.6 MB | `CD97A393E5F6F1C682D55214BD8655A593460D0D5CA4EE3FE1105859108D0545` |
-| **`180HzSetupHub.exe`** | ~81.7 MB | `C92875B4593B1BED6CB8B95F813701B870BCD7CB03EB9F7DBCE785501B16642F` |
+| **`180HzSetupHubSetup.exe`** | ~3.7 MB | `30F67B498099888C170B1242B94D13F251F18B647F64A0C5FFE90F3DB3ADD7B9` |
+| **`180HzSetupHub.exe`** | ~81.7 MB | `ACCB9673C69C46EDD64826533D8B8494F16178A35B741AB95078286991BD9158` |
 
 ### 💻 1-Click PowerShell Install (No Browser Needed)
 

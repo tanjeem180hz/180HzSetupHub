@@ -121,8 +121,7 @@ namespace SetupHub180Hz.Services
             var systemTweaks = await LoadJsonFileOrResourceAsync("tweaks.default.json");
             foreach (var t in systemTweaks)
             {
-                if (string.IsNullOrWhiteSpace(t.Section))
-                    t.Section = "System";
+                t.Section = "System"; // Force System section
             }
             TagRecommended(systemTweaks);
             result.AddRange(systemTweaks);
@@ -131,7 +130,7 @@ namespace SetupHub180Hz.Services
             var registryTweaks = await LoadJsonFileOrResourceAsync("registry_tweaks.default.json");
             foreach (var t in registryTweaks)
             {
-                t.Section = "Registry";
+                t.Section = "Registry"; // Force Registry section
             }
             result.AddRange(registryTweaks);
 
@@ -140,11 +139,18 @@ namespace SetupHub180Hz.Services
 
         private static async Task<List<TweakItem>> LoadJsonFileOrResourceAsync(string fileName)
         {
+            var localAppDataConfig = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Programs", "180Hz Setup Hub", "Configuration", fileName);
+
             var pathsToTry = new[]
             {
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configuration", fileName),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName),
+                localAppDataConfig,
                 Path.Combine(Environment.CurrentDirectory, "Configuration", fileName),
+                Path.Combine(Environment.CurrentDirectory, "WinSetupHub.App", "Configuration", fileName),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "Configuration", fileName)
             };
 
             foreach (var p in pathsToTry)
@@ -162,24 +168,36 @@ namespace SetupHub180Hz.Services
                 catch { }
             }
 
-            // Embedded resource fallback
+            // Embedded resource fallback (Strict prefix matching to avoid registry_tweaks collision)
             try
             {
-                var assembly = Assembly.GetExecutingAssembly();
-                var resourceName = assembly.GetManifestResourceNames()
-                    .FirstOrDefault(n => n.EndsWith(fileName, StringComparison.OrdinalIgnoreCase));
-
-                if (resourceName != null)
+                var candidateAssemblies = new[]
                 {
-                    using var stream = assembly.GetManifestResourceStream(resourceName);
-                    if (stream != null)
+                    typeof(TweakService).Assembly,
+                    Assembly.GetEntryAssembly(),
+                    Assembly.GetExecutingAssembly()
+                }.Where(a => a != null).Distinct();
+
+                foreach (var assembly in candidateAssemblies)
+                {
+                    var names = assembly!.GetManifestResourceNames();
+                    // Match with dot prefix or exact match so tweaks.default.json doesn't match registry_tweaks.default.json
+                    var resourceName = names.FirstOrDefault(n =>
+                        n.EndsWith("." + fileName, StringComparison.OrdinalIgnoreCase) ||
+                        n.Equals(fileName, StringComparison.OrdinalIgnoreCase));
+
+                    if (resourceName != null)
                     {
-                        using var reader = new StreamReader(stream);
-                        var json = await reader.ReadToEndAsync();
-                        var items = JsonSerializer.Deserialize<List<TweakItem>>(json, JsonOptions);
-                        if (items != null && items.Count > 0)
+                        using var stream = assembly.GetManifestResourceStream(resourceName);
+                        if (stream != null)
                         {
-                            return items;
+                            using var reader = new StreamReader(stream);
+                            var json = await reader.ReadToEndAsync();
+                            var items = JsonSerializer.Deserialize<List<TweakItem>>(json, JsonOptions);
+                            if (items != null && items.Count > 0)
+                            {
+                                return items;
+                            }
                         }
                     }
                 }

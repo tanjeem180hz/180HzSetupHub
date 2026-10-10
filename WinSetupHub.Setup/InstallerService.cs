@@ -25,6 +25,8 @@ public sealed class InstallerService
 
     private const string PayloadPackages = "packages.default.json";
     private const string PayloadAppSettings = "appsettings.default.json";
+    private const string PayloadTweaks = "tweaks.default.json";
+    private const string PayloadRegistryTweaks = "registry_tweaks.default.json";
 
     public static string GetDefaultInstallRoot()
     {
@@ -158,6 +160,8 @@ public sealed class InstallerService
         progress?.Invoke("Extracting package catalog and configurations...", 86);
         ExtractResourceToFile(PayloadPackages, Path.Combine(configDir, "packages.default.json"));
         ExtractResourceToFile(PayloadAppSettings, Path.Combine(configDir, "appsettings.default.json"));
+        ExtractResourceToFile(PayloadTweaks, Path.Combine(configDir, "tweaks.default.json"));
+        ExtractResourceToFile(PayloadRegistryTweaks, Path.Combine(configDir, "registry_tweaks.default.json"));
 
         // 6. Copy current installer as Uninstaller (90%)
         var uninstallerTarget = Path.Combine(installRoot, UninstallerExeName);
@@ -218,6 +222,8 @@ public sealed class InstallerService
         progress?.Invoke("Restoring default package catalogs...", 86);
         ExtractResourceToFile(PayloadPackages, Path.Combine(configDir, "packages.default.json"));
         ExtractResourceToFile(PayloadAppSettings, Path.Combine(configDir, "appsettings.default.json"));
+        ExtractResourceToFile(PayloadTweaks, Path.Combine(configDir, "tweaks.default.json"));
+        ExtractResourceToFile(PayloadRegistryTweaks, Path.Combine(configDir, "registry_tweaks.default.json"));
 
         // 5. Ensure uninstaller binary is healthy (90%)
         var uninstallerTarget = Path.Combine(installRoot, UninstallerExeName);
@@ -616,36 +622,32 @@ public sealed class InstallerService
     private static void ExtractResourceToFile(string resourceName, string destinationPath)
     {
         var assembly = Assembly.GetExecutingAssembly();
-        using (var stream = assembly.GetManifestResourceStream(resourceName))
+        var targetResource = assembly.GetManifestResourceNames()
+            .FirstOrDefault(n => n.EndsWith("." + resourceName, StringComparison.OrdinalIgnoreCase) || n.Equals(resourceName, StringComparison.OrdinalIgnoreCase));
+
+        using (var stream = targetResource != null ? assembly.GetManifestResourceStream(targetResource) : assembly.GetManifestResourceStream(resourceName))
         {
-            if (stream is null)
+            if (stream != null)
             {
-                var fullResource = assembly.GetManifestResourceNames()
-                    .FirstOrDefault(n => n.EndsWith(resourceName, StringComparison.OrdinalIgnoreCase));
-                if (fullResource is not null)
-                {
-                    using (var fallbackStream = assembly.GetManifestResourceStream(fullResource))
-                    {
-                        if (fallbackStream is not null)
-                        {
-                            WriteTempAndMove(fallbackStream, destinationPath);
-                            return;
-                        }
-                    }
-                }
-
-                // Fallback: check if file exists in configuration folder
-                var localFallback = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configuration", resourceName);
-                if (File.Exists(localFallback))
-                {
-                    File.Copy(localFallback, destinationPath, overwrite: true);
-                    return;
-                }
-
+                WriteTempAndMove(stream, destinationPath);
                 return;
             }
+        }
 
-            WriteTempAndMove(stream, destinationPath);
+        // Fallback: check if file exists in configuration folder
+        var localFallback = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configuration", resourceName);
+        if (File.Exists(localFallback))
+        {
+            File.Copy(localFallback, destinationPath, overwrite: true);
+            return;
+        }
+
+        // Fallback: check in base directory
+        var rootFallback = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, resourceName);
+        if (File.Exists(rootFallback))
+        {
+            File.Copy(rootFallback, destinationPath, overwrite: true);
+            return;
         }
     }
 

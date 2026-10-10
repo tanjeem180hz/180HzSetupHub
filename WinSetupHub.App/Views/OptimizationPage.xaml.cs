@@ -27,10 +27,14 @@ namespace SetupHub180Hz.Views
             Loaded += async (_, _) =>
             {
                 if (_allTweaks.Count == 0)
+                {
                     await InitializeAsync();
+                }
                 else
                 {
-                    RefreshAppliedStates();
+                    BuildCategoryChips();
+                    ApplyFilter();
+                    await Task.Run(() => RefreshAppliedStates());
                     BuildCategoryChips();
                     ApplyFilter();
                 }
@@ -39,14 +43,35 @@ namespace SetupHub180Hz.Views
 
         private async Task InitializeAsync()
         {
-            _allTweaks = await _tweakService.GetAllAsync();
-            _systemTweaks = await _tweakService.GetSystemTweaksAsync();
-            _registryTweaks = await _tweakService.GetRegistryTweaksAsync();
+            try
+            {
+                _allTweaks = await _tweakService.GetAllAsync();
+                _systemTweaks = await _tweakService.GetSystemTweaksAsync();
+                _registryTweaks = await _tweakService.GetRegistryTweaksAsync();
 
-            RefreshAppliedStates();
+                // 1. Instant rendering so user sees all tweaks immediately without any lag
+                BuildCategoryChips();
+                ApplyFilter();
 
-            BuildCategoryChips();
-            ApplyFilter();
+                // 2. Scan live system applied states in background thread
+                await Task.Run(() =>
+                {
+                    RefreshAppliedStates();
+                });
+
+                // 3. Update category chips and subtitle count once applied scan completes
+                BuildCategoryChips();
+                ApplyFilter();
+            }
+            catch
+            {
+                try
+                {
+                    BuildCategoryChips();
+                    ApplyFilter();
+                }
+                catch { }
+            }
         }
 
         public void RefreshAppliedStates()
@@ -75,7 +100,6 @@ namespace SetupHub180Hz.Views
                     TxtSectionDescription.Text = "System, gaming presets, and desktop environment optimizations.";
                 }
 
-                RefreshAppliedStates();
                 BuildCategoryChips();
                 ApplyFilter();
             }
