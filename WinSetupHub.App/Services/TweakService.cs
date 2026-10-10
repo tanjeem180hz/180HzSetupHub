@@ -425,42 +425,78 @@ namespace SetupHub180Hz.Services
 
         public async Task ApplyAsync(TweakItem tweak)
         {
-            foreach (var reg in tweak.Registry)
+            if (tweak == null) return;
+            try
             {
-                CapturePreState(reg);
-                ApplyRegistryEntry(reg, undo: false);
-            }
+                if (tweak.Registry != null)
+                {
+                    foreach (var reg in tweak.Registry)
+                    {
+                        if (reg != null)
+                        {
+                            CapturePreState(reg);
+                            ApplyRegistryEntry(reg, undo: false);
+                        }
+                    }
+                }
 
-            foreach (var svc in tweak.Service)
-            {
-                await SetServiceStartupAsync(svc.Name, svc.StartupType);
-            }
+                if (tweak.Service != null)
+                {
+                    foreach (var svc in tweak.Service)
+                    {
+                        if (svc != null && !string.IsNullOrWhiteSpace(svc.Name))
+                            await SetServiceStartupAsync(svc.Name, svc.StartupType);
+                    }
+                }
 
-            foreach (var script in tweak.InvokeScript)
-            {
-                if (!string.IsNullOrWhiteSpace(script))
-                    await RunPowerShellAsync(script);
+                if (tweak.InvokeScript != null)
+                {
+                    foreach (var script in tweak.InvokeScript)
+                    {
+                        if (!string.IsNullOrWhiteSpace(script))
+                            await RunPowerShellAsync(script);
+                    }
+                }
             }
+            catch { }
         }
 
         public async Task UndoAsync(TweakItem tweak)
         {
-            foreach (var reg in tweak.Registry)
+            if (tweak == null) return;
+            try
             {
-                ApplyRegistryEntry(reg, undo: true);
-            }
+                if (tweak.Registry != null)
+                {
+                    foreach (var reg in tweak.Registry)
+                    {
+                        if (reg != null)
+                            ApplyRegistryEntry(reg, undo: true);
+                    }
+                }
 
-            foreach (var svc in tweak.Service)
-            {
-                if (!string.IsNullOrWhiteSpace(svc.OriginalType))
-                    await SetServiceStartupAsync(svc.Name, svc.OriginalType);
-            }
+                if (tweak.Service != null)
+                {
+                    foreach (var svc in tweak.Service)
+                    {
+                        if (svc != null && !string.IsNullOrWhiteSpace(svc.Name))
+                        {
+                            string origType = !string.IsNullOrWhiteSpace(svc.OriginalType) ? svc.OriginalType : "Manual";
+                            await SetServiceStartupAsync(svc.Name, origType);
+                        }
+                    }
+                }
 
-            foreach (var script in tweak.UndoScript)
-            {
-                if (!string.IsNullOrWhiteSpace(script))
-                    await RunPowerShellAsync(script);
+                if (tweak.UndoScript != null)
+                {
+                    foreach (var script in tweak.UndoScript)
+                    {
+                        if (!string.IsNullOrWhiteSpace(script))
+                            await RunPowerShellAsync(script);
+                    }
+                }
             }
+            catch { }
         }
 
         private static void ApplyRegistryEntry(TweakRegistryEntry reg, bool undo)

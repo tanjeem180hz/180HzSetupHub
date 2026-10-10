@@ -836,10 +836,10 @@
     "registry": [],
     "service": [],
     "invokeScript": [
-      "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /deny *S-1-1-0:F"
+      "$db = \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\"; if (Test-Path $db) { icacls $db /deny \"*S-1-1-0:F\" | Out-Null }"
     ],
     "undoScript": [
-      "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /grant *S-1-1-0:F"
+      "$db = \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\"; if (Test-Path $db) { icacls $db /grant \"*S-1-1-0:F\" | Out-Null }"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablestoresearch"
   },
@@ -1082,10 +1082,10 @@
     "registry": [],
     "service": [],
     "invokeScript": [
-      "\n      # Sometimes if you dont stop the Widgets process the removal may fail\n\n      Get-Process *Widget* | Stop-Process\n      Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers | Remove-AppxPackage -AllUsers\n      Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers | Remove-AppxPackage -AllUsers\n\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      Write-Host \"Removed widgets\"\n      "
+      "Get-Process *Widget* -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue; Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "undoScript": [
-      "winget install --id 9MSSGKG348SP --accept-source-agreements --accept-package-agreements --silent 2>$null"
+      "winget install --id 9MSSGKG348SP --accept-source-agreements --accept-package-agreements --silent -ErrorAction SilentlyContinue 2>$null; Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/widget"
   },
@@ -1167,10 +1167,10 @@
     ],
     "service": [],
     "invokeScript": [
-      "\n      Invoke-WinUtilExplorerUpdate\n      if ($sync.ThemeButton.Content -eq [char]0xF08C) {\n        Invoke-WinutilThemeChange -theme \"Auto\"\n      }\n      "
+      "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "undoScript": [
-      "\n      Invoke-WinUtilExplorerUpdate\n      if ($sync.ThemeButton.Content -eq [char]0xF08C) {\n        Invoke-WinutilThemeChange -theme \"Auto\"\n      }\n      "
+      "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/darkmode"
   },
@@ -1215,10 +1215,10 @@
     ],
     "service": [],
     "invokeScript": [
-      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+      "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "undoScript": [
-      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+      "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/showext"
   },
@@ -1241,10 +1241,10 @@
     ],
     "service": [],
     "invokeScript": [
-      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+      "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "undoScript": [
-      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+      "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hiddenfiles"
   },
@@ -1640,10 +1640,10 @@
     ],
     "service": [],
     "invokeScript": [
-      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+      "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "undoScript": [
-      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+      "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/startmenurecommendations"
   },
@@ -1710,10 +1710,10 @@
     ],
     "service": [],
     "invokeScript": [
-      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+      "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "undoScript": [
-      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+      "Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbaralignment"
   },
@@ -2087,10 +2087,10 @@
     "registry": [],
     "service": [],
     "invokeScript": [
-      "\n      Stop-Process -Name \"logi_download_assistant\" -Force -ErrorAction SilentlyContinue\n\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        Remove-Item $LogiPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $LogiPath -ItemType Directory\n      }\n\n      icacls $LogiPath /deny \"*S-1-1-0:(W)\"\n      if ($LASTEXITCODE -ne 0) { throw \"icacls failed to deny write access on $LogiPath (exit code $LASTEXITCODE)\" }\n      "
+      "Stop-Process -Name 'logi_download_assistant' -Force -ErrorAction SilentlyContinue; $pf = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }; $dir = Join-Path $pf 'LogiDownloadAssistant'; if (-not (Test-Path $dir)) { New-Item -Path $dir -ItemType Directory -Force | Out-Null }; if (Test-Path $dir) { icacls $dir /deny '*S-1-1-0:(W)' | Out-Null }"
     ],
     "undoScript": [
-      "\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        icacls $LogiPath /remove:d \"*S-1-1-0\"\n        if ($LASTEXITCODE -ne 0) { throw \"icacls failed to remove the write-deny rule on $LogiPath (exit code $LASTEXITCODE)\" }\n      }\n      "
+      "$pf = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }; $dir = Join-Path $pf 'LogiDownloadAssistant'; if (Test-Path $dir) { icacls $dir /remove:d '*S-1-1-0' | Out-Null }"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock"
   },
@@ -2254,10 +2254,10 @@
     "registry": [],
     "service": [],
     "invokeScript": [
-      "\n      # Deny permission to remove OneDrive folder\n      icacls $Env:OneDrive /deny \"*S-1-5-32-544:(D,DC)\"\n\n      Write-Host \"Uninstalling OneDrive...\"\n      Start-Process -FilePath (Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\") -ArgumentList '/uninstall' -Wait\n\n      # Some of OneDrive files use explorer, and OneDrive uses FileCoAuth\n      Write-Host \"Removing leftover OneDrive Files...\"\n\n      Stop-Process -Name FileCoAuth,Explorer\n\n      Remove-Item \"$Env:LocalAppData\\Microsoft\\OneDrive\" -Recurse -Force\n      Remove-Item \"$Env:ProgramData\\Microsoft OneDrive\" -Recurse -Force\n\n      # Grant back permission to access OneDrive folder\n      icacls $Env:OneDrive /grant \"*S-1-5-32-544:(D,DC)\"\n\n      if (-not (Get-ChildItem -Path $Env:OneDrive)) {\n          Remove-Item -Path $Env:OneDrive -Recurse\n          [Environment]::SetEnvironmentVariable('OneDrive', $null, 'User')\n      }\n\n      # Disable OneSyncSvc\n      Set-Service -Name OneSyncSvc -StartupType Disabled\n      "
+      "if ($Env:OneDrive -and (Test-Path $Env:OneDrive)) { icacls $Env:OneDrive /deny '*S-1-5-32-544:(D,DC)' -ErrorAction SilentlyContinue | Out-Null }; $setup = Join-Path $Env:SystemRoot 'System32\\OneDriveSetup.exe'; if (Test-Path $setup) { Start-Process -FilePath $setup -ArgumentList '/uninstall' -Wait -ErrorAction SilentlyContinue }; Stop-Process -Name FileCoAuth,Explorer -Force -ErrorAction SilentlyContinue; Remove-Item \"$Env:LocalAppData\\Microsoft\\OneDrive\" -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item \"$Env:ProgramData\\Microsoft OneDrive\" -Recurse -Force -ErrorAction SilentlyContinue; Set-Service -Name OneSyncSvc -StartupType Disabled -ErrorAction SilentlyContinue"
     ],
     "undoScript": [
-      "\n      Write-Host \"Installing OneDrive\"\n      winget install Microsoft.Onedrive --source winget\n\n      # Enabled OneSyncSvc\n      Set-Service -Name OneSyncSvc -StartupType Automatic\n      "
+      "winget install Microsoft.OneDrive --source winget --accept-source-agreements --silent -ErrorAction SilentlyContinue 2>$null; Set-Service -Name OneSyncSvc -StartupType Automatic -ErrorAction SilentlyContinue"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeonedrive"
   },
@@ -2327,10 +2327,10 @@
     ],
     "service": [],
     "invokeScript": [
-      "\n      $RazerPath = \"$Env:SystemRoot\\Installer\\Razer\"\n\n      if (Test-Path $RazerPath) {\n        Remove-Item $RazerPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $RazerPath -ItemType Directory\n      }\n\n      icacls $RazerPath /deny \"*S-1-1-0:(W)\"\n      "
+      "$dir = \"$Env:SystemRoot\\Installer\\Razer\"; if (-not (Test-Path $dir)) { New-Item -Path $dir -ItemType Directory -Force | Out-Null }; if (Test-Path $dir) { icacls $dir /deny '*S-1-1-0:(W)' | Out-Null }"
     ],
     "undoScript": [
-      "\n      icacls \"$Env:SystemRoot\\Installer\\Razer\" /remove:d *S-1-1-0\n      "
+      "$dir = \"$Env:SystemRoot\\Installer\\Razer\"; if (Test-Path $dir) { icacls $dir /remove:d '*S-1-1-0' | Out-Null }"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/razerblock"
   },
@@ -2344,10 +2344,10 @@
     "registry": [],
     "service": [],
     "invokeScript": [
-      "\n      New-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Name InprocServer32 -Value \"\" -Force\n      Stop-Process -Name explorer\n      "
+      "New-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Name InprocServer32 -Value '' -Force -ErrorAction SilentlyContinue | Out-Null; Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "undoScript": [
-      "Remove-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Recurse"
+      "Remove-Item -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Recurse -Force -ErrorAction SilentlyContinue; Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/rightclickmenu"
   },
@@ -2523,7 +2523,7 @@
       "Set-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\" -Type Binary -Value ([byte[]](144,18,3,128,16,0,0,0))"
     ],
     "undoScript": [
-      "Remove-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\""
+      "Set-ItemProperty -Path 'HKCU:\\Control Panel\\Desktop' -Name 'UserPreferencesMask' -Type Binary -Value ([byte[]](158,30,7,128,18,0,0,0)) -Force -ErrorAction SilentlyContinue"
     ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/display"
   },
