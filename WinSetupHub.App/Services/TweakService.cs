@@ -251,6 +251,100 @@ namespace SetupHub180Hz.Services
             }
         }
 
+        private static readonly string AppliedStoreFile = Path.Combine(BackupDir, "applied_optimizations.json");
+        private static HashSet<string>? _appliedCache;
+        private static readonly object AppliedLock = new();
+
+        private static void EnsureAppliedCacheLoaded()
+        {
+            lock (AppliedLock)
+            {
+                if (_appliedCache != null) return;
+                _appliedCache = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                try
+                {
+                    if (File.Exists(AppliedStoreFile))
+                    {
+                        var json = File.ReadAllText(AppliedStoreFile);
+                        var list = JsonSerializer.Deserialize<List<string>>(json, JsonOptions);
+                        if (list != null)
+                        {
+                            foreach (var id in list)
+                                if (!string.IsNullOrWhiteSpace(id))
+                                    _appliedCache.Add(id);
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        public static HashSet<string> GetAppliedTweakIds()
+        {
+            EnsureAppliedCacheLoaded();
+            lock (AppliedLock)
+            {
+                return new HashSet<string>(_appliedCache ?? new HashSet<string>(), StringComparer.OrdinalIgnoreCase);
+            }
+        }
+
+        public static void RecordAppliedTweak(string tweakId)
+        {
+            if (string.IsNullOrWhiteSpace(tweakId)) return;
+            RecordAppliedTweaks(new[] { tweakId });
+        }
+
+        public static void RecordAppliedTweaks(IEnumerable<string> tweakIds)
+        {
+            lock (AppliedLock)
+            {
+                EnsureAppliedCacheLoaded();
+                bool changed = false;
+                foreach (var id in tweakIds)
+                {
+                    if (!string.IsNullOrWhiteSpace(id) && _appliedCache!.Add(id))
+                        changed = true;
+                }
+                if (changed) SaveAppliedCache();
+            }
+        }
+
+        public static void RecordUnappliedTweak(string tweakId)
+        {
+            if (string.IsNullOrWhiteSpace(tweakId)) return;
+            RecordUnappliedTweaks(new[] { tweakId });
+        }
+
+        public static void RecordUnappliedTweaks(IEnumerable<string> tweakIds)
+        {
+            lock (AppliedLock)
+            {
+                EnsureAppliedCacheLoaded();
+                bool changed = false;
+                foreach (var id in tweakIds)
+                {
+                    if (!string.IsNullOrWhiteSpace(id) && _appliedCache!.Remove(id))
+                        changed = true;
+                }
+                if (changed) SaveAppliedCache();
+            }
+        }
+
+        private static void SaveAppliedCache()
+        {
+            try
+            {
+                if (!Directory.Exists(BackupDir))
+                    Directory.CreateDirectory(BackupDir);
+
+                var list = _appliedCache?.ToList() ?? new List<string>();
+                var json = JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(AppliedStoreFile, json);
+            }
+            catch { }
+        }
+
         public static void OpenBackupsDirectory()
         {
             try
@@ -457,6 +551,10 @@ namespace SetupHub180Hz.Services
                             await RunPowerShellAsync(script);
                     }
                 }
+
+                tweak.IsApplied = true;
+                tweak.IsSelected = true;
+                RecordAppliedTweak(tweak.Id);
             }
             catch { }
         }
@@ -495,8 +593,267 @@ namespace SetupHub180Hz.Services
                             await RunPowerShellAsync(script);
                     }
                 }
+
+                tweak.IsApplied = false;
+                tweak.IsSelected = false;
+                RecordUnappliedTweak(tweak.Id);
             }
             catch { }
+        }
+
+        public bool IsTweakApplied(TweakItem tweak)
+        {
+            if (tweak == null) return false;
+
+            EnsureAppliedCacheLoaded();
+            bool inStore = _appliedCache != null && _appliedCache.Contains(tweak.Id);
+
+            // 1. Registry verification
+            if (tweak.Registry != null && tweak.Registry.Count > 0)
+            {
+                bool allMatch = true;
+                foreach (var reg in tweak.Registry)
+                {
+                    if (reg == null) continue;
+                    if (!IsRegistryEntryApplied(reg))
+                    {
+                        allMatch = false;
+                        break;
+                    }
+                }
+
+                if (allMatch)
+                {
+                    if (!inStore) RecordAppliedTweak(tweak.Id);
+                    return true;
+                }
+                else if (inStore)
+                {
+                    RecordUnappliedTweak(tweak.Id);
+                    return false;
+                }
+                return false;
+            }
+
+            // 2. Service verification
+            if (tweak.Service != null && tweak.Service.Count > 0)
+            {
+                bool allMatch = true;
+                foreach (var svc in tweak.Service)
+                {
+                    if (svc == null || string.IsNullOrWhiteSpace(svc.Name)) continue;
+                    if (!IsServiceApplied(svc))
+                    {
+                        allMatch = false;
+                        break;
+                    }
+                }
+
+                if (allMatch)
+                {
+                    if (!inStore) RecordAppliedTweak(tweak.Id);
+                    return true;
+                }
+                return false;
+            }
+
+            // 3. Known script tweak inspection
+            bool? scriptCheck = CheckScriptTweakApplied(tweak.Id);
+            if (scriptCheck.HasValue)
+            {
+                if (scriptCheck.Value && !inStore) RecordAppliedTweak(tweak.Id);
+                else if (!scriptCheck.Value && inStore) RecordUnappliedTweak(tweak.Id);
+                return scriptCheck.Value;
+            }
+
+            // 4. Fallback to persistent record
+            return inStore;
+        }
+
+        private static bool IsRegistryEntryApplied(TweakRegistryEntry reg)
+        {
+            try
+            {
+                var (hiveEnum, subKey) = ParseHivePath(reg.Path);
+                if (!hiveEnum.HasValue || string.IsNullOrWhiteSpace(subKey)) return false;
+
+                using var baseKey = RegistryKey.OpenBaseKey(hiveEnum.Value, RegistryView.Registry64);
+                if (baseKey == null) return false;
+
+                using var key = baseKey.OpenSubKey(subKey, writable: false);
+
+                string expectedVal = reg.Value ?? "";
+                bool expectRemoval = string.Equals(expectedVal, "<RemoveEntry>", StringComparison.OrdinalIgnoreCase);
+
+                if (key == null)
+                {
+                    return expectRemoval;
+                }
+
+                var liveVal = key.GetValue(reg.Name);
+                if (liveVal == null)
+                {
+                    return expectRemoval;
+                }
+
+                if (expectRemoval) return false;
+
+                string regType = reg.Type ?? "DWord";
+
+                switch (regType.ToLowerInvariant())
+                {
+                    case "dword":
+                        uint expDw = ParseUInt(expectedVal);
+                        uint actDw = liveVal is int i ? unchecked((uint)i) : Convert.ToUInt32(liveVal);
+                        return expDw == actDw;
+
+                    case "qword":
+                        ulong expQw = ParseULong(expectedVal);
+                        ulong actQw = liveVal is long l ? unchecked((ulong)l) : Convert.ToUInt64(liveVal);
+                        return expQw == actQw;
+
+                    case "string":
+                    case "sz":
+                    case "expandstring":
+                    case "expandsz":
+                        return string.Equals(liveVal.ToString()?.Trim(), expectedVal.Trim(), StringComparison.OrdinalIgnoreCase);
+
+                    case "binary":
+                        byte[] expBytes = ParseHexBytes(expectedVal);
+                        byte[] actBytes = liveVal is byte[] bArr ? bArr : Array.Empty<byte>();
+                        return expBytes.SequenceEqual(actBytes);
+
+                    default:
+                        if (uint.TryParse(expectedVal, out uint defDw))
+                        {
+                            uint actDefDw = liveVal is int di ? unchecked((uint)di) : Convert.ToUInt32(liveVal);
+                            return defDw == actDefDw;
+                        }
+                        return string.Equals(liveVal.ToString()?.Trim(), expectedVal.Trim(), StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static uint ParseUInt(string val)
+        {
+            if (string.IsNullOrWhiteSpace(val)) return 0;
+            val = val.Trim();
+            if (val.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                if (uint.TryParse(val.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out uint h))
+                    return h;
+            }
+            if (uint.TryParse(val, out uint u)) return u;
+            if (int.TryParse(val, out int i)) return unchecked((uint)i);
+            return 0;
+        }
+
+        private static ulong ParseULong(string val)
+        {
+            if (string.IsNullOrWhiteSpace(val)) return 0;
+            val = val.Trim();
+            if (val.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                if (ulong.TryParse(val.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out ulong h))
+                    return h;
+            }
+            if (ulong.TryParse(val, out ulong u)) return u;
+            if (long.TryParse(val, out long l)) return unchecked((ulong)l);
+            return 0;
+        }
+
+        private static bool IsServiceApplied(TweakServiceEntry svc)
+        {
+            try
+            {
+                using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+                using var key = baseKey.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{svc.Name}", writable: false);
+                if (key == null) return false;
+
+                var startVal = key.GetValue("Start");
+                if (startVal == null) return false;
+
+                int start = Convert.ToInt32(startVal);
+                string exp = svc.StartupType?.Trim().ToLowerInvariant() ?? "";
+
+                if (exp == "disabled") return start == 4;
+                if (exp == "automatic" || exp == "auto") return start == 2;
+                if (exp == "manual") return start == 3;
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool? CheckScriptTweakApplied(string tweakId)
+        {
+            try
+            {
+                switch (tweakId)
+                {
+                    case "WPFTweaksRightClickMenu":
+                        using (var hkcu = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                        using (var key = hkcu.OpenSubKey(@"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32"))
+                        {
+                            return key != null;
+                        }
+
+                    case "WPFTweaksReservedStorage":
+                        using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+                        using (var key = hklm.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager"))
+                        {
+                            var val = key?.GetValue("ShippedWithReserves");
+                            if (val != null) return Convert.ToInt32(val) == 0;
+                        }
+                        break;
+
+                    case "NetTweakTcpAckNoDelay":
+                        using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+                        using (var interfacesKey = hklm.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces"))
+                        {
+                            if (interfacesKey != null)
+                            {
+                                foreach (var subName in interfacesKey.GetSubKeyNames())
+                                {
+                                    using var sub = interfacesKey.OpenSubKey(subName);
+                                    var val = sub?.GetValue("TcpAckFrequency");
+                                    if (val != null && Convert.ToInt32(val) == 1) return true;
+                                }
+                            }
+                        }
+                        break;
+
+                    case "WPFTweaksDisableExplorerAutoDiscovery":
+                        using (var hkcu = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Registry64))
+                        using (var key = hkcu.OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell"))
+                        {
+                            var folderType = key?.GetValue("FolderType")?.ToString();
+                            return string.Equals(folderType, "NotSpecified", StringComparison.OrdinalIgnoreCase);
+                        }
+
+                    case "DiskTweakEnableTrim":
+                        using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+                        using (var key = hklm.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\FileSystem"))
+                        {
+                            var val = key?.GetValue("DisableDeleteNotify");
+                            if (val != null) return Convert.ToInt32(val) == 0;
+                        }
+                        break;
+
+                    case "WPFTweaksRemoveOneDrive":
+                        string odPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "OneDrive");
+                        return !Directory.Exists(odPath);
+                }
+            }
+            catch { }
+            return null;
         }
 
         private static void ApplyRegistryEntry(TweakRegistryEntry reg, bool undo)

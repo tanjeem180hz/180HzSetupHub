@@ -191,6 +191,16 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
+        <!-- Applied badge style -->
+        <Style x:Key="AppliedBadge" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#1A00FF66"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="7,2"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
     </UserControl.Resources>
 
     <Grid>
@@ -429,6 +439,15 @@
                                                            FontSize="13" FontWeight="SemiBold"
                                                            Foreground="{DynamicResource BrushTextPrimary}"
                                                            VerticalAlignment="Center"/>
+                                                <!-- Applied status badge -->
+                                                <Border Style="{StaticResource AppliedBadge}"
+                                                        Margin="8,0,0,0"
+                                                        Visibility="{Binding IsApplied, Converter={StaticResource BoolToVis}}">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <TextBlock Text="✓" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,0,3,0"/>
+                                                        <TextBlock Text="APPLIED" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                                                    </StackPanel>
+                                                </Border>
                                                 <!-- Recommended badge -->
                                                 <Border Style="{StaticResource RecommendedBadge}"
                                                         Margin="8,0,0,0"

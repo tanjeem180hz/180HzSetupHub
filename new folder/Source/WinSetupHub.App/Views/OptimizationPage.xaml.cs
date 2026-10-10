@@ -28,6 +28,12 @@ namespace SetupHub180Hz.Views
             {
                 if (_allTweaks.Count == 0)
                     await InitializeAsync();
+                else
+                {
+                    RefreshAppliedStates();
+                    BuildCategoryChips();
+                    ApplyFilter();
+                }
             };
         }
 
@@ -37,8 +43,20 @@ namespace SetupHub180Hz.Views
             _systemTweaks = await _tweakService.GetSystemTweaksAsync();
             _registryTweaks = await _tweakService.GetRegistryTweaksAsync();
 
+            RefreshAppliedStates();
+
             BuildCategoryChips();
             ApplyFilter();
+        }
+
+        public void RefreshAppliedStates()
+        {
+            foreach (var tweak in _allTweaks)
+            {
+                bool applied = _tweakService.IsTweakApplied(tweak);
+                tweak.IsApplied = applied;
+                tweak.IsSelected = applied; // Checked by default if applied
+            }
         }
 
         private void SectionTab_Checked(object sender, RoutedEventArgs e)
@@ -57,6 +75,7 @@ namespace SetupHub180Hz.Views
                     TxtSectionDescription.Text = "System, gaming presets, and desktop environment optimizations.";
                 }
 
+                RefreshAppliedStates();
                 BuildCategoryChips();
                 ApplyFilter();
             }
@@ -78,18 +97,30 @@ namespace SetupHub180Hz.Views
             var allChip = new RadioButton
             {
                 Style = (Style)FindResource("TweakCategoryChip"),
-                Content = "All",
+                Content = $"All ({sourceList.Count})",
                 IsChecked = string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase),
             };
             allChip.Checked += (_, _) => { _activeCategory = "All"; ApplyFilter(); };
             CategoryChipsPanel.Children.Add(allChip);
 
+            // "Applied" chip
+            int appliedTotal = sourceList.Count(t => t.IsApplied);
+            var appliedChip = new RadioButton
+            {
+                Style = (Style)FindResource("TweakCategoryChip"),
+                Content = $"✓ Applied ({appliedTotal})",
+                IsChecked = string.Equals(_activeCategory, "Applied", StringComparison.OrdinalIgnoreCase),
+            };
+            appliedChip.Checked += (_, _) => { _activeCategory = "Applied"; ApplyFilter(); };
+            CategoryChipsPanel.Children.Add(appliedChip);
+
             foreach (var cat in categories)
             {
+                int catCount = sourceList.Count(t => string.Equals(t.Category, cat, StringComparison.OrdinalIgnoreCase));
                 var chip = new RadioButton
                 {
                     Style = (Style)FindResource("TweakCategoryChip"),
-                    Content = cat,
+                    Content = $"{cat} ({catCount})",
                     IsChecked = string.Equals(_activeCategory, cat, StringComparison.OrdinalIgnoreCase),
                 };
                 var catCapture = cat;
@@ -119,7 +150,11 @@ namespace SetupHub180Hz.Views
             IEnumerable<TweakItem> filtered = sourceList;
 
             // 1. Category Filter
-            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(_activeCategory, "Applied", StringComparison.OrdinalIgnoreCase))
+            {
+                filtered = filtered.Where(t => t.IsApplied);
+            }
+            else if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
             {
                 filtered = filtered.Where(t => string.Equals(t.Category, _activeCategory, StringComparison.OrdinalIgnoreCase));
             }
@@ -148,8 +183,10 @@ namespace SetupHub180Hz.Views
             AdvancedWarningBanner.Visibility = hasAdvanced ? Visibility.Visible : Visibility.Collapsed;
 
             int totalSectionCount = sourceList.Count;
+            int totalApplied = sourceList.Count(t => t.IsApplied);
             int totalRecommended = sourceList.Count(t => t.IsRecommended);
             int currentCount = list.Count;
+            int currentApplied = list.Count(t => t.IsApplied);
             int currentRec = list.Count(t => t.IsRecommended);
 
             string sectionName = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase)
@@ -158,14 +195,24 @@ namespace SetupHub180Hz.Views
 
             if (string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(_searchQuery))
             {
-                TxtSubtitle.Text = $"{sectionName} • {totalSectionCount} tweaks available • {totalRecommended} recommended safe";
+                string statusTag = totalApplied == totalSectionCount && totalSectionCount > 0
+                    ? " • 100% Fully Optimized ✓"
+                    : $" • {totalApplied} Applied";
+
+                TxtSubtitle.Text = $"{sectionName} • {totalSectionCount} tweaks{statusTag} • {totalRecommended} recommended safe";
                 BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in {sectionName}";
                 if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for {sectionName}";
+            }
+            else if (string.Equals(_activeCategory, "Applied", StringComparison.OrdinalIgnoreCase))
+            {
+                TxtSubtitle.Text = $"{sectionName} › Active Applied • {currentApplied} optimizations currently active on this PC";
+                BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in this view";
+                if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for this view";
             }
             else
             {
                 string scope = string.IsNullOrWhiteSpace(_searchQuery) ? _activeCategory : $"Search: \"{_searchQuery}\"";
-                TxtSubtitle.Text = $"{sectionName} › {scope} • {currentCount} tweaks ({currentRec} recommended)";
+                TxtSubtitle.Text = $"{sectionName} › {scope} • {currentCount} tweaks ({currentApplied} applied • {currentRec} recommended)";
                 BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in {scope}";
                 if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for {scope}";
             }
@@ -288,8 +335,17 @@ namespace SetupHub180Hz.Views
 
             if (dialog.ShowDialog() == true)
             {
+                foreach (var t in selected)
+                {
+                    t.IsApplied = true;
+                    t.IsSelected = true;
+                }
+                TweakService.RecordAppliedTweaks(selected.Select(t => t.Id));
+
                 TxtStatus.Text = $"✓ Applied {selected.Count} {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
                 StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
                 CheckRebootNeeded(selected);
             }
         }
@@ -336,8 +392,17 @@ namespace SetupHub180Hz.Views
 
             if (dialog.ShowDialog() == true)
             {
+                foreach (var t in recommended)
+                {
+                    t.IsApplied = true;
+                    t.IsSelected = true;
+                }
+                TweakService.RecordAppliedTweaks(recommended.Select(t => t.Id));
+
                 TxtStatus.Text = $"✓ Applied {recommended.Count} recommended {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
                 StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
                 CheckRebootNeeded(recommended);
             }
         }
@@ -373,10 +438,16 @@ namespace SetupHub180Hz.Views
             if (dialog.ShowDialog() == true)
             {
                 foreach (var t in targetTweaks)
+                {
+                    t.IsApplied = false;
                     t.IsSelected = false;
+                }
+                TweakService.RecordUnappliedTweaks(targetTweaks.Select(t => t.Id));
 
                 TxtStatus.Text = $"✓ Restored {targetTweaks.Count} {sectionLabel.ToLowerInvariant()} tweak(s) to Windows defaults.";
                 StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
             }
         }
 
@@ -411,10 +482,16 @@ namespace SetupHub180Hz.Views
             if (dialog.ShowDialog() == true)
             {
                 foreach (var t in targetTweaks)
+                {
+                    t.IsApplied = true;
                     t.IsSelected = true;
+                }
+                TweakService.RecordAppliedTweaks(targetTweaks.Select(t => t.Id));
 
                 TxtStatus.Text = $"✓ Applied {targetTweaks.Count} {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
                 StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
                 CheckRebootNeeded(targetTweaks);
             }
         }
@@ -445,10 +522,16 @@ namespace SetupHub180Hz.Views
             if (dialog.ShowDialog() == true)
             {
                 foreach (var t in selected)
+                {
+                    t.IsApplied = false;
                     t.IsSelected = false;
+                }
+                TweakService.RecordUnappliedTweaks(selected.Select(t => t.Id));
 
                 TxtStatus.Text = $"✓ Undone {selected.Count} {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
                 StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
             }
         }
 

@@ -13,7 +13,12 @@ namespace SetupHub180Hz.Views
     {
         private readonly TweakService _tweakService = new();
         private List<TweakItem> _allTweaks = new();
+        private List<TweakItem> _systemTweaks = new();
+        private List<TweakItem> _registryTweaks = new();
+
+        private string _activeSection = "System"; // "System" or "Registry"
         private string _activeCategory = "All";
+        private string _searchQuery = "";
 
         public OptimizationPage()
         {
@@ -23,17 +28,67 @@ namespace SetupHub180Hz.Views
             {
                 if (_allTweaks.Count == 0)
                     await InitializeAsync();
+                else
+                {
+                    RefreshAppliedStates();
+                    BuildCategoryChips();
+                    ApplyFilter();
+                }
             };
         }
 
         private async Task InitializeAsync()
         {
             _allTweaks = await _tweakService.GetAllAsync();
+            _systemTweaks = await _tweakService.GetSystemTweaksAsync();
+            _registryTweaks = await _tweakService.GetRegistryTweaksAsync();
 
-            var categories = _allTweaks
+            RefreshAppliedStates();
+
+            BuildCategoryChips();
+            ApplyFilter();
+        }
+
+        public void RefreshAppliedStates()
+        {
+            foreach (var tweak in _allTweaks)
+            {
+                bool applied = _tweakService.IsTweakApplied(tweak);
+                tweak.IsApplied = applied;
+                tweak.IsSelected = applied; // Checked by default if applied
+            }
+        }
+
+        private void SectionTab_Checked(object sender, RoutedEventArgs e)
+        {
+            if (sender is RadioButton rb && rb.Tag is string section)
+            {
+                _activeSection = section;
+                _activeCategory = "All";
+
+                if (string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase))
+                {
+                    TxtSectionDescription.Text = "Deep Windows Registry tweaks for latency, ping, scheduling, and hardware acceleration.";
+                }
+                else
+                {
+                    TxtSectionDescription.Text = "System, gaming presets, and desktop environment optimizations.";
+                }
+
+                RefreshAppliedStates();
+                BuildCategoryChips();
+                ApplyFilter();
+            }
+        }
+
+        private void BuildCategoryChips()
+        {
+            var sourceList = GetCurrentSectionItems();
+            var categories = sourceList
                 .Select(t => t.Category)
+                .Where(c => !string.IsNullOrWhiteSpace(c))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(c => _allTweaks.First(t => t.Category == c).CategoryOrder)
+                .OrderBy(c => sourceList.FirstOrDefault(t => string.Equals(t.Category, c, StringComparison.OrdinalIgnoreCase))?.CategoryOrder ?? 99)
                 .ToList();
 
             CategoryChipsPanel.Children.Clear();
@@ -42,62 +97,139 @@ namespace SetupHub180Hz.Views
             var allChip = new RadioButton
             {
                 Style = (Style)FindResource("TweakCategoryChip"),
-                Content = "All",
-                IsChecked = true,
+                Content = $"All ({sourceList.Count})",
+                IsChecked = string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase),
             };
             allChip.Checked += (_, _) => { _activeCategory = "All"; ApplyFilter(); };
             CategoryChipsPanel.Children.Add(allChip);
 
+            // "Applied" chip
+            int appliedTotal = sourceList.Count(t => t.IsApplied);
+            var appliedChip = new RadioButton
+            {
+                Style = (Style)FindResource("TweakCategoryChip"),
+                Content = $"✓ Applied ({appliedTotal})",
+                IsChecked = string.Equals(_activeCategory, "Applied", StringComparison.OrdinalIgnoreCase),
+            };
+            appliedChip.Checked += (_, _) => { _activeCategory = "Applied"; ApplyFilter(); };
+            CategoryChipsPanel.Children.Add(appliedChip);
+
             foreach (var cat in categories)
             {
+                int catCount = sourceList.Count(t => string.Equals(t.Category, cat, StringComparison.OrdinalIgnoreCase));
                 var chip = new RadioButton
                 {
                     Style = (Style)FindResource("TweakCategoryChip"),
-                    Content = cat,
+                    Content = $"{cat} ({catCount})",
+                    IsChecked = string.Equals(_activeCategory, cat, StringComparison.OrdinalIgnoreCase),
                 };
                 var catCapture = cat;
                 chip.Checked += (_, _) => { _activeCategory = catCapture; ApplyFilter(); };
                 CategoryChipsPanel.Children.Add(chip);
             }
+        }
+
+        private void FilterBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _searchQuery = FilterBox.Text.Trim();
+            ClearFilterButton.Visibility = string.IsNullOrWhiteSpace(_searchQuery)
+                ? Visibility.Collapsed
+                : Visibility.Visible;
 
             ApplyFilter();
         }
 
+        private void ClearFilter_Click(object sender, RoutedEventArgs e)
+        {
+            FilterBox.Text = string.Empty;
+        }
+
         private void ApplyFilter()
         {
-            IEnumerable<TweakItem> filtered = _allTweaks;
+            var sourceList = GetCurrentSectionItems();
+            IEnumerable<TweakItem> filtered = sourceList;
 
-            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            // 1. Category Filter
+            if (string.Equals(_activeCategory, "Applied", StringComparison.OrdinalIgnoreCase))
+            {
+                filtered = filtered.Where(t => t.IsApplied);
+            }
+            else if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            {
                 filtered = filtered.Where(t => string.Equals(t.Category, _activeCategory, StringComparison.OrdinalIgnoreCase));
+            }
 
-            var list = filtered.OrderBy(t => t.Name).ToList();
+            // 2. Search Text Filter
+            if (!string.IsNullOrWhiteSpace(_searchQuery))
+            {
+                filtered = filtered.Where(t =>
+                    t.Name.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    t.Description.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    t.Category.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                    t.Registry.Any(r =>
+                        r.Path.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                        r.Name.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            var list = filtered.OrderBy(t => t.CategoryOrder).ThenBy(t => t.Name).ToList();
 
             TweaksItemsControl.ItemsSource = list;
             EmptyState.Visibility = list.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
-            // Reset scroll position to top whenever category is changed
+            // Reset scroll position to top
             TweaksScrollViewer?.ScrollToTop();
-            TweaksScrollViewer?.ScrollToVerticalOffset(0);
 
             bool hasAdvanced = list.Any(t => t.IsAdvanced);
             AdvancedWarningBanner.Visibility = hasAdvanced ? Visibility.Visible : Visibility.Collapsed;
 
-            int total = _allTweaks.Count;
+            int totalSectionCount = sourceList.Count;
+            int totalApplied = sourceList.Count(t => t.IsApplied);
+            int totalRecommended = sourceList.Count(t => t.IsRecommended);
             int currentCount = list.Count;
+            int currentApplied = list.Count(t => t.IsApplied);
             int currentRec = list.Count(t => t.IsRecommended);
 
-            if (string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            string sectionName = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase)
+                ? "Registry Optimizations"
+                : "System Tweaks";
+
+            if (string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(_searchQuery))
             {
-                TxtSubtitle.Text = $"{total} tweaks available • {_allTweaks.Count(t => t.IsRecommended)} recommended safe";
-                BtnSelectRecommended.ToolTip = "Select recommended tweaks across all categories";
-                BtnApplyRecommendation.ToolTip = "Apply all recommended optimizations instantly";
+                string statusTag = totalApplied == totalSectionCount && totalSectionCount > 0
+                    ? " • 100% Fully Optimized ✓"
+                    : $" • {totalApplied} Applied";
+
+                TxtSubtitle.Text = $"{sectionName} • {totalSectionCount} tweaks{statusTag} • {totalRecommended} recommended safe";
+                BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in {sectionName}";
+                if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for {sectionName}";
+            }
+            else if (string.Equals(_activeCategory, "Applied", StringComparison.OrdinalIgnoreCase))
+            {
+                TxtSubtitle.Text = $"{sectionName} › Active Applied • {currentApplied} optimizations currently active on this PC";
+                BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in this view";
+                if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for this view";
             }
             else
             {
-                TxtSubtitle.Text = $"{_activeCategory} • {currentCount} tweaks ({currentRec} recommended)";
-                BtnSelectRecommended.ToolTip = $"Select recommended tweaks in {_activeCategory}";
-                BtnApplyRecommendation.ToolTip = $"Apply recommended optimizations for {_activeCategory}";
+                string scope = string.IsNullOrWhiteSpace(_searchQuery) ? _activeCategory : $"Search: \"{_searchQuery}\"";
+                TxtSubtitle.Text = $"{sectionName} › {scope} • {currentCount} tweaks ({currentApplied} applied • {currentRec} recommended)";
+                BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in {scope}";
+                if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for {scope}";
             }
+        }
+
+        private List<TweakItem> GetCurrentSectionItems()
+        {
+            return string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase)
+                ? _registryTweaks
+                : _systemTweaks;
+        }
+
+        private IEnumerable<TweakItem> GetCurrentItems()
+        {
+            if (TweaksItemsControl.ItemsSource is IEnumerable<TweakItem> items)
+                return items;
+            return GetCurrentSectionItems();
         }
 
         private void BtnSelectAll_Click(object sender, RoutedEventArgs e)
@@ -108,15 +240,14 @@ namespace SetupHub180Hz.Views
 
         private void BtnDeselectAll_Click(object sender, RoutedEventArgs e)
         {
-            // Category-wise deselect if in a category, otherwise all
-            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase) || !string.IsNullOrWhiteSpace(_searchQuery))
             {
                 foreach (var t in GetCurrentItems())
                     t.IsSelected = false;
             }
             else
             {
-                foreach (var t in _allTweaks)
+                foreach (var t in GetCurrentSectionItems())
                     t.IsSelected = false;
             }
         }
@@ -133,15 +264,97 @@ namespace SetupHub180Hz.Views
             }
             else
             {
-                // If a category has no items specifically tagged, select non-advanced safe items
                 foreach (var t in currentItems)
                     t.IsSelected = !t.IsAdvanced;
             }
         }
 
+        private async void BtnCreateRestorePoint_Click(object sender, RoutedEventArgs e)
+        {
+            BtnCreateRestorePoint.IsEnabled = false;
+            TxtStatus.Text = "Creating Windows System Restore point checkpoint…";
+            StatusBar.Visibility = Visibility.Visible;
+
+            bool ok = await DeepUninstallService.CreateRestorePointAsync("180Hz Setup Hub: Optimization Safeguard");
+            BtnCreateRestorePoint.IsEnabled = true;
+
+            if (ok)
+            {
+                TxtStatus.Text = "✓ System Restore Point checkpoint created successfully.";
+                ThemedMessageBox.Show("Windows System Restore Point created successfully.\nYour system state is safely checkpointed.",
+                    "Safeguard Created", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                TxtStatus.Text = "ℹ️ System Restore is disabled or unavailable on this system.";
+                ThemedMessageBox.Show("Windows System Restore is disabled or unconfigured on this drive.\n(Safe to proceed with individual tweaks).",
+                    "System Restore Notice", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void BtnOpenBackups_Click(object sender, RoutedEventArgs e)
+        {
+            TweakService.OpenBackupsDirectory();
+            TxtStatus.Text = "📁 Opened automatic registry snapshots and backups folder.";
+            StatusBar.Visibility = Visibility.Visible;
+        }
+
+        private void BtnApplySelected_Click(object sender, RoutedEventArgs e)
+        {
+            var sourceList = GetCurrentSectionItems();
+            var selected = sourceList.Where(t => t.IsSelected).ToList();
+            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
+
+            if (selected.Count == 0)
+            {
+                var prompt = ThemedMessageBox.Show(
+                    $"No {sectionLabel.ToLowerInvariant()} optimizations are currently selected.\n\nWould you like to select and apply the RECOMMENDED optimizations now?",
+                    $"Apply {sectionLabel} Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (prompt == MessageBoxResult.Yes)
+                {
+                    BtnSelectRecommended_Click(sender, e);
+                    selected = sourceList.Where(t => t.IsSelected).ToList();
+                    if (selected.Count == 0) return;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            var dialog = new OptimizationDialog(
+                title: $"Apply {selected.Count} Selected {sectionLabel} Optimizations",
+                subtitle: $"This will safely apply {selected.Count} selected optimization(s) to maximize your PC performance:",
+                tweaks: selected,
+                isUndo: false,
+                tweakService: _tweakService)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                foreach (var t in selected)
+                {
+                    t.IsApplied = true;
+                    t.IsSelected = true;
+                }
+                TweakService.RecordAppliedTweaks(selected.Select(t => t.Id));
+
+                TxtStatus.Text = $"✓ Applied {selected.Count} {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
+                StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
+                CheckRebootNeeded(selected);
+            }
+        }
+
         private void BtnApplyRecommendation_Click(object sender, RoutedEventArgs e)
         {
+            var sourceList = GetCurrentSectionItems();
             List<TweakItem> recommended;
+            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
             string categoryLabel = "";
 
             if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
@@ -154,13 +367,13 @@ namespace SetupHub180Hz.Views
             }
             else
             {
-                recommended = _allTweaks.Where(t => t.IsRecommended).ToList();
+                recommended = sourceList.Where(t => t.IsRecommended).ToList();
             }
 
             if (recommended.Count == 0)
             {
                 ThemedMessageBox.Show("No recommended tweaks found for the current selection.",
-                    "180Hz Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
+                    $"180Hz {sectionLabel} Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
@@ -168,8 +381,8 @@ namespace SetupHub180Hz.Views
                 t.IsSelected = recommended.Contains(t);
 
             var dialog = new OptimizationDialog(
-                title: $"Apply Recommended Optimizations{categoryLabel}",
-                subtitle: $"This will apply {recommended.Count} recommended optimizations for {(_activeCategory == "All" ? "peak system velocity & responsiveness" : _activeCategory)}:",
+                title: $"Apply Recommended {sectionLabel} Optimizations{categoryLabel}",
+                subtitle: $"This will apply {recommended.Count} recommended optimizations for peak performance & stability:",
                 tweaks: recommended,
                 isUndo: false,
                 tweakService: _tweakService)
@@ -179,15 +392,26 @@ namespace SetupHub180Hz.Views
 
             if (dialog.ShowDialog() == true)
             {
-                TxtStatus.Text = $"✓ Applied {recommended.Count} recommended optimization(s) successfully.";
+                foreach (var t in recommended)
+                {
+                    t.IsApplied = true;
+                    t.IsSelected = true;
+                }
+                TweakService.RecordAppliedTweaks(recommended.Select(t => t.Id));
+
+                TxtStatus.Text = $"✓ Applied {recommended.Count} recommended {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
                 StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
                 CheckRebootNeeded(recommended);
             }
         }
 
         private void BtnRestoreDefault_Click(object sender, RoutedEventArgs e)
         {
+            var sourceList = GetCurrentSectionItems();
             List<TweakItem> targetTweaks;
+            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
             string scopeText;
 
             if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
@@ -197,12 +421,12 @@ namespace SetupHub180Hz.Views
             }
             else
             {
-                targetTweaks = _allTweaks;
-                scopeText = $"all {_allTweaks.Count} system tweaks";
+                targetTweaks = sourceList;
+                scopeText = $"all {sourceList.Count} {sectionLabel.ToLowerInvariant()} optimizations";
             }
 
             var dialog = new OptimizationDialog(
-                title: "Restore Default Settings",
+                title: $"Restore Default {sectionLabel} Settings",
                 subtitle: $"This will revert {scopeText} back to standard Windows factory defaults:",
                 tweaks: targetTweaks,
                 isUndo: true,
@@ -214,16 +438,24 @@ namespace SetupHub180Hz.Views
             if (dialog.ShowDialog() == true)
             {
                 foreach (var t in targetTweaks)
+                {
+                    t.IsApplied = false;
                     t.IsSelected = false;
+                }
+                TweakService.RecordUnappliedTweaks(targetTweaks.Select(t => t.Id));
 
-                TxtStatus.Text = $"✓ Restored {targetTweaks.Count} tweak(s) to Windows defaults.";
+                TxtStatus.Text = $"✓ Restored {targetTweaks.Count} {sectionLabel.ToLowerInvariant()} tweak(s) to Windows defaults.";
                 StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
             }
         }
 
         private void BtnApplyAll_Click(object sender, RoutedEventArgs e)
         {
+            var sourceList = GetCurrentSectionItems();
             List<TweakItem> targetTweaks;
+            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
             string scopeText;
 
             if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
@@ -233,12 +465,12 @@ namespace SetupHub180Hz.Views
             }
             else
             {
-                targetTweaks = _allTweaks;
-                scopeText = $"all {_allTweaks.Count} optimizations across all categories";
+                targetTweaks = sourceList;
+                scopeText = $"all {sourceList.Count} {sectionLabel.ToLowerInvariant()} optimizations";
             }
 
             var dialog = new OptimizationDialog(
-                title: "Apply Optimizations",
+                title: $"Apply {sectionLabel} Optimizations",
                 subtitle: $"This will apply {scopeText} to your system:",
                 tweaks: targetTweaks,
                 isUndo: false,
@@ -250,55 +482,36 @@ namespace SetupHub180Hz.Views
             if (dialog.ShowDialog() == true)
             {
                 foreach (var t in targetTweaks)
+                {
+                    t.IsApplied = true;
                     t.IsSelected = true;
+                }
+                TweakService.RecordAppliedTweaks(targetTweaks.Select(t => t.Id));
 
-                TxtStatus.Text = $"✓ Applied {targetTweaks.Count} optimization(s) successfully.";
+                TxtStatus.Text = $"✓ Applied {targetTweaks.Count} {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
                 StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
                 CheckRebootNeeded(targetTweaks);
-            }
-        }
-
-        private void BtnApplySelected_Click(object sender, RoutedEventArgs e)
-        {
-            var selected = _allTweaks.Where(t => t.IsSelected).ToList();
-            if (selected.Count == 0)
-            {
-                ThemedMessageBox.Show("No tweaks selected. Toggle the tweaks you want to apply first.",
-                    "180Hz Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            var dialog = new OptimizationDialog(
-                title: "Apply Selected Optimizations",
-                subtitle: $"This will apply {selected.Count} selected optimization(s):",
-                tweaks: selected,
-                isUndo: false,
-                tweakService: _tweakService)
-            {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                TxtStatus.Text = $"✓ Applied {selected.Count} optimization(s) successfully.";
-                StatusBar.Visibility = Visibility.Visible;
-                CheckRebootNeeded(selected);
             }
         }
 
         private void BtnUndoSelected_Click(object sender, RoutedEventArgs e)
         {
-            var selected = _allTweaks.Where(t => t.IsSelected).ToList();
+            var sourceList = GetCurrentSectionItems();
+            var selected = sourceList.Where(t => t.IsSelected).ToList();
+            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
+
             if (selected.Count == 0)
             {
-                ThemedMessageBox.Show("No tweaks selected to undo.",
-                    "180Hz Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
+                ThemedMessageBox.Show("No tweaks selected to undo in this section.",
+                    $"180Hz {sectionLabel} Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
             var dialog = new OptimizationDialog(
-                title: "Undo Selected Optimizations",
-                subtitle: $"This will revert {selected.Count} selected optimization(s) back to standard Windows defaults:",
+                title: $"Undo Selected {sectionLabel} Optimizations",
+                subtitle: $"This will revert {selected.Count} selected {sectionLabel.ToLowerInvariant()} optimization(s) back to standard Windows defaults:",
                 tweaks: selected,
                 isUndo: true,
                 tweakService: _tweakService)
@@ -308,8 +521,17 @@ namespace SetupHub180Hz.Views
 
             if (dialog.ShowDialog() == true)
             {
-                TxtStatus.Text = $"✓ Undone {selected.Count} optimization(s) successfully.";
+                foreach (var t in selected)
+                {
+                    t.IsApplied = false;
+                    t.IsSelected = false;
+                }
+                TweakService.RecordUnappliedTweaks(selected.Select(t => t.Id));
+
+                TxtStatus.Text = $"✓ Undone {selected.Count} {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
                 StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
             }
         }
 
@@ -323,13 +545,6 @@ namespace SetupHub180Hz.Views
                 if (r == MessageBoxResult.Yes)
                     System.Diagnostics.Process.Start("shutdown", "/r /t 30 /c \"180Hz Setup Hub: Optimization tweaks applied.\"");
             }
-        }
-
-        private IEnumerable<TweakItem> GetCurrentItems()
-        {
-            if (TweaksItemsControl.ItemsSource is IEnumerable<TweakItem> items)
-                return items;
-            return _allTweaks;
         }
     }
 }

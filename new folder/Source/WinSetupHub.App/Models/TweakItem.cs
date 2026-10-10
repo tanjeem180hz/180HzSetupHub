@@ -43,6 +43,20 @@ namespace SetupHub180Hz.Models
         [JsonPropertyName("undoScript")]
         public List<string> UndoScript { get; set; } = new();
 
+        private bool _isApplied;
+        public bool IsApplied
+        {
+            get => _isApplied;
+            set
+            {
+                if (_isApplied != value)
+                {
+                    _isApplied = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public bool IsSelected
         {
             get => _isSelected;

@@ -89,6 +89,10 @@ irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/in
   * *Standalone Windows `.reg` Backups:* Automatically generates timestamped, standard Windows `.reg` files in `Data\backups\` containing full undo instructions (`"Value"=-` for deletes and original values for edits) before every apply operation.
   * *100% Accurate Defaults Restoration:* Every single tweak across both sections has verified, tested rollback scripts and original value definitions, guaranteeing 100% factory default restoration without orphaned keys or broken settings.
   * *Instant 1-Click Backups Access:* Direct access to the backups folder (`[ 📁 BACKUPS ]`) for full user transparency.
+* **🔍 Live Applied Detection & Persistent State Tracking:**
+  * *Instant Live System Scanning:* On every page load, inspects real-time Windows Registry values and service states to automatically detect which optimizations are already active on the PC.
+  * *Persistent Optimization Memory:* Records applied tweak IDs in `Data\applied_optimizations.json` so states survive app updates, reboots, and sessions.
+  * *Visual Applied Status Badges & Filter:* Applied tweaks prominently display a glowing toxic neon green `[ ✓ APPLIED ]` badge and active switch state, with a dedicated `[ ✓ Applied (X) ]` category filter for 1-click inspection.
 * **🚀 100% Android & VM Emulator Performance Suite:**
   * *VBS & Hypervisor Bypass:* Disables Windows Hypervisor and Virtualization-Based Security (VBS/HVCI) overhead, giving BlueStacks, LDPlayer, Nox, and MEMU 100% direct bare-metal hardware VT-x / AMD-V access.
   * *Kernel IFEO CPU & I/O Scheduling:* Automates High CPU Priority and High I/O Priority for `HD-Player.exe`, `dnplayer.exe`, `LdBoxHeadless.exe`, `Nox.exe`, and `MEmu.exe`.
