@@ -72,18 +72,6 @@
                               StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                               VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Button>
-
-                    <!-- Breadcrumb Path -->
-                    <Border Margin="10,0,0,0" Padding="8,2" CornerRadius="4" Background="#14FFFFFF"
-                            BorderBrush="#1AFFFFFF" BorderThickness="1"
-                            VerticalAlignment="Center" shell:WindowChrome.IsHitTestVisibleInChrome="False">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Ellipse Width="5" Height="5" Fill="{DynamicResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtNavBreadcrumb" Text="Dashboard"
-                                       FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
                 </StackPanel>
             </StackPanel>
 

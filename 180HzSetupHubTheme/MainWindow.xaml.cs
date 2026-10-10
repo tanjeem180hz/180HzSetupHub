@@ -374,11 +374,6 @@ namespace SetupHub180Hz
                     ? $"Go Forward to {GetPageFriendlyTitle(_forwardStack.Peek())} (Alt+Right, Mouse 5)"
                     : "Go Forward (Alt+Right, Mouse 5)";
             }
-
-            if (TxtNavBreadcrumb != null)
-            {
-                TxtNavBreadcrumb.Text = GetPageFriendlyTitle(_currentPageKey);
-            }
         }
 
         private static string GetPageFriendlyTitle(string? key) => key switch

@@ -123,7 +123,7 @@ irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/in
 * **Instant Invalidation & Live Sync:** Automatically refreshes catalog state and invalidates caches across all sections upon completion so uninstalled apps never remain marked as installed.
 
 ### 🧭 Universal History Navigation & Hardware Mouse Control
-* **Persistent Title Bar Navigation:** Sleek `[ ‹ Back ]` pill button, `[ › ]` forward button, and dynamic breadcrumbs with glowing status indicator accessible across every section.
+* **Persistent Title Bar Navigation:** Sleek `[ ‹ Back ]` pill button and `[ › ]` forward button accessible across every section.
 * **Full Hardware Mouse Support:** Seamless backward (`Mouse 4` / `XButton1`) and forward (`Mouse 5` / `XButton2`) navigation compatible with all gaming and productivity mice (Logitech, Razer, Corsair, etc.) via WPF input and Win32 `WM_APPCOMMAND` / `WM_XBUTTONDOWN`.
 * **Keyboard Hotkeys:** Rapid navigation using `Alt + Left Arrow`, `Alt + Right Arrow`, or `Backspace`.
 * **Zero-Latency In-Memory Stack:** Instantaneous page switching with state preservation and background memory trimming.
