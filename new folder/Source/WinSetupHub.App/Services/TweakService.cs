@@ -200,10 +200,234 @@ namespace SetupHub180Hz.Services
             }
         }
 
+        private static readonly string BackupDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Programs", "180Hz Setup Hub", "Data", "backups");
+        private static readonly string SnapshotFile = Path.Combine(BackupDir, "prestate_snapshots.json");
+        private static readonly object CacheLock = new();
+        private static Dictionary<string, TweakPreStateSnapshot>? _preStateCache;
+
+        private static void EnsureCacheLoaded()
+        {
+            lock (CacheLock)
+            {
+                if (_preStateCache != null) return;
+                _preStateCache = new Dictionary<string, TweakPreStateSnapshot>(StringComparer.OrdinalIgnoreCase);
+
+                try
+                {
+                    if (File.Exists(SnapshotFile))
+                    {
+                        var json = File.ReadAllText(SnapshotFile);
+                        var list = JsonSerializer.Deserialize<List<TweakPreStateSnapshot>>(json, JsonOptions);
+                        if (list != null)
+                        {
+                            foreach (var s in list)
+                            {
+                                string key = $"{s.Path}\\{s.Name}";
+                                _preStateCache[key] = s;
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void SaveCache()
+        {
+            lock (CacheLock)
+            {
+                try
+                {
+                    if (!Directory.Exists(BackupDir))
+                        Directory.CreateDirectory(BackupDir);
+
+                    var list = _preStateCache?.Values.ToList() ?? new List<TweakPreStateSnapshot>();
+                    var json = JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = true });
+                    File.WriteAllText(SnapshotFile, json);
+                }
+                catch { }
+            }
+        }
+
+        public static void OpenBackupsDirectory()
+        {
+            try
+            {
+                if (!Directory.Exists(BackupDir))
+                    Directory.CreateDirectory(BackupDir);
+
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = BackupDir,
+                    UseShellExecute = true
+                });
+            }
+            catch { }
+        }
+
+        public static string ExportPreTweakRegBackup(IEnumerable<TweakItem> tweaks)
+        {
+            try
+            {
+                if (!Directory.Exists(BackupDir))
+                    Directory.CreateDirectory(BackupDir);
+
+                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string regFilePath = Path.Combine(BackupDir, $"tweak_backup_{timestamp}.reg");
+
+                var sb = new System.Text.StringBuilder();
+                sb.AppendLine("Windows Registry Editor Version 5.00");
+                sb.AppendLine();
+                sb.AppendLine("; ================================================================");
+                sb.AppendLine("; 180Hz Setup Hub - Pre-Optimization State Backup");
+                sb.AppendLine($"; Created on: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                sb.AppendLine("; Double-click this file to restore these settings at any time.");
+                sb.AppendLine("; ================================================================");
+                sb.AppendLine();
+
+                var regEntries = tweaks.SelectMany(t => t.Registry)
+                    .GroupBy(r => r.Path, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var group in regEntries)
+                {
+                    string path = group.Key;
+                    var (hiveEnum, subKey) = ParseHivePath(path);
+                    if (!hiveEnum.HasValue || string.IsNullOrWhiteSpace(subKey)) continue;
+
+                    string fullHiveName = hiveEnum.Value switch
+                    {
+                        RegistryHive.LocalMachine => "HKEY_LOCAL_MACHINE",
+                        RegistryHive.CurrentUser => "HKEY_CURRENT_USER",
+                        RegistryHive.ClassesRoot => "HKEY_CLASSES_ROOT",
+                        RegistryHive.Users => "HKEY_USERS",
+                        RegistryHive.CurrentConfig => "HKEY_CURRENT_CONFIG",
+                        _ => "HKEY_LOCAL_MACHINE"
+                    };
+
+                    sb.AppendLine($"[{fullHiveName}\\{subKey}]");
+
+                    using var baseKey = RegistryKey.OpenBaseKey(hiveEnum.Value, RegistryView.Registry64);
+                    using var key = baseKey?.OpenSubKey(subKey, writable: false);
+
+                    foreach (var entry in group)
+                    {
+                        string valName = entry.Name;
+                        object? liveVal = key?.GetValue(valName);
+
+                        if (liveVal == null)
+                        {
+                            // If value does not exist, registry syntax to delete value is "Name"=-
+                            sb.AppendLine($"\"{EscapeRegString(valName)}\"=-");
+                        }
+                        else
+                        {
+                            var kind = key!.GetValueKind(valName);
+                            sb.AppendLine(FormatRegFileLine(valName, liveVal, kind));
+                        }
+                    }
+                    sb.AppendLine();
+                }
+
+                File.WriteAllText(regFilePath, sb.ToString(), System.Text.Encoding.Unicode);
+                return regFilePath;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private static string FormatRegFileLine(string name, object val, RegistryValueKind kind)
+        {
+            string escapedName = $"\"{EscapeRegString(name)}\"";
+            switch (kind)
+            {
+                case RegistryValueKind.DWord:
+                    uint dw = val is int i ? unchecked((uint)i) : Convert.ToUInt32(val);
+                    return $"{escapedName}=dword:{dw:x8}";
+
+                case RegistryValueKind.QWord:
+                    ulong qw = val is long l ? unchecked((ulong)l) : Convert.ToUInt64(val);
+                    byte[] qBytes = BitConverter.GetBytes(qw);
+                    return $"{escapedName}=hex(b):{string.Join(",", qBytes.Select(b => $"{b:x2}"))}";
+
+                case RegistryValueKind.Binary:
+                    byte[] bytes = val is byte[] bArr ? bArr : Array.Empty<byte>();
+                    return $"{escapedName}=hex:{string.Join(",", bytes.Select(b => $"{b:x2}"))}";
+
+                case RegistryValueKind.MultiString:
+                    string[] lines = val is string[] sArr ? sArr : new[] { val.ToString() ?? "" };
+                    var msBytes = new List<byte>();
+                    foreach (var line in lines)
+                    {
+                        msBytes.AddRange(System.Text.Encoding.Unicode.GetBytes(line));
+                        msBytes.AddRange(new byte[] { 0, 0 });
+                    }
+                    msBytes.AddRange(new byte[] { 0, 0 });
+                    return $"{escapedName}=hex(7):{string.Join(",", msBytes.Select(b => $"{b:x2}"))}";
+
+                case RegistryValueKind.ExpandString:
+                    byte[] esBytes = System.Text.Encoding.Unicode.GetBytes((val.ToString() ?? "") + "\0");
+                    return $"{escapedName}=hex(2):{string.Join(",", esBytes.Select(b => $"{b:x2}"))}";
+
+                case RegistryValueKind.String:
+                default:
+                    return $"{escapedName}=\"{EscapeRegString(val.ToString() ?? "")}\"";
+            }
+        }
+
+        private static string EscapeRegString(string s)
+            => s.Replace("\\", "\\\\").Replace("\"", "\\\"");
+
+        private static void CapturePreState(TweakRegistryEntry reg)
+        {
+            EnsureCacheLoaded();
+            string keyId = $"{reg.Path}\\{reg.Name}";
+            if (_preStateCache!.ContainsKey(keyId)) return; // Keep original pre-tweak state!
+
+            var (hiveEnum, subKey) = ParseHivePath(reg.Path);
+            if (!hiveEnum.HasValue || string.IsNullOrWhiteSpace(subKey)) return;
+
+            var snap = new TweakPreStateSnapshot
+            {
+                Path = reg.Path,
+                Name = reg.Name,
+                Existed = false
+            };
+
+            try
+            {
+                using var baseKey = RegistryKey.OpenBaseKey(hiveEnum.Value, RegistryView.Registry64);
+                using var key = baseKey.OpenSubKey(subKey, writable: false);
+                if (key != null)
+                {
+                    var liveVal = key.GetValue(reg.Name);
+                    if (liveVal != null)
+                    {
+                        snap.Existed = true;
+                        snap.Type = key.GetValueKind(reg.Name).ToString();
+                        if (liveVal is byte[] bArr)
+                            snap.Value = string.Join(" ", bArr.Select(b => b.ToString("X2")));
+                        else if (liveVal is string[] sArr)
+                            snap.Value = string.Join("\n", sArr);
+                        else
+                            snap.Value = liveVal.ToString();
+                    }
+                }
+            }
+            catch { }
+
+            _preStateCache[keyId] = snap;
+            SaveCache();
+        }
+
         public async Task ApplyAsync(TweakItem tweak)
         {
             foreach (var reg in tweak.Registry)
             {
+                CapturePreState(reg);
                 ApplyRegistryEntry(reg, undo: false);
             }
 
@@ -254,9 +478,37 @@ namespace SetupHub180Hz.Services
                 using var baseKey = RegistryKey.OpenBaseKey(hiveEnum.Value, RegistryView.Registry64);
                 if (baseKey == null) return;
 
-                // Value deletion handling
-                if ((undo && (value == "<RemoveEntry>" || string.IsNullOrEmpty(value))) ||
-                    (!undo && value == "<RemoveEntry>"))
+                // When undoing, verify against pre-state snapshot if available
+                if (undo)
+                {
+                    EnsureCacheLoaded();
+                    string keyId = $"{reg.Path}\\{reg.Name}";
+                    if (_preStateCache != null && _preStateCache.TryGetValue(keyId, out var snap))
+                    {
+                        if (!snap.Existed)
+                        {
+                            // Value did not exist originally before optimization -> delete it!
+                            using var key = baseKey.OpenSubKey(subKey, writable: true);
+                            key?.DeleteValue(name, throwOnMissingValue: false);
+                            return;
+                        }
+                        else
+                        {
+                            // Restore exact original pre-state
+                            value = snap.Value ?? "";
+                            type = snap.Type ?? reg.Type ?? "DWord";
+                        }
+                    }
+                    else if (value == "<RemoveEntry>" || string.IsNullOrEmpty(value))
+                    {
+                        using var key = baseKey.OpenSubKey(subKey, writable: true);
+                        key?.DeleteValue(name, throwOnMissingValue: false);
+                        return;
+                    }
+                }
+
+                // Value deletion handling for standard remove entries
+                if (!undo && value == "<RemoveEntry>")
                 {
                     using var key = baseKey.OpenSubKey(subKey, writable: true);
                     key?.DeleteValue(name, throwOnMissingValue: false);

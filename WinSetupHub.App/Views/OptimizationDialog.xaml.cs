@@ -71,6 +71,13 @@ namespace SetupHub180Hz.Views
             int total = _tweaks.Count;
             int done = 0;
 
+            if (!_isUndo)
+            {
+                UpdateProgress(0, 0, total, "Creating pre-optimization registry backup...");
+                await Task.Run(() => TweakService.ExportPreTweakRegBackup(_tweaks));
+                await Task.Delay(100);
+            }
+
             UpdateProgress(0, 0, total, "Initializing...");
 
             foreach (var tweak in _tweaks)

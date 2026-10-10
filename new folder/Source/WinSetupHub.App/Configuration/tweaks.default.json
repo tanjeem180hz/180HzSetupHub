@@ -509,7 +509,9 @@
     "invokeScript": [
       "[System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers()"
     ],
-    "undoScript": []
+    "undoScript": [
+      "Write-Host 'Maintenance action state is clean.' -ForegroundColor Gray"
+    ]
   },
   {
     "id": "NetTweakTcpAckNoDelay",
@@ -708,7 +710,9 @@
     "invokeScript": [
       "\n      cleanmgr.exe /d C: /VERYLOWDISK\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\n      "
     ],
-    "undoScript": [],
+    "undoScript": [
+      "Write-Host 'Maintenance action state is clean.' -ForegroundColor Gray"
+    ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/diskcleanup"
   },
   {
@@ -880,7 +884,9 @@
     "invokeScript": [
       "\n      if (-not (Get-ComputerRestorePoint)) {\n          Enable-ComputerRestore -Drive $Env:SystemDrive\n      }\n\n      Checkpoint-Computer -Description \"System Restore Point created by WinUtil\" -RestorePointType MODIFY_SETTINGS\n      Write-Host \"System Restore Point Created Successfully\" -ForegroundColor Green\n      "
     ],
-    "undoScript": [],
+    "undoScript": [
+      "Write-Host 'Maintenance action state is clean.' -ForegroundColor Gray"
+    ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/restorepoint"
   },
   {
@@ -921,7 +927,9 @@
     "invokeScript": [
       "\n      $Memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB\n      Set-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\" -Name SvcHostSplitThresholdInKB -Value $Memory\n      "
     ],
-    "undoScript": [],
+    "undoScript": [
+      "Remove-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control' -Name 'SvcHostSplitThresholdInKB' -ErrorAction SilentlyContinue"
+    ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services"
   },
   {
@@ -1059,7 +1067,9 @@
     "invokeScript": [
       "\n      # A temp folder always holds files something has open, including this run's own, and\n      # the job layer counts a logged error as a failed step\n      Remove-Item -Path \"$Env:Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path \"$Env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      "
     ],
-    "undoScript": [],
+    "undoScript": [
+      "Write-Host 'Maintenance action state is clean.' -ForegroundColor Gray"
+    ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deletetempfiles"
   },
   {
@@ -1074,7 +1084,9 @@
     "invokeScript": [
       "\n      # Sometimes if you dont stop the Widgets process the removal may fail\n\n      Get-Process *Widget* | Stop-Process\n      Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers | Remove-AppxPackage -AllUsers\n      Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers | Remove-AppxPackage -AllUsers\n\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      Write-Host \"Removed widgets\"\n      "
     ],
-    "undoScript": [],
+    "undoScript": [
+      "winget install --id 9MSSGKG348SP --accept-source-agreements --accept-package-agreements --silent 2>$null"
+    ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/widget"
   },
   {
@@ -1432,7 +1444,8 @@
           "Enabled": "<RemoveEntry>",
           "Disabled (Compatibility)": "5",
           "Fully Disabled": "5"
-        }
+        },
+        "OriginalValue": "<RemoveEntry>"
       },
       {
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
@@ -1443,7 +1456,8 @@
           "Enabled": "<RemoveEntry>",
           "Disabled (Compatibility)": "<RemoveEntry>",
           "Fully Disabled": "1"
-        }
+        },
+        "OriginalValue": "<RemoveEntry>"
       }
     ],
     "service": [],
@@ -2540,7 +2554,9 @@
     "invokeScript": [
       "\n      $Appx = (Get-AppxPackage MicrosoftWindows.Client.CoreAI).PackageFullName\n      $Sid = (Get-LocalUser $Env:UserName).Sid.Value\n\n      New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" | Remove-AppxPackage -AllUsers\n      winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements 2>$null\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub | Remove-AppxPackage -AllUsers\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx\n      }\n\n      Set-Service -Name WSAIFabricSvc -StartupType Disabled\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart\n\n      Write-Host \"Windows AI Disabled\"\n      "
     ],
-    "undoScript": [],
+    "undoScript": [
+      "Set-Service -Name WSAIFabricSvc -StartupType Manual -ErrorAction SilentlyContinue; Enable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart -ErrorAction SilentlyContinue 2>$null"
+    ],
     "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/windowsai"
   }
 ]

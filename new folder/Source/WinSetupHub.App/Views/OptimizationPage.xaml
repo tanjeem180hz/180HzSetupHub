@@ -225,6 +225,11 @@
                             Content="🛡️ RESTORE POINT" Padding="10,7" Margin="0,0,6,4"
                             Click="BtnCreateRestorePoint_Click" ToolTip="Create a Windows System Restore point before applying changes"/>
 
+                    <!-- Open Backups Folder -->
+                    <Button x:Name="BtnOpenBackups" Style="{StaticResource UndoButton}"
+                            Content="📁 BACKUPS" Padding="10,7" Margin="0,0,6,4"
+                            Click="BtnOpenBackups_Click" ToolTip="Open the folder containing automatic .reg snapshots and pre-state backups"/>
+
                     <!-- Select All -->
                     <Button x:Name="BtnSelectAll" Style="{StaticResource UndoButton}"
                             Content="✓ SELECT ALL" Padding="10,7" Margin="0,0,6,4"

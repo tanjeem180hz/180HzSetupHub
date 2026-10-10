@@ -83,7 +83,12 @@ irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/in
 
 ### ⚡ Dual-Section Optimization Suite & Deep Registry Tuning Engine
 * **Two Dedicated Optimization Modules:** Cleanly partitioned into **⚡ System Tweaks** and **🗃️ Registry Optimization** with instant segmented pill switching, category filters, and real-time search.
-* **Complete Selection & Restore Controls:** 1-Click `[ ✓ SELECT ALL ]`, `[ ✕ DESELECT ALL ]`, `[ ⭐ RECOMMENDED ]`, `[ ⚡ APPLY SELECTED ]`, `[ ↩ RESTORE SELECTED ]`, `[ 🔄 RESTORE ALL ]`, and `[ 🛡️ RESTORE POINT ]` checkpoints across both sections.
+* **Complete Selection & Restore Controls:** 1-Click `[ ✓ SELECT ALL ]`, `[ ✕ DESELECT ALL ]`, `[ ⭐ RECOMMENDED ]`, `[ ⚡ APPLY SELECTED ]`, `[ ↩ RESTORE SELECTED ]`, `[ 🔄 RESTORE ALL ]`, `[ 📁 BACKUPS ]`, and `[ 🛡️ RESTORE POINT ]` checkpoints across both sections.
+* **🛡️ 100% Fail-Safe Pre-State Snapshot & Automatic `.reg` Backups:**
+  * *Automatic Pre-State Snapshots:* Captures exact pre-existing registry keys and values before executing any optimization.
+  * *Standalone Windows `.reg` Backups:* Automatically generates timestamped, standard Windows `.reg` files in `Data\backups\` containing full undo instructions (`"Value"=-` for deletes and original values for edits) before every apply operation.
+  * *100% Accurate Defaults Restoration:* Every single tweak across both sections has verified, tested rollback scripts and original value definitions, guaranteeing 100% factory default restoration without orphaned keys or broken settings.
+  * *Instant 1-Click Backups Access:* Direct access to the backups folder (`[ 📁 BACKUPS ]`) for full user transparency.
 * **🚀 100% Android & VM Emulator Performance Suite:**
   * *VBS & Hypervisor Bypass:* Disables Windows Hypervisor and Virtualization-Based Security (VBS/HVCI) overhead, giving BlueStacks, LDPlayer, Nox, and MEMU 100% direct bare-metal hardware VT-x / AMD-V access.
   * *Kernel IFEO CPU & I/O Scheduling:* Automates High CPU Priority and High I/O Priority for `HD-Player.exe`, `dnplayer.exe`, `LdBoxHeadless.exe`, `Nox.exe`, and `MEmu.exe`.

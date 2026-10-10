@@ -76,4 +76,14 @@ namespace SetupHub180Hz.Models
         public string StartupType { get; set; } = "";
         public string OriginalType { get; set; } = "";
     }
+
+    public class TweakPreStateSnapshot
+    {
+        public string Path { get; set; } = "";
+        public string Name { get; set; } = "";
+        public bool Existed { get; set; }
+        public string? Value { get; set; }
+        public string? Type { get; set; }
+        public System.DateTime CapturedAt { get; set; } = System.DateTime.UtcNow;
+    }
 }

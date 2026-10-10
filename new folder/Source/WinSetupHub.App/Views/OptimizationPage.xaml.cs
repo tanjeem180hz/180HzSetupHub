@@ -245,6 +245,13 @@ namespace SetupHub180Hz.Views
             }
         }
 
+        private void BtnOpenBackups_Click(object sender, RoutedEventArgs e)
+        {
+            TweakService.OpenBackupsDirectory();
+            TxtStatus.Text = "📁 Opened automatic registry snapshots and backups folder.";
+            StatusBar.Visibility = Visibility.Visible;
+        }
+
         private void BtnApplySelected_Click(object sender, RoutedEventArgs e)
         {
             var sourceList = GetCurrentSectionItems();
