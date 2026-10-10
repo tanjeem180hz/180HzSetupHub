@@ -1,1943 +1,2546 @@
 [
-    {
-        "id": "WPFTweaksActivity",
-        "name": "Activity History - Disable",
-        "description": "Stops Windows from publishing or uploading user activities while preserving clipboard history.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-                "Name": "EnableActivityFeed",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-                "Name": "PublishUserActivities",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-                "Name": "UploadUserActivities",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/activity"
-    },
-    {
-        "id": "WPFTweaksDisableBitLocker",
-        "name": "BitLocker - Disable",
-        "description": "Disables BitLocker.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "Disable-BitLocker -MountPoint $Env:SystemDrive"
-        ],
-        "undoScript": [
-            "Enable-BitLocker -MountPoint $Env:SystemDrive"
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablebitlocker"
-    },
-    {
-        "id": "WPFTweaksConsumerFeatures",
-        "name": "ConsumerFeatures - Disable",
-        "description": "Stops promoted app installs and reduces app suggestions from Microsoft Store content.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
-                "Name": "DisableWindowsConsumerFeatures",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/consumerfeatures"
-    },
-    {
-        "id": "WPFTweaksDeliveryOptimization",
-        "name": "Delivery Optimization - Disable",
-        "description": "Stops Windows from using your bandwidth to upload updates to other PCs on the internet or local network.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
-                "Name": "DODownloadMode",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deliveryoptimization"
-    },
-    {
-        "id": "WPFTweaksDiskCleanup",
-        "name": "Disk Cleanup - Run",
-        "description": "Runs Disk Cleanup on Drive C: and removes old Windows Updates.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "\n      cleanmgr.exe /d C: /VERYLOWDISK\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\n      "
-        ],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/diskcleanup"
-    },
-    {
-        "id": "WPFTweaksEndTaskOnTaskbar",
-        "name": "End Task With Right Click - Enable",
-        "description": "Enables option to end task when right-clicking a program in the taskbar.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
-                "Name": "TaskbarEndTask",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/endtaskontaskbar"
-    },
-    {
-        "id": "WPFTweaksDisableExplorerAutoDiscovery",
-        "name": "File Explorer Automatic Folder Discovery - Disable",
-        "description": "Windows Explorer automatically tries to guess the type of the folder based on its contents, slowing down the browsing experience. WARNING! Will disable File Explorer grouping.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "\n      # Previously detected folders\n      $bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n\n      # Folder types lookup table\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n\n      # Flush Explorer view database\n      Remove-Item -Path $bags -Recurse -Force\n      Write-Host \"Removed $bags\"\n\n      Remove-Item -Path $bagMRU -Recurse -Force\n      Write-Host \"Removed $bagMRU\"\n\n      # Every folder\n      $allFolders = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell\"\n\n      if (!(Test-Path $allFolders)) {\n        New-Item -Path $allFolders -Force\n        Write-Host \"Created $allFolders\"\n      }\n\n      # Generic view\n      New-ItemProperty -Path $allFolders -Name \"FolderType\" -Value \"NotSpecified\" -PropertyType String -Force\n      Write-Host \"Set FolderType to NotSpecified\"\n\n      Write-Host Please sign out and back in, or restart your computer to apply the changes!\n      "
-        ],
-        "undoScript": [
-            "\n      # Previously detected folders\n      $bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n\n      # Folder types lookup table\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n\n      # Flush Explorer view database\n      Remove-Item -Path $bags -Recurse -Force\n      Write-Host \"Removed $bags\"\n\n      Remove-Item -Path $bagMRU -Recurse -Force\n      Write-Host \"Removed $bagMRU\"\n\n      Write-Host Please sign out and back in, or restart your computer to apply the changes!\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disableexplorerautodiscovery"
-    },
-    {
-        "id": "WPFTweaksHiber",
-        "name": "Hibernation - Disable",
-        "description": "Hibernation is really meant for laptops as it saves what's in memory before turning the PC off. It really should never be used.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\System\\CurrentControlSet\\Control\\Session Manager\\Power",
-                "Name": "HibernateEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FlyoutMenuSettings",
-                "Name": "ShowHibernateOption",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "powercfg.exe /hibernate off"
-        ],
-        "undoScript": [
-            "powercfg.exe /hibernate on"
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/hiber"
-    },
-    {
-        "id": "WPFTweaksLocation",
-        "name": "Location Tracking - Disable",
-        "description": "Disables Location Tracking.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
-                "Name": "Value",
-                "Value": "Deny",
-                "Type": "String",
-                "OriginalValue": "Allow"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
-                "Name": "SensorPermissionState",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKLM:\\SYSTEM\\Maps",
-                "Name": "AutoUpdateEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            }
-        ],
-        "service": [
-            {
-                "Name": "lfsvc",
-                "StartupType": "Disabled",
-                "OriginalType": "Manual"
-            }
-        ],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/location"
-    },
-    {
-        "id": "WPFTweaksDisableStoreSearch",
-        "name": "Microsoft Store Recommended Search Results - Disable",
-        "description": "Will not display recommended Microsoft Store apps when searching for apps in the Start menu.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /deny *S-1-1-0:F"
-        ],
-        "undoScript": [
-            "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /grant *S-1-1-0:F"
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablestoresearch"
-    },
-    {
-        "id": "WPFTweaksPreventDeviceMetadataFromNetwork",
-        "name": "Prevent Device Companion Apps",
-        "description": "Prevents additional software from being installed when plugging in devices (e.g. Ads when plugging in a monitor). Poses potential security risk.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata",
-                "Name": "PreventDeviceMetadataFromNetwork",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/preventdevicemetadatafromnetwork"
-    },
-    {
-        "id": "WPFTweaksRestorePoint",
-        "name": "Restore Point - Create",
-        "description": "Creates a restore point at runtime in case a revert is needed from WinUtil modifications.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SystemRestore",
-                "Name": "SystemRestorePointCreationFrequency",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1440"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "\n      if (-not (Get-ComputerRestorePoint)) {\n          Enable-ComputerRestore -Drive $Env:SystemDrive\n      }\n\n      Checkpoint-Computer -Description \"System Restore Point created by WinUtil\" -RestorePointType MODIFY_SETTINGS\n      Write-Host \"System Restore Point Created Successfully\" -ForegroundColor Green\n      "
-        ],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/restorepoint"
-    },
-    {
-        "id": "WPFTweaksServices",
-        "name": "Services - Set to Manual",
-        "description": "Sets some services to Manual startup and adjusts the SvcHostSplitThresholdInKB registry value to better match system memory, which can significantly reduce the number of svchost.exe processes.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [],
-        "service": [
-            {
-                "Name": "CscService",
-                "StartupType": "Disabled",
-                "OriginalType": "Manual"
-            },
-            {
-                "Name": "DiagTrack",
-                "StartupType": "Disabled",
-                "OriginalType": "Automatic"
-            },
-            {
-                "Name": "MapsBroker",
-                "StartupType": "Manual",
-                "OriginalType": "Automatic"
-            },
-            {
-                "Name": "StorSvc",
-                "StartupType": "Manual",
-                "OriginalType": "Automatic"
-            },
-            {
-                "Name": "SharedAccess",
-                "StartupType": "Disabled",
-                "OriginalType": "Automatic"
-            }
-        ],
-        "invokeScript": [
-            "\n      $Memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB\n      Set-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\" -Name SvcHostSplitThresholdInKB -Value $Memory\n      "
-        ],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services"
-    },
-    {
-        "id": "WPFTweaksRevertStartMenu",
-        "name": "Start Menu Previous Layout - Enable",
-        "description": "Bring back the old Start Menu layout from before the gradual rollout of the new one in 25H2. On newer versions of Windows !!THIS TWEAK WILL NOT WORK!!",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SYSTEM\\ControlSet001\\Control\\FeatureManagement\\Overrides\\8\\3036241548",
-                "Name": "EnabledState",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/revertstartmenu"
-    },
-    {
-        "id": "WPFTweaksTelemetry",
-        "name": "Telemetry - Disable",
-        "description": "Disables Microsoft Telemetry.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
-                "Name": "Enabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy",
-                "Name": "TailoredExperiencesWithDiagnosticDataEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy",
-                "Name": "HasAccepted",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Input\\TIPC",
-                "Name": "Enabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\InputPersonalization",
-                "Name": "RestrictImplicitInkCollection",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\InputPersonalization",
-                "Name": "RestrictImplicitTextCollection",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\InputPersonalization\\TrainedDataStore",
-                "Name": "HarvestContacts",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Personalization\\Settings",
-                "Name": "AcceptedPrivacyPolicy",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection",
-                "Name": "AllowTelemetry",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "Start_TrackProgs",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-                "Name": "PublishUserActivities",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Siuf\\Rules",
-                "Name": "NumberOfSIUFInPeriod",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "\n      # Disable Defender Auto Sample Submission\n      Set-MpPreference -SubmitSamplesConsent 2\n\n      # Disable (Connected User Experiences and Telemetry) Service\n      Set-Service -Name diagtrack -StartupType Disabled\n\n      # Disable (Windows Error Reporting Manager) Service\n      Set-Service -Name wermgr -StartupType Disabled\n\n      # Disable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '1', 'Machine')\n\n      Remove-ItemProperty -Path \"HKCU:\\Software\\Microsoft\\Siuf\\Rules\" -Name PeriodInNanoSeconds\n      "
-        ],
-        "undoScript": [
-            "\n      # Enable Defender Auto Sample Submission\n      Set-MpPreference -SubmitSamplesConsent 1\n\n      # Enable (Connected User Experiences and Telemetry) Service\n      Set-Service -Name diagtrack -StartupType Automatic\n\n      # Enable (Windows Error Reporting Manager) Service\n      Set-Service -Name wermgr -StartupType Automatic\n\n      # Enable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '', 'Machine')\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/telemetry"
-    },
-    {
-        "id": "WPFTweaksDeleteTempFiles",
-        "name": "Temporary Files - Remove",
-        "description": "Erases TEMP Folders.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "\n      # A temp folder always holds files something has open, including this run's own, and\n      # the job layer counts a logged error as a failed step\n      Remove-Item -Path \"$Env:Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path \"$Env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      "
-        ],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deletetempfiles"
-    },
-    {
-        "id": "WPFTweaksWidget",
-        "name": "Widgets - Remove",
-        "description": "Removes the annoying widgets in the bottom left of the Taskbar.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "\n      # Sometimes if you dont stop the Widgets process the removal may fail\n\n      Get-Process *Widget* | Stop-Process\n      Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers | Remove-AppxPackage -AllUsers\n      Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers | Remove-AppxPackage -AllUsers\n\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      Write-Host \"Removed widgets\"\n      "
-        ],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/widget"
-    },
-    {
-        "id": "WPFTweaksWPBT",
-        "name": "Windows Platform Binary Table (WPBT) - Disable",
-        "description": "If enabled, WPBT allows your computer vendor to execute programs at boot time, such as anti-theft software, software drivers, as well as force install software without user consent. Poses potential security risk.",
-        "category": "Essential Tweaks",
-        "categoryOrder": 0,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager",
-                "Name": "DisableWpbtExecution",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/wpbt"
-    },
-    {
-        "id": "WPFToggleDetailedBSoD",
-        "name": "BSoD Verbose Mode",
-        "description": "Gives more information when you blue screen.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl",
-                "Name": "DisplayParameters",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "false"
-            },
-            {
-                "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl",
-                "Name": "DisableEmoticon",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "false"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/detailedbsod"
-    },
-    {
-        "id": "WPFToggleDarkMode",
-        "name": "Dark Theme for Windows",
-        "description": "Dark Mode for the system and applications.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-                "Name": "AppsUseLightTheme",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1",
-                "DefaultState": "false"
-            },
-            {
-                "Path": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-                "Name": "SystemUsesLightTheme",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1",
-                "DefaultState": "false"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "\n      Invoke-WinUtilExplorerUpdate\n      if ($sync.ThemeButton.Content -eq [char]0xF08C) {\n        Invoke-WinutilThemeChange -theme \"Auto\"\n      }\n      "
-        ],
-        "undoScript": [
-            "\n      Invoke-WinUtilExplorerUpdate\n      if ($sync.ThemeButton.Content -eq [char]0xF08C) {\n        Invoke-WinutilThemeChange -theme \"Auto\"\n      }\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/darkmode"
-    },
-    {
-        "id": "WPFToggleLongPaths",
-        "name": "Enable Long Paths",
-        "description": "Toggles support for file paths longer than 260 characters in Explorer.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
-                "Name": "LongPathsEnabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "false"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/longpaths"
-    },
-    {
-        "id": "WPFToggleShowExt",
-        "name": "File Explorer File Extensions",
-        "description": "Shows .file extensions in Explorer (.exe, .png, etc.)",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "HideFileExt",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1",
-                "DefaultState": "false"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
-        ],
-        "undoScript": [
-            "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/showext"
-    },
-    {
-        "id": "WPFToggleHiddenFiles",
-        "name": "File Explorer Hidden Files",
-        "description": "Reveals hidden files in Explorer.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "Hidden",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "false"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
-        ],
-        "undoScript": [
-            "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hiddenfiles"
-    },
-    {
-        "id": "WPFToggleGameMode",
-        "name": "Game Mode",
-        "description": "Toggles Windows prioritizes gaming performance by allocating system resources to games.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\GameBar",
-                "Name": "AllowAutoGameMode",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\GameBar",
-                "Name": "AutoGameModeEnabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/gamemode"
-    },
-    {
-        "id": "WPFToggleDisableLockscreen",
-        "name": "Lock Screen - Disable",
-        "description": "Skips the lock screen entirely and goes directly to the sign-in screen on boot and wake.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization",
-                "Name": "NoLockScreen",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/disablelockscreen"
-    },
-    {
-        "id": "WPFToggleLoginBlur",
-        "name": "Logon Screen Acrylic Blur",
-        "description": "Toggles the acrylic blur effect on login screen background.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
-                "Name": "DisableAcrylicBackgroundOnLogon",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/loginblur"
-    },
-    {
-        "id": "WPFToggleVerboseLogon",
-        "name": "Logon Verbose Mode",
-        "description": "Show detailed messages during startup/shutdown.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
-                "Name": "VerboseStatus",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "false"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/verboselogon"
-    },
-    {
-        "id": "WPFToggleNewOutlook",
-        "name": "Microsoft Outlook New Version",
-        "description": "This will ensure the new Outlook application is used.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
-                "Name": "UseNewOutlook",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
-                "Name": "HideNewOutlookToggle",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1",
-                "DefaultState": "true"
-            },
-            {
-                "Path": "HKCU:\\Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
-                "Name": "DoNewOutlookAutoMigration",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "false"
-            },
-            {
-                "Path": "HKCU:\\Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
-                "Name": "NewOutlookMigrationUserSetting",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/newoutlook"
-    },
-    {
-        "id": "WPFToggleMouseAcceleration",
-        "name": "Mouse Acceleration",
-        "description": "Makes it so Cursor movement is affected by the speed of your physical mouse movements.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Control Panel\\Mouse",
-                "Name": "MouseSpeed",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            },
-            {
-                "Path": "HKCU:\\Control Panel\\Mouse",
-                "Name": "MouseThreshold1",
-                "Value": "6",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            },
-            {
-                "Path": "HKCU:\\Control Panel\\Mouse",
-                "Name": "MouseThreshold2",
-                "Value": "10",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/mouseacceleration"
-    },
-    {
-        "id": "WPFMultiplaneOverlay",
-        "name": "Multiplane Overlay",
-        "description": "Multiplane Overlay composes multiple image layers, which can sometimes cause issues with graphics cards. Changes to this preference are applied immediately.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
-                "Name": "OverlayTestMode",
-                "Type": "DWord",
-                "DefaultValue": "0",
-                "Values": {
-                    "Enabled": "<RemoveEntry>",
-                    "Disabled (Compatibility)": "5",
-                    "Fully Disabled": "5"
-                }
-            },
-            {
-                "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
-                "Name": "DisableOverlays",
-                "Type": "DWord",
-                "DefaultValue": "0",
-                "Values": {
-                    "Enabled": "<RemoveEntry>",
-                    "Disabled (Compatibility)": "<RemoveEntry>",
-                    "Fully Disabled": "1"
-                }
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/multiplaneoverlay"
-    },
-    {
-        "id": "WPFToggleNumLock",
-        "name": "Num Lock on Startup",
-        "description": "Toggle the Num Lock key state when your computer starts.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKU:\\.Default\\Control Panel\\Keyboard",
-                "Name": "InitialKeyboardIndicators",
-                "Value": "2",
-                "Type": "String",
-                "OriginalValue": "0",
-                "DefaultState": "false"
-            },
-            {
-                "Path": "HKCU:\\Control Panel\\Keyboard",
-                "Name": "InitialKeyboardIndicators",
-                "Value": "2",
-                "Type": "String",
-                "OriginalValue": "0",
-                "DefaultState": "false"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/numlock"
-    },
-    {
-        "id": "WPFToggleStandbyFix",
-        "name": "S0 Sleep Network Connectivity",
-        "description": "Toggles network connectivity during S0 Sleep which is low power idle in modern laptops.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
-                "Name": "ACSettingIndex",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/standbyfix"
-    },
-    {
-        "id": "WPFToggleS3Sleep",
-        "name": "S3 Sleep",
-        "description": "Toggles between Modern Standby and S3 Sleep, which cuts off power to the CPU while continuing to refresh the memory.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power",
-                "Name": "PlatformAoAcOverride",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>",
-                "DefaultState": "false"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/s3sleep"
-    },
-    {
-        "id": "WPFToggleScrollbars",
-        "name": "Scrollbars Always Visible",
-        "description": "If enabled, scrollbars will always be visible. If disabled, Windows will automatically hide scrollbars when not in use.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Control Panel\\Accessibility",
-                "Name": "DynamicScrollbars",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1",
-                "DefaultState": "false"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/scrollbars"
-    },
-    {
-        "id": "WPFToggleHideSettingsHome",
-        "name": "Settings Home Page",
-        "description": "Toggles the Home Page in the Windows Settings app.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                "Name": "SettingsPageVisibility",
-                "Value": "show:home",
-                "Type": "String",
-                "OriginalValue": "hide:home",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hidesettingshome"
-    },
-    {
-        "id": "WPFToggleBingSearch",
-        "name": "Start Menu Bing Search",
-        "description": "Toggles Bing web search results in Windows Search.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-                "Name": "BingSearchEnabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/bingsearch"
-    },
-    {
-        "id": "WPFToggleStartMenuRecommendations",
-        "name": "Start Menu Recommendations",
-        "description": "Toggles the recommendations section in the Start Menu. WARNING: This will also disable Windows Spotlight on your Lock Screen as a side effect.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Start",
-                "Name": "HideRecommendedSection",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1",
-                "DefaultState": "true"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Education",
-                "Name": "IsEducationEnvironment",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1",
-                "DefaultState": "true"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer",
-                "Name": "HideRecommendedSection",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
-        ],
-        "undoScript": [
-            "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/startmenurecommendations"
-    },
-    {
-        "id": "WPFToggleStickyKeys",
-        "name": "Sticky Keys",
-        "description": "Toggles the Sticky Keys, which activate when clicking shift rapidly.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Control Panel\\Accessibility\\StickyKeys",
-                "Name": "Flags",
-                "Value": "506",
-                "Type": "DWord",
-                "OriginalValue": "58",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/stickykeys"
-    },
-    {
-        "id": "WPFToggleBatteryPercentage",
-        "name": "System Tray Battery Percentage",
-        "description": "Shows numeric battery percentage next to the battery icon in the system tray.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "IsBatteryPercentageEnabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>",
-                "DefaultState": "false"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/batterypercentage"
-    },
-    {
-        "id": "WPFToggleTaskbarAlignment",
-        "name": "Taskbar Centered Icons",
-        "description": "Toggles the Taskbar alignment either to the left or center.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "TaskbarAl",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
-        ],
-        "undoScript": [
-            "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbaralignment"
-    },
-    {
-        "id": "WPFToggleTaskbarSearch",
-        "name": "Taskbar Search Icon",
-        "description": "Toggles the Search Button on the Taskbar.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-                "Name": "SearchboxTaskbarMode",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbarsearch"
-    },
-    {
-        "id": "WPFToggleTaskView",
-        "name": "Taskbar Task View Icon",
-        "description": "Toggles the Task View Button in the Taskbar.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "ShowTaskViewButton",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskview"
-    },
-    {
-        "id": "WPFToggleWindowSnapping",
-        "name": "Window Snapping",
-        "description": "Toggles the window snapping feature when dragging windows.",
-        "category": "Customize Preferences",
-        "categoryOrder": 1,
-        "isAdvanced": false,
-        "registry": [
-            {
-                "Path": "HKCU:\\Control Panel\\Desktop",
-                "Name": "WindowArrangementActive",
-                "Value": "1",
-                "Type": "String",
-                "OriginalValue": "0",
-                "DefaultState": "true"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/windowsnapping"
-    },
-    {
-        "id": "WPFRemoveUltPerf",
-        "name": "Ultimate Performance Profile - Disable",
-        "description": "",
-        "category": "Performance Plans - NOT FOR LAPTOPS",
-        "categoryOrder": 2,
-        "isAdvanced": false,
-        "registry": [],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/performance-plans---not-for-laptops/removeultperf"
-    },
-    {
-        "id": "WPFAddUltPerf",
-        "name": "Ultimate Performance Profile - Enable",
-        "description": "",
-        "category": "Performance Plans - NOT FOR LAPTOPS",
-        "categoryOrder": 2,
-        "isAdvanced": false,
-        "registry": [],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/performance-plans---not-for-laptops/addultperf"
-    },
-    {
-        "id": "WPFTweaksBlockAdobeNet",
-        "name": "Adobe URL Block List - Enable",
-        "description": "Reduces user interruptions by selectively blocking connections to Adobe's activation and telemetry servers. Credit: Ruddernation-Designs",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "\n      $hostsUrl = Invoke-RestMethod -Uri https://github.com/Ruddernation-Designs/Adobe-URL-Block-List/raw/refs/heads/master/hosts\n      Add-Content -Path \"$Env:SystemRoot\\System32\\drivers\\etc\\hosts\" -Value $hostsUrl\n\n      ipconfig /flushdns\n      Write-Host 'Added Adobe url block list from host file'\n      "
-        ],
-        "undoScript": [
-            "\n      Set-Content \"$Env:SystemRoot\\System32\\drivers\\etc\\hosts\" (\n          (Get-Content \"$Env:SystemRoot\\System32\\drivers\\etc\\hosts\") -join \"`n\" -replace '(?s)#New Ver.*', ''\n      )\n\n      ipconfig /flushdns\n      Write-Host 'Removed Adobe url block list from host file'\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/blockadobenet"
-    },
-    {
-        "id": "WPFTweaksDisableBGapps",
-        "name": "Background Apps - Disable",
-        "description": "Disables all Microsoft Store apps from running in the background, which has to be done individually since Windows 11.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
-                "Name": "GlobalUserDisabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablebgapps"
-    },
-    {
-        "id": "WPFTweaksBraveDebloat",
-        "name": "Brave Browser - Debloat",
-        "description": "Disables various annoyances like Brave Rewards, Leo AI, Crypto Wallet and VPN.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "BraveRewardsDisabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "BraveWalletDisabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "BraveVPNDisabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "BraveAIChatEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "BraveStatsPingEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "BraveNewsDisabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "BraveTalkDisabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "TorDisabled",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "BraveP3AEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "UrlKeyedAnonymizedDataCollectionEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "SafeBrowsingExtendedReportingEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
-                "Name": "MetricsReportingEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/bravedebloat"
-    },
-    {
-        "id": "WPFchangedns",
-        "name": "DNS - Set to:",
-        "description": "",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/changedns"
-    },
-    {
-        "id": "WPFTweaksUTC",
-        "name": "Date & Time - Set Time to UTC",
-        "description": "Essential for computers that are dual booting. Fixes the time sync with Linux systems.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation",
-                "Name": "RealTimeIsUniversal",
-                "Value": "1",
-                "Type": "QWord",
-                "OriginalValue": "0"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/utc"
-    },
-    {
-        "id": "WPFTweaksReservedStorage",
-        "name": "Disable Reserved Storage",
-        "description": "Disables Windows Reserved Storage (7-10 GB held for updates/temp files). Recommended only on small drives. Re-enable before major Windows feature updates to avoid installation failures.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "DISM /Online /Set-ReservedStorageState /State:Disabled"
-        ],
-        "undoScript": [
-            "DISM /Online /Set-ReservedStorageState /State:Enabled"
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/reservedstorage"
-    },
-    {
-        "id": "WPFTweaksRemoveHomeAndGallery",
-        "name": "File Explorer Home and Gallery - Disable",
-        "description": "Removes the Home and Gallery from Explorer and sets This PC as default.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}",
-                "Name": "System.IsPinnedToNameSpaceTree",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}",
-                "Name": "System.IsPinnedToNameSpaceTree",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "LaunchTo",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removehomeandgallery"
-    },
-    {
-        "id": "WPFTweaksDisableIPv6",
-        "name": "IPv6 - Disable",
-        "description": "Disables IPv6.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                "Name": "DisabledComponents",
-                "Value": "255",
-                "Type": "DWord",
-                "OriginalValue": "0"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "Disable-NetAdapterBinding -Name * -ComponentID ms_tcpip6"
-        ],
-        "undoScript": [
-            "Enable-NetAdapterBinding -Name * -ComponentID ms_tcpip6"
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disableipv6"
-    },
-    {
-        "id": "WPFTweaksIPv46",
-        "name": "IPv6 - Set IPv4 as Preferred",
-        "description": "Setting the IPv4 preference can have latency and security benefits on private networks where IPv6 is not configured.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                "Name": "DisabledComponents",
-                "Value": "32",
-                "Type": "DWord",
-                "OriginalValue": "0"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/ipv46"
-    },
-    {
-        "id": "WPFTweaksLogiBlock",
-        "name": "Logitech Download Assistant Auto-Install - Disable",
-        "description": "Blocks the Logi Download Assistant that Windows Update keeps reinstalling with Logitech device drivers. Logitech hardware keeps working without it.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "\n      Stop-Process -Name \"logi_download_assistant\" -Force -ErrorAction SilentlyContinue\n\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        Remove-Item $LogiPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $LogiPath -ItemType Directory\n      }\n\n      icacls $LogiPath /deny \"*S-1-1-0:(W)\"\n      if ($LASTEXITCODE -ne 0) { throw \"icacls failed to deny write access on $LogiPath (exit code $LASTEXITCODE)\" }\n      "
-        ],
-        "undoScript": [
-            "\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        icacls $LogiPath /remove:d \"*S-1-1-0\"\n        if ($LASTEXITCODE -ne 0) { throw \"icacls failed to remove the write-deny rule on $LogiPath (exit code $LASTEXITCODE)\" }\n      }\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock"
-    },
-    {
-        "id": "WPFTweaksEdgeDebloat",
-        "name": "Microsoft Edge - Debloat",
-        "description": "Disables various telemetry options, popups, and other annoyances in Edge.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
-                "Name": "CreateDesktopShortcutDefault",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "PersonalizationReportingEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge\\ExtensionInstallBlocklist",
-                "Name": "1",
-                "Value": "ofefcgjbeghpigppfmkologfjadafddi",
-                "Type": "String",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "ShowRecommendationsEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "HideFirstRunExperience",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "UserFeedbackAllowed",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "ConfigureDoNotTrack",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "AlternateErrorPagesEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "EdgeCollectionsEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "EdgeShoppingAssistantEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "MicrosoftEdgeInsiderPromotionEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "ShowMicrosoftRewards",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "WebWidgetAllowed",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "DiagnosticData",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "EdgeAssetDeliveryServiceEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "WalletDonationEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
-                "Name": "DefaultBrowserSettingsCampaignEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/edgedebloat"
-    },
-    {
-        "id": "WPFTweaksRemoveEdge",
-        "name": "Microsoft Edge - Remove",
-        "description": "Uninstalls Microsoft Edge by creating dummy MicrosoftEdge.exe file in the legacy Edge folder. This tricks Windows into unlocking the official Edge uninstaller allowing for a system-level removal.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "\n      $Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" | Select-Object -Last 1\n\n      if (Test-Path $Path) {\n          New-Item -Path \"$Env:SystemRoot\\SystemApps\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\MicrosoftEdge.exe\" -Force\n          Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait\n          Write-Host \"Microsoft Edge was removed\"\n      } else {\n          Write-Host \"Microsoft Edge is not installed\"\n      }\n      "
-        ],
-        "undoScript": [
-            "\n      Write-Host \"Installing Microsoft Edge...\"\n      winget install Microsoft.Edge --source winget\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeedge"
-    },
-    {
-        "id": "WPFTweaksRemoveOneDrive",
-        "name": "Microsoft OneDrive - Remove",
-        "description": "Denies permission to remove OneDrive user files, then uses its own uninstaller to remove it and restores the original permission afterward.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "\n      # Deny permission to remove OneDrive folder\n      icacls $Env:OneDrive /deny \"*S-1-5-32-544:(D,DC)\"\n\n      Write-Host \"Uninstalling OneDrive...\"\n      Start-Process -FilePath (Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\") -ArgumentList '/uninstall' -Wait\n\n      # Some of OneDrive files use explorer, and OneDrive uses FileCoAuth\n      Write-Host \"Removing leftover OneDrive Files...\"\n\n      Stop-Process -Name FileCoAuth,Explorer\n\n      Remove-Item \"$Env:LocalAppData\\Microsoft\\OneDrive\" -Recurse -Force\n      Remove-Item \"$Env:ProgramData\\Microsoft OneDrive\" -Recurse -Force\n\n      # Grant back permission to access OneDrive folder\n      icacls $Env:OneDrive /grant \"*S-1-5-32-544:(D,DC)\"\n\n      if (-not (Get-ChildItem -Path $Env:OneDrive)) {\n          Remove-Item -Path $Env:OneDrive -Recurse\n          [Environment]::SetEnvironmentVariable('OneDrive', $null, 'User')\n      }\n\n      # Disable OneSyncSvc\n      Set-Service -Name OneSyncSvc -StartupType Disabled\n      "
-        ],
-        "undoScript": [
-            "\n      Write-Host \"Installing OneDrive\"\n      winget install Microsoft.Onedrive --source winget\n\n      # Enabled OneSyncSvc\n      Set-Service -Name OneSyncSvc -StartupType Automatic\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeonedrive"
-    },
-    {
-        "id": "WPFOOSUbutton",
-        "name": "O&O ShutUp10++ - Run",
-        "description": "",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/oosubutton"
-    },
-    {
-        "id": "WPFTweaksDisableWarningForUnsignedRdp",
-        "name": "RDP Unsigned File Warnings - Disable",
-        "description": "Disables warnings shown when launching unsigned RDP files introduced with the latest Windows 10 and 11 updates.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services\\Client",
-                "Name": "RedirectionWarningDialogVersion",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\SOFTWARE\\Microsoft\\Terminal Server Client",
-                "Name": "RdpLaunchConsentAccepted",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablewarningforunsignedrdp"
-    },
-    {
-        "id": "WPFTweaksRazerBlock",
-        "name": "Razer Software Auto-Install - Disable",
-        "description": "Blocks ALL Razer Software installations. The hardware works fine without any software.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DriverSearching",
-                "Name": "SearchOrderConfig",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Device Installer",
-                "Name": "DisableCoInstallers",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "\n      $RazerPath = \"$Env:SystemRoot\\Installer\\Razer\"\n\n      if (Test-Path $RazerPath) {\n        Remove-Item $RazerPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $RazerPath -ItemType Directory\n      }\n\n      icacls $RazerPath /deny \"*S-1-1-0:(W)\"\n      "
-        ],
-        "undoScript": [
-            "\n      icacls \"$Env:SystemRoot\\Installer\\Razer\" /remove:d *S-1-1-0\n      "
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/razerblock"
-    },
-    {
-        "id": "WPFTweaksRightClickMenu",
-        "name": "Right-Click Menu Previous Layout - Enable",
-        "description": "Restores the classic context menu when right-clicking in File Explorer, replacing the simplified Windows 11 version.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [],
-        "service": [],
-        "invokeScript": [
-            "\n      New-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Name InprocServer32 -Value \"\" -Force\n      Stop-Process -Name explorer\n      "
-        ],
-        "undoScript": [
-            "Remove-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Recurse"
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/rightclickmenu"
-    },
-    {
-        "id": "WPFTweaksStorage",
-        "name": "Storage Sense - Disable",
-        "description": "Storage Sense deletes temp files automatically.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
-                "Name": "01",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/storage"
-    },
-    {
-        "id": "WPFTweaksDisableNotifications",
-        "name": "System Tray Notifications & Calendar - Disable",
-        "description": "Disables all Notifications INCLUDING Calendar.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer",
-                "Name": "DisableNotificationCenter",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications",
-                "Name": "ToastEnabled",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            }
-        ],
-        "service": [],
-        "invokeScript": [],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablenotifications"
-    },
-    {
-        "id": "WPFTweaksTeredo",
-        "name": "Teredo - Disable",
-        "description": "Teredo network tunneling is an IPv6 feature that can cause additional latency, but may cause problems with some games.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
-                "Name": "DisabledComponents",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "0"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "netsh interface teredo set state disabled"
-        ],
-        "undoScript": [
-            "netsh interface teredo set state default"
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/teredo"
-    },
-    {
-        "id": "WPFTweaksDisplay",
-        "name": "Visual Effects - Set to Best Performance",
-        "description": "Sets the system preferences to performance. You can do this manually with sysdm.cpl as well.",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKCU:\\Control Panel\\Desktop",
-                "Name": "DragFullWindows",
-                "Value": "0",
-                "Type": "String",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKCU:\\Control Panel\\Desktop",
-                "Name": "MenuShowDelay",
-                "Value": "200",
-                "Type": "String",
-                "OriginalValue": "400"
-            },
-            {
-                "Path": "HKCU:\\Control Panel\\Desktop\\WindowMetrics",
-                "Name": "MinAnimate",
-                "Value": "0",
-                "Type": "String",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKCU:\\Control Panel\\Keyboard",
-                "Name": "KeyboardDelay",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "ListviewAlphaSelect",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "ListviewShadow",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "TaskbarAnimations",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
-                "Name": "VisualFXSetting",
-                "Value": "3",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\DWM",
-                "Name": "EnableAeroPeek",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "TaskbarMn",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
-                "Name": "ShowTaskViewButton",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            },
-            {
-                "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",
-                "Name": "SearchboxTaskbarMode",
-                "Value": "0",
-                "Type": "DWord",
-                "OriginalValue": "1"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "Set-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\" -Type Binary -Value ([byte[]](144,18,3,128,16,0,0,0))"
-        ],
-        "undoScript": [
-            "Remove-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\""
-        ],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/display"
-    },
-    {
-        "id": "WPFTweaksWindowsAI",
-        "name": "Windows AI - Disable And Remove",
-        "description": "Removes and disables all AI features/packages",
-        "category": "Advanced Tweaks (Advanced)",
-        "categoryOrder": 3,
-        "isAdvanced": true,
-        "registry": [
-            {
-                "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
-                "Name": "SettingsPageVisibility",
-                "Value": "hide:aicomponents",
-                "Type": "String",
-                "OriginalValue": "<RemoveEntry>"
-            },
-            {
-                "Path": "HKLM:\\SOFTWARE\\Policies\\WindowsNotepad",
-                "Name": "DisableAIFeatures",
-                "Value": "1",
-                "Type": "DWord",
-                "OriginalValue": "<RemoveEntry>"
-            }
-        ],
-        "service": [],
-        "invokeScript": [
-            "\n      $Appx = (Get-AppxPackage MicrosoftWindows.Client.CoreAI).PackageFullName\n      $Sid = (Get-LocalUser $Env:UserName).Sid.Value\n\n      New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" | Remove-AppxPackage -AllUsers\n      winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements 2>$null\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub | Remove-AppxPackage -AllUsers\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx\n      }\n\n      Set-Service -Name WSAIFabricSvc -StartupType Disabled\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart\n\n      Write-Host \"Windows AI Disabled\"\n      "
-        ],
-        "undoScript": [],
-        "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/windowsai"
-    }
+  {
+    "id": "EmulTweakHypervisorVBS",
+    "name": "Emulator 100% CPU Utilization & VBS/Hypervisor Bypass",
+    "description": "Disables Windows Hypervisor and Virtualization-Based Security (VBS/HVCI) overhead, giving BlueStacks, LDPlayer, Nox, MEMU 100% direct bare-metal access to hardware VT-x / AMD-V with zero emulation stutter.",
+    "category": "🚀 Emulator 100% Performance",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\DeviceGuard",
+        "Name": "EnableVirtualizationBasedSecurity",
+        "Value": "0",
+        "OriginalValue": "1",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\DeviceGuard\\Scenarios\\HypervisorEnforcedCodeIntegrity",
+        "Name": "Enabled",
+        "Value": "0",
+        "OriginalValue": "1",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "bcdedit /set hypervisorlaunchtype off"
+    ],
+    "undoScript": [
+      "bcdedit /set hypervisorlaunchtype auto"
+    ],
+    "link": "https://support.bluestacks.com/hc/en-us/articles/360055244412-How-to-disable-Hyper-V-on-Windows-for-BlueStacks"
+  },
+  {
+    "id": "EmulTweakCpuPriority",
+    "name": "Android & VM Emulator Realtime CPU Priority (BlueStacks/LDPlayer/Nox/MEMU)",
+    "description": "Configures Windows kernel IFEO to automatically execute all major emulator processes (HD-Player.exe, dnplayer.exe, LdBoxHeadless.exe, Nox.exe, MEmu.exe) with High CPU Priority and High I/O Priority for maximum frame rates.",
+    "category": "🚀 Emulator 100% Performance",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Player.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Player.exe\\PerfOptions",
+        "Name": "IoPriority",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dnplayer.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dnplayer.exe\\PerfOptions",
+        "Name": "IoPriority",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LdBoxHeadless.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LdBoxHeadless.exe\\PerfOptions",
+        "Name": "IoPriority",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\Nox.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\MEmu.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "EmulTweakGpuPreference",
+    "name": "Force Discrete High-Performance GPU for All Emulators",
+    "description": "Forces Windows DirectX graphics runtime to route all Android and console emulator graphics rendering directly through your high-power discrete GPU instead of integrated graphics.",
+    "category": "🚀 Emulator 100% Performance",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "HD-Player.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "dnplayer.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "LdBoxHeadless.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "Nox.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "MEmu.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "EmulTweakPowerThrottling",
+    "name": "Disable CPU Power Throttling & EcoQoS for Emulators",
+    "description": "Stops Windows 10/11 from throttling multi-threaded Android emulator processes, preventing emulator CPU threads from getting relegated to slow efficiency states.",
+    "category": "🚀 Emulator 100% Performance",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+        "Name": "PowerThrottlingOff",
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "GfxTweakVisualFX",
+    "name": "Windows Visual Effects - Ultimate Gaming Performance Mode",
+    "description": "Disables window animations, menu fade delays, drop shadows, and taskbar transition latency while keeping crisp ClearType font rendering.",
+    "category": "🖥️ Graphical & Visual Responsiveness",
+    "categoryOrder": 1,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+        "Name": "VisualFXSetting",
+        "Value": "2",
+        "OriginalValue": "1",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop\\WindowMetrics",
+        "Name": "MinAnimate",
+        "Value": "0",
+        "OriginalValue": "1",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop",
+        "Name": "UserPreferencesMask",
+        "Value": "90 12 03 80 10 00 00 00",
+        "OriginalValue": "9e 1e 07 80 12 00 00 00",
+        "Type": "Binary"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop",
+        "Name": "MenuShowDelay",
+        "Value": "0",
+        "OriginalValue": "400",
+        "Type": "String"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "GfxTweakHAGS",
+    "name": "Hardware-Accelerated GPU Scheduling (HAGS)",
+    "description": "Offloads high-frequency video memory management directly to the GPU's dedicated scheduling processor, cutting frame latency and improving 1% low FPS.",
+    "category": "🖥️ Graphical & Visual Responsiveness",
+    "categoryOrder": 1,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "Name": "HwSchMode",
+        "Value": "2",
+        "OriginalValue": "1",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "GfxTweakShaderCache",
+    "name": "DirectX Shader Cache Maximize (1GB+ for Zero Stutter)",
+    "description": "Sets the global DirectX shader disk cache to 1GB to prevent in-game shader compilation stutters in modern games and 3D emulators.",
+    "category": "🖥️ Graphical & Visual Responsiveness",
+    "categoryOrder": 1,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Direct3D",
+        "Name": "DirectXDriverCacheSize",
+        "Value": "1073741824",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "GfxTweakFSE",
+    "name": "Disable Fullscreen Optimizations & DWM Overlay Delay",
+    "description": "Enforces true exclusive fullscreen mode and disables Windows Desktop Window Manager composition overhead for all DX11/DX12 games.",
+    "category": "🖥️ Graphical & Visual Responsiveness",
+    "categoryOrder": 1,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\System\\GameConfigStore",
+        "Name": "GameDVR_FSEBehavior",
+        "Value": "2",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKCU:\\System\\GameConfigStore",
+        "Name": "GameDVR_HonorUserFSEBehaviorMode",
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKCU:\\System\\GameConfigStore",
+        "Name": "GameDVR_DXGIHonorFSEWindowsCompatible",
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "GfxTweakMPO",
+    "name": "Disable Multi-Plane Overlay (MPO) Micro-Stutter Fix",
+    "description": "Eliminates infamous DWM multi-plane overlay frame drops, black screens, and micro-stutters across NVIDIA, AMD, and Intel GPUs.",
+    "category": "🖥️ Graphical & Visual Responsiveness",
+    "categoryOrder": 1,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
+        "Name": "OverlayTestMode",
+        "Value": "5",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "KernelTweakDynamicTick",
+    "name": "Disable Dynamic Tick (Kernel Clock Drift Elimination)",
+    "description": "Stops variable timer tick drift by locking the Windows kernel timer to a constant frequency, eliminating micro-stutters and frame jitter.",
+    "category": "⚡ Extreme Low Latency & Kernel Timers",
+    "categoryOrder": 2,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "bcdedit /set disabledynamictick yes"
+    ],
+    "undoScript": [
+      "bcdedit /set disabledynamictick no"
+    ]
+  },
+  {
+    "id": "KernelTweakTSCClock",
+    "name": "Force Hardware Invariant TSC Clock (Bypass HPET Latency)",
+    "description": "Bypasses high-overhead motherboard HPET timer chips and forces Windows to synchronize with the CPU's direct on-die Time Stamp Counter (TSC).",
+    "category": "⚡ Extreme Low Latency & Kernel Timers",
+    "categoryOrder": 2,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "bcdedit /set useplatformclock no",
+      "bcdedit /set useplatformtick yes"
+    ],
+    "undoScript": [
+      "bcdedit /deletevalue useplatformclock",
+      "bcdedit /deletevalue useplatformtick"
+    ]
+  },
+  {
+    "id": "KernelTweakTSCSync",
+    "name": "Enhanced CPU Time Stamp Counter (TSC) Synchronization",
+    "description": "Enforces strict TSC counter synchronization across all CPU cores for seamless multi-core game execution and zero frame pacing hitches.",
+    "category": "⚡ Extreme Low Latency & Kernel Timers",
+    "categoryOrder": 2,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "bcdedit /set tscsyncpolicy Enhanced"
+    ],
+    "undoScript": [
+      "bcdedit /set tscsyncpolicy Default"
+    ]
+  },
+  {
+    "id": "KernelTweakSysResponsiveness",
+    "name": "System Responsiveness 100% Gaming Reservation",
+    "description": "Sets Multimedia System Profile SystemResponsiveness to 0%, eliminating Windows' default 20% CPU reservation for background tasks.",
+    "category": "⚡ Extreme Low Latency & Kernel Timers",
+    "categoryOrder": 2,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+        "Name": "SystemResponsiveness",
+        "Value": "0",
+        "OriginalValue": "20",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+        "Name": "NetworkThrottlingIndex",
+        "Value": "4294967295",
+        "OriginalValue": "10",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "CpuTweakUnparkCores",
+    "name": "Unpark All CPU Cores & Ultimate Performance Plan",
+    "description": "Enables Windows Ultimate Performance power scheme and forces CPU core unparking to 100%, ensuring all physical and logical cores remain awake and ready.",
+    "category": "🧠 CPU, RAM & Power Tuning",
+    "categoryOrder": 3,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61",
+      "powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61",
+      "powercfg -setacvalueindex scheme_current sub_processor CPMIN 100",
+      "powercfg -setactive scheme_current"
+    ],
+    "undoScript": [
+      "powercfg /setactive 381b4222-f694-41f0-9685-ff5bb260df2e"
+    ]
+  },
+  {
+    "id": "CpuTweakWin32Priority",
+    "name": "Win32 Priority Separation (Foreground Game Quanta Boost)",
+    "description": "Configures processor scheduling thread quanta to 38 (0x26), granting 3:1 high priority boost to foreground gaming and emulator processes.",
+    "category": "🧠 CPU, RAM & Power Tuning",
+    "categoryOrder": 3,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+        "Name": "Win32PrioritySeparation",
+        "Value": "38",
+        "OriginalValue": "2",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "CpuTweakDisablePaging",
+    "name": "Disable Paging Executive (Lock Kernel & Drivers in RAM)",
+    "description": "Prevents Windows NT kernel and hardware driver code from ever being paged out to disk, keeping all system calls directly in ultra-fast RAM.",
+    "category": "🧠 CPU, RAM & Power Tuning",
+    "categoryOrder": 3,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+        "Name": "DisablePagingExecutive",
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+        "Name": "LargeSystemCache",
+        "Value": "0",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "MemTweakFlushStandby",
+    "name": "Purge Standby Memory Cache & Process Working Sets",
+    "description": "Instantly flushes stale Windows standby memory lists and frees fragmented RAM without needing third-party memory cleaners.",
+    "category": "🧠 CPU, RAM & Power Tuning",
+    "categoryOrder": 3,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "[System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers()"
+    ],
+    "undoScript": []
+  },
+  {
+    "id": "NetTweakTcpAckNoDelay",
+    "name": "Disable Nagle's Algorithm (TcpAckFrequency & TCPNoDelay)",
+    "description": "Disables delayed packet acknowledgment and Nagle's bundling algorithm on all network adapters, dropping multiplayer game packet latency to minimum.",
+    "category": "🌐 Network, TCP & Ultra-Low Ping",
+    "categoryOrder": 4,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "Get-ChildItem -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { Set-ItemProperty -Path $_.PSPath -Name 'TcpAckFrequency' -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue; Set-ItemProperty -Path $_.PSPath -Name 'TCPNoDelay' -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue; Set-ItemProperty -Path $_.PSPath -Name 'TcpDelAckTicks' -Value 0 -Type DWord -Force -ErrorAction SilentlyContinue }"
+    ],
+    "undoScript": [
+      "Get-ChildItem -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces' | ForEach-Object { Remove-ItemProperty -Path $_.PSPath -Name 'TcpAckFrequency' -ErrorAction SilentlyContinue; Remove-ItemProperty -Path $_.PSPath -Name 'TCPNoDelay' -ErrorAction SilentlyContinue; Remove-ItemProperty -Path $_.PSPath -Name 'TcpDelAckTicks' -ErrorAction SilentlyContinue }"
+    ]
+  },
+  {
+    "id": "NetTweakNetshRss",
+    "name": "Optimize TCP Auto-Tuning & Multi-Core Receive Side Scaling (RSS)",
+    "description": "Enables Receive Side Scaling to distribute incoming network packet interrupts across all CPU cores and disables high-latency TCP Chimney offloads.",
+    "category": "🌐 Network, TCP & Ultra-Low Ping",
+    "categoryOrder": 4,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "netsh int tcp set global autotuninglevel=normal",
+      "netsh int tcp set global rss=enabled",
+      "netsh int tcp set global chimney=disabled",
+      "netsh int tcp set global ecncapability=disabled"
+    ],
+    "undoScript": [
+      "netsh int tcp set global autotuninglevel=normal",
+      "netsh int tcp set global rss=default"
+    ]
+  },
+  {
+    "id": "DiskTweakNtfsFast",
+    "name": "Disable NTFS 8.3 Short-Names & Last-Access Time Updates",
+    "description": "Eliminates legacy 16-bit DOS 8.3 file creation and stops timestamp writes on every file read, significantly boosting SSD and NVMe read/write throughput.",
+    "category": "💾 Storage & NVMe Throughput",
+    "categoryOrder": 5,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+        "Name": "NtfsDisable8dot3NameCreation",
+        "Value": "1",
+        "OriginalValue": "2",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+        "Name": "NtfsDisableLastAccessUpdate",
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "DiskTweakEnableTrim",
+    "name": "Verify & Enable Hardware SSD TRIM",
+    "description": "Ensures Windows TRIM command is enabled for all SSDs so write performance and flash endurance never degrade over time.",
+    "category": "💾 Storage & NVMe Throughput",
+    "categoryOrder": 5,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "fsutil behavior set DisableDeleteNotify 0"
+    ],
+    "undoScript": [
+      "fsutil behavior set DisableDeleteNotify 0"
+    ]
+  },
+  {
+    "id": "WPFTweaksActivity",
+    "name": "Activity History - Disable",
+    "description": "Stops Windows from publishing or uploading user activities while preserving clipboard history.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "Name": "EnableActivityFeed",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "Name": "PublishUserActivities",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "Name": "UploadUserActivities",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/activity"
+  },
+  {
+    "id": "WPFTweaksDisableBitLocker",
+    "name": "BitLocker - Disable",
+    "description": "Disables BitLocker.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "Disable-BitLocker -MountPoint $Env:SystemDrive"
+    ],
+    "undoScript": [
+      "Enable-BitLocker -MountPoint $Env:SystemDrive"
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablebitlocker"
+  },
+  {
+    "id": "WPFTweaksConsumerFeatures",
+    "name": "ConsumerFeatures - Disable",
+    "description": "Stops promoted app installs and reduces app suggestions from Microsoft Store content.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
+        "Name": "DisableWindowsConsumerFeatures",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/consumerfeatures"
+  },
+  {
+    "id": "WPFTweaksDeliveryOptimization",
+    "name": "Delivery Optimization - Disable",
+    "description": "Stops Windows from using your bandwidth to upload updates to other PCs on the internet or local network.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+        "Name": "DODownloadMode",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deliveryoptimization"
+  },
+  {
+    "id": "WPFTweaksDiskCleanup",
+    "name": "Disk Cleanup - Run",
+    "description": "Runs Disk Cleanup on Drive C: and removes old Windows Updates.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "\n      cleanmgr.exe /d C: /VERYLOWDISK\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\n      "
+    ],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/diskcleanup"
+  },
+  {
+    "id": "WPFTweaksEndTaskOnTaskbar",
+    "name": "End Task With Right Click - Enable",
+    "description": "Enables option to end task when right-clicking a program in the taskbar.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
+        "Name": "TaskbarEndTask",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/endtaskontaskbar"
+  },
+  {
+    "id": "WPFTweaksDisableExplorerAutoDiscovery",
+    "name": "File Explorer Automatic Folder Discovery - Disable",
+    "description": "Windows Explorer automatically tries to guess the type of the folder based on its contents, slowing down the browsing experience. WARNING! Will disable File Explorer grouping.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "\n      # Previously detected folders\n      $bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n\n      # Folder types lookup table\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n\n      # Flush Explorer view database\n      Remove-Item -Path $bags -Recurse -Force\n      Write-Host \"Removed $bags\"\n\n      Remove-Item -Path $bagMRU -Recurse -Force\n      Write-Host \"Removed $bagMRU\"\n\n      # Every folder\n      $allFolders = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell\"\n\n      if (!(Test-Path $allFolders)) {\n        New-Item -Path $allFolders -Force\n        Write-Host \"Created $allFolders\"\n      }\n\n      # Generic view\n      New-ItemProperty -Path $allFolders -Name \"FolderType\" -Value \"NotSpecified\" -PropertyType String -Force\n      Write-Host \"Set FolderType to NotSpecified\"\n\n      Write-Host Please sign out and back in, or restart your computer to apply the changes!\n      "
+    ],
+    "undoScript": [
+      "\n      # Previously detected folders\n      $bags = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\"\n\n      # Folder types lookup table\n      $bagMRU = \"HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU\"\n\n      # Flush Explorer view database\n      Remove-Item -Path $bags -Recurse -Force\n      Write-Host \"Removed $bags\"\n\n      Remove-Item -Path $bagMRU -Recurse -Force\n      Write-Host \"Removed $bagMRU\"\n\n      Write-Host Please sign out and back in, or restart your computer to apply the changes!\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disableexplorerautodiscovery"
+  },
+  {
+    "id": "WPFTweaksHiber",
+    "name": "Hibernation - Disable",
+    "description": "Hibernation is really meant for laptops as it saves what's in memory before turning the PC off. It really should never be used.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\System\\CurrentControlSet\\Control\\Session Manager\\Power",
+        "Name": "HibernateEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FlyoutMenuSettings",
+        "Name": "ShowHibernateOption",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "powercfg.exe /hibernate off"
+    ],
+    "undoScript": [
+      "powercfg.exe /hibernate on"
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/hiber"
+  },
+  {
+    "id": "WPFTweaksLocation",
+    "name": "Location Tracking - Disable",
+    "description": "Disables Location Tracking.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location",
+        "Name": "Value",
+        "Value": "Deny",
+        "Type": "String",
+        "OriginalValue": "Allow"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Sensor\\Overrides\\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}",
+        "Name": "SensorPermissionState",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\Maps",
+        "Name": "AutoUpdateEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      }
+    ],
+    "service": [
+      {
+        "Name": "lfsvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      }
+    ],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/location"
+  },
+  {
+    "id": "WPFTweaksDisableStoreSearch",
+    "name": "Microsoft Store Recommended Search Results - Disable",
+    "description": "Will not display recommended Microsoft Store apps when searching for apps in the Start menu.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /deny *S-1-1-0:F"
+    ],
+    "undoScript": [
+      "icacls \"$Env:LocalAppData\\Packages\\Microsoft.WindowsStore_8wekyb3d8bbwe\\LocalState\\store.db\" /grant *S-1-1-0:F"
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablestoresearch"
+  },
+  {
+    "id": "WPFTweaksPreventDeviceMetadataFromNetwork",
+    "name": "Prevent Device Companion Apps",
+    "description": "Prevents additional software from being installed when plugging in devices (e.g. Ads when plugging in a monitor). Poses potential security risk.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata",
+        "Name": "PreventDeviceMetadataFromNetwork",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/preventdevicemetadatafromnetwork"
+  },
+  {
+    "id": "WPFTweaksRestorePoint",
+    "name": "Restore Point - Create",
+    "description": "Creates a restore point at runtime in case a revert is needed from WinUtil modifications.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SystemRestore",
+        "Name": "SystemRestorePointCreationFrequency",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1440"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "\n      if (-not (Get-ComputerRestorePoint)) {\n          Enable-ComputerRestore -Drive $Env:SystemDrive\n      }\n\n      Checkpoint-Computer -Description \"System Restore Point created by WinUtil\" -RestorePointType MODIFY_SETTINGS\n      Write-Host \"System Restore Point Created Successfully\" -ForegroundColor Green\n      "
+    ],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/restorepoint"
+  },
+  {
+    "id": "WPFTweaksServices",
+    "name": "Services - Set to Manual",
+    "description": "Sets some services to Manual startup and adjusts the SvcHostSplitThresholdInKB registry value to better match system memory, which can significantly reduce the number of svchost.exe processes.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [],
+    "service": [
+      {
+        "Name": "CscService",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "DiagTrack",
+        "StartupType": "Disabled",
+        "OriginalType": "Automatic"
+      },
+      {
+        "Name": "MapsBroker",
+        "StartupType": "Manual",
+        "OriginalType": "Automatic"
+      },
+      {
+        "Name": "StorSvc",
+        "StartupType": "Manual",
+        "OriginalType": "Automatic"
+      },
+      {
+        "Name": "SharedAccess",
+        "StartupType": "Disabled",
+        "OriginalType": "Automatic"
+      }
+    ],
+    "invokeScript": [
+      "\n      $Memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB\n      Set-ItemProperty -Path \"HKLM:\\SYSTEM\\CurrentControlSet\\Control\" -Name SvcHostSplitThresholdInKB -Value $Memory\n      "
+    ],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/services"
+  },
+  {
+    "id": "WPFTweaksRevertStartMenu",
+    "name": "Start Menu Previous Layout - Enable",
+    "description": "Bring back the old Start Menu layout from before the gradual rollout of the new one in 25H2. On newer versions of Windows !!THIS TWEAK WILL NOT WORK!!",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\ControlSet001\\Control\\FeatureManagement\\Overrides\\8\\3036241548",
+        "Name": "EnabledState",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/revertstartmenu"
+  },
+  {
+    "id": "WPFTweaksTelemetry",
+    "name": "Telemetry - Disable",
+    "description": "Disables Microsoft Telemetry.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
+        "Name": "Enabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy",
+        "Name": "TailoredExperiencesWithDiagnosticDataEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Speech_OneCore\\Settings\\OnlineSpeechPrivacy",
+        "Name": "HasAccepted",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Input\\TIPC",
+        "Name": "Enabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\InputPersonalization",
+        "Name": "RestrictImplicitInkCollection",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\InputPersonalization",
+        "Name": "RestrictImplicitTextCollection",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\InputPersonalization\\TrainedDataStore",
+        "Name": "HarvestContacts",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Personalization\\Settings",
+        "Name": "AcceptedPrivacyPolicy",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\DataCollection",
+        "Name": "AllowTelemetry",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "Start_TrackProgs",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "Name": "PublishUserActivities",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Siuf\\Rules",
+        "Name": "NumberOfSIUFInPeriod",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "\n      # Disable Defender Auto Sample Submission\n      Set-MpPreference -SubmitSamplesConsent 2\n\n      # Disable (Connected User Experiences and Telemetry) Service\n      Set-Service -Name diagtrack -StartupType Disabled\n\n      # Disable (Windows Error Reporting Manager) Service\n      Set-Service -Name wermgr -StartupType Disabled\n\n      # Disable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '1', 'Machine')\n\n      Remove-ItemProperty -Path \"HKCU:\\Software\\Microsoft\\Siuf\\Rules\" -Name PeriodInNanoSeconds\n      "
+    ],
+    "undoScript": [
+      "\n      # Enable Defender Auto Sample Submission\n      Set-MpPreference -SubmitSamplesConsent 1\n\n      # Enable (Connected User Experiences and Telemetry) Service\n      Set-Service -Name diagtrack -StartupType Automatic\n\n      # Enable (Windows Error Reporting Manager) Service\n      Set-Service -Name wermgr -StartupType Automatic\n\n      # Enable PowerShell 7 telemetry\n      [Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '', 'Machine')\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/telemetry"
+  },
+  {
+    "id": "WPFTweaksDeleteTempFiles",
+    "name": "Temporary Files - Remove",
+    "description": "Erases TEMP Folders.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "\n      # A temp folder always holds files something has open, including this run's own, and\n      # the job layer counts a logged error as a failed step\n      Remove-Item -Path \"$Env:Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path \"$Env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      "
+    ],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/deletetempfiles"
+  },
+  {
+    "id": "WPFTweaksWidget",
+    "name": "Widgets - Remove",
+    "description": "Removes the annoying widgets in the bottom left of the Taskbar.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "\n      # Sometimes if you dont stop the Widgets process the removal may fail\n\n      Get-Process *Widget* | Stop-Process\n      Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers | Remove-AppxPackage -AllUsers\n      Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers | Remove-AppxPackage -AllUsers\n\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      Write-Host \"Removed widgets\"\n      "
+    ],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/widget"
+  },
+  {
+    "id": "WPFTweaksWPBT",
+    "name": "Windows Platform Binary Table (WPBT) - Disable",
+    "description": "If enabled, WPBT allows your computer vendor to execute programs at boot time, such as anti-theft software, software drivers, as well as force install software without user consent. Poses potential security risk.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager",
+        "Name": "DisableWpbtExecution",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/wpbt"
+  },
+  {
+    "id": "WPFToggleDetailedBSoD",
+    "name": "BSoD Verbose Mode",
+    "description": "Gives more information when you blue screen.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl",
+        "Name": "DisplayParameters",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "false"
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl",
+        "Name": "DisableEmoticon",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "false"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/detailedbsod"
+  },
+  {
+    "id": "WPFToggleDarkMode",
+    "name": "Dark Theme for Windows",
+    "description": "Dark Mode for the system and applications.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+        "Name": "AppsUseLightTheme",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1",
+        "DefaultState": "false"
+      },
+      {
+        "Path": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+        "Name": "SystemUsesLightTheme",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1",
+        "DefaultState": "false"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "\n      Invoke-WinUtilExplorerUpdate\n      if ($sync.ThemeButton.Content -eq [char]0xF08C) {\n        Invoke-WinutilThemeChange -theme \"Auto\"\n      }\n      "
+    ],
+    "undoScript": [
+      "\n      Invoke-WinUtilExplorerUpdate\n      if ($sync.ThemeButton.Content -eq [char]0xF08C) {\n        Invoke-WinutilThemeChange -theme \"Auto\"\n      }\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/darkmode"
+  },
+  {
+    "id": "WPFToggleLongPaths",
+    "name": "Enable Long Paths",
+    "description": "Toggles support for file paths longer than 260 characters in Explorer.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+        "Name": "LongPathsEnabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "false"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/longpaths"
+  },
+  {
+    "id": "WPFToggleShowExt",
+    "name": "File Explorer File Extensions",
+    "description": "Shows .file extensions in Explorer (.exe, .png, etc.)",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "HideFileExt",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1",
+        "DefaultState": "false"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+    ],
+    "undoScript": [
+      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/showext"
+  },
+  {
+    "id": "WPFToggleHiddenFiles",
+    "name": "File Explorer Hidden Files",
+    "description": "Reveals hidden files in Explorer.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "Hidden",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "false"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+    ],
+    "undoScript": [
+      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hiddenfiles"
+  },
+  {
+    "id": "WPFToggleGameMode",
+    "name": "Game Mode",
+    "description": "Toggles Windows prioritizes gaming performance by allocating system resources to games.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\GameBar",
+        "Name": "AllowAutoGameMode",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\GameBar",
+        "Name": "AutoGameModeEnabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/gamemode"
+  },
+  {
+    "id": "WPFToggleDisableLockscreen",
+    "name": "Lock Screen - Disable",
+    "description": "Skips the lock screen entirely and goes directly to the sign-in screen on boot and wake.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization",
+        "Name": "NoLockScreen",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/disablelockscreen"
+  },
+  {
+    "id": "WPFToggleLoginBlur",
+    "name": "Logon Screen Acrylic Blur",
+    "description": "Toggles the acrylic blur effect on login screen background.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+        "Name": "DisableAcrylicBackgroundOnLogon",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/loginblur"
+  },
+  {
+    "id": "WPFToggleVerboseLogon",
+    "name": "Logon Verbose Mode",
+    "description": "Show detailed messages during startup/shutdown.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "Name": "VerboseStatus",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "false"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/verboselogon"
+  },
+  {
+    "id": "WPFToggleNewOutlook",
+    "name": "Microsoft Outlook New Version",
+    "description": "This will ensure the new Outlook application is used.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\SOFTWARE\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
+        "Name": "UseNewOutlook",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
+        "Name": "HideNewOutlookToggle",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1",
+        "DefaultState": "true"
+      },
+      {
+        "Path": "HKCU:\\Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Options\\General",
+        "Name": "DoNewOutlookAutoMigration",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "false"
+      },
+      {
+        "Path": "HKCU:\\Software\\Policies\\Microsoft\\Office\\16.0\\Outlook\\Preferences",
+        "Name": "NewOutlookMigrationUserSetting",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/newoutlook"
+  },
+  {
+    "id": "WPFToggleMouseAcceleration",
+    "name": "Mouse Acceleration",
+    "description": "Makes it so Cursor movement is affected by the speed of your physical mouse movements.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Control Panel\\Mouse",
+        "Name": "MouseSpeed",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Mouse",
+        "Name": "MouseThreshold1",
+        "Value": "6",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Mouse",
+        "Name": "MouseThreshold2",
+        "Value": "10",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/mouseacceleration"
+  },
+  {
+    "id": "WPFMultiplaneOverlay",
+    "name": "Multiplane Overlay",
+    "description": "Multiplane Overlay composes multiple image layers, which can sometimes cause issues with graphics cards. Changes to this preference are applied immediately.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
+        "Name": "OverlayTestMode",
+        "Type": "DWord",
+        "DefaultValue": "0",
+        "Values": {
+          "Enabled": "<RemoveEntry>",
+          "Disabled (Compatibility)": "5",
+          "Fully Disabled": "5"
+        }
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "Name": "DisableOverlays",
+        "Type": "DWord",
+        "DefaultValue": "0",
+        "Values": {
+          "Enabled": "<RemoveEntry>",
+          "Disabled (Compatibility)": "<RemoveEntry>",
+          "Fully Disabled": "1"
+        }
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/multiplaneoverlay"
+  },
+  {
+    "id": "WPFToggleNumLock",
+    "name": "Num Lock on Startup",
+    "description": "Toggle the Num Lock key state when your computer starts.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKU:\\.Default\\Control Panel\\Keyboard",
+        "Name": "InitialKeyboardIndicators",
+        "Value": "2",
+        "Type": "String",
+        "OriginalValue": "0",
+        "DefaultState": "false"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Keyboard",
+        "Name": "InitialKeyboardIndicators",
+        "Value": "2",
+        "Type": "String",
+        "OriginalValue": "0",
+        "DefaultState": "false"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/numlock"
+  },
+  {
+    "id": "WPFToggleStandbyFix",
+    "name": "S0 Sleep Network Connectivity",
+    "description": "Toggles network connectivity during S0 Sleep which is low power idle in modern laptops.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Power\\PowerSettings\\f15576e8-98b7-4186-b944-eafa664402d9",
+        "Name": "ACSettingIndex",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/standbyfix"
+  },
+  {
+    "id": "WPFToggleS3Sleep",
+    "name": "S3 Sleep",
+    "description": "Toggles between Modern Standby and S3 Sleep, which cuts off power to the CPU while continuing to refresh the memory.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power",
+        "Name": "PlatformAoAcOverride",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>",
+        "DefaultState": "false"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/s3sleep"
+  },
+  {
+    "id": "WPFToggleScrollbars",
+    "name": "Scrollbars Always Visible",
+    "description": "If enabled, scrollbars will always be visible. If disabled, Windows will automatically hide scrollbars when not in use.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Control Panel\\Accessibility",
+        "Name": "DynamicScrollbars",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1",
+        "DefaultState": "false"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/scrollbars"
+  },
+  {
+    "id": "WPFToggleHideSettingsHome",
+    "name": "Settings Home Page",
+    "description": "Toggles the Home Page in the Windows Settings app.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+        "Name": "SettingsPageVisibility",
+        "Value": "show:home",
+        "Type": "String",
+        "OriginalValue": "hide:home",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/hidesettingshome"
+  },
+  {
+    "id": "WPFToggleBingSearch",
+    "name": "Start Menu Bing Search",
+    "description": "Toggles Bing web search results in Windows Search.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+        "Name": "BingSearchEnabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/bingsearch"
+  },
+  {
+    "id": "WPFToggleStartMenuRecommendations",
+    "name": "Start Menu Recommendations",
+    "description": "Toggles the recommendations section in the Start Menu. WARNING: This will also disable Windows Spotlight on your Lock Screen as a side effect.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Start",
+        "Name": "HideRecommendedSection",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1",
+        "DefaultState": "true"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Education",
+        "Name": "IsEducationEnvironment",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1",
+        "DefaultState": "true"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer",
+        "Name": "HideRecommendedSection",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+    ],
+    "undoScript": [
+      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/startmenurecommendations"
+  },
+  {
+    "id": "WPFToggleStickyKeys",
+    "name": "Sticky Keys",
+    "description": "Toggles the Sticky Keys, which activate when clicking shift rapidly.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Control Panel\\Accessibility\\StickyKeys",
+        "Name": "Flags",
+        "Value": "506",
+        "Type": "DWord",
+        "OriginalValue": "58",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/stickykeys"
+  },
+  {
+    "id": "WPFToggleBatteryPercentage",
+    "name": "System Tray Battery Percentage",
+    "description": "Shows numeric battery percentage next to the battery icon in the system tray.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "IsBatteryPercentageEnabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>",
+        "DefaultState": "false"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/batterypercentage"
+  },
+  {
+    "id": "WPFToggleTaskbarAlignment",
+    "name": "Taskbar Centered Icons",
+    "description": "Toggles the Taskbar alignment either to the left or center.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "TaskbarAl",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+    ],
+    "undoScript": [
+      "\n      Invoke-WinUtilExplorerUpdate -action \"restart\"\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbaralignment"
+  },
+  {
+    "id": "WPFToggleTaskbarSearch",
+    "name": "Taskbar Search Icon",
+    "description": "Toggles the Search Button on the Taskbar.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+        "Name": "SearchboxTaskbarMode",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskbarsearch"
+  },
+  {
+    "id": "WPFToggleTaskView",
+    "name": "Taskbar Task View Icon",
+    "description": "Toggles the Task View Button in the Taskbar.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ShowTaskViewButton",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/taskview"
+  },
+  {
+    "id": "WPFToggleWindowSnapping",
+    "name": "Window Snapping",
+    "description": "Toggles the window snapping feature when dragging windows.",
+    "category": "Customize Preferences",
+    "categoryOrder": 1,
+    "isAdvanced": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop",
+        "Name": "WindowArrangementActive",
+        "Value": "1",
+        "Type": "String",
+        "OriginalValue": "0",
+        "DefaultState": "true"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/customize-preferences/windowsnapping"
+  },
+  {
+    "id": "WPFRemoveUltPerf",
+    "name": "Ultimate Performance Profile - Disable",
+    "description": "",
+    "category": "Performance Plans - NOT FOR LAPTOPS",
+    "categoryOrder": 2,
+    "isAdvanced": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/performance-plans---not-for-laptops/removeultperf"
+  },
+  {
+    "id": "WPFAddUltPerf",
+    "name": "Ultimate Performance Profile - Enable",
+    "description": "",
+    "category": "Performance Plans - NOT FOR LAPTOPS",
+    "categoryOrder": 2,
+    "isAdvanced": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/performance-plans---not-for-laptops/addultperf"
+  },
+  {
+    "id": "WPFTweaksBlockAdobeNet",
+    "name": "Adobe URL Block List - Enable",
+    "description": "Reduces user interruptions by selectively blocking connections to Adobe's activation and telemetry servers. Credit: Ruddernation-Designs",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "\n      $hostsUrl = Invoke-RestMethod -Uri https://github.com/Ruddernation-Designs/Adobe-URL-Block-List/raw/refs/heads/master/hosts\n      Add-Content -Path \"$Env:SystemRoot\\System32\\drivers\\etc\\hosts\" -Value $hostsUrl\n\n      ipconfig /flushdns\n      Write-Host 'Added Adobe url block list from host file'\n      "
+    ],
+    "undoScript": [
+      "\n      Set-Content \"$Env:SystemRoot\\System32\\drivers\\etc\\hosts\" (\n          (Get-Content \"$Env:SystemRoot\\System32\\drivers\\etc\\hosts\") -join \"`n\" -replace '(?s)#New Ver.*', ''\n      )\n\n      ipconfig /flushdns\n      Write-Host 'Removed Adobe url block list from host file'\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/blockadobenet"
+  },
+  {
+    "id": "WPFTweaksDisableBGapps",
+    "name": "Background Apps - Disable",
+    "description": "Disables all Microsoft Store apps from running in the background, which has to be done individually since Windows 11.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
+        "Name": "GlobalUserDisabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablebgapps"
+  },
+  {
+    "id": "WPFTweaksBraveDebloat",
+    "name": "Brave Browser - Debloat",
+    "description": "Disables various annoyances like Brave Rewards, Leo AI, Crypto Wallet and VPN.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "BraveRewardsDisabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "BraveWalletDisabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "BraveVPNDisabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "BraveAIChatEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "BraveStatsPingEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "BraveNewsDisabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "BraveTalkDisabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "TorDisabled",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "BraveP3AEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "UrlKeyedAnonymizedDataCollectionEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "SafeBrowsingExtendedReportingEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\BraveSoftware\\Brave",
+        "Name": "MetricsReportingEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/bravedebloat"
+  },
+  {
+    "id": "WPFchangedns",
+    "name": "DNS - Set to:",
+    "description": "",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/changedns"
+  },
+  {
+    "id": "WPFTweaksUTC",
+    "name": "Date & Time - Set Time to UTC",
+    "description": "Essential for computers that are dual booting. Fixes the time sync with Linux systems.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation",
+        "Name": "RealTimeIsUniversal",
+        "Value": "1",
+        "Type": "QWord",
+        "OriginalValue": "0"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/utc"
+  },
+  {
+    "id": "WPFTweaksReservedStorage",
+    "name": "Disable Reserved Storage",
+    "description": "Disables Windows Reserved Storage (7-10 GB held for updates/temp files). Recommended only on small drives. Re-enable before major Windows feature updates to avoid installation failures.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "DISM /Online /Set-ReservedStorageState /State:Disabled"
+    ],
+    "undoScript": [
+      "DISM /Online /Set-ReservedStorageState /State:Enabled"
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/reservedstorage"
+  },
+  {
+    "id": "WPFTweaksRemoveHomeAndGallery",
+    "name": "File Explorer Home and Gallery - Disable",
+    "description": "Removes the Home and Gallery from Explorer and sets This PC as default.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}",
+        "Name": "System.IsPinnedToNameSpaceTree",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}",
+        "Name": "System.IsPinnedToNameSpaceTree",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "LaunchTo",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removehomeandgallery"
+  },
+  {
+    "id": "WPFTweaksDisableIPv6",
+    "name": "IPv6 - Disable",
+    "description": "Disables IPv6.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+        "Name": "DisabledComponents",
+        "Value": "255",
+        "Type": "DWord",
+        "OriginalValue": "0"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "Disable-NetAdapterBinding -Name * -ComponentID ms_tcpip6"
+    ],
+    "undoScript": [
+      "Enable-NetAdapterBinding -Name * -ComponentID ms_tcpip6"
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disableipv6"
+  },
+  {
+    "id": "WPFTweaksIPv46",
+    "name": "IPv6 - Set IPv4 as Preferred",
+    "description": "Setting the IPv4 preference can have latency and security benefits on private networks where IPv6 is not configured.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+        "Name": "DisabledComponents",
+        "Value": "32",
+        "Type": "DWord",
+        "OriginalValue": "0"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/ipv46"
+  },
+  {
+    "id": "WPFTweaksLogiBlock",
+    "name": "Logitech Download Assistant Auto-Install - Disable",
+    "description": "Blocks the Logi Download Assistant that Windows Update keeps reinstalling with Logitech device drivers. Logitech hardware keeps working without it.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "\n      Stop-Process -Name \"logi_download_assistant\" -Force -ErrorAction SilentlyContinue\n\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        Remove-Item $LogiPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $LogiPath -ItemType Directory\n      }\n\n      icacls $LogiPath /deny \"*S-1-1-0:(W)\"\n      if ($LASTEXITCODE -ne 0) { throw \"icacls failed to deny write access on $LogiPath (exit code $LASTEXITCODE)\" }\n      "
+    ],
+    "undoScript": [
+      "\n      $ProgramFiles64 = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }\n      $LogiPath = \"$ProgramFiles64\\LogiDownloadAssistant\"\n\n      if (Test-Path $LogiPath) {\n        icacls $LogiPath /remove:d \"*S-1-1-0\"\n        if ($LASTEXITCODE -ne 0) { throw \"icacls failed to remove the write-deny rule on $LogiPath (exit code $LASTEXITCODE)\" }\n      }\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock"
+  },
+  {
+    "id": "WPFTweaksEdgeDebloat",
+    "name": "Microsoft Edge - Debloat",
+    "description": "Disables various telemetry options, popups, and other annoyances in Edge.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\EdgeUpdate",
+        "Name": "CreateDesktopShortcutDefault",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "PersonalizationReportingEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge\\ExtensionInstallBlocklist",
+        "Name": "1",
+        "Value": "ofefcgjbeghpigppfmkologfjadafddi",
+        "Type": "String",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "ShowRecommendationsEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "HideFirstRunExperience",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "UserFeedbackAllowed",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "ConfigureDoNotTrack",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "AlternateErrorPagesEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "EdgeCollectionsEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "EdgeShoppingAssistantEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "MicrosoftEdgeInsiderPromotionEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "ShowMicrosoftRewards",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "WebWidgetAllowed",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "DiagnosticData",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "EdgeAssetDeliveryServiceEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "WalletDonationEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+        "Name": "DefaultBrowserSettingsCampaignEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/edgedebloat"
+  },
+  {
+    "id": "WPFTweaksRemoveEdge",
+    "name": "Microsoft Edge - Remove",
+    "description": "Uninstalls Microsoft Edge by creating dummy MicrosoftEdge.exe file in the legacy Edge folder. This tricks Windows into unlocking the official Edge uninstaller allowing for a system-level removal.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "\n      $Path = Resolve-Path -Path \"$Env:ProgramFiles (x86)\\Microsoft\\Edge\\Application\\*\\Installer\\setup.exe\" | Select-Object -Last 1\n\n      if (Test-Path $Path) {\n          New-Item -Path \"$Env:SystemRoot\\SystemApps\\Microsoft.MicrosoftEdge_8wekyb3d8bbwe\\MicrosoftEdge.exe\" -Force\n          Start-Process -FilePath $Path -ArgumentList \"--uninstall --system-level --force-uninstall --delete-profile\" -Wait\n          Write-Host \"Microsoft Edge was removed\"\n      } else {\n          Write-Host \"Microsoft Edge is not installed\"\n      }\n      "
+    ],
+    "undoScript": [
+      "\n      Write-Host \"Installing Microsoft Edge...\"\n      winget install Microsoft.Edge --source winget\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeedge"
+  },
+  {
+    "id": "WPFTweaksRemoveOneDrive",
+    "name": "Microsoft OneDrive - Remove",
+    "description": "Denies permission to remove OneDrive user files, then uses its own uninstaller to remove it and restores the original permission afterward.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "\n      # Deny permission to remove OneDrive folder\n      icacls $Env:OneDrive /deny \"*S-1-5-32-544:(D,DC)\"\n\n      Write-Host \"Uninstalling OneDrive...\"\n      Start-Process -FilePath (Join-Path $Env:SystemRoot \"System32\\OneDriveSetup.exe\") -ArgumentList '/uninstall' -Wait\n\n      # Some of OneDrive files use explorer, and OneDrive uses FileCoAuth\n      Write-Host \"Removing leftover OneDrive Files...\"\n\n      Stop-Process -Name FileCoAuth,Explorer\n\n      Remove-Item \"$Env:LocalAppData\\Microsoft\\OneDrive\" -Recurse -Force\n      Remove-Item \"$Env:ProgramData\\Microsoft OneDrive\" -Recurse -Force\n\n      # Grant back permission to access OneDrive folder\n      icacls $Env:OneDrive /grant \"*S-1-5-32-544:(D,DC)\"\n\n      if (-not (Get-ChildItem -Path $Env:OneDrive)) {\n          Remove-Item -Path $Env:OneDrive -Recurse\n          [Environment]::SetEnvironmentVariable('OneDrive', $null, 'User')\n      }\n\n      # Disable OneSyncSvc\n      Set-Service -Name OneSyncSvc -StartupType Disabled\n      "
+    ],
+    "undoScript": [
+      "\n      Write-Host \"Installing OneDrive\"\n      winget install Microsoft.Onedrive --source winget\n\n      # Enabled OneSyncSvc\n      Set-Service -Name OneSyncSvc -StartupType Automatic\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/removeonedrive"
+  },
+  {
+    "id": "WPFOOSUbutton",
+    "name": "O&O ShutUp10++ - Run",
+    "description": "",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/oosubutton"
+  },
+  {
+    "id": "WPFTweaksDisableWarningForUnsignedRdp",
+    "name": "RDP Unsigned File Warnings - Disable",
+    "description": "Disables warnings shown when launching unsigned RDP files introduced with the latest Windows 10 and 11 updates.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services\\Client",
+        "Name": "RedirectionWarningDialogVersion",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\SOFTWARE\\Microsoft\\Terminal Server Client",
+        "Name": "RdpLaunchConsentAccepted",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablewarningforunsignedrdp"
+  },
+  {
+    "id": "WPFTweaksRazerBlock",
+    "name": "Razer Software Auto-Install - Disable",
+    "description": "Blocks ALL Razer Software installations. The hardware works fine without any software.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DriverSearching",
+        "Name": "SearchOrderConfig",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Device Installer",
+        "Name": "DisableCoInstallers",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "\n      $RazerPath = \"$Env:SystemRoot\\Installer\\Razer\"\n\n      if (Test-Path $RazerPath) {\n        Remove-Item $RazerPath\\* -Recurse -Force\n      } else {\n        New-Item -Path $RazerPath -ItemType Directory\n      }\n\n      icacls $RazerPath /deny \"*S-1-1-0:(W)\"\n      "
+    ],
+    "undoScript": [
+      "\n      icacls \"$Env:SystemRoot\\Installer\\Razer\" /remove:d *S-1-1-0\n      "
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/razerblock"
+  },
+  {
+    "id": "WPFTweaksRightClickMenu",
+    "name": "Right-Click Menu Previous Layout - Enable",
+    "description": "Restores the classic context menu when right-clicking in File Explorer, replacing the simplified Windows 11 version.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "\n      New-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Name InprocServer32 -Value \"\" -Force\n      Stop-Process -Name explorer\n      "
+    ],
+    "undoScript": [
+      "Remove-Item -Path \"HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\" -Recurse"
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/rightclickmenu"
+  },
+  {
+    "id": "WPFTweaksStorage",
+    "name": "Storage Sense - Disable",
+    "description": "Storage Sense deletes temp files automatically.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy",
+        "Name": "01",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/storage"
+  },
+  {
+    "id": "WPFTweaksDisableNotifications",
+    "name": "System Tray Notifications & Calendar - Disable",
+    "description": "Disables all Notifications INCLUDING Calendar.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer",
+        "Name": "DisableNotificationCenter",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications",
+        "Name": "ToastEnabled",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/disablenotifications"
+  },
+  {
+    "id": "WPFTweaksTeredo",
+    "name": "Teredo - Disable",
+    "description": "Teredo network tunneling is an IPv6 feature that can cause additional latency, but may cause problems with some games.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters",
+        "Name": "DisabledComponents",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "0"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "netsh interface teredo set state disabled"
+    ],
+    "undoScript": [
+      "netsh interface teredo set state default"
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/teredo"
+  },
+  {
+    "id": "WPFTweaksDisplay",
+    "name": "Visual Effects - Set to Best Performance",
+    "description": "Sets the system preferences to performance. You can do this manually with sysdm.cpl as well.",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop",
+        "Name": "DragFullWindows",
+        "Value": "0",
+        "Type": "String",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop",
+        "Name": "MenuShowDelay",
+        "Value": "200",
+        "Type": "String",
+        "OriginalValue": "400"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop\\WindowMetrics",
+        "Name": "MinAnimate",
+        "Value": "0",
+        "Type": "String",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Keyboard",
+        "Name": "KeyboardDelay",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ListviewAlphaSelect",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ListviewShadow",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "TaskbarAnimations",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+        "Name": "VisualFXSetting",
+        "Value": "3",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\DWM",
+        "Name": "EnableAeroPeek",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "TaskbarMn",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+        "Name": "ShowTaskViewButton",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+        "Name": "SearchboxTaskbarMode",
+        "Value": "0",
+        "Type": "DWord",
+        "OriginalValue": "1"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "Set-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\" -Type Binary -Value ([byte[]](144,18,3,128,16,0,0,0))"
+    ],
+    "undoScript": [
+      "Remove-ItemProperty -Path \"HKCU:\\Control Panel\\Desktop\" -Name \"UserPreferencesMask\""
+    ],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/display"
+  },
+  {
+    "id": "WPFTweaksWindowsAI",
+    "name": "Windows AI - Disable And Remove",
+    "description": "Removes and disables all AI features/packages",
+    "category": "Advanced Tweaks (Advanced)",
+    "categoryOrder": 3,
+    "isAdvanced": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+        "Name": "SettingsPageVisibility",
+        "Value": "hide:aicomponents",
+        "Type": "String",
+        "OriginalValue": "<RemoveEntry>"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\WindowsNotepad",
+        "Name": "DisableAIFeatures",
+        "Value": "1",
+        "Type": "DWord",
+        "OriginalValue": "<RemoveEntry>"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "\n      $Appx = (Get-AppxPackage MicrosoftWindows.Client.CoreAI).PackageFullName\n      $Sid = (Get-LocalUser $Env:UserName).Sid.Value\n\n      New-Item \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Appx\\AppxAllUserStore\\EndOfLife\\$Sid\\$Appx\" -Force\n\n      Get-AppxPackage -AllUsers \"*Copilot*\" | Remove-AppxPackage -AllUsers\n      winget uninstall -e --name \"Copilot\" --silent --force --accept-source-agreements 2>$null\n      Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub | Remove-AppxPackage -AllUsers\n\n      if ($Appx) {\n          Remove-AppxPackage $Appx\n      }\n\n      Set-Service -Name WSAIFabricSvc -StartupType Disabled\n      Disable-WindowsOptionalFeature -FeatureName Recall -Online -NoRestart\n\n      Write-Host \"Windows AI Disabled\"\n      "
+    ],
+    "undoScript": [],
+    "link": "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/windowsai"
+  }
 ]

@@ -56,7 +56,40 @@ namespace SetupHub180Hz.Services
             "WPFTweaksWindowsAI",
             "WPFTweaksLogiBlock",
             "WPFTweaksRazerBlock",
-            "WPFTweaksDisplay"
+            "WPFTweaksDisplay",
+
+            // 🚀 Emulator 100% Extreme Performance
+            "EmulTweakHypervisorVBS",
+            "EmulTweakCpuPriority",
+            "EmulTweakGpuPreference",
+            "EmulTweakPowerThrottling",
+
+            // 🖥️ Graphical & Visual Responsiveness
+            "GfxTweakVisualFX",
+            "GfxTweakHAGS",
+            "GfxTweakShaderCache",
+            "GfxTweakFSE",
+            "GfxTweakMPO",
+
+            // ⚡ Extreme Low Latency & Kernel Timers
+            "KernelTweakDynamicTick",
+            "KernelTweakTSCClock",
+            "KernelTweakTSCSync",
+            "KernelTweakSysResponsiveness",
+
+            // 🧠 CPU, RAM & Power Tuning
+            "CpuTweakUnparkCores",
+            "CpuTweakWin32Priority",
+            "CpuTweakDisablePaging",
+            "MemTweakFlushStandby",
+
+            // 🌐 Network & Ping Tuning
+            "NetTweakTcpAckNoDelay",
+            "NetTweakNetshRss",
+
+            // 💾 Storage & NVMe Throughput
+            "DiskTweakNtfsFast",
+            "DiskTweakEnableTrim"
         };
 
         private List<TweakItem>? _cache;
@@ -213,43 +246,74 @@ namespace SetupHub180Hz.Services
                 string path = reg.Path;
                 string name = reg.Name;
                 string value = undo ? reg.OriginalValue : reg.Value;
-                string type = reg.Type;
+                string type = reg.Type ?? "DWord";
 
-                (RegistryKey? hive, string subKey) = ParseHivePath(path);
-                if (hive == null) return;
+                var (hiveEnum, subKey) = ParseHivePath(path);
+                if (!hiveEnum.HasValue || string.IsNullOrWhiteSpace(subKey)) return;
 
-                if (undo && value == "<RemoveEntry>")
+                using var baseKey = RegistryKey.OpenBaseKey(hiveEnum.Value, RegistryView.Registry64);
+                if (baseKey == null) return;
+
+                // Value deletion handling
+                if ((undo && (value == "<RemoveEntry>" || string.IsNullOrEmpty(value))) ||
+                    (!undo && value == "<RemoveEntry>"))
                 {
-                    using var key = hive.OpenSubKey(subKey, writable: true);
+                    using var key = baseKey.OpenSubKey(subKey, writable: true);
                     key?.DeleteValue(name, throwOnMissingValue: false);
                     return;
                 }
 
-                if (value == "<RemoveEntry>") return;
-
-                using var regKey = hive.CreateSubKey(subKey, writable: true);
+                using var regKey = baseKey.CreateSubKey(subKey, writable: true);
                 if (regKey == null) return;
 
                 switch (type.ToLowerInvariant())
                 {
                     case "dword":
-                        if (int.TryParse(value, out int dword))
+                        if (uint.TryParse(value, out uint uDword))
+                            regKey.SetValue(name, unchecked((int)uDword), RegistryValueKind.DWord);
+                        else if (int.TryParse(value, out int dword))
                             regKey.SetValue(name, dword, RegistryValueKind.DWord);
+                        else if (value.StartsWith("0x", StringComparison.OrdinalIgnoreCase) &&
+                                 uint.TryParse(value.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out uint hexUVal))
+                            regKey.SetValue(name, unchecked((int)hexUVal), RegistryValueKind.DWord);
                         break;
+
                     case "qword":
-                        if (long.TryParse(value, out long qword))
+                        if (ulong.TryParse(value, out ulong uQword))
+                            regKey.SetValue(name, unchecked((long)uQword), RegistryValueKind.QWord);
+                        else if (long.TryParse(value, out long qword))
                             regKey.SetValue(name, qword, RegistryValueKind.QWord);
+                        else if (value.StartsWith("0x", StringComparison.OrdinalIgnoreCase) &&
+                                 ulong.TryParse(value.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out ulong hexUQVal))
+                            regKey.SetValue(name, unchecked((long)hexUQVal), RegistryValueKind.QWord);
                         break;
+
+                    case "binary":
+                        byte[] bytes = ParseHexBytes(value);
+                        if (bytes.Length > 0)
+                            regKey.SetValue(name, bytes, RegistryValueKind.Binary);
+                        break;
+
                     case "string":
                     case "sz":
                         regKey.SetValue(name, value, RegistryValueKind.String);
                         break;
+
                     case "expandstring":
                     case "expandsz":
                         regKey.SetValue(name, value, RegistryValueKind.ExpandString);
                         break;
+
+                    case "multistring":
+                    case "multisz":
+                        var lines = value.Split(new[] { "\r\n", "\n", ";" }, StringSplitOptions.RemoveEmptyEntries);
+                        regKey.SetValue(name, lines, RegistryValueKind.MultiString);
+                        break;
+
                     default:
-                        if (int.TryParse(value, out int def))
+                        if (uint.TryParse(value, out uint defUVal))
+                            regKey.SetValue(name, unchecked((int)defUVal), RegistryValueKind.DWord);
+                        else if (int.TryParse(value, out int def))
                             regKey.SetValue(name, def, RegistryValueKind.DWord);
                         else
                             regKey.SetValue(name, value, RegistryValueKind.String);
@@ -259,26 +323,48 @@ namespace SetupHub180Hz.Services
             catch { }
         }
 
-        private static (RegistryKey? hive, string subKey) ParseHivePath(string path)
+        private static (RegistryHive? hive, string subKey) ParseHivePath(string path)
         {
-            path = path.Replace("/", "\\");
-            string[] parts = path.Split(new[] { ':', '\\' }, 3);
-            if (parts.Length < 2) return (null, "");
+            if (string.IsNullOrWhiteSpace(path)) return (null, "");
 
-            string hivePart = parts[0].ToUpperInvariant();
-            string subKey = path.Contains(':') ? path.Substring(path.IndexOf(':') + 2) : path;
-
-            RegistryKey? hive = hivePart switch
+            // Strip PowerShell provider prefix if present: "Registry::" or "Microsoft.PowerShell.Core\Registry::"
+            if (path.Contains("::"))
             {
-                "HKLM" => Registry.LocalMachine,
-                "HKCU" => Registry.CurrentUser,
-                "HKCR" => Registry.ClassesRoot,
-                "HKU" => Registry.Users,
-                "HKCC" => Registry.CurrentConfig,
+                path = path.Substring(path.IndexOf("::") + 2);
+            }
+
+            path = path.Replace("/", "\\").Trim('\\');
+
+            // Find the first separator: '\' or ':'
+            int sepIdx = path.IndexOfAny(new[] { '\\', ':' });
+            string hivePart = (sepIdx > 0 ? path.Substring(0, sepIdx) : path).Trim().ToUpperInvariant();
+            string subKey = sepIdx > 0 ? path.Substring(sepIdx).TrimStart(':', '\\').Trim() : "";
+
+            RegistryHive? hive = hivePart switch
+            {
+                "HKLM" or "HKEY_LOCAL_MACHINE" => RegistryHive.LocalMachine,
+                "HKCU" or "HKEY_CURRENT_USER" => RegistryHive.CurrentUser,
+                "HKCR" or "HKEY_CLASSES_ROOT" => RegistryHive.ClassesRoot,
+                "HKU" or "HKEY_USERS" => RegistryHive.Users,
+                "HKCC" or "HKEY_CURRENT_CONFIG" => RegistryHive.CurrentConfig,
                 _ => null
             };
 
             return (hive, subKey);
+        }
+
+        private static byte[] ParseHexBytes(string hex)
+        {
+            if (string.IsNullOrWhiteSpace(hex)) return Array.Empty<byte>();
+            var cleaned = hex.Replace("0x", "").Replace(",", " ").Replace("-", " ");
+            var parts = cleaned.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var list = new List<byte>();
+            foreach (var p in parts)
+            {
+                if (byte.TryParse(p, System.Globalization.NumberStyles.HexNumber, null, out byte b))
+                    list.Add(b);
+            }
+            return list.ToArray();
         }
 
         private static async Task SetServiceStartupAsync(string serviceName, string startupType)
@@ -301,24 +387,44 @@ namespace SetupHub180Hz.Services
             {
                 try
                 {
+                    byte[] bytes = System.Text.Encoding.Unicode.GetBytes(script);
+                    string encoded = Convert.ToBase64String(bytes);
+
                     var psi = new System.Diagnostics.ProcessStartInfo
                     {
                         FileName = "powershell.exe",
-                        Arguments = $"-NonInteractive -NoProfile -ExecutionPolicy Bypass -Command \"{EscapeForPs(script)}\"",
-                        UseShellExecute = true,
-                        Verb = "runas",
-                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                        Arguments = $"-NonInteractive -NoProfile -ExecutionPolicy Bypass -EncodedCommand {encoded}",
+                        UseShellExecute = false,
                         CreateNoWindow = true,
+                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
                     };
 
                     using var proc = System.Diagnostics.Process.Start(psi);
                     proc?.WaitForExit(30_000);
                 }
-                catch { }
+                catch
+                {
+                    // Fallback to ShellExecute runas if needed
+                    try
+                    {
+                        var psiFallback = new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = "powershell.exe",
+                            Arguments = $"-NonInteractive -NoProfile -ExecutionPolicy Bypass -Command \"{EscapeForPs(script)}\"",
+                            UseShellExecute = true,
+                            Verb = "runas",
+                            WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                            CreateNoWindow = true,
+                        };
+                        using var procFallback = System.Diagnostics.Process.Start(psiFallback);
+                        procFallback?.WaitForExit(30_000);
+                    }
+                    catch { }
+                }
             });
         }
 
         private static string EscapeForPs(string script)
-            => script.Replace("\"", "\\\"").Replace("\r\n", " ").Replace("\n", " ");
+            => script.Replace("\"", "\\\"").Replace("\r\n", "; ").Replace("\n", "; ");
     }
 }

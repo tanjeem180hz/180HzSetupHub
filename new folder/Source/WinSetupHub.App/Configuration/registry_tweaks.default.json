@@ -1,5 +1,258 @@
 [
   {
+    "id": "RegTweakEmulBlueStacks",
+    "name": "BlueStacks Realtime CPU & IO Priority (HD-Player.exe)",
+    "description": "Configures Windows kernel scheduler IFEO to automatically run BlueStacks with High CPU Priority and High I/O Priority for maximum emulator FPS.",
+    "category": "Emulator & VM Acceleration",
+    "categoryOrder": 1,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Player.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Player.exe\\PerfOptions",
+        "Name": "IoPriority",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakEmulLDPlayer",
+    "name": "LDPlayer Realtime CPU & IO Priority (dnplayer.exe & LdBox)",
+    "description": "Configures Windows IFEO to run LDPlayer and LDBox VM core with High CPU Priority and High I/O Priority for stutter-free 120Hz/240Hz Android gaming.",
+    "category": "Emulator & VM Acceleration",
+    "categoryOrder": 1,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dnplayer.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dnplayer.exe\\PerfOptions",
+        "Name": "IoPriority",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LdBoxHeadless.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LdBoxHeadless.exe\\PerfOptions",
+        "Name": "IoPriority",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakEmulNoxMemu",
+    "name": "NoxPlayer & MEMU Realtime CPU Priority (Nox.exe & MEmu.exe)",
+    "description": "Configures Windows IFEO to execute NoxPlayer and MEMU emulator processes with High CPU Priority and high thread scheduling preference.",
+    "category": "Emulator & VM Acceleration",
+    "categoryOrder": 1,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\Nox.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\MEmu.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakEmulGpuDirectX",
+    "name": "Force Discrete High-Performance GPU for All Android Emulators",
+    "description": "Forces Windows DirectX graphics runtime to route all Android emulator rendering through your high-power discrete GPU.",
+    "category": "Emulator & VM Acceleration",
+    "categoryOrder": 1,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "HD-Player.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "dnplayer.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "LdBoxHeadless.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "Nox.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "MEmu.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakEmulPowerThrottling",
+    "name": "Disable CPU Power Throttling & EcoQoS for Emulators",
+    "description": "Stops Windows 10/11 from throttling multi-threaded Android emulator processes to slow efficiency states.",
+    "category": "Emulator & VM Acceleration",
+    "categoryOrder": 1,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+        "Name": "PowerThrottlingOff",
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakMPO",
+    "name": "Disable Multi-Plane Overlay (MPO) Micro-Stutter Fix",
+    "description": "Eliminates infamous Desktop Window Manager multi-plane overlay frame drops, black screens, and micro-stutters across NVIDIA, AMD, and Intel GPUs.",
+    "category": "GPU & DirectX",
+    "categoryOrder": 4,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
+        "Name": "OverlayTestMode",
+        "Value": "5",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakShaderCache",
+    "name": "DirectX Shader Cache Maximize (1GB+ for Zero Stutter)",
+    "description": "Sets the global DirectX shader disk cache to 1GB to prevent in-game shader compilation stutters in modern games and 3D emulators.",
+    "category": "GPU & DirectX",
+    "categoryOrder": 4,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Direct3D",
+        "Name": "DirectXDriverCacheSize",
+        "Value": "1073741824",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakVisualFXPerformance",
+    "name": "Windows Visual Effects - Ultimate Gaming Performance Mode",
+    "description": "Disables window animations, menu fade delays, drop shadows, and taskbar transition latency while keeping crisp ClearType font rendering.",
+    "category": "Windows UI & Shell",
+    "categoryOrder": 3,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+        "Name": "VisualFXSetting",
+        "Value": "2",
+        "OriginalValue": "1",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop\\WindowMetrics",
+        "Name": "MinAnimate",
+        "Value": "0",
+        "OriginalValue": "1",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Desktop",
+        "Name": "UserPreferencesMask",
+        "Value": "90 12 03 80 10 00 00 00",
+        "OriginalValue": "9e 1e 07 80 12 00 00 00",
+        "Type": "Binary"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
     "id": "RegTweakMouseRaw",
     "name": "Mouse 1:1 Raw Response (No Acceleration)",
     "description": "Disables Windows mouse acceleration curves and smoothing thresholds for true 1:1 pixel-perfect pointer tracking.",

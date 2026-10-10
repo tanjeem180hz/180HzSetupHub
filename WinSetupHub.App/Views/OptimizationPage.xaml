@@ -222,38 +222,43 @@
                 <WrapPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="12,0,0,0">
                     <!-- Create Restore Point Safeguard -->
                     <Button x:Name="BtnCreateRestorePoint" Style="{StaticResource UndoButton}"
-                            Content="🛡️ RESTORE POINT" Padding="10,7" Margin="0,0,8,4"
+                            Content="🛡️ RESTORE POINT" Padding="10,7" Margin="0,0,6,4"
                             Click="BtnCreateRestorePoint_Click" ToolTip="Create a Windows System Restore point before applying changes"/>
-
-                    <!-- Restore All Default -->
-                    <Button x:Name="BtnRestoreDefault" Style="{StaticResource DangerButton}"
-                            Content="RESTORE ALL DEFAULT" Padding="12,7" Margin="0,0,8,4"
-                            Click="BtnRestoreDefault_Click" ToolTip="Restore settings in this section back to factory defaults"/>
-
-                    <!-- Deselect All / Clear -->
-                    <Button x:Name="BtnDeselectAll" Style="{StaticResource UndoButton}"
-                            Content="DESELECT ALL" Padding="10,7" Margin="0,0,8,4"
-                            Click="BtnDeselectAll_Click" ToolTip="Deselect all checkboxes in this section"/>
 
                     <!-- Select All -->
                     <Button x:Name="BtnSelectAll" Style="{StaticResource UndoButton}"
-                            Content="SELECT ALL" Padding="10,7" Margin="0,0,8,4"
+                            Content="✓ SELECT ALL" Padding="10,7" Margin="0,0,6,4"
                             Click="BtnSelectAll_Click" ToolTip="Select all visible tweaks in this section"/>
 
-                    <!-- Undo Selected -->
-                    <Button x:Name="BtnUndoSelected" Style="{StaticResource UndoButton}"
-                            Content="UNDO SELECTED" Padding="10,7" Margin="0,0,8,4"
-                            Click="BtnUndoSelected_Click" ToolTip="Undo only checked tweaks"/>
+                    <!-- Deselect All / Clear -->
+                    <Button x:Name="BtnDeselectAll" Style="{StaticResource UndoButton}"
+                            Content="✕ DESELECT ALL" Padding="10,7" Margin="0,0,6,4"
+                            Click="BtnDeselectAll_Click" ToolTip="Deselect all checkboxes in this section"/>
+
+                    <!-- Select Recommended -->
+                    <Button x:Name="BtnSelectRecommended" Style="{StaticResource UndoButton}"
+                            Content="⭐ RECOMMENDED" Padding="10,7" Margin="0,0,6,4"
+                            Click="BtnSelectRecommended_Click" ToolTip="Select recommended safe optimizations"/>
+
+                    <!-- Undo / Restore Selected -->
+                    <Button x:Name="BtnUndoSelected" Style="{StaticResource DangerButton}"
+                            Content="↩ RESTORE SELECTED" Padding="10,7" Margin="0,0,6,4"
+                            Click="BtnUndoSelected_Click" ToolTip="Revert only checked tweaks back to standard Windows defaults"/>
+
+                    <!-- Restore All Default -->
+                    <Button x:Name="BtnRestoreDefault" Style="{StaticResource DangerButton}"
+                            Content="🔄 RESTORE ALL" Padding="10,7" Margin="0,0,6,4"
+                            Click="BtnRestoreDefault_Click" ToolTip="Restore all tweaks in this section back to factory defaults"/>
+
+                    <!-- Apply Selected (Primary Action) -->
+                    <Button x:Name="BtnApplySelected" Style="{StaticResource ApplyButton}"
+                            Content="⚡ APPLY SELECTED" Padding="14,7" Margin="0,0,6,4"
+                            Click="BtnApplySelected_Click" ToolTip="Apply all checked optimizations to your PC"/>
 
                     <!-- Apply All -->
                     <Button x:Name="BtnApplyAll" Style="{StaticResource UndoButton}"
-                            Content="APPLY ALL" Padding="12,7" Margin="0,0,8,4"
+                            Content="🚀 APPLY ALL" Padding="12,7" Margin="0,0,0,4"
                             Click="BtnApplyAll_Click" ToolTip="Apply all optimizations in this section"/>
-
-                    <!-- Apply Recommendation (Primary Accent) -->
-                    <Button x:Name="BtnApplyRecommendation" Style="{StaticResource ApplyButton}"
-                            Content="APPLY RECOMMENDATION" Padding="14,7" Margin="0,0,0,4"
-                            Click="BtnApplyRecommendation_Click" ToolTip="Apply recommended safe optimizations instantly"/>
                 </WrapPanel>
             </Grid>
         </Border>
@@ -351,9 +356,9 @@
                     </ScrollViewer>
 
                     <!-- Quick Select Recommended Helper -->
-                    <Button Grid.Column="1" x:Name="BtnSelectRecommended" Style="{StaticResource UndoButton}"
+                    <Button Grid.Column="1" x:Name="BtnCategoryRecommended" Style="{StaticResource UndoButton}"
                             Content="SELECT RECOMMENDED" Padding="10,5" Margin="8,0,0,0"
-                            Click="BtnSelectRecommended_Click" ToolTip="Select recommended safe tweaks"/>
+                            Click="BtnSelectRecommended_Click" ToolTip="Select recommended safe tweaks in this view"/>
                 </Grid>
             </Border>
 

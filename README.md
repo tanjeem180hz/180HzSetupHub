@@ -83,16 +83,34 @@ irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/in
 
 ### ⚡ Dual-Section Optimization Suite & Deep Registry Tuning Engine
 * **Two Dedicated Optimization Modules:** Cleanly partitioned into **⚡ System Tweaks** and **🗃️ Registry Optimization** with instant segmented pill switching, category filters, and real-time search.
-* **System Optimizations:** Fine-tunes high-performance power plans, Windows visual effects, telemetry reduction, and gaming priority presets.
-* **Deep Windows Registry Engine:** Curated catalog of 32+ high-impact registry modifications across 7 performance sectors:
-  * *Gaming & Input Latency:* Disables mouse acceleration, optimizes `CSRSS` thread priority, enables exclusive Game Mode flags, and eliminates fullscreen optimization input lag.
-  * *Network & Ping Optimization:* Disables Windows network throttling index (`NetworkThrottlingIndex`), sets TCP ACK frequency (`TcpAckFrequency`), configures non-delayed TCP delivery (`TCPNoDelay`), and tunes MMCSS gaming QoS.
-  * *CPU & RAM Scheduling:* Maximizes Win32 processor scheduling priority for foreground gaming tasks, disables paging executive (`DisablePagingExecutive`) to keep kernel in RAM, and trims idle memory footprint.
-  * *Windows UI & Shell Responsiveness:* Drops menu show delay to 0ms, disables window animation latency, and minimizes shell hover delays for razor-sharp response.
-  * *GPU & DirectX Acceleration:* Enables Hardware Accelerated GPU Scheduling (HAGS), disables DWM composition delays, and activates DirectX performance flags.
-  * *Privacy & Telemetry:* Eliminates Connected User Experiences diagnostic telemetry, activity tracking, and Cortana background overhead.
-  * *Filesystem & Disk Throughput:* Disables NTFS 8.3 short-name creation and last-access time updates for ultra-fast SSD/NVMe read/write cycles.
-* **Target Path Badges & Instant Checkpoint:** Every registry tweak displays exact registry root paths, keys, and values (`🔑 HKLM\... ➔ Name = Value`) with a 1-click **🛡️ RESTORE POINT** backup generator before applying bulk modifications.
+* **Complete Selection & Restore Controls:** 1-Click `[ ✓ SELECT ALL ]`, `[ ✕ DESELECT ALL ]`, `[ ⭐ RECOMMENDED ]`, `[ ⚡ APPLY SELECTED ]`, `[ ↩ RESTORE SELECTED ]`, `[ 🔄 RESTORE ALL ]`, and `[ 🛡️ RESTORE POINT ]` checkpoints across both sections.
+* **🚀 100% Android & VM Emulator Performance Suite:**
+  * *VBS & Hypervisor Bypass:* Disables Windows Hypervisor and Virtualization-Based Security (VBS/HVCI) overhead, giving BlueStacks, LDPlayer, Nox, and MEMU 100% direct bare-metal hardware VT-x / AMD-V access.
+  * *Kernel IFEO CPU & I/O Scheduling:* Automates High CPU Priority and High I/O Priority for `HD-Player.exe`, `dnplayer.exe`, `LdBoxHeadless.exe`, `Nox.exe`, and `MEmu.exe`.
+  * *Dedicated Discrete GPU Routing:* Enforces high-performance discrete GPU rendering for all emulator processes via DirectX UserGpuPreferences.
+  * *EcoQoS Power Throttling Elimination:* Prevents Windows 10/11 from throttling emulator threads to slow efficiency cores or power-saving states.
+* **🖥️ Graphical & Visual Responsiveness Suite:**
+  * *Windows Visual Effects Performance Mode:* Sets visual effects to best performance, disables animation delays and menu lag, while keeping crisp ClearType font rendering.
+  * *Hardware-Accelerated GPU Scheduling (HAGS):* Direct video memory scheduling on GPU processor for higher minimum 1% low FPS.
+  * *Multi-Plane Overlay (MPO) Stutter Fix:* Solves infamous DWM multi-plane overlay micro-stutters and frame drops across NVIDIA, AMD, and Intel GPUs.
+  * *1GB DirectX Shader Cache:* Prevents in-game texture compilation hitching in modern games and 3D emulators.
+  * *Exclusive Fullscreen Mode:* Disables GameDVR and DWM composition queue overlay latency.
+* **⚡ Extreme Low Latency Kernel Timers & BCDEdit:**
+  * *Dynamic Tick Elimination:* Disables variable timer tick drift (`disabledynamictick yes`) for razor-sharp frame pacing.
+  * *Hardware Invariant TSC Clock:* Bypasses high-latency HPET timers and synchronizes directly with CPU on-die TSC.
+  * *System Responsiveness 0%:* Allocates 100% CPU cycles to games/emulators without 20% background reservation.
+  * *Disable Network Throttling:* Removes packet rate limiting (`NetworkThrottlingIndex = 4294967295`).
+* **🧠 CPU, RAM & Power Extreme Tuning:**
+  * *Ultimate Performance Power Plan & 100% Core Unparking:* Unparks all CPU cores so no thread enters sleep states.
+  * *Win32 Priority Separation:* Grants 3:1 high priority quanta boost to foreground games.
+  * *Disable Paging Executive:* Locks Windows NT kernel and drivers into physical RAM.
+  * *Instant Standby List & RAM Flush:* Reclaims gigabytes of stale memory cache in milliseconds.
+* **🌐 Network, TCP & Ultra-Low Ping Tuning:**
+  * *Disable Nagle's Algorithm:* Enforces `TcpAckFrequency = 1` and `TCPNoDelay = 1` across all adapters for instant gaming packet delivery.
+  * *Receive Side Scaling (RSS):* Distributes network interrupts across all CPU cores.
+* **💾 Storage & SSD Throughput:**
+  * *Disable NTFS 8.3 & Last Access:* Eliminates DOS 8.3 short-name overhead and access timestamp writes for maximum NVMe/SSD speeds.
+  * *Hardware TRIM Verification:* Ensures TRIM is active for continuous peak SSD performance.
 
 ### 🛡️ Revo-Grade Deep Uninstallation Engine
 * **5-Phase Advanced Methodology:** Creates system protection checkpoints and registry backups, executes official vendor uninstallers with graceful fallback, then performs multi-level heuristic residual scans (Safe, Moderate, Advanced).

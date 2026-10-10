@@ -160,14 +160,14 @@ namespace SetupHub180Hz.Views
             {
                 TxtSubtitle.Text = $"{sectionName} • {totalSectionCount} tweaks available • {totalRecommended} recommended safe";
                 BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in {sectionName}";
-                BtnApplyRecommendation.ToolTip = $"Apply all recommended safe optimizations for {sectionName}";
+                if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for {sectionName}";
             }
             else
             {
                 string scope = string.IsNullOrWhiteSpace(_searchQuery) ? _activeCategory : $"Search: \"{_searchQuery}\"";
                 TxtSubtitle.Text = $"{sectionName} › {scope} • {currentCount} tweaks ({currentRec} recommended)";
                 BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in {scope}";
-                BtnApplyRecommendation.ToolTip = $"Apply recommended safe optimizations for {scope}";
+                if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for {scope}";
             }
         }
 
@@ -242,6 +242,48 @@ namespace SetupHub180Hz.Views
                 TxtStatus.Text = "ℹ️ System Restore is disabled or unavailable on this system.";
                 ThemedMessageBox.Show("Windows System Restore is disabled or unconfigured on this drive.\n(Safe to proceed with individual tweaks).",
                     "System Restore Notice", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void BtnApplySelected_Click(object sender, RoutedEventArgs e)
+        {
+            var sourceList = GetCurrentSectionItems();
+            var selected = sourceList.Where(t => t.IsSelected).ToList();
+            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
+
+            if (selected.Count == 0)
+            {
+                var prompt = ThemedMessageBox.Show(
+                    $"No {sectionLabel.ToLowerInvariant()} optimizations are currently selected.\n\nWould you like to select and apply the RECOMMENDED optimizations now?",
+                    $"Apply {sectionLabel} Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (prompt == MessageBoxResult.Yes)
+                {
+                    BtnSelectRecommended_Click(sender, e);
+                    selected = sourceList.Where(t => t.IsSelected).ToList();
+                    if (selected.Count == 0) return;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            var dialog = new OptimizationDialog(
+                title: $"Apply {selected.Count} Selected {sectionLabel} Optimizations",
+                subtitle: $"This will safely apply {selected.Count} selected optimization(s) to maximize your PC performance:",
+                tweaks: selected,
+                isUndo: false,
+                tweakService: _tweakService)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                TxtStatus.Text = $"✓ Applied {selected.Count} {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
+                StatusBar.Visibility = Visibility.Visible;
+                CheckRebootNeeded(selected);
             }
         }
 
