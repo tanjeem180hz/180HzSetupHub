@@ -56,7 +56,8 @@ if ($Standalone) {
     $urls = @(
         "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe",
         "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/artifacts/installer/180HzSetupHubSetup.exe",
-        "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe"
+        "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe",
+        "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/installer/180HzSetupHubSetup.exe"
     )
 
     $tempDir = [System.IO.Path]::GetTempPath()

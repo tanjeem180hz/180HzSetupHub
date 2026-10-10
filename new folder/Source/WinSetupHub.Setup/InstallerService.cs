@@ -20,6 +20,7 @@ public sealed class InstallerService
     public const string RegistryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\180HzSetupHub";
 
     public const string DefaultDownloadUrl = "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe";
+    public const string RawDownloadUrl = "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/artifacts/publish/win-x64/180HzSetupHub.exe";
     public const string FallbackDownloadUrl = "https://github.com/tanjeem180hz/180HzSetupHub/releases/latest/download/180HzSetupHub.exe";
 
     private const string PayloadPackages = "packages.default.json";
@@ -287,14 +288,14 @@ public sealed class InstallerService
         }
 
         // Perform online download with retry and verification
-        var downloadUrl = Environment.GetEnvironmentVariable("WINSETUPHUB_DOWNLOAD_URL");
-        if (string.IsNullOrWhiteSpace(downloadUrl))
+        var candidateUrls = new List<string>();
+        var envDownloadUrl = Environment.GetEnvironmentVariable("WINSETUPHUB_DOWNLOAD_URL");
+        if (!string.IsNullOrWhiteSpace(envDownloadUrl))
         {
-            downloadUrl = DefaultDownloadUrl;
+            candidateUrls.Add(envDownloadUrl.Trim());
         }
-
-        detailLog?.Invoke($"Downloading 180Hz Setup Hub from: {downloadUrl}");
-        progress?.Invoke("Connecting to download server...", 30);
+        candidateUrls.Add(DefaultDownloadUrl);
+        candidateUrls.Add(RawDownloadUrl);
 
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | (SecurityProtocolType)3072;
 
@@ -305,6 +306,10 @@ public sealed class InstallerService
 
         for (int attempt = 1; attempt <= maxRetries; attempt++)
         {
+            var downloadUrl = candidateUrls[(attempt - 1) % candidateUrls.Count];
+            detailLog?.Invoke($"Downloading 180Hz Setup Hub from: {downloadUrl}");
+            progress?.Invoke("Connecting to download server...", 30);
+
             try
             {
                 if (File.Exists(tempTarget))
