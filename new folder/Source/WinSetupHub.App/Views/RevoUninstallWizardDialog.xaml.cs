@@ -402,10 +402,10 @@ namespace SetupHub180Hz.Views
                 UninstallerStatusIconText.Text = "ℹ️";
                 UninstallerStatusIconBorder.Background = new SolidColorBrush(Color.FromArgb(0x26, 0x2F, 0xB6, 0xFF));
                 UninstallerTitleText.Text = "BUILT-IN UNINSTALLER NOT FOUND";
-                UninstallerSubtextText.Text = $"No official uninstaller was registered for {_app.Name}. Revo engine will perform a clean deep removal of all residual registry entries and disk files.";
-                UninstallerCommandText.Text = "Ready for heuristic leftover scan.";
+                UninstallerSubtextText.Text = $"No official uninstaller was registered for {_app.Name}. Zero-Trace Deep Uninstaller will perform a clean forensic wipe of the executable, installation files, and registry footprints.";
+                UninstallerCommandText.Text = "Ready for forensic leftover scan.";
                 UninstallerLiveProgressBar.Visibility = Visibility.Collapsed;
-                BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
+                BtnProceedToScanFromBuiltIn.Content = "Force Deep Scan & Eradicate ➔";
                 BtnProceedToScanFromBuiltIn.Focus();
             }
 
@@ -422,10 +422,13 @@ namespace SetupHub180Hz.Views
 
             _ = Task.Run(async () =>
             {
+                int exitCode = -1;
+                bool failed = false;
                 try
                 {
                     var parentName = proc.ProcessName;
                     await proc.WaitForExitAsync();
+                    try { exitCode = proc.ExitCode; } catch { }
 
                     // If parent process exited quickly, check if child/temp uninstaller is still active
                     var startTime = DateTime.UtcNow;
@@ -439,26 +442,38 @@ namespace SetupHub180Hz.Views
                         await Task.Delay(1000);
                     }
 
-                    await Dispatcher.InvokeAsync(() =>
+                    if (exitCode != 0 && exitCode != 3010 && exitCode != -1)
+                    {
+                        failed = true;
+                    }
+                }
+                catch
+                {
+                    failed = true;
+                }
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    UninstallerLiveProgressBar.Visibility = Visibility.Collapsed;
+                    if (failed)
+                    {
+                        UninstallerStatusIconText.Text = "⚠️";
+                        UninstallerStatusIconBorder.Background = new SolidColorBrush(Color.FromArgb(0x26, 0xF5, 0xB8, 0x4C));
+                        UninstallerTitleText.Text = "UNINSTALLER ENCOUNTERED AN ISSUE";
+                        UninstallerSubtextText.Text = $"Built-in uninstaller reported exit code {exitCode} or was aborted. Zero-Trace Deep Uninstaller will forcefully purge all application files, the executable, and residual registry traces.";
+                        BtnProceedToScanFromBuiltIn.Content = "Force Deep Scan & Eradicate ➔";
+                    }
+                    else
                     {
                         IsUninstalled = true;
-                        UninstallerLiveProgressBar.Visibility = Visibility.Collapsed;
                         UninstallerStatusIconText.Text = "✓";
                         UninstallerStatusIconBorder.Background = new SolidColorBrush(Color.FromArgb(0x26, 0x3F, 0xCB, 0x7E));
                         UninstallerTitleText.Text = "BUILT-IN UNINSTALLER COMPLETED";
                         UninstallerSubtextText.Text = $"Official uninstaller has finished. Click 'Scan for Leftovers' below to remove residual traces.";
                         BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
-                        BtnProceedToScanFromBuiltIn.Focus();
-                    });
-                }
-                catch
-                {
-                    await Dispatcher.InvokeAsync(() =>
-                    {
-                        UninstallerLiveProgressBar.Visibility = Visibility.Collapsed;
-                        BtnProceedToScanFromBuiltIn.Content = "Scan for Leftovers ➔";
-                    });
-                }
+                    }
+                    BtnProceedToScanFromBuiltIn.Focus();
+                });
             });
         }
 
@@ -578,7 +593,7 @@ namespace SetupHub180Hz.Views
             foreach (var item in leftovers)
             {
                 var vm = new LeftoverViewModel(item, _app.Name);
-                if (item.Type == LeftoverType.RegistryKey)
+                if (item.Type == LeftoverType.RegistryKey || item.Type == LeftoverType.RegistryValue)
                 {
                     vm.PropertyChanged += (_, _) => UpdateRegistryCounts();
                     _registryViewModels.Add(vm);
@@ -596,7 +611,7 @@ namespace SetupHub180Hz.Views
             // Transition to Phase 4 (Registry) or Phase 5 (Files) or Complete
             if (_registryViewModels.Count > 0)
             {
-                RegistryCountText.Text = $"{_registryViewModels.Count} residual registry key(s) detected.";
+                RegistryCountText.Text = $"{_registryViewModels.Count} residual registry trace(s) detected.";
                 RegistryEmptyText.Visibility = Visibility.Collapsed;
                 SetStep(4);
                 UpdateRegistryCounts();
@@ -863,7 +878,7 @@ namespace SetupHub180Hz.Views
 
             NotificationService.Notify(
                 "App Eradicated",
-                $"{_app.Name} has been completely removed with Revo-grade deep cleaning.");
+                $"{_app.Name} has been completely eliminated with zero-trace forensic wipe.");
         }
 
         private static string FormatBytes(long bytes)

@@ -7,6 +7,7 @@ namespace SetupHub180Hz.Models
     public enum LeftoverType
     {
         RegistryKey,
+        RegistryValue,
         Folder,
         File
     }
@@ -16,7 +17,8 @@ namespace SetupHub180Hz.Models
         string Path,
         long? SizeBytes,
         string MatchedOn,
-        bool IsHighConfidence = true);
+        bool IsHighConfidence = true,
+        string? ValueName = null);
 
     public class LeftoverViewModel : INotifyPropertyChanged
     {
@@ -25,14 +27,20 @@ namespace SetupHub180Hz.Models
         public LeftoverItem Item { get; }
         public LeftoverType Type => Item.Type;
         public string Path => Item.Path;
+        public string? ValueName => Item.ValueName;
         public string MatchedOn => Item.MatchedOn;
         public long? SizeBytes => Item.SizeBytes;
         public bool IsHighConfidence => Item.IsHighConfidence;
         public string ConfidenceBadge => IsHighConfidence ? "Verified Safe" : "Review Recommended";
 
+        public string DisplayPath => !string.IsNullOrEmpty(ValueName)
+            ? $"{Path}  ➔  [{ValueName}]"
+            : Path;
+
         public string TypeIcon => Type switch
         {
             LeftoverType.RegistryKey => "🔑",
+            LeftoverType.RegistryValue => "🏷️",
             LeftoverType.Folder => "📁",
             _ => "📄"
         };
@@ -40,6 +48,7 @@ namespace SetupHub180Hz.Models
         public string TypeName => Type switch
         {
             LeftoverType.RegistryKey => "Registry Key",
+            LeftoverType.RegistryValue => "Registry Value",
             LeftoverType.Folder => "Folder",
             _ => "File"
         };

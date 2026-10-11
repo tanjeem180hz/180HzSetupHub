@@ -266,10 +266,27 @@ namespace SetupHub180Hz.Services
                 // 3. Exact protected paths check
                 if (ProtectedExactPaths.Contains(full)) return false;
 
-                // 4. Windows directory & all subdirectories check
+                // 4. Windows directory check (safely permitting individual Prefetch .pf files and Windows\Temp items)
                 var winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-                if (!string.IsNullOrEmpty(winDir) && full.StartsWith(NormalizePath(winDir), StringComparison.OrdinalIgnoreCase))
-                    return false;
+                if (!string.IsNullOrEmpty(winDir))
+                {
+                    var normWin = NormalizePath(winDir);
+                    if (full.StartsWith(normWin, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var prefetchDir = NormalizePath(Path.Combine(winDir, "Prefetch"));
+                        var winTempDir = NormalizePath(Path.Combine(winDir, "Temp"));
+
+                        if (full.StartsWith(prefetchDir, StringComparison.OrdinalIgnoreCase) && !string.Equals(full, prefetchDir, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return full.EndsWith(".pf", StringComparison.OrdinalIgnoreCase);
+                        }
+                        if (full.StartsWith(winTempDir, StringComparison.OrdinalIgnoreCase) && !string.Equals(full, winTempDir, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return true;
+                        }
+                        return false;
+                    }
+                }
 
                 // 5. System drive top-level folders check (e.g. C:\Users, C:\Windows, C:\ProgramData)
                 var sysDrive = Path.GetPathRoot(Environment.SystemDirectory);
@@ -410,6 +427,35 @@ namespace SetupHub180Hz.Services
             }
         }
 
+        public static bool IsSafeRegistryValueToDelete(string? fullKeyPath, string? valueName)
+        {
+            if (string.IsNullOrWhiteSpace(fullKeyPath) || string.IsNullOrWhiteSpace(valueName)) return false;
+
+            try
+            {
+                var trimmed = fullKeyPath.Trim().TrimEnd('\\', '/');
+                if (trimmed.Equals(@"HKEY_CURRENT_USER", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Equals(@"HKEY_LOCAL_MACHINE", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Equals(@"HKEY_CLASSES_ROOT", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Equals(@"HKEY_USERS", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Equals(@"HKEY_CURRENT_CONFIG", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                if (valueName.Equals("Default", StringComparison.OrdinalIgnoreCase) && fullKeyPath.EndsWith(@"\CurrentVersion", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         #endregion
 
         #region Token and Signature Extraction (Revo-Grade Precision)
@@ -419,7 +465,32 @@ namespace SetupHub180Hz.Services
             string CleanName,
             string? DistinctProductName,
             string? PublisherPart,
-            string? IdProductPart);
+            string? IdProductPart,
+            HashSet<string> ExeNames,
+            HashSet<string> SearchTokens,
+            string? ConfirmedInstallDir);
+
+        public static string Rot13(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return string.Empty;
+            var array = input.ToCharArray();
+            for (int i = 0; i < array.Length; i++)
+            {
+                int number = (int)array[i];
+                if (number >= 'a' && number <= 'z')
+                {
+                    if (number > 'm') number -= 13;
+                    else number += 13;
+                }
+                else if (number >= 'A' && number <= 'Z')
+                {
+                    if (number > 'M') number -= 13;
+                    else number += 13;
+                }
+                array[i] = (char)number;
+            }
+            return new string(array);
+        }
 
         public AppSearchSignature BuildSearchSignature(AppItem app)
         {
@@ -496,7 +567,146 @@ namespace SetupHub180Hz.Services
                 }
             }
 
-            return new AppSearchSignature(rawName, cleanName, distinctProductName, publisherPart, idProductPart);
+            // 1. Locate confirmed installation directory
+            string? confirmedInstallDir = app.InstallLocation;
+            if (string.IsNullOrWhiteSpace(confirmedInstallDir) || !Directory.Exists(confirmedInstallDir))
+            {
+                var regInfo = AppMetadataHelper.GetRegistryInfo(app.Name ?? string.Empty, app.Id ?? string.Empty);
+                if (!string.IsNullOrWhiteSpace(regInfo?.InstallLocation) && Directory.Exists(regInfo.InstallLocation))
+                {
+                    confirmedInstallDir = regInfo.InstallLocation;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(confirmedInstallDir) || !Directory.Exists(confirmedInstallDir))
+            {
+                var uninst = app.UninstallString ?? FindRegistryUninstallString(app);
+                if (!string.IsNullOrWhiteSpace(uninst))
+                {
+                    var (fn, _) = ParseUninstallString(uninst);
+                    if (Path.IsPathRooted(fn))
+                    {
+                        var dir = Path.GetDirectoryName(fn);
+                        if (!string.IsNullOrWhiteSpace(dir) && Directory.Exists(dir) && IsSafePathToDelete(dir))
+                        {
+                            confirmedInstallDir = dir;
+                        }
+                    }
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(confirmedInstallDir) || !Directory.Exists(confirmedInstallDir))
+            {
+                if (!string.IsNullOrWhiteSpace(app.LocalIconPath))
+                {
+                    var iconFile = AppMetadataHelper.CleanIconPath(app.LocalIconPath);
+                    if (File.Exists(iconFile))
+                    {
+                        var dir = Path.GetDirectoryName(iconFile);
+                        if (!string.IsNullOrWhiteSpace(dir) && Directory.Exists(dir) && IsSafePathToDelete(dir))
+                        {
+                            confirmedInstallDir = dir;
+                        }
+                    }
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(confirmedInstallDir) || !Directory.Exists(confirmedInstallDir))
+            {
+                var candidates = new[]
+                {
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), cleanName),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), cleanName),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", cleanName),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), cleanName)
+                };
+                foreach (var c in candidates)
+                {
+                    if (Directory.Exists(c) && IsSafePathToDelete(c))
+                    {
+                        confirmedInstallDir = c;
+                        break;
+                    }
+                }
+            }
+
+            // 2. Discover known executable names
+            var exeNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (!string.IsNullOrWhiteSpace(cleanName))
+            {
+                exeNames.Add(cleanName.ToLowerInvariant() + ".exe");
+                exeNames.Add(cleanName.ToLowerInvariant());
+
+                var compact = Regex.Replace(cleanName, @"\s+", "").ToLowerInvariant();
+                exeNames.Add(compact + ".exe");
+                exeNames.Add(compact);
+            }
+
+            if (!string.IsNullOrWhiteSpace(distinctProductName))
+            {
+                exeNames.Add(distinctProductName.ToLowerInvariant() + ".exe");
+                exeNames.Add(distinctProductName.ToLowerInvariant());
+            }
+
+            if (!string.IsNullOrWhiteSpace(idProductPart))
+            {
+                exeNames.Add(idProductPart.ToLowerInvariant() + ".exe");
+                exeNames.Add(idProductPart.ToLowerInvariant());
+            }
+
+            if (!string.IsNullOrWhiteSpace(app.LocalIconPath))
+            {
+                var iconFile = AppMetadataHelper.CleanIconPath(app.LocalIconPath);
+                if (iconFile.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    var fn = Path.GetFileName(iconFile).ToLowerInvariant();
+                    exeNames.Add(fn);
+                    exeNames.Add(Path.GetFileNameWithoutExtension(fn));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(confirmedInstallDir) && Directory.Exists(confirmedInstallDir))
+            {
+                try
+                {
+                    var exes = Directory.GetFiles(confirmedInstallDir, "*.exe", SearchOption.TopDirectoryOnly);
+                    foreach (var exe in exes)
+                    {
+                        var fn = Path.GetFileName(exe).ToLowerInvariant();
+                        if (!fn.StartsWith("unins") && !fn.StartsWith("setup"))
+                        {
+                            exeNames.Add(fn);
+                            exeNames.Add(Path.GetFileNameWithoutExtension(fn));
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            // 3. Build search tokens
+            var searchTokens = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (!string.IsNullOrWhiteSpace(cleanName)) searchTokens.Add(cleanName);
+            if (!string.IsNullOrWhiteSpace(rawName)) searchTokens.Add(rawName);
+            if (!string.IsNullOrWhiteSpace(distinctProductName)) searchTokens.Add(distinctProductName);
+            if (!string.IsNullOrWhiteSpace(idProductPart)) searchTokens.Add(idProductPart);
+
+            var compactClean = Regex.Replace(cleanName, @"[\s\-_\.]", "");
+            if (compactClean.Length >= 3) searchTokens.Add(compactClean);
+
+            foreach (var exe in exeNames)
+            {
+                searchTokens.Add(exe);
+            }
+
+            return new AppSearchSignature(
+                rawName,
+                cleanName,
+                distinctProductName,
+                publisherPart,
+                idProductPart,
+                exeNames,
+                searchTokens,
+                confirmedInstallDir);
         }
 
         private static string CleanAppName(string rawName)
@@ -531,7 +741,7 @@ namespace SetupHub180Hz.Services
             combined.AddRange(filesystemTask.Result);
 
             var unique = combined
-                .GroupBy(i => i.Path, StringComparer.OrdinalIgnoreCase)
+                .GroupBy(i => (i.Type, i.Path, i.ValueName ?? string.Empty))
                 .Select(g => g.First())
                 .OrderByDescending(i => i.IsHighConfidence)
                 .ThenByDescending(i => i.SizeBytes ?? 0)
@@ -544,6 +754,32 @@ namespace SetupHub180Hz.Services
         {
             var results = new List<LeftoverItem>();
 
+            // 1. Forceful Install Location & Executable scan (vital if uninstallation failed)
+            ScanInstallLocationAndExecutables(app, sig, results);
+
+            // 2. Windows Prefetch Execution Footprints (C:\Windows\Prefetch\*.pf)
+            ScanPrefetch(sig, results);
+
+            // 3. Application Crash Dumps (%LOCALAPPDATA%\CrashDumps)
+            ScanCrashDumps(sig, results);
+
+            // 4. Recent execution shortcuts & JumpLists (%APPDATA%\Microsoft\Windows\Recent)
+            ScanRecentShortcuts(sig, results);
+
+            // 5. Temp directories and installer caches (%TEMP% and C:\Windows\Temp)
+            ScanTempFolders(sig, results);
+
+            // 6. Application data, installation roots & vendor directories
+            ScanAppDataAndProgramFiles(sig, mode, results);
+
+            // 7. Desktop & Start Menu Shortcuts
+            ScanShortcuts(sig, results);
+
+            return results;
+        }
+
+        private void ScanAppDataAndProgramFiles(AppSearchSignature sig, UninstallScanMode mode, List<LeftoverItem> results)
+        {
             var candidateRoots = new List<string>
             {
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
@@ -580,12 +816,6 @@ namespace SetupHub180Hz.Services
                         }
                     }
                     catch { }
-                }
-
-                var tempPath = Path.GetTempPath();
-                if (!string.IsNullOrEmpty(tempPath) && Directory.Exists(tempPath))
-                {
-                    candidateRoots.Add(tempPath);
                 }
             }
 
@@ -637,8 +867,11 @@ namespace SetupHub180Hz.Services
                 }
                 catch { }
             }
+        }
 
-            var installLocation = app.InstallLocation;
+        private static void ScanInstallLocationAndExecutables(AppItem app, AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            var installLocation = sig.ConfirmedInstallDir ?? app.InstallLocation;
             if (string.IsNullOrWhiteSpace(installLocation))
             {
                 var uninst = app.UninstallString ?? FindRegistryUninstallString(app);
@@ -661,13 +894,36 @@ namespace SetupHub180Hz.Services
                 if (IsSafePathToDelete(installLocation))
                 {
                     long size = CalculateDirectorySizeSafe(installLocation);
-                    results.Add(new LeftoverItem(LeftoverType.Folder, installLocation, size, "Install Location", IsHighConfidence: true));
+                    results.Add(new LeftoverItem(LeftoverType.Folder, installLocation, size, "Application Installation Directory", IsHighConfidence: true));
+
+                    try
+                    {
+                        var exes = Directory.GetFiles(installLocation, "*.exe", SearchOption.AllDirectories);
+                        foreach (var exe in exes)
+                        {
+                            if (IsSafePathToDelete(exe))
+                            {
+                                var fi = new FileInfo(exe);
+                                results.Add(new LeftoverItem(LeftoverType.File, exe, fi.Length, $"Target Executable ({Path.GetFileName(exe)})", IsHighConfidence: true));
+                            }
+                        }
+                    }
+                    catch { }
                 }
             }
 
-            ScanShortcuts(sig, results);
-
-            return results;
+            if (!string.IsNullOrWhiteSpace(app.LocalIconPath))
+            {
+                var iconFile = AppMetadataHelper.CleanIconPath(app.LocalIconPath);
+                if (File.Exists(iconFile) && iconFile.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (IsSafePathToDelete(iconFile))
+                    {
+                        var fi = new FileInfo(iconFile);
+                        results.Add(new LeftoverItem(LeftoverType.File, iconFile, fi.Length, $"Application Binary ({Path.GetFileName(iconFile)})", IsHighConfidence: true));
+                    }
+                }
+            }
         }
 
         private static void ScanShortcuts(AppSearchSignature sig, List<LeftoverItem> results)
@@ -702,37 +958,165 @@ namespace SetupHub180Hz.Services
             }
         }
 
+        private static void ScanPrefetch(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            try
+            {
+                var winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                var prefetchDir = Path.Combine(winDir, "Prefetch");
+                if (Directory.Exists(prefetchDir))
+                {
+                    var pfFiles = Directory.GetFiles(prefetchDir, "*.pf");
+                    foreach (var pf in pfFiles)
+                    {
+                        var fileName = Path.GetFileName(pf);
+                        if (IsForensicMatch(fileName, sig))
+                        {
+                            var fi = new FileInfo(pf);
+                            results.Add(new LeftoverItem(LeftoverType.File, pf, fi.Length, $"Windows Prefetch Trace ({fileName})", IsHighConfidence: true));
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private static void ScanCrashDumps(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            try
+            {
+                var localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var crashDir = Path.Combine(localApp, "CrashDumps");
+                if (Directory.Exists(crashDir))
+                {
+                    var dmpFiles = Directory.GetFiles(crashDir, "*.dmp");
+                    foreach (var dmp in dmpFiles)
+                    {
+                        var fileName = Path.GetFileName(dmp);
+                        if (IsForensicMatch(fileName, sig))
+                        {
+                            var fi = new FileInfo(dmp);
+                            results.Add(new LeftoverItem(LeftoverType.File, dmp, fi.Length, $"Application Crash Dump ({fileName})", IsHighConfidence: true));
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private static void ScanRecentShortcuts(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            try
+            {
+                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var recentDir = Path.Combine(appData, @"Microsoft\Windows\Recent");
+                if (Directory.Exists(recentDir))
+                {
+                    var lnks = Directory.GetFiles(recentDir, "*.lnk", SearchOption.TopDirectoryOnly);
+                    foreach (var lnk in lnks)
+                    {
+                        var name = Path.GetFileNameWithoutExtension(lnk);
+                        if (IsMatch(name, sig) || IsForensicMatch(name, sig))
+                        {
+                            var fi = new FileInfo(lnk);
+                            results.Add(new LeftoverItem(LeftoverType.File, lnk, fi.Length, $"Recent History Shortcut ({name})", IsHighConfidence: true));
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private static void ScanTempFolders(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            var tempDirs = new List<string>();
+            var userTemp = Path.GetTempPath();
+            if (!string.IsNullOrEmpty(userTemp) && Directory.Exists(userTemp)) tempDirs.Add(userTemp);
+
+            var winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            if (!string.IsNullOrEmpty(winDir))
+            {
+                var sysTemp = Path.Combine(winDir, "Temp");
+                if (Directory.Exists(sysTemp)) tempDirs.Add(sysTemp);
+            }
+
+            foreach (var tDir in tempDirs)
+            {
+                try
+                {
+                    foreach (var sub in Directory.GetDirectories(tDir))
+                    {
+                        var name = Path.GetFileName(sub);
+                        if (IsMatch(name, sig) || IsForensicMatch(name, sig))
+                        {
+                            if (IsSafePathToDelete(sub))
+                            {
+                                results.Add(new LeftoverItem(LeftoverType.Folder, sub, CalculateDirectorySizeSafe(sub), $"Temp Cache Folder ({name})", IsHighConfidence: true));
+                            }
+                        }
+                    }
+
+                    foreach (var file in Directory.GetFiles(tDir))
+                    {
+                        var name = Path.GetFileName(file);
+                        if (IsForensicMatch(name, sig))
+                        {
+                            if (IsSafePathToDelete(file))
+                            {
+                                var fi = new FileInfo(file);
+                                results.Add(new LeftoverItem(LeftoverType.File, file, fi.Length, $"Temp Log/Artifact ({name})", IsHighConfidence: true));
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
         private static bool IsMatch(string targetName, AppSearchSignature sig)
         {
             if (string.IsNullOrWhiteSpace(targetName)) return false;
             if (targetName.Length < 2) return false;
 
-            // 1. Direct match on clean name or full name (Always valid!)
+            // 1. Direct match on clean name or full name
             if (string.Equals(targetName, sig.CleanName, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(targetName, sig.FullName, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            // 2. Direct match on distinct product name (e.g. "Chrome" for "Google Chrome", "VLC" for "VLC media player")
+            // 2. Direct match on distinct product name
             if (!string.IsNullOrWhiteSpace(sig.DistinctProductName) &&
                 string.Equals(targetName, sig.DistinctProductName, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            // 3. Direct match on Winget/Package ID product part (e.g. "VLC" for "VideoLAN.VLC")
+            // 3. Direct match on Winget/Package ID product part
             if (!string.IsNullOrWhiteSpace(sig.IdProductPart) &&
                 string.Equals(targetName, sig.IdProductPart, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            // 4. Blacklist guard: only apply to prevent generic fuzzy/prefix matching
+            // 4. Match against known ExeNames or Compact tokens
+            if (sig.ExeNames.Any(e => string.Equals(targetName, e, StringComparison.OrdinalIgnoreCase) ||
+                                     string.Equals(Path.GetFileNameWithoutExtension(targetName), e, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            var compactTarget = Regex.Replace(targetName, @"[\s\-_\.]", "");
+            if (sig.SearchTokens.Any(t => string.Equals(compactTarget, Regex.Replace(t, @"[\s\-_\.]", ""), StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            // 5. Blacklist guard: only apply to prevent generic fuzzy/prefix matching
             if (BlacklistedTokens.Contains(targetName)) return false;
             if (ProtectedVendorNames.Contains(targetName)) return false;
 
-            // 5. Specific prefix matching with delimiter check (' ', '-', '_')
+            // 6. Specific prefix matching with delimiter check (' ', '-', '_')
             if (sig.CleanName.Length >= 4)
             {
                 if (targetName.StartsWith(sig.CleanName + " ", StringComparison.OrdinalIgnoreCase) ||
@@ -756,14 +1140,464 @@ namespace SetupHub180Hz.Services
             return false;
         }
 
+        private static bool IsForensicMatch(string text, AppSearchSignature sig)
+        {
+            if (string.IsNullOrWhiteSpace(text) || text.Length < 2) return false;
+
+            if (!string.IsNullOrWhiteSpace(sig.ConfirmedInstallDir) &&
+                text.IndexOf(sig.ConfirmedInstallDir, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+
+            foreach (var exe in sig.ExeNames)
+            {
+                if (exe.Length >= 3 && text.IndexOf(exe, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return true;
+                }
+            }
+
+            if (sig.CleanName.Length >= 3 && text.IndexOf(sig.CleanName, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(sig.DistinctProductName) &&
+                sig.DistinctProductName.Length >= 3 &&
+                text.IndexOf(sig.DistinctProductName, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(sig.IdProductPart) &&
+                sig.IdProductPart.Length >= 3 &&
+                text.IndexOf(sig.IdProductPart, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private List<LeftoverItem> ScanRegistry(AppItem app, AppSearchSignature sig, UninstallScanMode mode)
         {
             var results = new List<LeftoverItem>();
 
+            // 1. Official Windows Uninstall registration keys (HKLM, HKCU, WOW6432Node)
             ScanUninstallRegistryKeys(app, sig, results);
+
+            // 2. Windows App Paths
             ScanAppPaths(sig, results);
+
+            // 3. Classes Applications (Shell associations)
             ScanClassesApplications(sig, results);
 
+            // 4. UserAssist (ROT13 encoded execution footprints)
+            ScanUserAssist(sig, results);
+
+            // 5. MUICache (Shell application friendly name cache)
+            ScanMuiCache(sig, results);
+
+            // 6. AppCompatFlags & PCA (Compatibility Assistant execution stores & layers)
+            ScanAppCompatFlags(sig, results);
+
+            // 7. Windows Firewall Rules
+            ScanFirewallRules(sig, results);
+
+            // 8. Notification Settings
+            ScanNotificationSettings(sig, results);
+
+            // 9. Startup & Run / RunOnce registrations
+            ScanStartupAndRun(sig, results);
+
+            // 10. FeatureUsage & RecentApps
+            ScanFeatureUsageAndRecent(sig, results);
+
+            // 11. Classes & ProgIDs
+            ScanClassesAndProgId(sig, results);
+
+            // 12. Deep Software tree (HKCU\Software, HKLM\Software, WOW6432Node down to 3 levels)
+            ScanSoftwareTreeDeep(sig, results);
+
+            // 13. Windows Installer / MSI Product registrations
+            ScanProductsAndInstaller(app, sig, results);
+
+            return results;
+        }
+
+        private static void ScanUserAssist(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            try
+            {
+                using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
+                using var uaKey = baseKey.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist", false);
+                if (uaKey != null)
+                {
+                    foreach (var guid in uaKey.GetSubKeyNames())
+                    {
+                        try
+                        {
+                            using var countKey = uaKey.OpenSubKey($@"{guid}\Count", false);
+                            if (countKey == null) continue;
+
+                            foreach (var valName in countKey.GetValueNames())
+                            {
+                                var decoded = Rot13(valName);
+                                if (IsForensicMatch(decoded, sig) || IsForensicMatch(valName, sig))
+                                {
+                                    var fullKey = $@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{guid}\Count";
+                                    var label = Path.GetFileName(decoded);
+                                    if (string.IsNullOrWhiteSpace(label)) label = decoded;
+                                    results.Add(new LeftoverItem(
+                                        LeftoverType.RegistryValue,
+                                        fullKey,
+                                        null,
+                                        $"UserAssist Execution Record ({label})",
+                                        IsHighConfidence: true,
+                                        ValueName: valName));
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private static void ScanMuiCache(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            var muiTargets = new[]
+            {
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache", @"HKEY_CURRENT_USER\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache"),
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Microsoft\Windows\ShellNoRoam\MUICache", @"HKEY_CURRENT_USER\Software\Microsoft\Windows\ShellNoRoam\MUICache"),
+                (RegistryHive.ClassesRoot, RegistryView.Default, @"Local Settings\Software\Microsoft\Windows\Shell\MuiCache", @"HKEY_CLASSES_ROOT\Local Settings\Software\Microsoft\Windows\Shell\MuiCache")
+            };
+
+            foreach (var (hive, view, subKeyPath, displayPrefix) in muiTargets)
+            {
+                try
+                {
+                    using var baseKey = RegistryKey.OpenBaseKey(hive, view);
+                    using var key = baseKey.OpenSubKey(subKeyPath, false);
+                    if (key == null) continue;
+
+                    foreach (var valName in key.GetValueNames())
+                    {
+                        bool match = IsForensicMatch(valName, sig);
+                        if (!match)
+                        {
+                            var valData = key.GetValue(valName) as string;
+                            if (!string.IsNullOrWhiteSpace(valData) && IsForensicMatch(valData, sig))
+                            {
+                                match = true;
+                            }
+                        }
+
+                        if (match)
+                        {
+                            var label = Path.GetFileName(valName);
+                            if (string.IsNullOrWhiteSpace(label)) label = valName;
+                            results.Add(new LeftoverItem(
+                                LeftoverType.RegistryValue,
+                                displayPrefix,
+                                null,
+                                $"MUICache Display Name ({label})",
+                                IsHighConfidence: true,
+                                ValueName: valName));
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void ScanAppCompatFlags(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            var compatTargets = new[]
+            {
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store", @"HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store"),
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", @"HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"),
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store", @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store"),
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"),
+                (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store", @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store"),
+                (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers")
+            };
+
+            foreach (var (hive, view, subKeyPath, displayPrefix) in compatTargets)
+            {
+                try
+                {
+                    using var baseKey = RegistryKey.OpenBaseKey(hive, view);
+                    using var key = baseKey.OpenSubKey(subKeyPath, false);
+                    if (key == null) continue;
+
+                    foreach (var valName in key.GetValueNames())
+                    {
+                        if (IsForensicMatch(valName, sig))
+                        {
+                            var label = Path.GetFileName(valName);
+                            if (string.IsNullOrWhiteSpace(label)) label = valName;
+                            results.Add(new LeftoverItem(
+                                LeftoverType.RegistryValue,
+                                displayPrefix,
+                                null,
+                                $"AppCompat Execution Record ({label})",
+                                IsHighConfidence: true,
+                                ValueName: valName));
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void ScanFirewallRules(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            try
+            {
+                using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+                using var fwKey = baseKey.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\FirewallRules", false);
+                if (fwKey != null)
+                {
+                    var displayPrefix = @"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\FirewallRules";
+                    foreach (var valName in fwKey.GetValueNames())
+                    {
+                        bool match = IsForensicMatch(valName, sig);
+                        if (!match)
+                        {
+                            var valData = fwKey.GetValue(valName) as string;
+                            if (!string.IsNullOrWhiteSpace(valData) && IsForensicMatch(valData, sig))
+                            {
+                                match = true;
+                            }
+                        }
+
+                        if (match)
+                        {
+                            results.Add(new LeftoverItem(
+                                LeftoverType.RegistryValue,
+                                displayPrefix,
+                                null,
+                                $"Windows Firewall Rule ({valName})",
+                                IsHighConfidence: true,
+                                ValueName: valName));
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private static void ScanStartupAndRun(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            var startupTargets = new[]
+            {
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Microsoft\Windows\CurrentVersion\Run", @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run"),
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Microsoft\Windows\CurrentVersion\RunOnce", @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce"),
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Microsoft\Windows\CurrentVersion\Run", @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run"),
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Microsoft\Windows\CurrentVersion\RunOnce", @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce"),
+                (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\Run", @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"),
+                (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\RunOnce", @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\RunOnce"),
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run"),
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run"),
+                (RegistryHive.LocalMachine, RegistryView.Registry32, @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run32", @"HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run32")
+            };
+
+            foreach (var (hive, view, subKeyPath, displayPrefix) in startupTargets)
+            {
+                try
+                {
+                    using var baseKey = RegistryKey.OpenBaseKey(hive, view);
+                    using var key = baseKey.OpenSubKey(subKeyPath, false);
+                    if (key == null) continue;
+
+                    foreach (var valName in key.GetValueNames())
+                    {
+                        bool match = IsMatch(valName, sig) || IsForensicMatch(valName, sig);
+                        if (!match)
+                        {
+                            var valData = key.GetValue(valName)?.ToString();
+                            if (!string.IsNullOrWhiteSpace(valData) && IsForensicMatch(valData, sig))
+                            {
+                                match = true;
+                            }
+                        }
+
+                        if (match)
+                        {
+                            results.Add(new LeftoverItem(
+                                LeftoverType.RegistryValue,
+                                displayPrefix,
+                                null,
+                                $"Startup Registration ({valName})",
+                                IsHighConfidence: true,
+                                ValueName: valName));
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void ScanNotificationSettings(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            try
+            {
+                using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
+                using var notifKey = baseKey.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Notifications\Settings", false);
+                if (notifKey != null)
+                {
+                    var displayPrefix = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings";
+                    foreach (var subName in notifKey.GetSubKeyNames())
+                    {
+                        if (IsMatch(subName, sig) || IsForensicMatch(subName, sig))
+                        {
+                            var fullPath = $@"{displayPrefix}\{subName}";
+                            if (IsSafeRegistryKeyToDelete(fullPath))
+                            {
+                                results.Add(new LeftoverItem(
+                                    LeftoverType.RegistryKey,
+                                    fullPath,
+                                    null,
+                                    $"Notification Registration ({subName})",
+                                    IsHighConfidence: true));
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private static void ScanFeatureUsageAndRecent(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            var targets = new[]
+            {
+                @"Software\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\AppSwitched",
+                @"Software\Microsoft\Windows\CurrentVersion\Explorer\FeatureUsage\ShowJumpView"
+            };
+
+            foreach (var subPath in targets)
+            {
+                try
+                {
+                    using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
+                    using var key = baseKey.OpenSubKey(subPath, false);
+                    if (key == null) continue;
+
+                    var displayPrefix = $@"HKEY_CURRENT_USER\{subPath}";
+                    foreach (var valName in key.GetValueNames())
+                    {
+                        if (IsForensicMatch(valName, sig))
+                        {
+                            var label = Path.GetFileName(valName);
+                            if (string.IsNullOrWhiteSpace(label)) label = valName;
+                            results.Add(new LeftoverItem(
+                                LeftoverType.RegistryValue,
+                                displayPrefix,
+                                null,
+                                $"Recent Activity Trace ({label})",
+                                IsHighConfidence: true,
+                                ValueName: valName));
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void ScanClassesAndProgId(AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            var targets = new[]
+            {
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Classes", @"HKEY_CURRENT_USER\Software\Classes"),
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Classes", @"HKEY_LOCAL_MACHINE\Software\Classes")
+            };
+
+            foreach (var (hive, view, subKeyPath, displayPrefix) in targets)
+            {
+                try
+                {
+                    using var baseKey = RegistryKey.OpenBaseKey(hive, view);
+                    using var key = baseKey.OpenSubKey(subKeyPath, false);
+                    if (key == null) continue;
+
+                    foreach (var subName in key.GetSubKeyNames())
+                    {
+                        if (subName.StartsWith(".") || ProtectedTopLevelRegistryNames.Contains(subName)) continue;
+
+                        if (IsMatch(subName, sig))
+                        {
+                            var fullPath = $@"{displayPrefix}\{subName}";
+                            if (IsSafeRegistryKeyToDelete(fullPath))
+                            {
+                                results.Add(new LeftoverItem(
+                                    LeftoverType.RegistryKey,
+                                    fullPath,
+                                    null,
+                                    $"ProgID / File Association ({subName})",
+                                    IsHighConfidence: true));
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void ScanProductsAndInstaller(AppItem app, AppSearchSignature sig, List<LeftoverItem> results)
+        {
+            var targets = new[]
+            {
+                (RegistryHive.LocalMachine, RegistryView.Registry64, @"Software\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products", @"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Installer\UserData\S-1-5-18\Products"),
+                (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Microsoft\Installer\Products", @"HKEY_CURRENT_USER\Software\Microsoft\Installer\Products")
+            };
+
+            foreach (var (hive, view, subKeyPath, displayPrefix) in targets)
+            {
+                try
+                {
+                    using var baseKey = RegistryKey.OpenBaseKey(hive, view);
+                    using var key = baseKey.OpenSubKey(subKeyPath, false);
+                    if (key == null) continue;
+
+                    foreach (var subName in key.GetSubKeyNames())
+                    {
+                        try
+                        {
+                            using var sub = key.OpenSubKey(subName, false);
+                            var prodName = sub?.GetValue("ProductName") as string;
+                            if (string.IsNullOrWhiteSpace(prodName))
+                            {
+                                using var installProps = sub?.OpenSubKey("InstallProperties", false);
+                                prodName = installProps?.GetValue("DisplayName") as string;
+                            }
+
+                            if (!string.IsNullOrWhiteSpace(prodName) && (IsMatch(prodName, sig) || IsForensicMatch(prodName, sig)))
+                            {
+                                var fullPath = $@"{displayPrefix}\{subName}";
+                                if (IsSafeRegistryKeyToDelete(fullPath))
+                                {
+                                    results.Add(new LeftoverItem(
+                                        LeftoverType.RegistryKey,
+                                        fullPath,
+                                        null,
+                                        $"Windows Installer Product ({prodName})",
+                                        IsHighConfidence: true));
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static void ScanSoftwareTreeDeep(AppSearchSignature sig, List<LeftoverItem> results)
+        {
             var targets = new List<(RegistryHive Hive, RegistryView View, string SubKeyPath, string DisplayPrefix)>
             {
                 (RegistryHive.CurrentUser, RegistryView.Default, @"Software", @"HKEY_CURRENT_USER\Software"),
@@ -782,6 +1616,8 @@ namespace SetupHub180Hz.Services
                     var subKeyNames = subKey.GetSubKeyNames();
                     foreach (var name in subKeyNames)
                     {
+                        if (ProtectedTopLevelRegistryNames.Contains(name)) continue;
+
                         if (IsMatch(name, sig))
                         {
                             var fullPath = $@"{target.DisplayPrefix}\{name}";
@@ -792,7 +1628,7 @@ namespace SetupHub180Hz.Services
                         }
                         else
                         {
-                            // Check subkeys under publisher/vendor keys (e.g. VideoLAN\VLC, Valve\Steam)
+                            // Check subkeys under publisher/vendor keys
                             try
                             {
                                 using var vendorKey = subKey.OpenSubKey(name, false);
@@ -808,6 +1644,29 @@ namespace SetupHub180Hz.Services
                                                 results.Add(new LeftoverItem(LeftoverType.RegistryKey, fullPath, null, childName, IsHighConfidence: true));
                                             }
                                         }
+                                        else
+                                        {
+                                            // Check level 3 (e.g. Vendor\SubProduct\Product)
+                                            try
+                                            {
+                                                using var childKey = vendorKey.OpenSubKey(childName, false);
+                                                if (childKey != null)
+                                                {
+                                                    foreach (var grandChildName in childKey.GetSubKeyNames())
+                                                    {
+                                                        if (IsMatch(grandChildName, sig))
+                                                        {
+                                                            var fullPath = $@"{target.DisplayPrefix}\{name}\{childName}\{grandChildName}";
+                                                            if (IsSafeRegistryKeyToDelete(fullPath))
+                                                            {
+                                                                results.Add(new LeftoverItem(LeftoverType.RegistryKey, fullPath, null, grandChildName, IsHighConfidence: true));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            catch { }
+                                        }
                                     }
                                 }
                             }
@@ -817,8 +1676,6 @@ namespace SetupHub180Hz.Services
                 }
                 catch { }
             }
-
-            return results;
         }
 
         private static void ScanAppPaths(AppSearchSignature sig, List<LeftoverItem> results)
@@ -924,18 +1781,38 @@ namespace SetupHub180Hz.Services
                         {
                             isMatch = true;
                         }
+                        else if (IsMatch(subName, sig) || IsForensicMatch(subName, sig))
+                        {
+                            isMatch = true;
+                        }
                         else
                         {
                             try
                             {
                                 using var sub = uninstKey.OpenSubKey(subName, false);
-                                var disp = sub?.GetValue("DisplayName") as string;
-                                if (!string.IsNullOrWhiteSpace(disp) &&
-                                    (string.Equals(disp.Trim(), cleanName, StringComparison.OrdinalIgnoreCase) ||
-                                     string.Equals(disp.Trim(), sig.CleanName, StringComparison.OrdinalIgnoreCase) ||
-                                     (!string.IsNullOrWhiteSpace(sig.DistinctProductName) && string.Equals(disp.Trim(), sig.DistinctProductName, StringComparison.OrdinalIgnoreCase))))
+                                if (sub != null)
                                 {
-                                    isMatch = true;
+                                    var disp = sub.GetValue("DisplayName") as string;
+                                    var installLoc = sub.GetValue("InstallLocation") as string;
+                                    var dispIcon = sub.GetValue("DisplayIcon") as string;
+                                    var uninstVal = sub.GetValue("UninstallString") as string;
+
+                                    if (!string.IsNullOrWhiteSpace(disp) && (IsMatch(disp.Trim(), sig) || IsForensicMatch(disp.Trim(), sig)))
+                                    {
+                                        isMatch = true;
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(installLoc) && IsForensicMatch(installLoc, sig))
+                                    {
+                                        isMatch = true;
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(dispIcon) && IsForensicMatch(dispIcon, sig))
+                                    {
+                                        isMatch = true;
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(uninstVal) && IsForensicMatch(uninstVal, sig))
+                                    {
+                                        isMatch = true;
+                                    }
                                 }
                             }
                             catch { }
@@ -946,7 +1823,7 @@ namespace SetupHub180Hz.Services
                             var fullPath = $@"{target.DisplayPrefix}\{subName}";
                             if (IsSafeRegistryKeyToDelete(fullPath))
                             {
-                                results.Add(new LeftoverItem(LeftoverType.RegistryKey, fullPath, null, "Uninstall Key", IsHighConfidence: true));
+                                results.Add(new LeftoverItem(LeftoverType.RegistryKey, fullPath, null, $"Uninstall Registration ({subName})", IsHighConfidence: true));
                             }
                         }
                     }
@@ -1010,6 +1887,20 @@ namespace SetupHub180Hz.Services
                                 else { failed++; }
                             }
                         }
+                        else if (item.Type == LeftoverType.RegistryValue)
+                        {
+                            if (!IsSafeRegistryValueToDelete(item.Path, item.ValueName))
+                            {
+                                ActivityLogger.Instance.Log($"SAFETY SHIELD: Blocked deletion of protected registry value: {item.Path} -> {item.ValueName}", ActivityType.Warning);
+                                failed++;
+                            }
+                            else
+                            {
+                                bool okVal = DeleteRegistryValue(item.Path, item.ValueName ?? string.Empty);
+                                if (okVal) { deleted++; ok = true; }
+                                else { failed++; }
+                            }
+                        }
                         else if (item.Type == LeftoverType.Folder)
                         {
                             if (!IsSafePathToDelete(item.Path))
@@ -1019,6 +1910,7 @@ namespace SetupHub180Hz.Services
                             }
                             else
                             {
+                                KillProcessesInDirectory(item.Path);
                                 bool okDir = DeleteFolderSafe(item.Path);
                                 if (okDir) { deleted++; ok = true; }
                                 else { failed++; }
@@ -1131,6 +2023,12 @@ namespace SetupHub180Hz.Services
 
                     return deleted;
                 }
+                else if (fullPath.StartsWith(@"HKEY_CLASSES_ROOT\", StringComparison.OrdinalIgnoreCase))
+                {
+                    var subPath = fullPath.Substring(@"HKEY_CLASSES_ROOT\".Length);
+                    Registry.ClassesRoot.DeleteSubKeyTree(subPath, throwOnMissingSubKey: false);
+                    return true;
+                }
             }
             catch (Exception ex)
             {
@@ -1138,6 +2036,156 @@ namespace SetupHub180Hz.Services
                 return false;
             }
             return false;
+        }
+
+        public static bool DeleteRegistryValue(string fullKeyPath, string valueName)
+        {
+            if (string.IsNullOrWhiteSpace(fullKeyPath)) return false;
+
+            try
+            {
+                if (fullKeyPath.StartsWith(@"HKEY_CURRENT_USER\", StringComparison.OrdinalIgnoreCase))
+                {
+                    var subPath = fullKeyPath.Substring(@"HKEY_CURRENT_USER\".Length);
+                    using var key = Registry.CurrentUser.OpenSubKey(subPath, writable: true);
+                    if (key != null)
+                    {
+                        key.DeleteValue(valueName, throwOnMissingValue: false);
+                        return true;
+                    }
+                }
+                else if (fullKeyPath.StartsWith(@"HKEY_LOCAL_MACHINE\", StringComparison.OrdinalIgnoreCase))
+                {
+                    var subPath = fullKeyPath.Substring(@"HKEY_LOCAL_MACHINE\".Length);
+                    bool deleted = false;
+
+                    try
+                    {
+                        if (subPath.StartsWith(@"Software\WOW6432Node\", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var wowPath = subPath.Substring(@"Software\WOW6432Node\".Length);
+                            using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+                            using var swKey = baseKey.OpenSubKey("Software\\" + wowPath, writable: true);
+                            if (swKey != null)
+                            {
+                                swKey.DeleteValue(valueName, false);
+                                deleted = true;
+                            }
+                        }
+                        else
+                        {
+                            using var base64 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+                            using var sub64 = base64.OpenSubKey(subPath, writable: true);
+                            if (sub64 != null)
+                            {
+                                try { sub64.DeleteValue(valueName, false); deleted = true; } catch { }
+                            }
+
+                            using var base32 = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+                            using var sub32 = base32.OpenSubKey(subPath, writable: true);
+                            if (sub32 != null)
+                            {
+                                try { sub32.DeleteValue(valueName, false); deleted = true; } catch { }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        var regPsi = new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = "reg.exe",
+                            Arguments = $"delete \"{fullKeyPath}\" /v \"{valueName}\" /f",
+                            UseShellExecute = true,
+                            Verb = "runas",
+                            WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                        };
+                        using var p = System.Diagnostics.Process.Start(regPsi);
+                        p?.WaitForExit(3000);
+                        deleted = p != null && p.ExitCode == 0;
+
+                        if (!deleted && (fullKeyPath.Contains("WOW6432Node", StringComparison.OrdinalIgnoreCase) || Environment.Is64BitOperatingSystem))
+                        {
+                            var regPsi32 = new System.Diagnostics.ProcessStartInfo
+                            {
+                                FileName = "reg.exe",
+                                Arguments = $"delete \"{fullKeyPath}\" /v \"{valueName}\" /f /reg:32",
+                                UseShellExecute = true,
+                                Verb = "runas",
+                                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                            };
+                            using var p32 = System.Diagnostics.Process.Start(regPsi32);
+                            p32?.WaitForExit(3000);
+                            deleted = p32 != null && p32.ExitCode == 0;
+                        }
+                    }
+
+                    return deleted;
+                }
+                else if (fullKeyPath.StartsWith(@"HKEY_CLASSES_ROOT\", StringComparison.OrdinalIgnoreCase))
+                {
+                    var subPath = fullKeyPath.Substring(@"HKEY_CLASSES_ROOT\".Length);
+                    using var key = Registry.ClassesRoot.OpenSubKey(subPath, writable: true);
+                    if (key != null)
+                    {
+                        key.DeleteValue(valueName, throwOnMissingValue: false);
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Registry value delete error for {fullKeyPath} -> {valueName}: {ex.Message}", ActivityType.Warning);
+                return false;
+            }
+            return false;
+        }
+
+        public static void KillProcessesInDirectory(string folderPath)
+        {
+            if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath)) return;
+            try
+            {
+                var normFolder = NormalizePath(folderPath);
+                var procs = System.Diagnostics.Process.GetProcesses();
+                foreach (var p in procs)
+                {
+                    try
+                    {
+                        var procName = p.ProcessName;
+                        if (ProtectedProcessNames.Contains(procName)) continue;
+
+                        string? procPath = null;
+                        try { procPath = p.MainModule?.FileName; } catch { }
+
+                        if (!string.IsNullOrEmpty(procPath))
+                        {
+                            var normProcPath = NormalizePath(procPath);
+                            if (normProcPath.StartsWith(normFolder, StringComparison.OrdinalIgnoreCase))
+                            {
+                                try
+                                {
+                                    p.Kill();
+                                    p.WaitForExit(1500);
+                                }
+                                catch
+                                {
+                                    var psi = new System.Diagnostics.ProcessStartInfo
+                                    {
+                                        FileName = "taskkill.exe",
+                                        Arguments = $"/F /PID {p.Id}",
+                                        UseShellExecute = false,
+                                        CreateNoWindow = true
+                                    };
+                                    using var tk = System.Diagnostics.Process.Start(psi);
+                                    tk?.WaitForExit(1500);
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
         }
 
         public static bool DeleteFolderSafe(string folderPath)
@@ -1218,6 +2266,30 @@ namespace SetupHub180Hz.Services
             try
             {
                 try { File.SetAttributes(filePath, FileAttributes.Normal); } catch { }
+
+                // Terminate any running process using this file
+                try
+                {
+                    var normTarget = NormalizePath(filePath);
+                    var procs = System.Diagnostics.Process.GetProcesses();
+                    foreach (var p in procs)
+                    {
+                        try
+                        {
+                            if (ProtectedProcessNames.Contains(p.ProcessName)) continue;
+                            string? pPath = null;
+                            try { pPath = p.MainModule?.FileName; } catch { }
+                            if (!string.IsNullOrEmpty(pPath) && string.Equals(NormalizePath(pPath), normTarget, StringComparison.OrdinalIgnoreCase))
+                            {
+                                p.Kill();
+                                p.WaitForExit(1000);
+                            }
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+
                 try
                 {
                     File.Delete(filePath);
@@ -1725,12 +2797,27 @@ namespace SetupHub180Hz.Services
                             try
                             {
                                 using var sub = uninst.OpenSubKey(subName);
-                                var disp = sub?.GetValue("DisplayName") as string;
-                                if (!string.IsNullOrWhiteSpace(disp) &&
-                                    (string.Equals(disp.Trim(), cleanName, StringComparison.OrdinalIgnoreCase) ||
-                                     string.Equals(disp.Trim(), app.Name?.Trim(), StringComparison.OrdinalIgnoreCase)))
+                                if (sub != null)
                                 {
-                                    isMatch = true;
+                                    var disp = sub.GetValue("DisplayName") as string;
+                                    var loc = sub.GetValue("InstallLocation") as string;
+                                    var icon = sub.GetValue("DisplayIcon") as string;
+                                    var uStr = sub.GetValue("UninstallString") as string;
+
+                                    if (!string.IsNullOrWhiteSpace(disp) &&
+                                        (string.Equals(disp.Trim(), cleanName, StringComparison.OrdinalIgnoreCase) ||
+                                         string.Equals(disp.Trim(), app.Name?.Trim(), StringComparison.OrdinalIgnoreCase) ||
+                                         (cleanName.Length >= 4 && disp.Contains(cleanName, StringComparison.OrdinalIgnoreCase))))
+                                    {
+                                        isMatch = true;
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(app.InstallLocation) &&
+                                             ((!string.IsNullOrWhiteSpace(loc) && loc.Trim().Equals(app.InstallLocation.Trim(), StringComparison.OrdinalIgnoreCase)) ||
+                                              (!string.IsNullOrWhiteSpace(icon) && icon.Contains(app.InstallLocation, StringComparison.OrdinalIgnoreCase)) ||
+                                              (!string.IsNullOrWhiteSpace(uStr) && uStr.Contains(app.InstallLocation, StringComparison.OrdinalIgnoreCase))))
+                                    {
+                                        isMatch = true;
+                                    }
                                 }
                             }
                             catch { }

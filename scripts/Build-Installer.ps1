@@ -17,6 +17,7 @@ $dotnet = (Get-Command dotnet -ErrorAction SilentlyContinue).Source
 $userDotnet = Join-Path $env:USERPROFILE ".dotnet\dotnet.exe"
 if (Test-Path -LiteralPath $userDotnet) {
     $dotnet = $userDotnet
+    $env:DOTNET_ROOT = Split-Path -Parent $userDotnet
 } elseif (-not $dotnet) {
     $dotnet = "C:\Program Files\dotnet\dotnet.exe"
 }
