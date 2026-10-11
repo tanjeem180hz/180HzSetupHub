@@ -44,6 +44,7 @@ namespace SetupHub180Hz.Views
                     await LoadItemsAsync();
                 }
                 RefreshHistory();
+                UpdateSelectionCount();
             };
         }
 
@@ -56,6 +57,7 @@ namespace SetupHub180Hz.Views
                 UpdateStatCounts();
                 ApplyFilters();
                 RefreshHistory();
+                UpdateSelectionCount();
 
                 // Background async icon extraction & website discovery in parallel
                 _ = Task.Run(async () =>
@@ -233,6 +235,8 @@ namespace SetupHub180Hz.Views
                     EmptyNotice.Visibility = Visibility.Collapsed;
                 }
             }
+
+            UpdateSelectionCount();
         }
 
         private void Filter_Checked(object sender, RoutedEventArgs e)
@@ -409,7 +413,6 @@ namespace SetupHub180Hz.Views
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    // Revert toggle
                     item.IsEnabled = !newEnabled;
                     toggle.IsChecked = !newEnabled;
 
@@ -426,6 +429,251 @@ namespace SetupHub180Hz.Views
                 }
             }
         }
+
+        // ==================== BATCH SELECTION & ACTION HANDLERS ====================
+
+        private void RowCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateSelectionCount();
+        }
+
+        private void MasterSelect_Click(object sender, RoutedEventArgs e)
+        {
+            if (MasterSelectCheckBox == null) return;
+            var select = MasterSelectCheckBox.IsChecked == true;
+
+            foreach (var item in _displayedItems)
+            {
+                item.IsSelected = select;
+            }
+
+            UpdateSelectionCount();
+        }
+
+        private void InvertSelection_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in _displayedItems)
+            {
+                item.IsSelected = !item.IsSelected;
+            }
+
+            UpdateSelectionCount();
+        }
+
+        private void UpdateSelectionCount()
+        {
+            if (!_isInitialized) return;
+
+            var selectedCount = _items.Count(i => i.IsSelected);
+            if (SelectionCountText != null)
+            {
+                SelectionCountText.Text = $"{selectedCount} selected";
+            }
+
+            if (MasterSelectCheckBox != null)
+            {
+                if (_displayedItems.Count == 0)
+                {
+                    MasterSelectCheckBox.IsChecked = false;
+                }
+                else
+                {
+                    var allSelected = _displayedItems.All(i => i.IsSelected);
+                    var anySelected = _displayedItems.Any(i => i.IsSelected);
+                    MasterSelectCheckBox.IsChecked = allSelected ? true : (anySelected ? null : false);
+                }
+            }
+        }
+
+        private void DisableSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var targets = _items.Where(i => i.IsSelected && i.IsEnabled).ToList();
+            if (targets.Count == 0)
+            {
+                ThemedMessageBox.Show("Please select one or more enabled startup applications to disable.", "No Items Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            try
+            {
+                _startupService.SetEnabledBatch(targets, false);
+                ActivityLogger.Instance.Log($"Batch disabled {targets.Count} startup applications.", ActivityType.Info);
+
+                UpdateStatCounts();
+                ApplyFilters();
+                RefreshHistory();
+                UpdateSelectionCount();
+            }
+            catch (Exception ex)
+            {
+                ThemedMessageBox.Show($"Batch disable failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void EnableSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var targets = _items.Where(i => i.IsSelected && !i.IsEnabled).ToList();
+            if (targets.Count == 0)
+            {
+                ThemedMessageBox.Show("Please select one or more disabled startup applications to enable.", "No Items Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            try
+            {
+                _startupService.SetEnabledBatch(targets, true);
+                ActivityLogger.Instance.Log($"Batch enabled {targets.Count} startup applications.", ActivityType.Info);
+
+                UpdateStatCounts();
+                ApplyFilters();
+                RefreshHistory();
+                UpdateSelectionCount();
+            }
+            catch (Exception ex)
+            {
+                ThemedMessageBox.Show($"Batch enable failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void DisableUnselected_Click(object sender, RoutedEventArgs e)
+        {
+            // "deselect gula disable" -> Disable items that are NOT selected
+            var targets = _items.Where(i => !i.IsSelected && i.IsEnabled).ToList();
+            if (targets.Count == 0)
+            {
+                ThemedMessageBox.Show("All unselected startup applications are already disabled.", "Disable Unselected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var confirm = ThemedMessageBox.Show(
+                $"Disable all {targets.Count} unselected startup applications while keeping your selected applications ON?",
+                "Disable Unselected Applications",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirm == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    _startupService.SetEnabledBatch(targets, false);
+                    ActivityLogger.Instance.Log($"Force disabled {targets.Count} unselected startup applications.", ActivityType.Info);
+
+                    UpdateStatCounts();
+                    ApplyFilters();
+                    RefreshHistory();
+                    UpdateSelectionCount();
+                }
+                catch (Exception ex)
+                {
+                    ThemedMessageBox.Show($"Batch disable failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void DisableAll_Click(object sender, RoutedEventArgs e)
+        {
+            var targets = _items.Where(i => i.IsEnabled).ToList();
+            if (targets.Count == 0)
+            {
+                ThemedMessageBox.Show("All startup applications are already disabled.", "Disable All", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var confirm = ThemedMessageBox.Show(
+                $"Are you sure you want to disable all {targets.Count} startup applications? This will maximize Windows boot performance.",
+                "Disable All Applications",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirm == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    _startupService.SetEnabledBatch(targets, false);
+                    ActivityLogger.Instance.Log($"Force disabled all {targets.Count} startup applications.", ActivityType.Info);
+
+                    UpdateStatCounts();
+                    ApplyFilters();
+                    RefreshHistory();
+                    UpdateSelectionCount();
+                }
+                catch (Exception ex)
+                {
+                    ThemedMessageBox.Show($"Disable All failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void EnableAll_Click(object sender, RoutedEventArgs e)
+        {
+            var targets = _items.Where(i => !i.IsEnabled).ToList();
+            if (targets.Count == 0)
+            {
+                ThemedMessageBox.Show("All startup applications are already enabled.", "Enable All", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var confirm = ThemedMessageBox.Show(
+                $"Enable all {targets.Count} disabled startup applications?",
+                "Enable All Applications",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirm == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    _startupService.SetEnabledBatch(targets, true);
+                    ActivityLogger.Instance.Log($"Batch enabled all {targets.Count} startup applications.", ActivityType.Info);
+
+                    UpdateStatCounts();
+                    ApplyFilters();
+                    RefreshHistory();
+                    UpdateSelectionCount();
+                }
+                catch (Exception ex)
+                {
+                    ThemedMessageBox.Show($"Enable All failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void SmartBoost_Click(object sender, RoutedEventArgs e)
+        {
+            var targets = _startupService.GetNonEssentialItems(_items);
+            if (targets.Count == 0)
+            {
+                ThemedMessageBox.Show("Your startup is already fully optimized! No heavy non-essential background applications are currently enabled.", "Smart Boost", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var sample = string.Join(", ", targets.Take(4).Select(i => i.Name)) + (targets.Count > 4 ? "…" : "");
+            var confirm = ThemedMessageBox.Show(
+                $"Found {targets.Count} heavy third-party startup applications ({sample}). Would you like to force disable them for fastest boot time while preserving system audio and graphics drivers?",
+                "Smart Startup Boost",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirm == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    _startupService.SetEnabledBatch(targets, false);
+                    ActivityLogger.Instance.Log($"Smart Boost disabled {targets.Count} non-essential startup applications.", ActivityType.Info);
+
+                    UpdateStatCounts();
+                    ApplyFilters();
+                    RefreshHistory();
+                    UpdateSelectionCount();
+                }
+                catch (Exception ex)
+                {
+                    ThemedMessageBox.Show($"Smart Boost failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        // ==================== SINGLE ITEM LAUNCH & EXPLORER HANDLERS ====================
 
         private void LaunchApp_Click(object sender, RoutedEventArgs e)
         {

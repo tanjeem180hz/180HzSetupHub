@@ -210,6 +210,20 @@ namespace SetupHub180Hz.Models
         public string StatusBadgeForeground => IsEnabled ? "#10B981" : "#94A3B8";
         public string StatusBadgeBorder => IsEnabled ? "#059669" : "#334155";
 
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string? prop = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));

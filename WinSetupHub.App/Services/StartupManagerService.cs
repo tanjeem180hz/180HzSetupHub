@@ -22,6 +22,15 @@ namespace SetupHub180Hz.Services
         private const string DisabledSubKey = @"Software\Microsoft\Windows\CurrentVersion\Run180HzDisabled";
         private const string DisabledSubKeyWow64 = @"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run180HzDisabled";
 
+        private static readonly HashSet<string> NonEssentialKeywords = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "discord", "steam", "epicgames", "spotify", "opera", "edgeautolaunch", "onedrive", "skype",
+            "ccleaner", "teams", "cortana", "battle.net", "riot", "ea desktop", "ubisoft", "bluestacks",
+            "telegram", "whatsapp", "viber", "utorrent", "bittorrent", "qbittorrent", "idm", "neatdm",
+            "razerappengine", "logioptionsplus", "corsair", "steelseries", "overwolf", "medal", "lightshot",
+            "dropbox", "googledrive", "zoom", "slack", "anydesk", "teamviewer"
+        };
+
         public List<StartupItem> GetStartupItems()
         {
             var list = new List<StartupItem>();
@@ -172,26 +181,37 @@ namespace SetupHub180Hz.Services
                 foreach (var file in files)
                 {
                     var ext = Path.GetExtension(file).ToLowerInvariant();
-                    if (ext is not (".lnk" or ".url" or ".bat" or ".cmd" or ".exe")) continue;
+                    if (ext is not (".lnk" or ".url" or ".bat" or ".cmd" or ".exe" or ".disabled")) continue;
 
-                    var fileName = Path.GetFileName(file);
-                    var displayName = Path.GetFileNameWithoutExtension(file);
+                    var rawFileName = Path.GetFileName(file);
+                    bool isExplicitDisabled = false;
+                    var normalizedFileName = rawFileName;
 
-                    // Key in StartupApproved is the exact file name (e.g. "AULA F75.lnk")
-                    var isEnabled = DetermineApprovedState(approvedRoot, approvedPath, fileName, out var toggleTime);
+                    if (ext == ".disabled")
+                    {
+                        isExplicitDisabled = true;
+                        normalizedFileName = Path.GetFileNameWithoutExtension(rawFileName);
+                    }
 
-                    // Also check displayName if not found
+                    var displayName = Path.GetFileNameWithoutExtension(normalizedFileName);
+
+                    // Key in StartupApproved is the file name (e.g. "AULA F75.lnk")
+                    var isApproved = DetermineApprovedState(approvedRoot, approvedPath, normalizedFileName, out var toggleTime);
+
                     if (toggleTime == null)
                     {
                         var altEnabled = DetermineApprovedState(approvedRoot, approvedPath, displayName, out var altTime);
                         if (altTime != null)
                         {
-                            isEnabled = altEnabled;
+                            isApproved = altEnabled;
                             toggleTime = altTime;
                         }
                     }
 
-                    var command = ext == ".lnk" ? ResolveShortcutTarget(file) : file;
+                    var isEnabled = isExplicitDisabled ? false : isApproved;
+                    var command = (normalizedFileName.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
+                        ? ResolveShortcutTarget(file)
+                        : file;
 
                     list.Add(new StartupItem
                     {
@@ -223,7 +243,6 @@ namespace SetupHub180Hz.Services
                 foreach (var valueName in key.GetValueNames())
                 {
                     if (string.IsNullOrWhiteSpace(valueName)) continue;
-                    // If already present in list, don't duplicate
                     if (list.Any(i => string.Equals(i.Name, valueName, StringComparison.OrdinalIgnoreCase))) continue;
 
                     var command = key.GetValue(valueName)?.ToString() ?? "";
@@ -253,7 +272,6 @@ namespace SetupHub180Hz.Services
                     var obj = approvedKey.GetValue(valueName);
                     if (obj is byte[] bytes && bytes.Length > 0)
                     {
-                        // Byte 0: even / 0x02 = enabled, odd / 0x03 / 0x01 = disabled
                         var isEnabled = (bytes[0] & 1) == 0;
                         if (bytes.Length >= 12)
                         {
@@ -273,13 +291,13 @@ namespace SetupHub180Hz.Services
             }
             catch { }
 
-            // Default: if no entry in StartupApproved, Windows treats standard Run items as Enabled
             return true;
         }
 
         public static string ResolveShortcutTarget(string shortcutPath)
         {
-            if (!string.Equals(Path.GetExtension(shortcutPath), ".lnk", StringComparison.OrdinalIgnoreCase))
+            if (!shortcutPath.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) &&
+                !shortcutPath.EndsWith(".lnk.disabled", StringComparison.OrdinalIgnoreCase))
             {
                 return shortcutPath;
             }
@@ -336,31 +354,84 @@ namespace SetupHub180Hz.Services
                         break;
 
                     case StartupItemType.RegistryLocalMachine:
-                        WriteStartupApprovedFlag(Registry.LocalMachine, StartupApprovedRun, item.Name, enabled);
-                        MigrateLegacyIfPresent(Registry.LocalMachine, RunSubKey, DisabledSubKey, item.Name, item.Command);
+                        try
+                        {
+                            WriteStartupApprovedFlag(Registry.LocalMachine, StartupApprovedRun, item.Name, enabled);
+                            MigrateLegacyIfPresent(Registry.LocalMachine, RunSubKey, DisabledSubKey, item.Name, item.Command);
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
+                            // Standard user fallback: HKCU StartupApproved overrides HKLM for the current user
+                            WriteStartupApprovedFlag(Registry.CurrentUser, StartupApprovedRun, item.Name, enabled);
+                        }
+                        // Always sync to HKCU for double enforcement
+                        try { WriteStartupApprovedFlag(Registry.CurrentUser, StartupApprovedRun, item.Name, enabled); } catch { }
                         break;
 
                     case StartupItemType.RegistryLocalMachineWow64:
-                        WriteStartupApprovedFlag(Registry.LocalMachine, StartupApprovedRun32, item.Name, enabled);
-                        MigrateLegacyIfPresent(Registry.LocalMachine, RunSubKeyWow64, DisabledSubKeyWow64, item.Name, item.Command);
+                        try
+                        {
+                            WriteStartupApprovedFlag(Registry.LocalMachine, StartupApprovedRun32, item.Name, enabled);
+                            MigrateLegacyIfPresent(Registry.LocalMachine, RunSubKeyWow64, DisabledSubKeyWow64, item.Name, item.Command);
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
+                            WriteStartupApprovedFlag(Registry.CurrentUser, StartupApprovedRun, item.Name, enabled);
+                        }
+                        try { WriteStartupApprovedFlag(Registry.CurrentUser, StartupApprovedRun, item.Name, enabled); } catch { }
                         break;
 
                     case StartupItemType.StartupFolderUser:
-                        var fileNameUser = !string.IsNullOrWhiteSpace(item.TargetFilePath)
+                        var rawNameUser = !string.IsNullOrWhiteSpace(item.TargetFilePath)
                             ? Path.GetFileName(item.TargetFilePath)
                             : item.Name + ".lnk";
+                        var fileNameUser = rawNameUser.EndsWith(".disabled", StringComparison.OrdinalIgnoreCase)
+                            ? rawNameUser.Substring(0, rawNameUser.Length - ".disabled".Length)
+                            : rawNameUser;
+
                         WriteStartupApprovedFlag(Registry.CurrentUser, StartupApprovedFolder, fileNameUser, enabled);
+
+                        // File rename enforcement: .lnk <-> .lnk.disabled
+                        if (!string.IsNullOrWhiteSpace(item.TargetFilePath) && File.Exists(item.TargetFilePath))
+                        {
+                            try
+                            {
+                                if (!enabled && !item.TargetFilePath.EndsWith(".disabled", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    var newPath = item.TargetFilePath + ".disabled";
+                                    File.Move(item.TargetFilePath, newPath, true);
+                                    item.TargetFilePath = newPath;
+                                }
+                                else if (enabled && item.TargetFilePath.EndsWith(".disabled", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    var newPath = item.TargetFilePath.Substring(0, item.TargetFilePath.Length - ".disabled".Length);
+                                    File.Move(item.TargetFilePath, newPath, true);
+                                    item.TargetFilePath = newPath;
+                                }
+                            }
+                            catch { }
+                        }
                         break;
 
                     case StartupItemType.StartupFolderCommon:
-                        var fileNameCommon = !string.IsNullOrWhiteSpace(item.TargetFilePath)
+                        var rawNameCommon = !string.IsNullOrWhiteSpace(item.TargetFilePath)
                             ? Path.GetFileName(item.TargetFilePath)
                             : item.Name + ".lnk";
-                        WriteStartupApprovedFlag(Registry.LocalMachine, StartupApprovedFolder, fileNameCommon, enabled);
+                        var fileNameCommon = rawNameCommon.EndsWith(".disabled", StringComparison.OrdinalIgnoreCase)
+                            ? rawNameCommon.Substring(0, rawNameCommon.Length - ".disabled".Length)
+                            : rawNameCommon;
+
+                        try
+                        {
+                            WriteStartupApprovedFlag(Registry.LocalMachine, StartupApprovedFolder, fileNameCommon, enabled);
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
+                            WriteStartupApprovedFlag(Registry.CurrentUser, StartupApprovedFolder, fileNameCommon, enabled);
+                        }
                         break;
 
                     default:
-                        // Fallback: HKCU
                         WriteStartupApprovedFlag(Registry.CurrentUser, StartupApprovedRun, item.Name, enabled);
                         break;
                 }
@@ -373,15 +444,36 @@ namespace SetupHub180Hz.Services
                 // Persist into History and States JSON
                 StartupHistoryService.Instance.RecordAction(item.Name, enabled, item.Source, item.Command);
             }
-            catch (UnauthorizedAccessException)
-            {
-                throw new UnauthorizedAccessException(
-                    $"Administrator permissions are required to modify system-wide startup items in {item.Source}. Please run 180Hz Setup Hub as Administrator.");
-            }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Failed to update startup item: {ex.Message}", ex);
+                throw new InvalidOperationException($"Failed to force update startup item {item.Name}: {ex.Message}", ex);
             }
+        }
+
+        public void SetEnabledBatch(IEnumerable<StartupItem> items, bool enabled)
+        {
+            foreach (var item in items)
+            {
+                try
+                {
+                    if (item.IsEnabled != enabled)
+                    {
+                        SetEnabled(item, enabled);
+                    }
+                }
+                catch { }
+            }
+        }
+
+        public bool IsNonEssential(StartupItem item)
+        {
+            var text = $"{item.Name} {item.Command} {item.Source}";
+            return NonEssentialKeywords.Any(k => text.Contains(k, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public List<StartupItem> GetNonEssentialItems(IEnumerable<StartupItem> items)
+        {
+            return items.Where(i => i.IsEnabled && IsNonEssential(i)).ToList();
         }
 
         private static void WriteStartupApprovedFlag(RegistryKey root, string approvedPath, string valueName, bool enabled)
