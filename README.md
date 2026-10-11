@@ -9,54 +9,30 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-00FF66?style=for-the-badge&logo=windows&logoColor=050B06" alt="Platform"></a>
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Installer%20Size-~3.6%20MB-00FF66?style=for-the-badge&logo=speedtest&logoColor=050B06" alt="Installer Size"></a>
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe"><img src="https://img.shields.io/badge/Standalone%20App-~81%20MB-00FF66?style=for-the-badge&logo=windows&logoColor=050B06" alt="Standalone App"></a>
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Runtime-.NET%208%20%2B%204.8-162919?style=for-the-badge&logo=dotnet&logoColor=00FF66" alt=".NET"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-00FF66?style=for-the-badge&logo=windows&logoColor=050B06" alt="Platform"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Download-Latest%20Release-00FF66?style=for-the-badge&logo=windows&logoColor=050B06" alt="Download"></a>
+  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe"><img src="https://img.shields.io/badge/Runtime-.NET%208%20%2B%204.8-162919?style=for-the-badge&logo=dotnet&logoColor=00FF66" alt=".NET"></a>
   <a href="https://github.com/tanjeem180hz/180HzSetupHub/blob/main/SECURITY.md"><img src="https://img.shields.io/badge/Security-Hardened-00FF66?style=for-the-badge&logo=shield&logoColor=050B06" alt="Security"></a>
 </p>
 
 ---
 
-## ⚡ 1-Click Direct Download & Installation
-
-Choose your preferred way to download, install, or run **180Hz Setup Hub**:
+## ⚡ 1-Click Direct Download
 
 <p align="center">
   <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe">
-    <img src="https://img.shields.io/badge/Download-Official%20Installer%20(~3.6%20MB)-00FF66?style=for-the-badge&logo=windows&logoColor=050B06" alt="Download 180Hz Setup Hub Installer" height="48">
-  </a>
-  &nbsp;&nbsp;
-  <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe">
-    <img src="https://img.shields.io/badge/Download-Standalone%20Full%20App%20(~81%20MB)-162919?style=for-the-badge&logo=windows&logoColor=00FF66" alt="Download Standalone Full App Package" height="48">
+    <img src="https://img.shields.io/badge/DOWNLOAD-180Hz%20SETUP%20HUB%20(.EXE)-00FF66?style=for-the-badge&logo=windows&logoColor=050B06" alt="Download 180Hz Setup Hub Installer" height="54">
   </a>
 </p>
 
-### 📥 Direct Executable (.exe) Downloads
+<p align="center">
+  Direct Link: <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe"><strong>180HzSetupHubSetup.exe</strong></a>
+</p>
 
-| Package | Executable File | Size | 1-Click Direct Download (.exe) | Raw Mirror | In-Repo File |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Official Web Installer** <br>*(Recommended)* | `180HzSetupHubSetup.exe` | **~3.6 MB** | [⚡ **Download 180HzSetupHubSetup.exe**](https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe) | [Raw Mirror](https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/installer/180HzSetupHubSetup.exe) | [`installer/`](installer/180HzSetupHubSetup.exe) |
-| **Artifact Bootstrapper** | `180HzSetupHubSetup.exe` | **~3.6 MB** | [⚡ **Download Artifact (.exe)**](https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/installer/180HzSetupHubSetup.exe) | [Raw Mirror](https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/artifacts/installer/180HzSetupHubSetup.exe) | [`artifacts/installer/`](artifacts/installer/180HzSetupHubSetup.exe) |
-| **Standalone Full App Package** <br>*(Offline Single-File, No Setup)* | `180HzSetupHub.exe` | **~81 MB** | [📦 **Download Standalone 180HzSetupHub.exe**](https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe) | [Raw Mirror](https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/artifacts/publish/win-x64/180HzSetupHub.exe) | [`artifacts/publish/win-x64/`](artifacts/publish/win-x64/180HzSetupHub.exe) |
-
-### 🔐 Verified SHA-256 Checksums
-
-| Executable | Size | SHA-256 Hash |
-| :--- | :--- | :--- |
-| **`180HzSetupHubSetup.exe`** | ~3.7 MB | `30F67B498099888C170B1242B94D13F251F18B647F64A0C5FFE90F3DB3ADD7B9` |
-| **`180HzSetupHub.exe`** | ~81.7 MB | `ACCB9673C69C46EDD64826533D8B8494F16178A35B741AB95078286991BD9158` |
-
-### 💻 1-Click PowerShell Install (No Browser Needed)
-
-If you prefer installing or running directly from the terminal, open **PowerShell** and run:
+### 💻 1-Click PowerShell Install (Terminal)
 
 ```powershell
-# Recommended: Official Web Installer (~3.6 MB)
 irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/install.ps1 | iex
-
-# Alternative: Standalone Full Offline Package (~81 MB)
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/scripts/install.ps1))) -Standalone
 ```
 
 ---
