@@ -25,10 +25,6 @@
   </a>
 </p>
 
-<p align="center">
-  Direct Link: <a href="https://github.com/tanjeem180hz/180HzSetupHub/raw/main/installer/180HzSetupHubSetup.exe"><strong>180HzSetupHubSetup.exe</strong></a>
-</p>
-
 ### 💻 1-Click PowerShell Install (Terminal)
 
 ```powershell
