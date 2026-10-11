@@ -22,6 +22,40 @@
             </Setter>
         </Style>
 
+        <!-- Action Pill Button Style (For Open, Location, Links) -->
+        <Style x:Key="ActionPillButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Filter Tab RadioButtons (All / Enabled / Disabled) -->
         <Style x:Key="StartupFilterChip" TargetType="{x:Type RadioButton}">
             <Setter Property="Background" Value="Transparent"/>
@@ -237,9 +271,25 @@
                                    ToolTip="{Binding Command}"/>
                     </StackPanel>
 
-                    <!-- 3. Actions: Official Site & Toggle Switch -->
+                    <!-- 3. Actions: Open App, File Location, Official Site & Toggle Switch -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Open / Run Button -->
+                        <Button Click="LaunchApp_Click" Style="{StaticResource ActionPillButton}"
+                                ToolTip="Launch / Open this application" Margin="0,0,6,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="▶ " FontSize="10" VerticalAlignment="Center" Foreground="{DynamicResource BrushAccent}"/>
+                                <TextBlock Text="Open" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Open Folder Location Button -->
+                        <Button Click="OpenLocation_Click" Style="{StaticResource ActionPillButton}"
+                                ToolTip="Reveal file location in Explorer" Margin="0,0,8,0" VerticalAlignment="Center">
+                            <TextBlock Text="📁" FontSize="11" VerticalAlignment="Center"/>
+                        </Button>
+
                         <ContentControl Loaded="OfficialLinkContainer_Loaded" Margin="0,0,12,0" VerticalAlignment="Center"/>
+
                         <ToggleButton Style="{StaticResource ToggleSwitch}"
                                       IsChecked="{Binding IsEnabled, Mode=TwoWay}"
                                       VerticalAlignment="Center"
@@ -410,7 +460,7 @@
                 <!-- Filter Tabs: All / Enabled (ON) / Disabled (OFF) -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <RadioButton x:Name="FilterAllRadio" Content="All Apps" Style="{StaticResource StartupFilterChip}"
-                                 IsChecked="True" Checked="Filter_Checked"/>
+                                 Checked="Filter_Checked"/>
                     <RadioButton x:Name="FilterEnabledRadio" Content="🟢 Active ON" Style="{StaticResource StartupFilterChip}"
                                  Checked="Filter_Checked"/>
                     <RadioButton x:Name="FilterDisabledRadio" Content="⚪ Disabled OFF" Style="{StaticResource StartupFilterChip}"
@@ -536,7 +586,7 @@
                         <!-- Filter Chips: All / Enabled / Disabled -->
                         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                             <RadioButton x:Name="HistoryFilterAllRadio" Content="All Events" Style="{StaticResource HistoryFilterChip}"
-                                         IsChecked="True" Checked="HistoryFilter_Checked"/>
+                                         Checked="HistoryFilter_Checked"/>
                             <RadioButton x:Name="HistoryFilterEnabledRadio" Content="🟢 Enabled" Style="{StaticResource HistoryFilterChip}"
                                          Checked="HistoryFilter_Checked"/>
                             <RadioButton x:Name="HistoryFilterDisabledRadio" Content="🔴 Disabled" Style="{StaticResource HistoryFilterChip}"
