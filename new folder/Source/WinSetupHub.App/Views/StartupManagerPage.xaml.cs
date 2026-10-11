@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
 using SetupHub180Hz.Models;
@@ -18,7 +19,12 @@ namespace SetupHub180Hz.Views
         private readonly StartupManagerService _startupService = new();
         private readonly PackageCatalogService _catalogService = new();
         private List<StartupItem> _items = new();
+        private List<StartupItem> _displayedItems = new();
         private List<AppItem>? _catalogCache;
+
+        private string _currentFilter = "All"; // "All", "Enabled", "Disabled"
+        private string _searchQuery = "";
+        private string _currentHistoryFilter = "All"; // "All", "Enabled", "Disabled"
 
         public StartupManagerPage()
         {
@@ -29,56 +35,63 @@ namespace SetupHub180Hz.Views
                 {
                     await LoadItemsAsync();
                 }
+                RefreshHistory();
             };
         }
 
         private async Task LoadItemsAsync()
         {
-            SummaryText.Text = "Scanning startup entries…";
-
             _items = await Task.Run(() => _startupService.GetStartupItems());
 
-            var enabledCount = _items.Count(i => i.IsEnabled);
-            SummaryText.Text = $"{_items.Count} startup apps registered ({enabledCount} enabled).";
-            StartupList.ItemsSource = null;
-            StartupList.ItemsSource = _items;
+            UpdateStatCounts();
+            ApplyFilters();
+            RefreshHistory();
 
             // Background async icon extraction & website discovery in parallel
             _ = Task.Run(async () =>
             {
                 _catalogCache ??= await _catalogService.GetAllAsync();
 
-                await Parallel.ForEachAsync(_items, new ParallelOptions { MaxDegreeOfParallelism = 3 }, async (item, ct) =>
+                await Parallel.ForEachAsync(_items, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (item, ct) =>
                 {
                     ImageSource? icon = null;
 
-                    // 1. Try extracting local .exe icon from command line
-                    var exePath = ExtractExecutablePath(item.Command);
-                    if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
+                    // 1. If target file path exists (e.g. from Startup folder), extract directly
+                    if (!string.IsNullOrWhiteSpace(item.TargetFilePath) && File.Exists(item.TargetFilePath))
                     {
-                        exePath = ResolveFromAppPaths(item.Name) ?? ResolveFromAppPaths(item.Command);
+                        item.LocalIconPath = item.TargetFilePath;
+                        icon = IconCacheService.GetLocalFileIcon(item.TargetFilePath);
                     }
 
-                    // 1.5 Try resolving from Windows Registry installed applications
-                    if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
+                    // 2. Try extracting local .exe icon from command line
+                    if (icon == null)
                     {
-                        exePath = AppMetadataHelper.FindLocalIconPath(item.Name);
+                        var exePath = ExtractExecutablePath(item.Command);
+                        if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
+                        {
+                            exePath = ResolveFromAppPaths(item.Name) ?? ResolveFromAppPaths(item.Command);
+                        }
+
+                        if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
+                        {
+                            exePath = AppMetadataHelper.FindLocalIconPath(item.Name);
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(exePath) && File.Exists(exePath))
+                        {
+                            item.LocalIconPath = exePath;
+                            icon = IconCacheService.GetLocalFileIcon(exePath);
+                        }
                     }
 
-                    if (!string.IsNullOrWhiteSpace(exePath) && File.Exists(exePath))
-                    {
-                        item.LocalIconPath = exePath;
-                        icon = IconCacheService.GetLocalFileIcon(exePath);
-                    }
-
-                    // 2. Query registry for official website
+                    // 3. Query registry for official website
                     var regInfo = AppMetadataHelper.GetRegistryInfo(item.Name);
                     if (regInfo != null && !string.IsNullOrWhiteSpace(regInfo.WebUrl))
                     {
                         item.WebUrl = regInfo.WebUrl;
                     }
 
-                    // 3. Match against catalog for authentic logo & website
+                    // 4. Match against catalog for authentic logo & website
                     if (_catalogCache != null)
                     {
                         var matchedPkg = AppMetadataHelper.FindCatalogMatchForName(item.Name, _catalogCache);
@@ -100,7 +113,7 @@ namespace SetupHub180Hz.Views
                         }
                     }
 
-                    // 4. Derive icon from WebUrl if still missing
+                    // 5. Derive icon from WebUrl if still missing
                     if (icon == null && !string.IsNullOrWhiteSpace(item.WebUrl))
                     {
                         var favUrl = IconCacheService.DeriveFaviconUrl(item.WebUrl);
@@ -116,6 +129,238 @@ namespace SetupHub180Hz.Views
                     }
                 });
             });
+        }
+
+        private void UpdateStatCounts()
+        {
+            var total = _items.Count;
+            var enabledCount = _items.Count(i => i.IsEnabled);
+            var disabledCount = total - enabledCount;
+            var historyCount = StartupHistoryService.Instance.GetHistory().Count;
+
+            StatTotalText.Text = $"{total} Apps";
+            StatActiveText.Text = $"{enabledCount} Active (ON)";
+            StatDisabledText.Text = $"{disabledCount} Disabled (OFF)";
+            StatHistoryText.Text = $"{historyCount} History Logs";
+
+            if (FilterAllRadio != null) FilterAllRadio.Content = $"All ({total})";
+            if (FilterEnabledRadio != null) FilterEnabledRadio.Content = $"🟢 Active ON ({enabledCount})";
+            if (FilterDisabledRadio != null) FilterDisabledRadio.Content = $"⚪ Disabled OFF ({disabledCount})";
+        }
+
+        private void ApplyFilters()
+        {
+            IEnumerable<StartupItem> query = _items;
+
+            // 1. Filter by status
+            if (_currentFilter == "Enabled")
+            {
+                query = query.Where(i => i.IsEnabled);
+            }
+            else if (_currentFilter == "Disabled")
+            {
+                query = query.Where(i => !i.IsEnabled);
+            }
+
+            // 2. Filter by search text
+            if (!string.IsNullOrWhiteSpace(_searchQuery))
+            {
+                var q = _searchQuery.Trim();
+                query = query.Where(i =>
+                    (i.Name != null && i.Name.Contains(q, StringComparison.OrdinalIgnoreCase)) ||
+                    (i.Command != null && i.Command.Contains(q, StringComparison.OrdinalIgnoreCase)) ||
+                    (i.Source != null && i.Source.Contains(q, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            _displayedItems = query.ToList();
+            StartupList.ItemsSource = null;
+            StartupList.ItemsSource = _displayedItems;
+
+            // Empty state
+            if (_displayedItems.Count == 0)
+            {
+                EmptyNotice.Visibility = Visibility.Visible;
+                if (!string.IsNullOrWhiteSpace(_searchQuery))
+                {
+                    EmptyNoticeDetail.Text = $"No startup applications matching \"{_searchQuery}\".";
+                }
+                else if (_currentFilter == "Enabled")
+                {
+                    EmptyNoticeDetail.Text = "No startup applications are currently enabled (turned ON).";
+                }
+                else if (_currentFilter == "Disabled")
+                {
+                    EmptyNoticeDetail.Text = "No startup applications are currently disabled (turned OFF).";
+                }
+                else
+                {
+                    EmptyNoticeDetail.Text = "No startup applications found on this system.";
+                }
+            }
+            else
+            {
+                EmptyNotice.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void Filter_Checked(object sender, RoutedEventArgs e)
+        {
+            if (FilterAllRadio.IsChecked == true) _currentFilter = "All";
+            else if (FilterEnabledRadio.IsChecked == true) _currentFilter = "Enabled";
+            else if (FilterDisabledRadio.IsChecked == true) _currentFilter = "Disabled";
+
+            ApplyFilters();
+        }
+
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _searchQuery = SearchBox.Text.Trim();
+            ClearSearchButton.Visibility = string.IsNullOrWhiteSpace(_searchQuery) ? Visibility.Collapsed : Visibility.Visible;
+            ApplyFilters();
+        }
+
+        private void ClearSearch_Click(object sender, RoutedEventArgs e)
+        {
+            SearchBox.Text = "";
+            SearchBox.Focus();
+        }
+
+        private void StatActive_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (FilterEnabledRadio != null)
+            {
+                FilterEnabledRadio.IsChecked = true;
+            }
+        }
+
+        private void StatDisabled_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (FilterDisabledRadio != null)
+            {
+                FilterDisabledRadio.IsChecked = true;
+            }
+        }
+
+        private void StatHistory_Click(object sender, MouseButtonEventArgs e)
+        {
+            OpenHistory();
+        }
+
+        private void OpenHistory_Click(object sender, RoutedEventArgs e)
+        {
+            OpenHistory();
+        }
+
+        private void OpenHistory()
+        {
+            HistoryOverlay.Visibility = Visibility.Visible;
+            RefreshHistory();
+        }
+
+        private void CloseHistory_Click(object sender, RoutedEventArgs e)
+        {
+            HistoryOverlay.Visibility = Visibility.Collapsed;
+        }
+
+        private void HistoryBackdrop_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            HistoryOverlay.Visibility = Visibility.Collapsed;
+        }
+
+        private void RefreshHistory()
+        {
+            var history = StartupHistoryService.Instance.GetHistory();
+
+            IEnumerable<StartupHistoryEntry> q = history;
+            if (_currentHistoryFilter == "Enabled")
+            {
+                q = q.Where(h => h.IsEnabledAction);
+            }
+            else if (_currentHistoryFilter == "Disabled")
+            {
+                q = q.Where(h => !h.IsEnabledAction);
+            }
+
+            var list = q.ToList();
+            HistoryList.ItemsSource = null;
+            HistoryList.ItemsSource = list;
+
+            EmptyHistoryNotice.Visibility = list.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            HistorySummaryText.Text = $"{history.Count} total modification events recorded";
+            StatHistoryText.Text = $"{history.Count} History Logs";
+        }
+
+        private void HistoryFilter_Checked(object sender, RoutedEventArgs e)
+        {
+            if (HistoryFilterAllRadio.IsChecked == true) _currentHistoryFilter = "All";
+            else if (HistoryFilterEnabledRadio.IsChecked == true) _currentHistoryFilter = "Enabled";
+            else if (HistoryFilterDisabledRadio.IsChecked == true) _currentHistoryFilter = "Disabled";
+
+            RefreshHistory();
+        }
+
+        private void ClearHistory_Click(object sender, RoutedEventArgs e)
+        {
+            var result = ThemedMessageBox.Show(
+                "Are you sure you want to clear the startup modification history log?",
+                "Clear History Log",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                StartupHistoryService.Instance.ClearHistory();
+                RefreshHistory();
+                ActivityLogger.Instance.Log("Cleared startup manager modification history.", ActivityType.Info);
+            }
+        }
+
+        private async void Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadItemsAsync();
+        }
+
+        private void Toggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is ToggleButton toggle && toggle.DataContext is StartupItem item)
+            {
+                var newEnabled = toggle.IsChecked == true;
+
+                try
+                {
+                    _startupService.SetEnabled(item, newEnabled);
+
+                    ActivityLogger.Instance.Log(
+                        $"{(newEnabled ? "Enabled (Turned ON)" : "Disabled (Turned OFF)")} startup application: {item.Name}",
+                        ActivityType.Info);
+
+                    UpdateStatCounts();
+                    RefreshHistory();
+
+                    // If currently filtered to Enabled or Disabled, re-evaluate list
+                    if (_currentFilter != "All")
+                    {
+                        ApplyFilters();
+                    }
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    // Revert toggle
+                    item.IsEnabled = !newEnabled;
+                    toggle.IsChecked = !newEnabled;
+
+                    ThemedMessageBox.Show(ex.Message, "Administrator Permission Required", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    ActivityLogger.Instance.Log($"Permission denied modifying {item.Name} startup entry.", ActivityType.Warning);
+                }
+                catch (Exception ex)
+                {
+                    item.IsEnabled = !newEnabled;
+                    toggle.IsChecked = !newEnabled;
+
+                    ThemedMessageBox.Show($"Could not update startup item: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    ActivityLogger.Instance.Log($"Failed to toggle {item.Name}: {ex.Message}", ActivityType.Error);
+                }
+            }
         }
 
         public static string? ExtractExecutablePath(string? command)
@@ -175,7 +420,6 @@ namespace SetupHub180Hz.Views
                 tokens.Add(clean + ".exe");
             }
 
-            // Also check first word
             var firstWord = clean.Split(' ', '-', '_').FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(firstWord))
             {
@@ -203,45 +447,6 @@ namespace SetupHub180Hz.Views
             }
 
             return null;
-        }
-
-        private async void Refresh_Click(object sender, RoutedEventArgs e) => await LoadItemsAsync();
-
-        private void Toggle_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is ToggleButton toggle && toggle.DataContext is StartupItem item)
-            {
-                var newEnabled = toggle.IsChecked == true;
-
-                try
-                {
-                    _startupService.SetEnabled(item, newEnabled);
-
-                    ActivityLogger.Instance.Log(
-                        $"{(newEnabled ? "Enabled" : "Disabled")} startup application: {item.Name}",
-                        ActivityType.Info);
-
-                    var enabledCount = _items.Count(i => i.IsEnabled);
-                    SummaryText.Text = $"{_items.Count} startup apps registered ({enabledCount} enabled).";
-                }
-                catch (UnauthorizedAccessException ex)
-                {
-                    // Revert toggle
-                    item.IsEnabled = !newEnabled;
-                    toggle.IsChecked = !newEnabled;
-
-                    ThemedMessageBox.Show(ex.Message, "Permission Required", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    ActivityLogger.Instance.Log($"Permission denied modifying {item.Name} startup entry.", ActivityType.Warning);
-                }
-                catch (Exception ex)
-                {
-                    item.IsEnabled = !newEnabled;
-                    toggle.IsChecked = !newEnabled;
-
-                    ThemedMessageBox.Show($"Could not update startup item: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    ActivityLogger.Instance.Log($"Failed to toggle {item.Name}: {ex.Message}", ActivityType.Error);
-                }
-            }
         }
 
         private void OfficialLinkContainer_Loaded(object sender, RoutedEventArgs e)

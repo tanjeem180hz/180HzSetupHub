@@ -6,6 +6,7 @@
              xmlns:services="clr-namespace:SetupHub180Hz.Services">
 
     <UserControl.Resources>
+        <!-- Clean ListBox Item (Removes default selection accent/hover borders) -->
         <Style x:Key="CleanListBoxItem" TargetType="{x:Type ListBoxItem}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -21,6 +22,87 @@
             </Setter>
         </Style>
 
+        <!-- Filter Tab RadioButtons (All / Enabled / Disabled) -->
+        <Style x:Key="StartupFilterChip" TargetType="{x:Type RadioButton}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="GroupName" Value="StartupFilterGroup"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurface}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- History Filter Chip RadioButtons -->
+        <Style x:Key="HistoryFilterChip" TargetType="{x:Type RadioButton}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="GroupName" Value="HistoryFilterGroup"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurface}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Startup Item Row Template -->
         <DataTemplate x:Key="StartupItemTemplate" DataType="{x:Type models:StartupItem}">
             <Border Style="{StaticResource ListRow}" Padding="16,12" Margin="0,0,0,8">
                 <Grid>
@@ -38,7 +120,7 @@
                             HorizontalAlignment="Left" VerticalAlignment="Center"
                             ClipToBounds="True">
                         <Grid>
-                            <!-- Neutral Loading/Fallback Placeholder: ONLY visible when HasIconImage is False -->
+                            <!-- Placeholder -->
                             <Border Background="{StaticResource BrushSurface}" CornerRadius="7">
                                 <Border.Style>
                                     <Style TargetType="Border">
@@ -50,14 +132,14 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
-                                <TextBlock Text="📦"
+                                <TextBlock Text="⚡"
                                            FontSize="16"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"
                                            Opacity="0.4"/>
                             </Border>
 
-                            <!-- Authentic Software Logo: Displayed cleanly with NO text behind it -->
+                            <!-- Authentic Logo -->
                             <Image Source="{Binding IconImageSource}"
                                    Width="32" Height="32"
                                    Stretch="Uniform"
@@ -67,8 +149,9 @@
                         </Grid>
                     </Border>
 
-                    <!-- 2. Details -->
+                    <!-- 2. Details & Status -->
                     <StackPanel Grid.Column="1" Margin="12,0,16,0" VerticalAlignment="Center">
+                        <!-- Name + Source + Status Badges -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                             <TextBlock Text="{Binding Name}"
                                        FontFamily="{StaticResource AppFont}"
@@ -77,6 +160,7 @@
                                        Foreground="{StaticResource BrushTextPrimary}"
                                        VerticalAlignment="Center"/>
 
+                            <!-- Source Badge -->
                             <Border Background="{StaticResource BrushSurfaceHover}"
                                     BorderBrush="{StaticResource BrushBorder}"
                                     BorderThickness="1"
@@ -89,12 +173,68 @@
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource BrushTextSecondary}"/>
                             </Border>
+
+                            <!-- Status Badge (Live ON / OFF) -->
+                            <Border BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="7,2"
+                                    Margin="8,0,0,0"
+                                    VerticalAlignment="Center">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#152E20"/>
+                                        <Setter Property="BorderBrush" Value="#059669"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                <Setter Property="Background" Value="#1C2128"/>
+                                                <Setter Property="BorderBrush" Value="#38444D"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding StatusText}"
+                                           FontSize="10"
+                                           FontWeight="Bold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#10B981"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                                    <Setter Property="Foreground" Value="#8B949E"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
                         </StackPanel>
 
+                        <!-- Last Action / History Notice (If any) -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasLastAction}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <TextBlock Text="🕒 " FontSize="10" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding LastActionDescription}"
+                                       FontSize="11"
+                                       Foreground="{StaticResource BrushTextSecondary}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <!-- Command Line / Shortcut Target -->
                         <TextBlock Text="{Binding Command}"
                                    Style="{StaticResource TextBody}"
-                                   FontSize="12"
-                                   TextTrimming="CharacterEllipsis"/>
+                                   FontSize="11"
+                                   Foreground="{StaticResource BrushTextSecondary}"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip="{Binding Command}"/>
                     </StackPanel>
 
                     <!-- 3. Actions: Official Site & Toggle Switch -->
@@ -103,60 +243,374 @@
                         <ToggleButton Style="{StaticResource ToggleSwitch}"
                                       IsChecked="{Binding IsEnabled, Mode=TwoWay}"
                                       VerticalAlignment="Center"
+                                      ToolTip="Toggle startup status (synchronizes natively with Windows Task Manager)"
                                       Click="Toggle_Click"/>
                     </StackPanel>
                 </Grid>
             </Border>
         </DataTemplate>
+
+        <!-- History Entry Template -->
+        <DataTemplate x:Key="HistoryEntryTemplate" DataType="{x:Type models:StartupHistoryEntry}">
+            <Border Background="{StaticResource BrushSurfaceHover}"
+                    BorderBrush="{StaticResource BrushBorder}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="14,10"
+                    Margin="0,0,0,8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Action Badge -->
+                        <Border BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="#152E20"/>
+                                    <Setter Property="BorderBrush" Value="#059669"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEnabledAction}" Value="False">
+                                            <Setter Property="Background" Value="#2E1515"/>
+                                            <Setter Property="BorderBrush" Value="#DC2626"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Text="{Binding ActionText}" FontSize="10" FontWeight="Bold">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#10B981"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEnabledAction}" Value="False">
+                                                <Setter Property="Foreground" Value="#EF4444"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Border>
+
+                        <!-- Item Name -->
+                        <TextBlock Grid.Column="1" Text="{Binding ItemName}"
+                                   FontFamily="{StaticResource AppFont}"
+                                   FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrushTextPrimary}"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+
+                        <!-- Timestamp Pill -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding FormattedTime}" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,0,6,0"/>
+                            <Border Background="{StaticResource BrushSurface}" CornerRadius="4" Padding="5,1">
+                                <TextBlock Text="{Binding TimeAgo}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Source}" FontSize="10" Foreground="{StaticResource BrushTextSecondary}" Margin="0,0,10,0"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Command}" FontSize="10" Foreground="{StaticResource BrushTextSecondary}" Opacity="0.7" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </DataTemplate>
     </UserControl.Resources>
 
-    <Grid Margin="28">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <!-- Main Content Area -->
+        <Grid Margin="28">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,18">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
-                                            services:LottieHelper.AssetName="startup_boost.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                <TextBlock Text="Startup Manager" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
-            </StackPanel>
-            <TextBlock Text="View, enable, or disable applications configured to launch automatically with Windows."
-                       Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
-        </StackPanel>
+            <!-- 1. Header & Live Stats Cards -->
+            <Grid Grid.Row="0" Margin="0,0,0,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-        <!-- Toolbar -->
-        <Grid Grid.Row="1" Margin="0,0,0,16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
+                                                    services:LottieHelper.AssetName="startup_boost.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Startup Manager" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Manage programs configured to launch with Windows. View active ON/OFF history and toggle entries safely with Task Manager synchronization."
+                               Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
+                </StackPanel>
 
-            <TextBlock x:Name="SummaryText" Text="Scanning startup entries…"
-                       VerticalAlignment="Center" Style="{StaticResource TextBody}" FontWeight="SemiBold"/>
+                <!-- Top Stats Badges -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Total Count Card -->
+                    <Border Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1"
+                            CornerRadius="8" Padding="12,7" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="📦 " FontSize="11" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="StatTotalText" Text="0 Apps" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
 
-            <Button Grid.Column="1" Tag="Refresh" Style="{StaticResource ExpandableOutlineButton}"
-                    Click="Refresh_Click">
-                <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
-                                            services:LottieHelper.AssetName="loading_disc.json"/>
-            </Button>
+                    <!-- Active ON Card (Clickable to filter ON) -->
+                    <Border x:Name="StatActiveBorder" Background="#152E20" BorderBrush="#059669" BorderThickness="1"
+                            CornerRadius="8" Padding="12,7" Margin="0,0,8,0" Cursor="Hand" MouseLeftButtonDown="StatActive_Click"
+                            ToolTip="Click to view only active enabled startup apps">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="7" Height="7" Fill="#10B981" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="StatActiveText" Text="0 Active (ON)" FontSize="11" FontWeight="Bold" Foreground="#10B981" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Disabled OFF Card (Clickable to filter OFF) -->
+                    <Border x:Name="StatDisabledBorder" Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1"
+                            CornerRadius="8" Padding="12,7" Margin="0,0,8,0" Cursor="Hand" MouseLeftButtonDown="StatDisabled_Click"
+                            ToolTip="Click to view disabled startup apps">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="7" Height="7" Fill="#64748B" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="StatDisabledText" Text="0 Disabled (OFF)" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- History Events Badge (Clickable to open History drawer) -->
+                    <Border x:Name="StatHistoryBorder" Background="{StaticResource BrushSurfaceHover}" BorderBrush="{StaticResource BrushAccent}" BorderThickness="1"
+                            CornerRadius="8" Padding="12,7" Cursor="Hand" MouseLeftButtonDown="StatHistory_Click"
+                            ToolTip="Click to view persistent startup modification history">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="📜 " FontSize="11" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="StatHistoryText" Text="0 History Logs" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource BrushAccent}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- 2. Filter Bar & Search Toolbar -->
+            <Grid Grid.Row="1" Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Filter Tabs: All / Enabled (ON) / Disabled (OFF) -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <RadioButton x:Name="FilterAllRadio" Content="All Apps" Style="{StaticResource StartupFilterChip}"
+                                 IsChecked="True" Checked="Filter_Checked"/>
+                    <RadioButton x:Name="FilterEnabledRadio" Content="🟢 Active ON" Style="{StaticResource StartupFilterChip}"
+                                 Checked="Filter_Checked"/>
+                    <RadioButton x:Name="FilterDisabledRadio" Content="⚪ Disabled OFF" Style="{StaticResource StartupFilterChip}"
+                                 Checked="Filter_Checked"/>
+                </StackPanel>
+
+                <!-- Search Input Container -->
+                <Border Grid.Column="1" Margin="10,0,12,0" Background="{StaticResource BrushSurface}"
+                        BorderBrush="{StaticResource BrushBorder}" BorderThickness="1" CornerRadius="8"
+                        VerticalAlignment="Center">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="🔍" FontSize="11" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource BrushTextSecondary}"/>
+                        <TextBox x:Name="SearchBox" Grid.Column="1" Background="Transparent" BorderThickness="0"
+                                 Foreground="{StaticResource BrushTextPrimary}" CaretBrush="{StaticResource BrushAccent}"
+                                 FontFamily="{StaticResource AppFont}" FontSize="12" Padding="8,8"
+                                 VerticalContentAlignment="Center"
+                                 TextChanged="SearchBox_TextChanged"/>
+                        <Button x:Name="ClearSearchButton" Grid.Column="2" Content="✕"
+                                Background="Transparent" BorderThickness="0" Foreground="{StaticResource BrushTextSecondary}"
+                                Padding="8,0" Cursor="Hand" Visibility="Collapsed" Click="ClearSearch_Click"/>
+                    </Grid>
+                </Border>
+
+                <!-- Action Button: Open History Drawer -->
+                <Button Grid.Column="2" Click="OpenHistory_Click" Margin="0,0,8,0"
+                        Style="{StaticResource ExpandableOutlineButton}" Tag="History Log" ToolTip="View persistent startup toggle history">
+                    <TextBlock Text="📜" FontSize="13" VerticalAlignment="Center"/>
+                </Button>
+
+                <!-- Action Button: Refresh -->
+                <Button Grid.Column="3" Click="Refresh_Click"
+                        Style="{StaticResource ExpandableOutlineButton}" Tag="Refresh" ToolTip="Rescan startup entries">
+                    <lottie:LottieAnimationView Width="16" Height="16" AutoPlay="True" RepeatCount="-1"
+                                                services:LottieHelper.AssetName="loading_disc.json"/>
+                </Button>
+            </Grid>
+
+            <!-- 3. Startup Items List -->
+            <Grid Grid.Row="2">
+                <ListBox x:Name="StartupList"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         VirtualizingPanel.ScrollUnit="Pixel"
+                         ScrollViewer.CanContentScroll="True"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         ItemContainerStyle="{StaticResource CleanListBoxItem}"
+                         ItemTemplate="{StaticResource StartupItemTemplate}"/>
+
+                <!-- Empty State Notice (When list is empty or search yields no matches) -->
+                <Border x:Name="EmptyNotice" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Background="{StaticResource BrushSurface}" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1"
+                        CornerRadius="10" Padding="32,24" MaxWidth="440">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="🔍" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                        <TextBlock Text="No startup applications found" FontSize="16" FontWeight="Bold"
+                                   Foreground="{StaticResource BrushTextPrimary}" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                        <TextBlock x:Name="EmptyNoticeDetail" Text="No matching startup entries found for the selected filter."
+                                   FontSize="12" Foreground="{StaticResource BrushTextSecondary}" HorizontalAlignment="Center" TextAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Grid>
 
-        <!-- Startup Items List (Virtualized for 0-lag scrolling & instant rendering) -->
-        <ListBox x:Name="StartupList"
-                 Grid.Row="2"
-                 VirtualizingPanel.IsVirtualizing="True"
-                 VirtualizingPanel.VirtualizationMode="Recycling"
-                 VirtualizingPanel.ScrollUnit="Pixel"
-                 ScrollViewer.CanContentScroll="True"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                 Background="Transparent"
-                 BorderThickness="0"
-                 ItemContainerStyle="{StaticResource CleanListBoxItem}"
-                 ItemTemplate="{StaticResource StartupItemTemplate}"/>
-</Grid>
+        <!-- 4. Interactive History Drawer Overlay (Smooth Slide-In Panel) -->
+        <Grid x:Name="HistoryOverlay" Visibility="Collapsed" Panel.ZIndex="100">
+            <!-- Semi-transparent backdrop (Click to dismiss) -->
+            <Border Background="#BF080B08" MouseLeftButtonDown="HistoryBackdrop_MouseDown"/>
+
+            <!-- History Panel Drawer (Right-aligned 520px wide) -->
+            <Border HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="520"
+                    Background="{StaticResource BrushSurface}"
+                    BorderBrush="{StaticResource BrushBorder}"
+                    BorderThickness="1,0,0,0">
+                <Grid Margin="24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Drawer Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="📜 " FontSize="18" VerticalAlignment="Center"/>
+                                <TextBlock Text="Startup Modification History" FontSize="18" FontWeight="Bold"
+                                           Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock Text="Persistent chronological log of all applications enabled or disabled on this PC."
+                                       FontSize="11" Foreground="{StaticResource BrushTextSecondary}" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <!-- Close Button -->
+                        <Button Grid.Column="1" Click="CloseHistory_Click"
+                                Background="Transparent" BorderThickness="0"
+                                Foreground="{StaticResource BrushTextSecondary}"
+                                FontSize="16" Cursor="Hand" Padding="8,4" VerticalAlignment="Top">
+                            <TextBlock Text="✕" FontSize="14" FontWeight="Bold"/>
+                        </Button>
+                    </Grid>
+
+                    <!-- History Toolbar & Filters -->
+                    <Grid Grid.Row="1" Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Filter Chips: All / Enabled / Disabled -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <RadioButton x:Name="HistoryFilterAllRadio" Content="All Events" Style="{StaticResource HistoryFilterChip}"
+                                         IsChecked="True" Checked="HistoryFilter_Checked"/>
+                            <RadioButton x:Name="HistoryFilterEnabledRadio" Content="🟢 Enabled" Style="{StaticResource HistoryFilterChip}"
+                                         Checked="HistoryFilter_Checked"/>
+                            <RadioButton x:Name="HistoryFilterDisabledRadio" Content="🔴 Disabled" Style="{StaticResource HistoryFilterChip}"
+                                         Checked="HistoryFilter_Checked"/>
+                        </StackPanel>
+
+                        <!-- Clear History Button -->
+                        <Button Grid.Column="1" Content="🗑️ Clear Log" Click="ClearHistory_Click"
+                                Background="Transparent" BorderBrush="{StaticResource BrushBorder}" BorderThickness="1"
+                                Foreground="{StaticResource BrushTextSecondary}" FontSize="11" FontWeight="SemiBold"
+                                Padding="10,4" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Foreground" Value="{StaticResource BrushError}"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource BrushError}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+
+                    <!-- History Items List -->
+                    <Grid Grid.Row="2">
+                        <ListBox x:Name="HistoryList"
+                                 VirtualizingPanel.IsVirtualizing="True"
+                                 VirtualizingPanel.VirtualizationMode="Recycling"
+                                 VirtualizingPanel.ScrollUnit="Pixel"
+                                 ScrollViewer.CanContentScroll="True"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 ItemContainerStyle="{StaticResource CleanListBoxItem}"
+                                 ItemTemplate="{StaticResource HistoryEntryTemplate}"/>
+
+                        <!-- Empty History Notice -->
+                        <StackPanel x:Name="EmptyHistoryNotice" Visibility="Collapsed"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,40,0,0">
+                            <TextBlock Text="📜" FontSize="36" HorizontalAlignment="Center" Opacity="0.4" Margin="0,0,0,12"/>
+                            <TextBlock Text="No modification history yet" FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrushTextPrimary}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="When you toggle startup programs ON or OFF, they will be logged here."
+                                       FontSize="11" Foreground="{StaticResource BrushTextSecondary}"
+                                       HorizontalAlignment="Center" TextAlignment="Center" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- History Footer Summary -->
+                    <Border Grid.Row="3" Margin="0,14,0,0" Padding="0,12,0,0"
+                            BorderBrush="{StaticResource BrushBorder}" BorderThickness="0,1,0,0">
+                        <Grid>
+                            <TextBlock x:Name="HistorySummaryText" Text="0 events recorded"
+                                       FontSize="11" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                            <Button Content="Done" HorizontalAlignment="Right" Click="CloseHistory_Click"
+                                    Style="{StaticResource AccentButton}" Padding="16,6" FontSize="11"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
 </UserControl>

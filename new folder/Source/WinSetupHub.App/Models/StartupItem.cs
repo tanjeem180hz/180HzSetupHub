@@ -1,15 +1,29 @@
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 
 namespace SetupHub180Hz.Models
 {
+    public enum StartupItemType
+    {
+        RegistryCurrentUser,
+        RegistryLocalMachine,
+        RegistryLocalMachineWow64,
+        StartupFolderUser,
+        StartupFolderCommon
+    }
+
     public class StartupItem : INotifyPropertyChanged
     {
         private bool _isEnabled;
         private string _name = "";
         private string _command = "";
         private string _source = "Registry (Current User)";
+        private StartupItemType _startupType = StartupItemType.RegistryCurrentUser;
+        private string? _targetFilePath;
+        private string? _lastActionDescription;
+        private DateTime? _lastActionTime;
         private ImageSource? _iconImageSource;
         private string? _localIconPath;
         private string? _iconUrl;
@@ -54,6 +68,61 @@ namespace SetupHub180Hz.Models
                 }
             }
         }
+
+        public StartupItemType StartupType
+        {
+            get => _startupType;
+            set
+            {
+                if (_startupType != value)
+                {
+                    _startupType = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string? TargetFilePath
+        {
+            get => _targetFilePath;
+            set
+            {
+                if (_targetFilePath != value)
+                {
+                    _targetFilePath = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string? LastActionDescription
+        {
+            get => _lastActionDescription;
+            set
+            {
+                if (_lastActionDescription != value)
+                {
+                    _lastActionDescription = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HasLastAction));
+                }
+            }
+        }
+
+        public DateTime? LastActionTime
+        {
+            get => _lastActionTime;
+            set
+            {
+                if (_lastActionTime != value)
+                {
+                    _lastActionTime = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool HasLastAction => !string.IsNullOrWhiteSpace(LastActionDescription);
 
         public string Initial => !string.IsNullOrWhiteSpace(Name)
             ? Name.Trim().Substring(0, 1).ToUpperInvariant()
@@ -126,9 +195,20 @@ namespace SetupHub180Hz.Models
                 {
                     _isEnabled = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(StatusText));
+                    OnPropertyChanged(nameof(StatusShortText));
+                    OnPropertyChanged(nameof(StatusBadgeBackground));
+                    OnPropertyChanged(nameof(StatusBadgeForeground));
+                    OnPropertyChanged(nameof(StatusBadgeBorder));
                 }
             }
         }
+
+        public string StatusText => IsEnabled ? "Enabled (ON)" : "Disabled (OFF)";
+        public string StatusShortText => IsEnabled ? "ON" : "OFF";
+        public string StatusBadgeBackground => IsEnabled ? "#152E20" : "#20242C";
+        public string StatusBadgeForeground => IsEnabled ? "#10B981" : "#94A3B8";
+        public string StatusBadgeBorder => IsEnabled ? "#059669" : "#334155";
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string? prop = null) =>
