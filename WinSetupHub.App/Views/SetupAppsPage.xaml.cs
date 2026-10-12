@@ -353,10 +353,11 @@ namespace SetupHub180Hz.Views
                     p.Description.Contains(query, StringComparison.OrdinalIgnoreCase));
             }
 
-            var results = filtered
+            var results = PackageCatalogService.DeduplicatePackages(
+                filtered
                 .OrderBy(GetAppSortRank)
                 .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
-                .ToList();
+            );
 
             CatalogCountText.Text = $"{results.Count} Packages Ready";
 
@@ -459,7 +460,8 @@ namespace SetupHub180Hz.Views
             }
 
             // Find matching apps from _allPackages (preset catalog, 0ms instant)
-            var matches = _allPackages
+            var matches = PackageCatalogService.DeduplicatePackages(
+                _allPackages
                 .Where(p =>
                     p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                     p.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
@@ -477,8 +479,9 @@ namespace SetupHub180Hz.Views
                 })
                 .ThenBy(GetAppSortRank)
                 .ThenBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
-                .Take(7)
-                .ToList();
+            )
+            .Take(7)
+            .ToList();
 
             var topMatch = matches.FirstOrDefault();
             if (topMatch != null)
@@ -523,6 +526,7 @@ namespace SetupHub180Hz.Views
                     onlineList = await _winget.SearchAsync(query);
                     if (onlineList != null)
                     {
+                        onlineList = PackageCatalogService.DeduplicatePackages(onlineList);
                         _onlineSuggestCache[query] = onlineList;
                     }
                 }
@@ -551,8 +555,9 @@ namespace SetupHub180Hz.Views
                     bool added = false;
                     foreach (var onlineApp in topOnline)
                     {
+                        string normOnline = PackageCatalogService.NormalizeAppKey(onlineApp.Name);
                         if (!currentList.Any(m => string.Equals(m.Id, onlineApp.Id, StringComparison.OrdinalIgnoreCase) ||
-                                                 string.Equals(m.Name, onlineApp.Name, StringComparison.OrdinalIgnoreCase)))
+                                                 string.Equals(PackageCatalogService.NormalizeAppKey(m.Name), normOnline, StringComparison.OrdinalIgnoreCase)))
                         {
                             currentList.Add(onlineApp);
                             added = true;
@@ -839,7 +844,7 @@ namespace SetupHub180Hz.Views
 
             try
             {
-                var onlineResults = await _winget.SearchAsync(query);
+                var onlineResults = PackageCatalogService.DeduplicatePackages(await _winget.SearchAsync(query));
                 if (onlineResults.Count == 0)
                 {
                     StatusText.Text = $"No online packages found matching '{query}'.";

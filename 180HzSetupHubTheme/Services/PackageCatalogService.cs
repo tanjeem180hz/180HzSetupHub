@@ -38,8 +38,44 @@ namespace SetupHub180Hz.Services
             if (_cachedPackages != null) return _cachedPackages;
 
             var list = await LoadFromJsonAsync();
-            _cachedPackages = list;
+            _cachedPackages = DeduplicatePackages(list);
             return _cachedPackages;
+        }
+
+        public static List<AppItem> DeduplicatePackages(IEnumerable<AppItem> items)
+        {
+            var seenIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var seenNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var result = new List<AppItem>();
+
+            foreach (var item in items)
+            {
+                if (item == null || string.IsNullOrWhiteSpace(item.Id)) continue;
+                string idKey = item.Id.Trim();
+                string normName = NormalizeAppKey(item.Name);
+
+                if (seenIds.Contains(idKey) || (!string.IsNullOrWhiteSpace(normName) && seenNames.Contains(normName)))
+                {
+                    continue;
+                }
+
+                seenIds.Add(idKey);
+                if (!string.IsNullOrWhiteSpace(normName))
+                {
+                    seenNames.Add(normName);
+                }
+                result.Add(item);
+            }
+
+            return result;
+        }
+
+        public static string NormalizeAppKey(string? name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return "";
+            var clean = System.Text.RegularExpressions.Regex.Replace(name, @"\s*\([^)]*\)", "").Trim();
+            clean = System.Text.RegularExpressions.Regex.Replace(clean, @"[^a-zA-Z0-9]", "").ToLowerInvariant();
+            return clean;
         }
 
         public async Task<List<string>> GetCategoriesAsync()
@@ -76,7 +112,7 @@ namespace SetupHub180Hz.Services
                     p.Description.Contains(q, StringComparison.OrdinalIgnoreCase));
             }
 
-            return query.ToList();
+            return DeduplicatePackages(query);
         }
 
         private static readonly Dictionary<string, string[]> KnownPackageAliases = new(StringComparer.OrdinalIgnoreCase)
@@ -339,12 +375,18 @@ namespace SetupHub180Hz.Services
 
         private static async Task<List<AppItem>> LoadFromJsonAsync()
         {
+            var localAppDataConfig = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Programs", "180Hz Setup Hub", "Configuration", "packages.default.json");
+
             var pathsToTry = new[]
             {
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Configuration", "packages.default.json"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "packages.default.json"),
+                localAppDataConfig,
                 Path.Combine(Environment.CurrentDirectory, "Configuration", "packages.default.json"),
-                Path.Combine(Environment.CurrentDirectory, "WinSetupHub.App", "Configuration", "packages.default.json")
+                Path.Combine(Environment.CurrentDirectory, "WinSetupHub.App", "Configuration", "packages.default.json"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "Configuration", "packages.default.json")
             };
 
             foreach (var p in pathsToTry)
@@ -367,19 +409,30 @@ namespace SetupHub180Hz.Services
             // Embedded resource fallback
             try
             {
-                var assembly = Assembly.GetExecutingAssembly();
-                var resourceName = assembly.GetManifestResourceNames()
-                    .FirstOrDefault(n => n.EndsWith("packages.default.json", StringComparison.OrdinalIgnoreCase));
-
-                if (resourceName != null)
+                var candidateAssemblies = new[]
                 {
-                    using var stream = assembly.GetManifestResourceStream(resourceName);
-                    if (stream != null)
+                    typeof(PackageCatalogService).Assembly,
+                    Assembly.GetEntryAssembly(),
+                    Assembly.GetExecutingAssembly()
+                }.Where(a => a != null).Distinct();
+
+                foreach (var assembly in candidateAssemblies)
+                {
+                    var names = assembly!.GetManifestResourceNames();
+                    var resourceName = names.FirstOrDefault(n =>
+                        n.EndsWith(".packages.default.json", StringComparison.OrdinalIgnoreCase) ||
+                        n.Equals("packages.default.json", StringComparison.OrdinalIgnoreCase));
+
+                    if (resourceName != null)
                     {
-                        using var reader = new StreamReader(stream);
-                        var json = await reader.ReadToEndAsync();
-                        var items = JsonSerializer.Deserialize<List<AppItem>>(json, JsonOptions);
-                        if (items != null && items.Count > 0) return items;
+                        using var stream = assembly.GetManifestResourceStream(resourceName);
+                        if (stream != null)
+                        {
+                            using var reader = new StreamReader(stream);
+                            var json = await reader.ReadToEndAsync();
+                            var items = JsonSerializer.Deserialize<List<AppItem>>(json, JsonOptions);
+                            if (items != null && items.Count > 0) return items;
+                        }
                     }
                 }
             }

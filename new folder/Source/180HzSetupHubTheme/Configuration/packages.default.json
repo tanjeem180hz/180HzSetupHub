@@ -315,13 +315,14 @@
         "id": "Brave.Brave",
         "name": "Brave Browser",
         "category": "Browsers",
-        "description": "Privacy-focused Chromium browser with tracker blocking.",
+        "description": "Brave is a privacy-focused web browser that blocks ads and trackers, offering a faster and safer browsing experience.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=brave.com&sz=128",
         "accentColor": "#FB542B",
         "essential": true,
         "webUrl": "https://brave.com",
         "version": "154.1.96.59",
-        "size": "158 MB"
+        "size": "158 MB",
+        "source": "winget"
     },
     {
         "id": "Hibbiki.Chromium",
@@ -379,7 +380,7 @@
         "id": "Google.Chrome",
         "name": "Google Chrome",
         "category": "Browsers",
-        "description": "Fast mainstream browser for daily use, Google services, and testing.",
+        "description": "Google Chrome is a widely used web browser known for its speed, simplicity, and seamless integration with Google services.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=google.com/chrome&sz=128",
         "accentColor": "#4285F4",
         "detectionNames": [
@@ -389,7 +390,8 @@
         "essential": true,
         "webUrl": "https://google.com/chrome",
         "version": "154.0.8037.58",
-        "size": "159.9 MB"
+        "size": "159.9 MB",
+        "source": "winget"
     },
     {
         "id": "Google.Chrome.Beta",
@@ -447,25 +449,27 @@
         "id": "Microsoft.Edge",
         "name": "Microsoft Edge",
         "category": "Browsers",
-        "description": "Microsoft Chromium browser with Windows integration.",
+        "description": "Microsoft Edge is a modern web browser built on Chromium, offering performance, security, and integration with Microsoft services.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=microsoft.com/edge&sz=128",
         "accentColor": "#0A84FF",
         "essential": false,
         "webUrl": "https://microsoft.com/edge",
         "version": "154.0.4258.37",
-        "size": "202.8 MB"
+        "size": "202.8 MB",
+        "source": "winget"
     },
     {
         "id": "Mozilla.Firefox",
         "name": "Mozilla Firefox",
         "category": "Browsers",
-        "description": "Independent browser engine for compatibility testing and privacy.",
+        "description": "Mozilla Firefox is an open-source web browser known for its customization options, privacy features, and extensions.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=mozilla.org/firefox&sz=128",
         "accentColor": "#FF7139",
         "essential": false,
         "webUrl": "https://mozilla.org/firefox",
         "version": "156.0.1",
-        "size": "88.5 MB"
+        "size": "88.5 MB",
+        "source": "winget"
     },
     {
         "id": "MullvadVPN.MullvadBrowser",
@@ -503,7 +507,8 @@
         "essential": false,
         "webUrl": "https://opera.com",
         "version": "136.0.6008.52",
-        "size": "133.1 MB"
+        "size": "133.1 MB",
+        "source": "winget"
     },
     {
         "id": "Opera.OperaGX",
@@ -535,25 +540,27 @@
         "id": "TorProject.TorBrowser",
         "name": "Tor Browser",
         "category": "Browsers",
-        "description": "Privacy browser for Tor network access.",
+        "description": "Tor Browser is designed for anonymous web browsing, utilizing the Tor network to protect user privacy and security.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=torproject.org&sz=128",
         "accentColor": "#7D4698",
         "essential": false,
         "webUrl": "https://torproject.org",
         "version": "15.0.23",
-        "size": "108.4 MB"
+        "size": "108.4 MB",
+        "source": "winget"
     },
     {
         "id": "Vivaldi.Vivaldi",
         "name": "Vivaldi",
         "category": "Browsers",
-        "description": "Customizable power-user browser.",
+        "description": "Vivaldi is a highly customizable web browser with a focus on user personalization and productivity features.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=vivaldi.com&sz=128",
         "accentColor": "#EF3939",
         "essential": false,
         "webUrl": "https://vivaldi.com",
         "version": "8.2.4133.76",
-        "size": "148.9 MB"
+        "size": "148.9 MB",
+        "source": "winget"
     },
     {
         "id": "Waterfox.Waterfox",
@@ -585,13 +592,14 @@
         "id": "AnyDesk.AnyDesk",
         "name": "AnyDesk",
         "category": "Communication",
-        "description": "Lightweight remote desktop and support tool.",
+        "description": "AnyDesk is a remote desktop software that enables users to access and control computers remotely. It is known for its fast connection and low latency.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=anydesk.com&sz=128",
         "accentColor": "#EF443B",
         "essential": false,
         "webUrl": "https://anydesk.com",
         "version": "9.7.16",
-        "size": "8.2 MB"
+        "size": "8.2 MB",
+        "source": "winget"
     },
     {
         "id": "Beeper.Beeper",
@@ -603,19 +611,21 @@
         "essential": false,
         "webUrl": "https://beeper.com",
         "version": "4.3.152",
-        "size": "218 MB"
+        "size": "218 MB",
+        "source": "winget"
     },
     {
         "id": "Discord.Discord",
         "name": "Discord",
         "category": "Communication",
-        "description": "Voice, video, and community chat for gamers and teams.",
+        "description": "Discord is a popular communication platform with voice, video, and text chat, designed for gamers but used by a wide range of communities.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=discord.com&sz=128",
         "accentColor": "#5865F2",
         "essential": false,
         "webUrl": "https://discord.com",
         "version": "1.0.9259",
-        "size": "139 MB"
+        "size": "139 MB",
+        "source": "winget"
     },
     {
         "id": "Element.Element",
@@ -699,13 +709,14 @@
         "id": "Microsoft.Teams",
         "name": "Microsoft Teams",
         "category": "Communication",
-        "description": "Microsoft collaboration, meetings, and chat.",
+        "description": "Microsoft Teams is a collaboration platform that integrates with Office 365 and offers chat, video conferencing, file sharing, and more.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=microsoft.com/microsoft-teams&sz=128",
         "accentColor": "#6264A7",
         "essential": false,
         "webUrl": "https://microsoft.com/microsoft-teams",
         "version": "26198.304.4946.9672",
-        "size": "270.9 MB"
+        "size": "270.9 MB",
+        "source": "winget"
     },
     {
         "id": "Mozilla.Thunderbird",
@@ -776,37 +787,40 @@
         "id": "SlackTechnologies.Slack",
         "name": "Slack",
         "category": "Communication",
-        "description": "Team chat and workspace communication.",
+        "description": "Slack is a collaboration hub that connects teams and facilitates communication through channels, messaging, and file sharing.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=slack.com&sz=128",
         "accentColor": "#4A154B",
         "essential": false,
         "webUrl": "https://slack.com",
         "version": "4.52.162",
-        "size": "158.9 MB"
+        "size": "158.9 MB",
+        "source": "winget"
     },
     {
         "id": "TeamViewer.TeamViewer",
         "name": "TeamViewer",
         "category": "Communication",
-        "description": "Remote support and remote desktop access.",
+        "description": "TeamViewer is a popular remote access and support software that allows you to connect to and control remote devices.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=teamviewer.com&sz=128",
         "accentColor": "#0E8EE9",
         "essential": false,
         "webUrl": "https://teamviewer.com",
         "version": "15.81.6",
-        "size": "90 MB"
+        "size": "90 MB",
+        "source": "winget"
     },
     {
         "id": "Telegram.TelegramDesktop",
         "name": "Telegram Desktop",
         "category": "Communication",
-        "description": "Fast desktop messaging client.",
+        "description": "Telegram is a cloud-based instant messaging app known for its security features, speed, and simplicity.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=telegram.org&sz=128",
         "accentColor": "#26A5E4",
         "essential": false,
         "webUrl": "https://telegram.org",
         "version": "7.2.9",
-        "size": "53.1 MB"
+        "size": "53.1 MB",
+        "source": "winget"
     },
     {
         "id": "DucFabulous.UltraViewer",
@@ -890,13 +904,14 @@
         "id": "Zoom.Zoom",
         "name": "Zoom",
         "category": "Communication",
-        "description": "Video meetings, classes, and team calls.",
+        "description": "Zoom is a popular video conferencing and web conferencing service for online meetings, webinars, and collaborative projects.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=zoom.us&sz=128",
         "accentColor": "#0B5CFF",
         "essential": false,
         "webUrl": "https://zoom.us",
         "version": "7.2.48556",
-        "size": "210.1 MB"
+        "size": "210.1 MB",
+        "source": "winget"
     },
     {
         "id": "Zulip.Zulip",
@@ -973,7 +988,8 @@
         "essential": false,
         "webUrl": "https://sqlitebrowser.org",
         "version": "3.13.1",
-        "size": "18.9 MB"
+        "size": "18.9 MB",
+        "source": "winget"
     },
     {
         "id": "DBeaver.DBeaver.Community",
@@ -985,7 +1001,8 @@
         "essential": false,
         "webUrl": "https://dbeaver.io",
         "version": "26.2.0",
-        "size": "111.8 MB"
+        "size": "111.8 MB",
+        "source": "winget"
     },
     {
         "id": "JanProchazka.dbgate",
@@ -1049,7 +1066,8 @@
         "essential": false,
         "webUrl": "https://mongodb.com",
         "version": "1.51.0.0",
-        "size": "194 MB"
+        "size": "194 MB",
+        "source": "winget"
     },
     {
         "id": "MongoDB.Shell",
@@ -1074,7 +1092,8 @@
         "essential": false,
         "webUrl": "https://mysql.com",
         "version": "26.7.0",
-        "size": "261.2 MB"
+        "size": "261.2 MB",
+        "source": "winget"
     },
     {
         "id": "NoSQLBooster.NoSQLBooster",
@@ -1099,7 +1118,8 @@
         "essential": false,
         "webUrl": "https://pgadmin.org",
         "version": "9.18",
-        "size": "229.4 MB"
+        "size": "229.4 MB",
+        "source": "winget"
     },
     {
         "id": "PostgreSQL.PostgreSQL.18",
@@ -1124,7 +1144,8 @@
         "essential": false,
         "webUrl": "https://redis.io",
         "version": "3.4.2",
-        "size": "111.7 MB"
+        "size": "111.7 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.SQLServerManagementStudio.22",
@@ -1182,13 +1203,14 @@
         "id": "BlenderFoundation.Blender",
         "name": "Blender",
         "category": "Design & Creative",
-        "description": "3D modeling, animation, rendering, and VFX suite.",
+        "description": "Blender is a powerful open-source 3D creation suite, offering modeling, sculpting, animation, and rendering tools.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=blender.org&sz=128",
         "accentColor": "#F5792A",
         "essential": false,
         "webUrl": "https://blender.org",
         "version": "5.2.1",
-        "size": "348.2 MB"
+        "size": "348.2 MB",
+        "source": "winget"
     },
     {
         "id": "Canva.Canva",
@@ -1200,7 +1222,8 @@
         "essential": false,
         "webUrl": "https://canva.com",
         "version": "1.126.0",
-        "size": "203.7 MB"
+        "size": "203.7 MB",
+        "source": "winget"
     },
     {
         "id": "darktable.darktable",
@@ -1225,7 +1248,8 @@
         "essential": false,
         "webUrl": "https://figma.com",
         "version": "126.9.10",
-        "size": "147.8 MB"
+        "size": "147.8 MB",
+        "source": "winget"
     },
     {
         "id": "FreeCAD.FreeCAD",
@@ -1250,7 +1274,8 @@
         "essential": false,
         "webUrl": "https://gimp.org",
         "version": "3.2.4",
-        "size": "179.4 MB"
+        "size": "179.4 MB",
+        "source": "winget"
     },
     {
         "id": "Inkscape.Inkscape",
@@ -1262,7 +1287,8 @@
         "essential": false,
         "webUrl": "https://inkscape.org",
         "version": "1.4.4",
-        "size": "162.4 MB"
+        "size": "162.4 MB",
+        "source": "winget"
     },
     {
         "id": "KDE.Krita",
@@ -1274,7 +1300,8 @@
         "essential": false,
         "webUrl": "https://krita.org",
         "version": "5.3.4.0",
-        "size": "226 MB"
+        "size": "226 MB",
+        "source": "winget"
     },
     {
         "id": "Icons8.Lunacy",
@@ -1429,7 +1456,8 @@
         "essential": false,
         "webUrl": "https://dotnet.microsoft.com",
         "version": "8.0.425",
-        "size": "215.1 MB"
+        "size": "215.1 MB",
+        "source": "winget"
     },
     {
         "id": "Amazon.AWSCLI",
@@ -1441,7 +1469,8 @@
         "essential": false,
         "webUrl": "https://aws.amazon.com",
         "version": "2.37.4",
-        "size": "47.5 MB"
+        "size": "47.5 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.AzureCLI",
@@ -1453,7 +1482,8 @@
         "essential": false,
         "webUrl": "https://azure.microsoft.com",
         "version": "2.90.0",
-        "size": "66.4 MB"
+        "size": "66.4 MB",
+        "source": "winget"
     },
     {
         "id": "Oven-sh.Bun",
@@ -1465,67 +1495,73 @@
         "essential": false,
         "webUrl": "https://bun.sh",
         "version": "1.4.2",
-        "size": "38 MB"
+        "size": "38 MB",
+        "source": "winget"
     },
     {
         "id": "Docker.DockerDesktop",
         "name": "Docker Desktop",
         "category": "Developer",
-        "description": "Containers and local services for full-stack development.",
+        "description": "Docker Desktop provides a local environment for building, running, and testing containerized applications on Windows.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=docker.com&sz=128",
         "accentColor": "#2496ED",
         "essential": false,
         "webUrl": "https://docker.com",
         "version": "4.91.0",
-        "size": "598.9 MB"
+        "size": "598.9 MB",
+        "source": "winget"
     },
     {
         "id": "Git.Git",
         "name": "Git",
         "category": "Developer",
-        "description": "Version control CLI and Windows shell integration.",
+        "description": "Git is a distributed version control system widely used for tracking changes in source code during software development.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=git-scm.com&sz=128",
         "accentColor": "#F05032",
         "essential": true,
         "webUrl": "https://git-scm.com",
         "version": "2.55.0.3",
-        "size": "62.4 MB"
+        "size": "62.4 MB",
+        "source": "winget"
     },
     {
         "id": "GitHub.cli",
         "name": "GitHub CLI",
         "category": "Developer",
-        "description": "GitHub command-line tool for repos, issues, pull requests, and workflows.",
+        "description": "GitHub CLI brings pull requests, issues, releases, and other GitHub workflows to the terminal.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=cli.github.com&sz=128",
         "accentColor": "#24292F",
         "essential": false,
         "webUrl": "https://cli.github.com",
         "version": "2.101.0",
-        "size": "15 MB"
+        "size": "15 MB",
+        "source": "winget"
     },
     {
         "id": "GitHub.GitHubDesktop",
         "name": "GitHub Desktop",
         "category": "Developer",
-        "description": "Desktop Git client for GitHub repositories.",
+        "description": "GitHub Desktop is a visual Git client that simplifies collaboration on GitHub repositories with an easy-to-use interface.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=desktop.github.com&sz=128",
         "accentColor": "#24292F",
         "essential": false,
         "webUrl": "https://desktop.github.com",
         "version": "3.6.6",
-        "size": "293.3 MB"
+        "size": "293.3 MB",
+        "source": "winget"
     },
     {
         "id": "GoLang.Go",
         "name": "Go",
         "category": "Developer",
-        "description": "Go toolchain for backend services and CLI apps.",
+        "description": "Go (or Golang) is a statically typed, compiled programming language designed for simplicity, reliability, and efficiency.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=go.dev&sz=128",
         "accentColor": "#00ADD8",
         "essential": false,
         "webUrl": "https://go.dev",
         "version": "1.27.0",
-        "size": "63 MB"
+        "size": "63 MB",
+        "source": "winget"
     },
     {
         "id": "Helm.Helm",
@@ -1537,7 +1573,8 @@
         "essential": false,
         "webUrl": "https://helm.sh",
         "version": "4.3.0",
-        "size": "19.9 MB"
+        "size": "19.9 MB",
+        "source": "winget"
     },
     {
         "id": "Insomnia.Insomnia",
@@ -1549,19 +1586,21 @@
         "essential": false,
         "webUrl": "https://insomnia.rest",
         "version": "13.3.0",
-        "size": "589.3 MB"
+        "size": "589.3 MB",
+        "source": "winget"
     },
     {
         "id": "JetBrains.Toolbox",
         "name": "JetBrains Toolbox",
         "category": "Developer",
-        "description": "Manager for JetBrains IDEs and development tools.",
+        "description": "Jetbrains Toolbox is a platform for easy installation and management of JetBrains developer tools.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=jetbrains.com&sz=128",
         "accentColor": "#FF2D55",
         "essential": false,
         "webUrl": "https://jetbrains.com",
         "version": "3.8.1.0",
-        "size": "142 MB"
+        "size": "142 MB",
+        "source": "winget"
     },
     {
         "id": "Kubernetes.kubectl",
@@ -1573,7 +1612,8 @@
         "essential": false,
         "webUrl": "https://kubernetes.io",
         "version": "1.37.1",
-        "size": "60.5 MB"
+        "size": "60.5 MB",
+        "source": "winget"
     },
     {
         "id": "Meld.Meld",
@@ -1585,25 +1625,27 @@
         "essential": false,
         "webUrl": "https://meldmerge.org",
         "version": "3.24.0",
-        "size": "102 MB"
+        "size": "102 MB",
+        "source": "winget"
     },
     {
         "id": "Neovim.Neovim",
         "name": "Neovim",
         "category": "Developer",
-        "description": "Modern Vim-based editor for keyboard-driven workflows.",
+        "description": "Neovim is a highly extensible text editor and an improvement over the original Vim editor.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=neovim.io&sz=128",
         "accentColor": "#57A143",
         "essential": false,
         "webUrl": "https://neovim.io",
         "version": "0.12.5",
-        "size": "11.9 MB"
+        "size": "11.9 MB",
+        "source": "winget"
     },
     {
         "id": "OpenJS.NodeJS.LTS",
         "name": "Node.js LTS",
         "category": "Developer",
-        "description": "LTS JavaScript runtime with npm for frontend and backend development.",
+        "description": "NodeJS LTS provides Long-Term Support releases for stable and reliable server-side JavaScript development.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=nodejs.org&sz=128",
         "accentColor": "#539E43",
         "detectionNames": [
@@ -1613,49 +1655,53 @@
         "essential": true,
         "webUrl": "https://nodejs.org",
         "version": "24.19.0",
-        "size": "31.4 MB"
+        "size": "31.4 MB",
+        "source": "winget"
     },
     {
         "id": "Notepad++.Notepad++",
         "name": "Notepad++",
         "category": "Developer",
-        "description": "Fast text and source-code editor for Windows.",
+        "description": "Notepad++ is a free, open-source code editor and Notepad replacement with support for multiple languages.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=notepad-plus-plus.org&sz=128",
         "accentColor": "#78A82A",
         "essential": true,
         "webUrl": "https://notepad-plus-plus.org",
         "version": "8.9.8.1",
-        "size": "7.5 MB"
+        "size": "7.5 MB",
+        "source": "winget"
     },
     {
         "id": "pnpm.pnpm",
         "name": "pnpm",
         "category": "Developer",
-        "description": "Fast disk-efficient JavaScript package manager.",
+        "description": "pnpm is a fast and disk space efficient package manager for JavaScript and Node.js applications.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=pnpm.io&sz=128",
         "accentColor": "#F69220",
         "essential": false,
         "webUrl": "https://pnpm.io",
         "version": "12.6.0",
-        "size": "22.1 MB"
+        "size": "22.1 MB",
+        "source": "winget"
     },
     {
         "id": "Postman.Postman",
         "name": "Postman",
         "category": "Developer",
-        "description": "API testing, documentation, and collaboration tool.",
+        "description": "Postman is an API platform and desktop client for designing, testing, documenting, and collaborating on APIs.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=postman.com&sz=128",
         "accentColor": "#FF6C37",
         "essential": false,
         "webUrl": "https://postman.com",
         "version": "12.29.5",
-        "size": "200.2 MB"
+        "size": "200.2 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.PowerShell",
         "name": "PowerShell",
         "category": "Developer",
-        "description": "Modern command shell and automation platform.",
+        "description": "PowerShell is a task automation framework and scripting language designed for system administrators, offering powerful command-line capabilities.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=learn.microsoft.com/powershell&sz=128",
         "accentColor": "#012456",
         "detectionNames": [
@@ -1665,7 +1711,8 @@
         "essential": true,
         "webUrl": "https://learn.microsoft.com/powershell",
         "version": "7.6.6.0",
-        "size": "335.9 MB"
+        "size": "335.9 MB",
+        "source": "winget"
     },
     {
         "id": "Python.Python.3.13",
@@ -1677,7 +1724,8 @@
         "essential": true,
         "webUrl": "https://python.org",
         "version": "3.13.15",
-        "size": "28.1 MB"
+        "size": "28.1 MB",
+        "source": "winget"
     },
     {
         "id": "Rustlang.Rustup",
@@ -1689,19 +1737,21 @@
         "essential": false,
         "webUrl": "https://rust-lang.org",
         "version": "1.29.1",
-        "size": "12.1 MB"
+        "size": "12.1 MB",
+        "source": "winget"
     },
     {
         "id": "SublimeHQ.SublimeText.4",
         "name": "Sublime Text",
         "category": "Developer",
-        "description": "Fast code and text editor.",
+        "description": "Sublime Text is a sophisticated text editor for code, markup, and prose.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=sublimetext.com&sz=128",
         "accentColor": "#FF9800",
         "essential": false,
         "webUrl": "https://sublimetext.com",
         "version": "4.0.0.421500",
-        "size": "21 MB"
+        "size": "21 MB",
+        "source": "winget"
     },
     {
         "id": "EclipseAdoptium.Temurin.21.JDK",
@@ -1713,7 +1763,8 @@
         "essential": false,
         "webUrl": "https://adoptium.net",
         "version": "21.0.12.101",
-        "size": "171 MB"
+        "size": "171 MB",
+        "source": "winget"
     },
     {
         "id": "Hashicorp.Terraform",
@@ -1725,19 +1776,21 @@
         "essential": false,
         "webUrl": "https://terraform.io",
         "version": "1.16.2",
-        "size": "35 MB"
+        "size": "35 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.VisualStudio.2022.Community",
         "name": "Visual Studio 2022 Community",
         "category": "Developer",
-        "description": "Full IDE for .NET, C++, desktop, mobile, and game tooling.",
+        "description": "Visual Studio 2022 is an integrated development environment (IDE) for building, debugging, and deploying applications.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=visualstudio.microsoft.com&sz=128",
         "accentColor": "#5C2D91",
         "essential": false,
         "webUrl": "https://visualstudio.microsoft.com",
         "version": "17.14.41",
-        "size": "4.3 MB"
+        "size": "4.3 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.VisualStudio.2022.BuildTools",
@@ -1749,13 +1802,14 @@
         "essential": false,
         "webUrl": "https://visualstudio.microsoft.com",
         "version": "17.14.41",
-        "size": "4.3 MB"
+        "size": "4.3 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.VisualStudioCode",
         "name": "Visual Studio Code",
         "category": "Developer",
-        "description": "Lightweight editor for web, backend, Python, and full-stack work.",
+        "description": "Visual Studio Code is a free, open-source code editor with support for multiple programming languages.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=128",
         "accentColor": "#007ACC",
         "detectionNames": [
@@ -1765,7 +1819,8 @@
         "essential": true,
         "webUrl": "https://code.visualstudio.com",
         "version": "1.139.1",
-        "size": "222.1 MB"
+        "size": "222.1 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.WSL",
@@ -1777,19 +1832,21 @@
         "essential": false,
         "webUrl": "https://learn.microsoft.com/windows/wsl",
         "version": "2.7.13",
-        "size": "494.9 MB"
+        "size": "494.9 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.WindowsTerminal",
         "name": "Windows Terminal",
         "category": "Developer",
-        "description": "Modern terminal app for PowerShell, Command Prompt, and WSL.",
+        "description": "Windows Terminal is a modern, fast, and efficient terminal application for command-line users, supporting multiple tabs, panes, and more.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=github.com/microsoft/terminal&sz=128",
         "accentColor": "#4D4D4D",
         "essential": true,
         "webUrl": "https://github.com/microsoft/terminal",
         "version": "1.24.11911.0",
-        "size": "21.3 MB"
+        "size": "21.3 MB",
+        "source": "winget"
     },
     {
         "id": "WinMerge.WinMerge",
@@ -1801,31 +1858,34 @@
         "essential": false,
         "webUrl": "https://winmerge.org",
         "version": "2.16.58.2",
-        "size": "16.4 MB"
+        "size": "16.4 MB",
+        "source": "winget"
     },
     {
         "id": "WinSCP.WinSCP",
         "name": "WinSCP",
         "category": "Developer",
-        "description": "SFTP, SCP, FTP, and WebDAV client for server file transfers.",
+        "description": "WinSCP is a popular open-source SFTP, FTP, and SCP client for Windows. It allows secure file transfers between a local and a remote computer.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=winscp.net&sz=128",
         "accentColor": "#2C6AA0",
         "essential": false,
         "webUrl": "https://winscp.net",
         "version": "6.5.6",
-        "size": "11.7 MB"
+        "size": "11.7 MB",
+        "source": "winget"
     },
     {
         "id": "Yarn.Yarn",
         "name": "Yarn",
         "category": "Developer",
-        "description": "JavaScript package manager for frontend and Node projects.",
+        "description": "Yarn is a fast, reliable, and secure dependency management tool for JavaScript projects.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=yarnpkg.com&sz=128",
         "accentColor": "#2C8EBB",
         "essential": false,
         "webUrl": "https://yarnpkg.com",
         "version": "1.22.22",
-        "size": "1.6 MB"
+        "size": "1.6 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.DotNet.DesktopRuntime.6",
@@ -1844,7 +1904,7 @@
         "id": "Microsoft.DotNet.DesktopRuntime.8",
         "name": ".NET Desktop Runtime 8",
         "category": "Drivers",
-        "description": "Runtime for modern .NET desktop applications.",
+        "description": ".NET Desktop Runtime 8 is a runtime environment required for running applications developed with .NET 8.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com&sz=128",
         "accentColor": "#512BD4",
         "detectionNames": [
@@ -1854,7 +1914,8 @@
         "essential": true,
         "webUrl": "https://dotnet.microsoft.com",
         "version": "8.0.31",
-        "size": "56 MB"
+        "size": "56 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.DotNet.DesktopRuntime.9",
@@ -1957,7 +2018,8 @@
         "essential": true,
         "webUrl": "https://microsoft.com",
         "version": "9.29.1974.0",
-        "size": "55.7 MB"
+        "size": "55.7 MB",
+        "source": "winget"
     },
     {
         "id": "IObit.DriverBooster",
@@ -2060,7 +2122,8 @@
         "essential": false,
         "webUrl": "https://java.com",
         "version": "8.0.5030.1",
-        "size": "69 MB"
+        "size": "69 MB",
+        "source": "winget"
     },
     {
         "id": "Kingston.SSDManager",
@@ -2176,7 +2239,8 @@
         "essential": false,
         "webUrl": "https://nvidia.com",
         "version": "9.26.0703",
-        "size": "33.4 MB"
+        "size": "33.4 MB",
+        "source": "winget"
     },
     {
         "id": "Nvidia.PhysXLegacy",
@@ -2308,7 +2372,8 @@
         "essential": false,
         "webUrl": "https://learn.microsoft.com/cpp",
         "version": "10.0.40219",
-        "size": "9.8 MB"
+        "size": "9.8 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.VCRedist.2010.x86",
@@ -2323,7 +2388,8 @@
         "essential": false,
         "webUrl": "https://learn.microsoft.com/cpp",
         "version": "10.0.40219",
-        "size": "8.6 MB"
+        "size": "8.6 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.VCRedist.2012.x64",
@@ -2364,7 +2430,8 @@
         "essential": false,
         "webUrl": "https://learn.microsoft.com/cpp",
         "version": "12.0.40664.0",
-        "size": "6.9 MB"
+        "size": "6.9 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.VCRedist.2013.x86",
@@ -2379,13 +2446,14 @@
         "essential": false,
         "webUrl": "https://learn.microsoft.com/cpp",
         "version": "12.0.40664.0",
-        "size": "6.2 MB"
+        "size": "6.2 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.VCRedist.2015+.x64",
         "name": "Visual C++ Redistributable x64",
         "category": "Drivers",
-        "description": "Common Microsoft C++ runtime required by many games and apps.",
+        "description": "Visual C++ 2015-2022 64-bit redistributable package installs runtime components of Visual C++ libraries required to run 64-bit applications.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp&sz=128",
         "accentColor": "#5C2D91",
         "detectionNames": [
@@ -2394,13 +2462,14 @@
         "essential": true,
         "webUrl": "https://learn.microsoft.com/cpp",
         "version": "14.51.36247.0",
-        "size": "17.9 MB"
+        "size": "17.9 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.VCRedist.2015+.x86",
         "name": "Visual C++ Redistributable x86",
         "category": "Drivers",
-        "description": "32-bit Microsoft C++ runtime required by many games and legacy apps.",
+        "description": "Visual C++ 2015-2022 32-bit redistributable package installs runtime components of Visual C++ libraries required to run 32-bit applications.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=learn.microsoft.com/cpp&sz=128",
         "accentColor": "#5C2D91",
         "detectionNames": [
@@ -2409,7 +2478,8 @@
         "essential": true,
         "webUrl": "https://learn.microsoft.com/cpp",
         "version": "14.51.36247.0",
-        "size": "6.6 MB"
+        "size": "6.6 MB",
+        "source": "winget"
     },
     {
         "id": "KhronosGroup.VulkanRT",
@@ -2486,7 +2556,8 @@
         "essential": false,
         "webUrl": "https://godotengine.org",
         "version": "4.7.2",
-        "size": "82 MB"
+        "size": "82 MB",
+        "source": "winget"
     },
     {
         "id": "GodotEngine.GodotEngine.Mono",
@@ -2661,13 +2732,14 @@
         "id": "Unity.UnityHub",
         "name": "Unity Hub",
         "category": "Game Development",
-        "description": "Unity project, editor, and module manager.",
+        "description": "Unity is a powerful game development platform for creating 2D, 3D, augmented reality, and virtual reality games.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=unity.com&sz=128",
         "accentColor": "#000000",
         "essential": false,
         "webUrl": "https://unity.com",
         "version": "3.21.3.65535",
-        "size": "239 MB"
+        "size": "239 MB",
+        "source": "winget"
     },
     {
         "id": "xemu-project.xemu",
@@ -2686,13 +2758,14 @@
         "id": "Blizzard.BattleNet",
         "name": "Battle.net",
         "category": "Gaming",
-        "description": "Blizzard game launcher and account client.",
+        "description": "Battle.net is a launcher for games created and developed by Activision Blizzard",
         "iconUrl": "https://www.google.com/s2/favicons?domain=battle.net&sz=128",
         "accentColor": "#00AEFF",
         "essential": false,
         "webUrl": "https://battle.net",
         "version": "1.19.3.3219",
-        "size": "4.7 MB"
+        "size": "4.7 MB",
+        "source": "winget"
     },
     {
         "id": "Corsair.iCUE.5",
@@ -2704,31 +2777,34 @@
         "essential": false,
         "webUrl": "https://corsair.com",
         "version": "5.51.42",
-        "size": "100 MB"
+        "size": "100 MB",
+        "source": "winget"
     },
     {
         "id": "CPUID.CPU-Z",
         "name": "CPU-Z",
         "category": "Gaming",
-        "description": "CPU, motherboard, RAM, and system information utility.",
+        "description": "CPU-Z is a system monitoring and diagnostic tool for Windows. It provides detailed information about the computer's hardware components, including the CPU, memory, and motherboard.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=cpuid.com&sz=128",
         "accentColor": "#744DA9",
         "essential": false,
         "webUrl": "https://cpuid.com",
         "version": "3.01",
-        "size": "4.6 MB"
+        "size": "4.6 MB",
+        "source": "winget"
     },
     {
         "id": "Wagnardsoft.DisplayDriverUninstaller",
         "name": "Display Driver Uninstaller",
         "category": "Gaming",
-        "description": "Clean GPU driver removal tool for troubleshooting.",
+        "description": "Display Driver Uninstaller (DDU) is a tool for completely uninstalling graphics drivers from NVIDIA, AMD, and Intel. It is useful for troubleshooting graphics driver-related issues.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=wagnardsoft.com&sz=128",
         "accentColor": "#546E7A",
         "essential": false,
         "webUrl": "https://wagnardsoft.com",
         "version": "18.1.5.3",
-        "size": "1.7 MB"
+        "size": "1.7 MB",
+        "source": "winget"
     },
     {
         "id": "Recol.DLSSUpdater",
@@ -2740,79 +2816,86 @@
         "essential": false,
         "webUrl": "https://github.com",
         "version": "5.0.3",
-        "size": "69.6 MB"
+        "size": "69.6 MB",
+        "source": "winget"
     },
     {
         "id": "ElectronicArts.EADesktop",
         "name": "EA app",
         "category": "Gaming",
-        "description": "EA game launcher and library app.",
+        "description": "EA App is a platform for accessing and playing Electronic Arts games.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=ea.com&sz=128",
         "accentColor": "#FF4747",
         "essential": false,
         "webUrl": "https://ea.com",
         "version": "13.796.0.6309",
-        "size": "128 MB"
+        "size": "128 MB",
+        "source": "winget"
     },
     {
         "id": "EpicGames.EpicGamesLauncher",
         "name": "Epic Games Launcher",
         "category": "Gaming",
-        "description": "Epic Games store and game launcher.",
+        "description": "Epic Games Launcher is the client for accessing and playing games from the Epic Games Store.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=epicgames.com&sz=128",
         "accentColor": "#313131",
         "essential": false,
         "webUrl": "https://epicgames.com",
         "version": "1.3.210.0",
-        "size": "252 MB"
+        "size": "252 MB",
+        "source": "winget"
     },
     {
         "id": "GOG.Galaxy",
         "name": "GOG Galaxy",
         "category": "Gaming",
-        "description": "Game library and launcher for GOG titles.",
+        "description": "GOG Galaxy is a gaming client that offers DRM-free games, additional content, and more.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=gog.com&sz=128",
         "accentColor": "#78387B",
         "essential": false,
         "webUrl": "https://gog.com",
         "version": "2.1.8.30",
-        "size": "326.4 MB"
+        "size": "326.4 MB",
+        "source": "winget"
     },
     {
         "id": "TechPowerUp.GPU-Z",
         "name": "GPU-Z",
         "category": "Gaming",
-        "description": "Graphics card information and sensor monitor.",
+        "description": "GPU-Z provides detailed information about your graphics card and GPU.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=techpowerup.com&sz=128",
         "accentColor": "#1E88E5",
         "essential": false,
         "webUrl": "https://techpowerup.com",
         "version": "2.71.0",
-        "size": "123 MB"
+        "size": "123 MB",
+        "source": "winget"
     },
     {
         "id": "REALiX.HWiNFO",
         "name": "HWiNFO",
         "category": "Gaming",
-        "description": "Detailed hardware monitoring for gaming PCs and workstations.",
+        "description": "HWiNFO provides comprehensive hardware information and diagnostics for Windows.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=hwinfo.com&sz=128",
         "accentColor": "#1976D2",
         "essential": false,
         "webUrl": "https://hwinfo.com",
         "version": "7.72",
-        "size": "14.1 MB"
+        "size": "14.1 MB",
+        "source": "winget"
     },
     {
         "id": "CPUID.HWMonitor",
         "name": "HWMonitor",
         "category": "Gaming",
-        "description": "Hardware temperature, voltage, and fan monitoring.",
+        "description": "HWMonitor is a hardware monitoring program that reads PC systems main health sensors.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=cpuid.com&sz=128",
         "accentColor": "#7E57C2",
         "essential": false,
         "webUrl": "https://cpuid.com",
         "version": "1.68",
-        "size": "3.5 MB"
+        "size": "3.5 MB",
+        "source": "winget"
     },
     {
         "id": "Logitech.GHUB",
@@ -2824,43 +2907,47 @@
         "essential": false,
         "webUrl": "https://logitechg.com",
         "version": "2026.4.919028",
-        "size": "67.1 MB"
+        "size": "67.1 MB",
+        "source": "winget"
     },
     {
         "id": "MoonlightGameStreamingProject.Moonlight",
         "name": "Moonlight",
         "category": "Gaming",
-        "description": "GameStream client for remote gaming.",
+        "description": "Moonlight/GameStream Client allows you to stream PC games to other devices over your local network.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=moonlight-stream.org&sz=128",
         "accentColor": "#38BDF8",
         "essential": false,
         "webUrl": "https://moonlight-stream.org",
         "version": "6.1.0.0",
-        "size": "41.3 MB"
+        "size": "41.3 MB",
+        "source": "winget"
     },
     {
         "id": "Guru3D.Afterburner",
         "name": "MSI Afterburner",
         "category": "Gaming",
-        "description": "GPU monitoring, fan curve, and performance tuning utility.",
+        "description": "MSI Afterburner is a graphics card overclocking utility with advanced features.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=guru3d.com&sz=128",
         "accentColor": "#C20E1A",
         "essential": false,
         "webUrl": "https://guru3d.com",
         "version": "4.6.6",
-        "size": "125 MB"
+        "size": "125 MB",
+        "source": "winget"
     },
     {
         "id": "TechPowerUp.NVCleanstall",
         "name": "NVCleanstall",
         "category": "Gaming",
-        "description": "Customize and clean NVIDIA driver installations.",
+        "description": "NVCleanstall is a tool designed to customize NVIDIA driver installations, allowing advanced users to control more aspects of the installation process.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=techpowerup.com&sz=128",
         "accentColor": "#76B900",
         "essential": false,
         "webUrl": "https://techpowerup.com",
         "version": "1.19.0",
-        "size": "119 MB"
+        "size": "119 MB",
+        "source": "winget"
     },
     {
         "id": "Nvidia.FrameView",
@@ -2872,19 +2959,21 @@
         "essential": false,
         "webUrl": "https://nvidia.com",
         "version": "2.0",
-        "size": "19.8 MB"
+        "size": "19.8 MB",
+        "source": "winget"
     },
     {
         "id": "Nvidia.GeForceNow",
         "name": "NVIDIA GeForce NOW",
         "category": "Gaming",
-        "description": "NVIDIA cloud gaming client.",
+        "description": "GeForce NOW is a cloud gaming service that allows you to play high-quality PC games on your device.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=nvidia.com&sz=128",
         "accentColor": "#76B900",
         "essential": false,
         "webUrl": "https://nvidia.com",
         "version": "2.0.88.129",
-        "size": "158.7 MB"
+        "size": "158.7 MB",
+        "source": "winget"
     },
     {
         "id": "Orbmu2k.nvidiaProfileInspector",
@@ -2896,31 +2985,34 @@
         "essential": false,
         "webUrl": "https://github.com",
         "version": "3.0.2.2",
-        "size": "0.4 MB"
+        "size": "0.4 MB",
+        "source": "winget"
     },
     {
         "id": "Parsec.Parsec",
         "name": "Parsec",
         "category": "Gaming",
-        "description": "Low-latency remote desktop and game streaming app.",
+        "description": "Parsec is a low-latency, high-quality remote desktop sharing application for collaborating and gaming across devices.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=parsec.app&sz=128",
         "accentColor": "#FF4F64",
         "essential": false,
         "webUrl": "https://parsec.app",
         "version": "150.104.1.0",
-        "size": "4.2 MB"
+        "size": "4.2 MB",
+        "source": "winget"
     },
     {
         "id": "Valve.Steam",
         "name": "Steam",
         "category": "Gaming",
-        "description": "PC game store, library, and community launcher.",
+        "description": "Steam is a digital distribution platform for purchasing and playing video games, offering multiplayer gaming, video streaming, and more.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=steampowered.com&sz=128",
         "accentColor": "#1B2838",
         "essential": false,
         "webUrl": "https://steampowered.com",
         "version": "2.10.91.91",
-        "size": "2.3 MB"
+        "size": "2.3 MB",
+        "source": "winget"
     },
     {
         "id": "SteelSeries.GG",
@@ -2932,19 +3024,21 @@
         "essential": false,
         "webUrl": "https://steelseries.com",
         "version": "120.0.0",
-        "size": "412.7 MB"
+        "size": "412.7 MB",
+        "source": "winget"
     },
     {
         "id": "Ubisoft.Connect",
         "name": "Ubisoft Connect",
         "category": "Gaming",
-        "description": "Ubisoft launcher, store, and friends app.",
+        "description": "Ubisoft Connect is Ubisoft's digital distribution and online gaming service, providing access to Ubisoft's games and services.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=ubisoft.com&sz=128",
         "accentColor": "#0070FF",
         "essential": false,
         "webUrl": "https://ubisoft.com",
         "version": "173.1.0.13333",
-        "size": "252.5 MB"
+        "size": "252.5 MB",
+        "source": "winget"
     },
     {
         "id": "AIMP.AIMP",
@@ -3151,7 +3245,8 @@
         "essential": false,
         "webUrl": "https://spotify.com",
         "version": "1.3.1.234.g59d6bf59",
-        "size": "141.3 MB"
+        "size": "141.3 MB",
+        "source": "winget"
     },
     {
         "id": "Stremio.Stremio",
@@ -3183,13 +3278,14 @@
         "id": "VideoLAN.VLC",
         "name": "VLC media player",
         "category": "Media & Streaming",
-        "description": "Reliable media player with broad codec support.",
+        "description": "VLC Media Player is a free and open-source multimedia player that supports a wide range of audio and video formats. It is known for its versatility and cross-platform compatibility.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=videolan.org&sz=128",
         "accentColor": "#FF8800",
         "essential": true,
         "webUrl": "https://videolan.org",
         "version": "3.0.23",
-        "size": "42 MB"
+        "size": "42 MB",
+        "source": "winget"
     },
     {
         "id": "Winamp.Winamp",
@@ -3247,13 +3343,14 @@
         "id": "Cloudflare.Warp",
         "name": "Cloudflare WARP",
         "category": "Networking",
-        "description": "Cloudflare DNS, WARP VPN, and secure network client.",
+        "description": "WARP is a freemium VPN service provided by Cloudflare. Includes usage of Cloudflare's DNS",
         "iconUrl": "https://www.google.com/s2/favicons?domain=one.one.one.one&sz=128",
         "accentColor": "#F48120",
         "essential": false,
         "webUrl": "https://one.one.one.one",
         "version": "26.7.1376.0",
-        "size": "56.7 MB"
+        "size": "56.7 MB",
+        "source": "winget"
     },
     {
         "id": "Iterate.Cyberduck",
@@ -3291,7 +3388,8 @@
         "essential": false,
         "webUrl": "https://mremoteng.org",
         "version": "1.76.20.24615",
-        "size": "41.6 MB"
+        "size": "41.6 MB",
+        "source": "winget"
     },
     {
         "id": "MullvadVPN.MullvadVPN",
@@ -3349,13 +3447,14 @@
         "id": "OpenVPNTechnologies.OpenVPNConnect",
         "name": "OpenVPN Connect",
         "category": "Networking",
-        "description": "OpenVPN client for work, server, and private VPN profiles.",
+        "description": "OpenVPN Connect is a VPN client that allows you to connect securely to a VPN server. It provides a secure and encrypted connection for protecting your online privacy.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=openvpn.net&sz=128",
         "accentColor": "#EA7E20",
         "essential": false,
         "webUrl": "https://openvpn.net",
         "version": "3.9.0",
-        "size": "119.6 MB"
+        "size": "119.6 MB",
+        "source": "winget"
     },
     {
         "id": "Proton.ProtonVPN",
@@ -3374,13 +3473,14 @@
         "id": "PuTTY.PuTTY",
         "name": "PuTTY",
         "category": "Networking",
-        "description": "SSH, Telnet, and serial terminal client.",
+        "description": "PuTTY is a free and open-source terminal emulator, serial console, and network file transfer application. It supports various network protocols such as SSH, Telnet, and SCP.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=putty.org&sz=128",
         "accentColor": "#1565C0",
         "essential": false,
         "webUrl": "https://putty.org",
         "version": "0.85.0.0",
-        "size": "3.7 MB"
+        "size": "3.7 MB",
+        "source": "winget"
     },
     {
         "id": "JimRadford.SuperPuTTY",
@@ -3399,13 +3499,14 @@
         "id": "Tailscale.Tailscale",
         "name": "Tailscale",
         "category": "Networking",
-        "description": "Private mesh VPN for secure remote device access.",
+        "description": "The Tailscale client allows you to connect all your devices using WireGuard®, without the hassle. Tailscale makes it as easy as installing an app and signing in.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=tailscale.com&sz=128",
         "accentColor": "#242424",
         "essential": false,
         "webUrl": "https://tailscale.com",
         "version": "1.102.4",
-        "size": "36.6 MB"
+        "size": "36.6 MB",
+        "source": "winget"
     },
     {
         "id": "Termius.Termius",
@@ -3417,7 +3518,8 @@
         "essential": false,
         "webUrl": "https://termius.com",
         "version": "10.1.0",
-        "size": "326.3 MB"
+        "size": "326.3 MB",
+        "source": "winget"
     },
     {
         "id": "Windscribe.Windscribe",
@@ -3436,25 +3538,27 @@
         "id": "WireGuard.WireGuard",
         "name": "WireGuard",
         "category": "Networking",
-        "description": "Fast modern VPN tunnel client.",
+        "description": "WireGuard is a fast and modern VPN (Virtual Private Network) protocol. It aims to be simpler and more efficient than other VPN protocols, providing secure and reliable connections.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=wireguard.com&sz=128",
         "accentColor": "#88171A",
         "essential": false,
         "webUrl": "https://wireguard.com",
         "version": "1.1.1",
-        "size": "3.1 MB"
+        "size": "3.1 MB",
+        "source": "winget"
     },
     {
         "id": "WiresharkFoundation.Wireshark",
         "name": "Wireshark",
         "category": "Networking",
-        "description": "Network protocol analyzer for troubleshooting and learning.",
+        "description": "Wireshark is a widely-used open-source network protocol analyzer. It allows users to capture and analyze network traffic in real-time, providing detailed insights into network activities.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=wireshark.org&sz=128",
         "accentColor": "#1679A7",
         "essential": false,
         "webUrl": "https://wireshark.org",
         "version": "4.6.8",
-        "size": "78.1 MB"
+        "size": "78.1 MB",
+        "source": "winget"
     },
     {
         "id": "Anaconda.Anaconda3",
@@ -3473,13 +3577,14 @@
         "id": "Kitware.CMake",
         "name": "CMake",
         "category": "Problem Solving",
-        "description": "Cross-platform build system for C and C++ projects.",
+        "description": "CMake is an open-source, cross-platform family of tools designed to build, test and package software.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=cmake.org&sz=128",
         "accentColor": "#064F8C",
         "essential": false,
         "webUrl": "https://cmake.org",
         "version": "4.4.3",
-        "size": "37.3 MB"
+        "size": "37.3 MB",
+        "source": "winget"
     },
     {
         "id": "Google.DartSDK",
@@ -3530,7 +3635,8 @@
         "name": "Graphviz",
         "webUrl": "https://graphviz.org",
         "size": "42 MB",
-        "accentColor": "#3B71CA"
+        "accentColor": "#3B71CA",
+        "source": "winget"
     },
     {
         "id": "Julialang.Julia",
@@ -3542,7 +3648,8 @@
         "name": "Julia",
         "webUrl": "https://julialang.org",
         "size": "125 MB",
-        "accentColor": "#9558B2"
+        "accentColor": "#9558B2",
+        "source": "winget"
     },
     {
         "id": "Julialang.Juliaup",
@@ -3567,7 +3674,8 @@
         "essential": false,
         "webUrl": "https://llvm.org",
         "version": "23.1.2",
-        "size": "609.8 MB"
+        "size": "609.8 MB",
+        "source": "winget"
     },
     {
         "id": "MaximaTeam.Maxima",
@@ -3579,7 +3687,8 @@
         "name": "Maxima CAS",
         "webUrl": "https://maxima.sourceforge.io",
         "size": "95 MB",
-        "accentColor": "#C0392B"
+        "accentColor": "#C0392B",
+        "source": "winget"
     },
     {
         "id": "MiKTeX.MiKTeX",
@@ -3591,7 +3700,8 @@
         "name": "MiKTeX",
         "webUrl": "https://miktex.org",
         "size": "180 MB",
-        "accentColor": "#336699"
+        "accentColor": "#336699",
+        "source": "winget"
     },
     {
         "id": "Anaconda.Miniconda3",
@@ -3603,7 +3713,8 @@
         "name": "Miniconda3",
         "webUrl": "https://docs.conda.io/en/latest/miniconda.html",
         "size": "95 MB",
-        "accentColor": "#44B848"
+        "accentColor": "#44B848",
+        "source": "winget"
     },
     {
         "id": "CondaForge.Miniforge3",
@@ -3641,7 +3752,8 @@
         "essential": false,
         "webUrl": "https://ninja-build.org",
         "version": "1.13.2",
-        "size": "0.3 MB"
+        "size": "0.3 MB",
+        "source": "winget"
     },
     {
         "id": "Nvidia.CUDA",
@@ -3653,7 +3765,8 @@
         "essential": false,
         "webUrl": "https://developer.nvidia.com/cuda-toolkit",
         "version": "13.4",
-        "size": "3.5 GB"
+        "size": "3.5 GB",
+        "source": "winget"
     },
     {
         "id": "Posit.RStudio",
@@ -3665,7 +3778,8 @@
         "name": "RStudio Desktop",
         "webUrl": "https://posit.co",
         "size": "235 MB",
-        "accentColor": "#75AADB"
+        "accentColor": "#75AADB",
+        "source": "winget"
     },
     {
         "id": "Scilab.Scilab",
@@ -3736,13 +3850,14 @@
         "id": "Dropbox.Dropbox",
         "name": "Dropbox",
         "category": "Productivity",
-        "description": "Cloud file sync and sharing app.",
+        "description": "Dropbox is a cloud storage client for syncing files, sharing content, and keeping documents available across devices.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=dropbox.com&sz=128",
         "accentColor": "#0061FF",
         "essential": false,
         "webUrl": "https://dropbox.com",
         "version": "262.4.3183",
-        "size": "289.7 MB"
+        "size": "289.7 MB",
+        "source": "winget"
     },
     {
         "id": "Evernote.Evernote",
@@ -3761,13 +3876,14 @@
         "id": "Google.GoogleDrive",
         "name": "Google Drive",
         "category": "Productivity",
-        "description": "Google Drive sync and desktop file access.",
+        "description": "File syncing across devices all tied to your Google account.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=drive.google.com&sz=128",
         "accentColor": "#0F9D58",
         "essential": false,
         "webUrl": "https://drive.google.com",
         "version": "131.0.2.0",
-        "size": "277.7 MB"
+        "size": "277.7 MB",
+        "source": "winget"
     },
     {
         "id": "Joplin.Joplin",
@@ -3786,13 +3902,14 @@
         "id": "TheDocumentFoundation.LibreOffice",
         "name": "LibreOffice",
         "category": "Productivity",
-        "description": "Free office suite for documents, spreadsheets, and presentations.",
+        "description": "LibreOffice is a powerful and free office suite, compatible with other major office suites.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=libreoffice.org&sz=128",
         "accentColor": "#18A303",
         "essential": false,
         "webUrl": "https://libreoffice.org",
         "version": "26.8.0.3",
-        "size": "357.5 MB"
+        "size": "357.5 MB",
+        "source": "winget"
     },
     {
         "id": "Mega.MEGASync",
@@ -3817,7 +3934,8 @@
         "essential": false,
         "webUrl": "https://microsoft.com/microsoft-365",
         "version": "16.0.20228.20124",
-        "size": "6.9 MB"
+        "size": "6.9 MB",
+        "source": "winget"
     },
     {
         "id": "Notion.Notion",
@@ -3829,7 +3947,8 @@
         "essential": false,
         "webUrl": "https://notion.so",
         "version": "7.35.1",
-        "size": "104.2 MB"
+        "size": "104.2 MB",
+        "source": "winget"
     },
     {
         "id": "Notion.NotionCalendar",
@@ -3854,19 +3973,21 @@
         "name": "Obsidian",
         "webUrl": "https://obsidian.md",
         "size": "115 MB",
-        "accentColor": "#7C3AED"
+        "accentColor": "#7C3AED",
+        "source": "winget"
     },
     {
         "id": "Microsoft.OneDrive",
         "name": "OneDrive",
         "category": "Productivity",
-        "description": "Microsoft cloud file sync client.",
+        "description": "OneDrive is a cloud storage service provided by Microsoft, allowing users to store and share files securely across devices.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=onedrive.live.com&sz=128",
         "accentColor": "#0078D4",
         "essential": false,
         "webUrl": "https://onedrive.live.com",
         "version": "26.150.0804.0011",
-        "size": "124.5 MB"
+        "size": "124.5 MB",
+        "source": "winget"
     },
     {
         "id": "ONLYOFFICE.DesktopEditors",
@@ -3963,13 +4084,14 @@
         "id": "AgileBits.1Password",
         "name": "1Password",
         "category": "Security",
-        "description": "Password manager and secure item vault.",
+        "description": "1Password is a password manager that allows you to store and manage your passwords securely.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=1password.com&sz=128",
         "accentColor": "#0070F4",
         "essential": false,
         "webUrl": "https://1password.com",
         "version": "8.12.36.40",
-        "size": "458.5 MB"
+        "size": "458.5 MB",
+        "source": "winget"
     },
     {
         "id": "AgileBits.1Password.CLI",
@@ -4014,13 +4136,14 @@
         "id": "Bitwarden.Bitwarden",
         "name": "Bitwarden",
         "category": "Security",
-        "description": "Password manager for secure vaults, logins, and secrets.",
+        "description": "Bitwarden is an open-source password management solution. It allows users to store and manage their passwords in a secure and encrypted vault, accessible across multiple devices.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=bitwarden.com&sz=128",
         "accentColor": "#175DDC",
         "essential": false,
         "webUrl": "https://bitwarden.com",
         "version": "2026.9.0",
-        "size": "0.7 MB"
+        "size": "0.7 MB",
+        "source": "winget"
     },
     {
         "id": "Bitwarden.CLI",
@@ -4117,13 +4240,14 @@
         "id": "KeePassXCTeam.KeePassXC",
         "name": "KeePassXC",
         "category": "Security",
-        "description": "Offline password manager compatible with KeePass databases.",
+        "description": "KeePassXC is a modern, secure, and open-source password manager that stores and manages your most sensitive information. You can run KeePassXC on Windows, macOS, and Linux systems. KeePassXC is for people with extremely high demands of secure personal data management. It saves many different types of information, such as usernames, passwords, URLs, attachments, and notes in an offline, encrypted file that can be stored in any location, including private and public cloud solutions. For easy identification and management, user-defined titles and icons can be specified for entries. In addition, entries are sorted into customizable groups. An integrated search function allows you to use advanced patterns to easily find any entry in your database. A customizable, fast, and easy-to-use password generator utility allows you to create passwords with any combination of characters or easy to remember passphrases.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=keepassxc.org&sz=128",
         "accentColor": "#6CAC4D",
         "essential": false,
         "webUrl": "https://keepassxc.org",
         "version": "2.7.12",
-        "size": "34.2 MB"
+        "size": "34.2 MB",
+        "source": "winget"
     },
     {
         "id": "NordSecurity.NordLocker",
@@ -4220,13 +4344,14 @@
         "id": "7zip.7zip",
         "name": "7-Zip",
         "category": "Utilities",
-        "description": "Archive manager for common compressed formats.",
+        "description": "7-Zip is a free and open-source file archiver utility. It supports several compression formats and provides a high compression ratio, making it a popular choice for file compression.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=7-zip.org&sz=128",
         "accentColor": "#46637F",
         "essential": true,
         "webUrl": "https://7-zip.org",
         "version": "26.03",
-        "size": "1.9 MB"
+        "size": "1.9 MB",
+        "source": "winget"
     },
     {
         "id": "Balena.Etcher",
@@ -4238,7 +4363,8 @@
         "essential": false,
         "webUrl": "https://balena.io/etcher",
         "version": "2.1.7",
-        "size": "190.8 MB"
+        "size": "190.8 MB",
+        "source": "winget"
     },
     {
         "id": "BleachBit.BleachBit",
@@ -4250,7 +4376,8 @@
         "essential": false,
         "webUrl": "https://bleachbit.org",
         "version": "6.0.4",
-        "size": "16.4 MB"
+        "size": "16.4 MB",
+        "source": "winget"
     },
     {
         "id": "Klocman.BulkCrapUninstaller",
@@ -4269,25 +4396,27 @@
         "id": "CrystalDewWorld.CrystalDiskInfo",
         "name": "CrystalDiskInfo",
         "category": "Utilities",
-        "description": "Storage health and SMART status monitor.",
+        "description": "Crystal Disk Info is a disk health monitoring tool that provides information about the status and performance of hard drives. It helps users anticipate potential issues and monitor drive health.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=crystalmark.info&sz=128",
         "accentColor": "#4FC3F7",
         "essential": false,
         "webUrl": "https://crystalmark.info",
         "version": "9.9.2",
-        "size": "5.9 MB"
+        "size": "5.9 MB",
+        "source": "winget"
     },
     {
         "id": "CrystalDewWorld.CrystalDiskMark",
         "name": "CrystalDiskMark",
         "category": "Utilities",
-        "description": "Storage benchmark utility.",
+        "description": "Crystal Disk Mark is a disk benchmarking tool that measures the read and write speeds of storage devices. It helps users assess the performance of their hard drives and SSDs.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=crystalmark.info&sz=128",
         "accentColor": "#81D4FA",
         "essential": false,
         "webUrl": "https://crystalmark.info",
         "version": "9.0.3",
-        "size": "4.3 MB"
+        "size": "4.3 MB",
+        "source": "winget"
     },
     {
         "id": "File-New-Project.EarTrumpet",
@@ -4306,13 +4435,14 @@
         "id": "voidtools.Everything",
         "name": "Everything",
         "category": "Utilities",
-        "description": "Instant file and folder search for Windows.",
+        "description": "Everything is a search engine that locates files and folders by filename instantly for Windows. Unlike Windows search Everything initially displays every file and folder on your computer (hence the name Everything). You type in a search filter to limit what files and folders are displayed.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=voidtools.com&sz=128",
         "accentColor": "#F2C94C",
         "essential": true,
         "webUrl": "https://voidtools.com",
         "version": "1.4.1.1032",
-        "size": "2.2 MB"
+        "size": "2.2 MB",
+        "source": "winget"
     },
     {
         "id": "flux.flux",
@@ -4337,7 +4467,8 @@
         "essential": false,
         "webUrl": "https://flameshot.org",
         "version": "14.0.0",
-        "size": "18.1 MB"
+        "size": "18.1 MB",
+        "source": "winget"
     },
     {
         "id": "Flow-Launcher.Flow-Launcher",
@@ -4362,7 +4493,8 @@
         "essential": false,
         "webUrl": "https://getgreenshot.org",
         "version": "1.3.315",
-        "size": "3.8 MB"
+        "size": "3.8 MB",
+        "source": "winget"
     },
     {
         "id": "Bopsoft.Listary",
@@ -4387,19 +4519,21 @@
         "essential": false,
         "webUrl": "https://malwarebytes.com",
         "version": "5.7.1.346",
-        "size": "407.8 MB"
+        "size": "407.8 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.PowerToys",
         "name": "Microsoft PowerToys",
         "category": "Utilities",
-        "description": "Windows power-user utilities including FancyZones and quick tools.",
+        "description": "PowerToys is a set of utilities for power users to enhance productivity, featuring tools like FancyZones, PowerRename, and more.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=learn.microsoft.com/windows/powertoys&sz=128",
         "accentColor": "#0078D4",
         "essential": true,
         "webUrl": "https://learn.microsoft.com/windows/powertoys",
         "version": "0.101.2362.0",
-        "size": "282.6 MB"
+        "size": "282.6 MB",
+        "source": "winget"
     },
     {
         "id": "Nilesoft.Shell",
@@ -4418,13 +4552,14 @@
         "id": "qBittorrent.qBittorrent",
         "name": "qBittorrent",
         "category": "Utilities",
-        "description": "Open-source BitTorrent client.",
+        "description": "qBittorrent is a free and open-source BitTorrent client that aims to provide a feature-rich and lightweight alternative to other torrent clients.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=qbittorrent.org&sz=128",
         "accentColor": "#2F67BA",
         "essential": false,
         "webUrl": "https://qbittorrent.org",
         "version": "5.2.3",
-        "size": "41.1 MB"
+        "size": "41.1 MB",
+        "source": "winget"
     },
     {
         "id": "QL-Win.QuickLook",
@@ -4456,37 +4591,40 @@
         "id": "RevoUninstaller.RevoUninstaller",
         "name": "Revo Uninstaller",
         "category": "Utilities",
-        "description": "App uninstaller and cleanup utility.",
+        "description": "Revo Uninstaller is an advanced uninstaller tool that helps you remove unwanted software and clean up your system.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=revouninstaller.com&sz=128",
         "accentColor": "#1E88E5",
         "essential": false,
         "webUrl": "https://revouninstaller.com",
         "version": "2.1.7",
-        "size": "7.1 MB"
+        "size": "7.1 MB",
+        "source": "winget"
     },
     {
         "id": "Rufus.Rufus",
         "name": "Rufus",
         "category": "Utilities",
-        "description": "Create bootable USB drives for Windows and Linux installers.",
+        "description": "Rufus is a utility that helps format and create bootable USB drives, such as USB keys or pen drives.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=rufus.ie&sz=128",
         "accentColor": "#2C7BE5",
         "essential": false,
         "webUrl": "https://rufus.ie",
         "version": "4.15",
-        "size": "1.9 MB"
+        "size": "1.9 MB",
+        "source": "winget"
     },
     {
         "id": "ShareX.ShareX",
         "name": "ShareX",
         "category": "Utilities",
-        "description": "Screenshot, screen capture, OCR, and sharing tool.",
+        "description": "ShareX is a free and open-source screen capture and file sharing tool. It supports various capture methods and offers advanced features for editing and sharing screenshots.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=getsharex.com&sz=128",
         "accentColor": "#2780D8",
         "essential": false,
         "webUrl": "https://getsharex.com",
         "version": "21.0.0",
-        "size": "132.7 MB"
+        "size": "132.7 MB",
+        "source": "winget"
     },
     {
         "id": "Microsoft.Sysinternals.Suite",
@@ -4498,7 +4636,8 @@
         "essential": false,
         "webUrl": "https://learn.microsoft.com/sysinternals",
         "version": "2026-07-09",
-        "size": "192.2 MB"
+        "size": "192.2 MB",
+        "source": "winget"
     },
     {
         "id": "CharlesMilette.TranslucentTB",
@@ -4543,13 +4682,14 @@
         "id": "Ventoy.Ventoy",
         "name": "Ventoy",
         "category": "Utilities",
-        "description": "Create multi-ISO bootable USB drives.",
+        "description": "Ventoy is an open-source tool for creating bootable USB drives. It supports multiple ISO files on a single USB drive, making it a versatile solution for installing operating systems.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=ventoy.net&sz=128",
         "accentColor": "#00A7E1",
         "essential": false,
         "webUrl": "https://ventoy.net",
         "version": "1.1.17",
-        "size": "15.9 MB"
+        "size": "15.9 MB",
+        "source": "winget"
     },
     {
         "id": "WinDirStat.WinDirStat",
@@ -4561,31 +4701,34 @@
         "essential": false,
         "webUrl": "https://windirstat.net",
         "version": "2.8.0",
-        "size": "2.8 MB"
+        "size": "2.8 MB",
+        "source": "winget"
     },
     {
         "id": "RARLab.WinRAR",
         "name": "WinRAR",
         "category": "Utilities",
-        "description": "Archive manager for RAR, ZIP, and compressed files.",
+        "description": "WinRAR is a powerful archive manager that allows you to create, manage, and extract compressed files.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=win-rar.com&sz=128",
         "accentColor": "#8B5CF6",
         "essential": false,
         "webUrl": "https://win-rar.com",
         "version": "7.23.0",
-        "size": "3.6 MB"
+        "size": "3.6 MB",
+        "source": "winget"
     },
     {
         "id": "AntibodySoftware.WizTree",
         "name": "WizTree",
         "category": "Utilities",
-        "description": "Fast disk space analyzer for large drives.",
+        "description": "WizTree is a fast disk space analyzer that helps you quickly find the files and folders consuming the most space on your hard drive.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=diskanalyzer.com&sz=128",
         "accentColor": "#1E88E5",
         "essential": false,
         "webUrl": "https://diskanalyzer.com",
         "version": "4.33",
-        "size": "4.9 MB"
+        "size": "4.9 MB",
+        "source": "winget"
     },
     {
         "id": "Adobe.CreativeCloud",
@@ -4597,19 +4740,21 @@
         "essential": false,
         "webUrl": "https://adobe.com",
         "version": "6.10.0.252.41",
-        "size": "296 MB"
+        "size": "296 MB",
+        "source": "winget"
     },
     {
         "id": "Audacity.Audacity",
         "name": "Audacity",
         "category": "Video Editing",
-        "description": "Audio recording and editing for content creators.",
+        "description": "Audacity is a free and open-source audio editing software known for its powerful recording and editing capabilities.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=audacityteam.org&sz=128",
         "accentColor": "#1C4DFF",
         "essential": false,
         "webUrl": "https://audacityteam.org",
         "version": "4.0.0.262451524",
-        "size": "47.2 MB"
+        "size": "47.2 MB",
+        "source": "winget"
     },
     {
         "id": "Avidemux.Avidemux",
@@ -4634,7 +4779,8 @@
         "essential": false,
         "webUrl": "https://capcut.com",
         "version": "9.4.0.4015",
-        "size": "531.4 MB"
+        "size": "531.4 MB",
+        "source": "winget"
     },
     {
         "id": "Elgato.StreamDeck",
@@ -4646,7 +4792,8 @@
         "essential": false,
         "webUrl": "https://elgato.com",
         "version": "7.6.0.23012",
-        "size": "208.9 MB"
+        "size": "208.9 MB",
+        "source": "winget"
     },
     {
         "id": "Gyan.FFmpeg",
@@ -4658,19 +4805,21 @@
         "essential": false,
         "webUrl": "https://ffmpeg.org",
         "version": "9.0.2",
-        "size": "245.8 MB"
+        "size": "245.8 MB",
+        "source": "winget"
     },
     {
         "id": "HandBrake.HandBrake",
         "name": "HandBrake",
         "category": "Video Editing",
-        "description": "Video transcoder and compression tool.",
+        "description": "HandBrake is an open-source video transcoder, allowing you to convert video from nearly any format to a selection of widely supported codecs.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=handbrake.fr&sz=128",
         "accentColor": "#8BC34A",
         "essential": false,
         "webUrl": "https://handbrake.fr",
         "version": "1.11.2",
-        "size": "24.2 MB"
+        "size": "24.2 MB",
+        "source": "winget"
     },
     {
         "id": "ImageMagick.ImageMagick",
@@ -4682,7 +4831,8 @@
         "essential": false,
         "webUrl": "https://imagemagick.org",
         "version": "7.1.2.31",
-        "size": "23.1 MB"
+        "size": "23.1 MB",
+        "source": "winget"
     },
     {
         "id": "KDE.Kdenlive",
@@ -4694,7 +4844,8 @@
         "essential": false,
         "webUrl": "https://kdenlive.org",
         "version": "26.08.1",
-        "size": "277 MB"
+        "size": "277 MB",
+        "source": "winget"
     },
     {
         "id": "LWKS.Lightworks",
@@ -4752,13 +4903,14 @@
         "id": "OBSProject.OBSStudio",
         "name": "OBS Studio",
         "category": "Video Editing",
-        "description": "Screen recording, streaming, and capture studio.",
+        "description": "OBS Studio is a free and open-source software for video recording and live streaming. It supports real-time video/audio capturing and mixing, making it popular among content creators.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=obsproject.com&sz=128",
         "accentColor": "#302E31",
         "essential": false,
         "webUrl": "https://obsproject.com",
         "version": "32.2.2",
-        "size": "152.4 MB"
+        "size": "152.4 MB",
+        "source": "winget"
     },
     {
         "id": "OliveTeam.OliveVideoEditor",
@@ -4796,7 +4948,8 @@
         "essential": false,
         "webUrl": "https://shotcut.org",
         "version": "26.8.1",
-        "size": "155.1 MB"
+        "size": "155.1 MB",
+        "source": "winget"
     },
     {
         "id": "Nikse.SubtitleEdit",
@@ -4834,7 +4987,8 @@
         "essential": false,
         "webUrl": "https://github.com",
         "version": "2026.08.19",
-        "size": "17 MB"
+        "size": "17 MB",
+        "source": "winget"
     },
     {
         "id": "Debian.Debian",
@@ -5074,13 +5228,14 @@
         "id": "Oracle.VirtualBox",
         "name": "VirtualBox",
         "category": "Virtualization",
-        "description": "Virtual machine platform for testing Windows, Linux, and labs.",
+        "description": "Oracle VirtualBox is a powerful and free open-source virtualization tool for x86 and AMD64/Intel64 architectures.",
         "iconUrl": "https://www.google.com/s2/favicons?domain=virtualbox.org&sz=128",
         "accentColor": "#183A61",
         "essential": false,
         "webUrl": "https://virtualbox.org",
         "version": "7.2.20",
-        "size": "169.9 MB"
+        "size": "169.9 MB",
+        "source": "winget"
     },
     {
         "id": "VMPlex.VMPlex",
@@ -5757,12 +5912,13 @@
         "version": "10.0.3",
         "iconUrl": "https://www.google.com/s2/favicons?domain=zotero.org&sz=128",
         "category": "Research & Science",
-        "description": "Premier open-source research and citation manager for academic publications and bibliographies.",
+        "description": "Zotero is a free, easy-to-use tool to help you collect, organize, cite, and share your research materials.",
         "essential": true,
         "name": "Zotero",
         "webUrl": "https://www.zotero.org",
         "size": "78 MB",
-        "accentColor": "#CC292B"
+        "accentColor": "#CC292B",
+        "source": "winget"
     },
     {
         "id": "Anki.Anki",
@@ -6151,7 +6307,8 @@
         "name": "GNU Octave",
         "webUrl": "https://octave.org",
         "size": "410 MB",
-        "accentColor": "#F08422"
+        "accentColor": "#F08422",
+        "source": "winget"
     },
     {
         "id": "Elsevier.MendeleyReferenceManager",
@@ -6163,7 +6320,8 @@
         "name": "Mendeley Reference Manager",
         "webUrl": "https://www.mendeley.com",
         "size": "142 MB",
-        "accentColor": "#A6192E"
+        "accentColor": "#A6192E",
+        "source": "winget"
     },
     {
         "id": "JabRef.JabRef",
@@ -6175,7 +6333,8 @@
         "name": "JabRef",
         "webUrl": "https://www.jabref.org",
         "size": "188 MB",
-        "accentColor": "#2A6496"
+        "accentColor": "#2A6496",
+        "source": "winget"
     },
     {
         "id": "RProject.R",
@@ -6187,7 +6346,8 @@
         "name": "R for Windows",
         "webUrl": "https://www.r-project.org",
         "size": "92 MB",
-        "accentColor": "#276DC3"
+        "accentColor": "#276DC3",
+        "source": "winget"
     },
     {
         "id": "Posit.Quarto",
@@ -6199,7 +6359,8 @@
         "name": "Quarto CLI",
         "webUrl": "https://quarto.org",
         "size": "118 MB",
-        "accentColor": "#447099"
+        "accentColor": "#447099",
+        "source": "winget"
     },
     {
         "id": "TeXstudio.TeXstudio",
@@ -6211,7 +6372,8 @@
         "name": "TeXstudio",
         "webUrl": "https://www.texstudio.org",
         "size": "132 MB",
-        "accentColor": "#2A72D4"
+        "accentColor": "#2A72D4",
+        "source": "winget"
     },
     {
         "id": "Texmaker.Texmaker",
@@ -6223,7 +6385,8 @@
         "name": "Texmaker",
         "webUrl": "https://www.xm1math.net/texmaker/",
         "size": "86 MB",
-        "accentColor": "#1D70B8"
+        "accentColor": "#1D70B8",
+        "source": "winget"
     },
     {
         "id": "LyX.LyX",
@@ -6235,7 +6398,8 @@
         "name": "LyX Document Processor",
         "webUrl": "https://www.lyx.org",
         "size": "165 MB",
-        "accentColor": "#005588"
+        "accentColor": "#005588",
+        "source": "winget"
     },
     {
         "id": "JohnMacFarlane.Pandoc",
@@ -6247,7 +6411,8 @@
         "name": "Pandoc",
         "webUrl": "https://pandoc.org",
         "size": "45 MB",
-        "accentColor": "#1B4F72"
+        "accentColor": "#1B4F72",
+        "source": "winget"
     },
     {
         "id": "OSGeo.QGIS",
@@ -6259,7 +6424,8 @@
         "name": "QGIS",
         "webUrl": "https://qgis.org",
         "size": "1.2 GB",
-        "accentColor": "#589632"
+        "accentColor": "#589632",
+        "source": "winget"
     },
     {
         "id": "UniversityOfAmsterdam.JASP",
@@ -6271,7 +6437,8 @@
         "name": "JASP",
         "webUrl": "https://jasp-stats.org",
         "size": "920 MB",
-        "accentColor": "#0088CC"
+        "accentColor": "#0088CC",
+        "source": "winget"
     },
     {
         "id": "Jamovi.Desktop.Current",
@@ -6283,7 +6450,8 @@
         "name": "Jamovi",
         "webUrl": "https://www.jamovi.org",
         "size": "480 MB",
-        "accentColor": "#2C3E50"
+        "accentColor": "#2C3E50",
+        "source": "winget"
     },
     {
         "id": "UniversityOfLjubljana.Orange",
@@ -6295,7 +6463,8 @@
         "name": "Orange Data Mining",
         "webUrl": "https://orangedatamining.com",
         "size": "830 MB",
-        "accentColor": "#FF6600"
+        "accentColor": "#FF6600",
+        "source": "winget"
     },
     {
         "id": "gnuplot.gnuplot",
@@ -6307,7 +6476,8 @@
         "name": "Gnuplot",
         "webUrl": "http://www.gnuplot.info",
         "size": "35 MB",
-        "accentColor": "#4A90E2"
+        "accentColor": "#4A90E2",
+        "source": "winget"
     },
     {
         "id": "Gephi.Gephi",
@@ -6319,7 +6489,8 @@
         "name": "Gephi",
         "webUrl": "https://gephi.org",
         "size": "135 MB",
-        "accentColor": "#E67E22"
+        "accentColor": "#E67E22",
+        "source": "winget"
     },
     {
         "id": "Fiji.ImageJ",
@@ -6331,7 +6502,8 @@
         "name": "Fiji (ImageJ)",
         "webUrl": "https://fiji.sc",
         "size": "450 MB",
-        "accentColor": "#00A86B"
+        "accentColor": "#00A86B",
+        "source": "winget"
     },
     {
         "id": "Avogadro.Avogadro",
@@ -6343,33 +6515,8 @@
         "name": "Avogadro",
         "webUrl": "https://avogadro.cc",
         "size": "48 MB",
-        "accentColor": "#16A085"
-    },
-    {
-        "id": "AgileBits.1Password",
-        "source": "winget",
-        "name": "1Password",
-        "category": "Utilities",
-        "description": "1Password is a password manager that allows you to store and manage your passwords securely.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=1password.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://1password.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "7zip.7zip",
-        "source": "winget",
-        "name": "7-Zip",
-        "category": "Utilities",
-        "description": "7-Zip is a free and open-source file archiver utility. It supports several compression formats and provides a high compression ratio, making it a popular choice for file compression.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=7-zip.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.7-zip.org/",
-        "version": "Latest",
-        "size": ""
+        "accentColor": "#16A085",
+        "source": "winget"
     },
     {
         "id": "amir1376.ABDownloadManager",
@@ -6381,32 +6528,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://abdownloadmanager.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "AnyDesk.AnyDesk",
-        "source": "winget",
-        "name": "AnyDesk",
-        "category": "Utilities",
-        "description": "AnyDesk is a remote desktop software that enables users to access and control computers remotely. It is known for its fast connection and low latency.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=anydesk.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://anydesk.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Audacity.Audacity",
-        "source": "winget",
-        "name": "Audacity",
-        "category": "Media & Streaming",
-        "description": "Audacity is a free and open-source audio editing software known for its powerful recording and editing capabilities.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=audacityteam.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.audacityteam.org/",
         "version": "Latest",
         "size": ""
     },
@@ -6433,58 +6554,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://learn.microsoft.com/en-us/sysinternals/downloads/rdcman",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Blizzard.BattleNet",
-        "source": "winget",
-        "name": "Battle.net",
-        "category": "Gaming",
-        "description": "Battle.net is a launcher for games created and developed by Activision Blizzard",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=battle.net&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://battle.net",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Bitwarden.Bitwarden",
-        "source": "winget",
-        "name": "Bitwarden",
-        "category": "Utilities",
-        "description": "Bitwarden is an open-source password management solution. It allows users to store and manage their passwords in a secure and encrypted vault, accessible across multiple devices.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=bitwarden.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://bitwarden.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "BlenderFoundation.Blender",
-        "source": "winget",
-        "name": "Blender (3D Graphics)",
-        "category": "Media & Streaming",
-        "description": "Blender is a powerful open-source 3D creation suite, offering modeling, sculpting, animation, and rendering tools.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=blender.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.blender.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Brave.Brave",
-        "source": "winget",
-        "name": "Brave",
-        "category": "Browsers",
-        "description": "Brave is a privacy-focused web browser that blocks ads and trackers, offering a faster and safer browsing experience.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=brave.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.brave.com",
         "version": "Latest",
         "size": ""
     },
@@ -6554,19 +6623,6 @@
         "size": ""
     },
     {
-        "id": "Google.Chrome",
-        "source": "winget",
-        "name": "Chrome",
-        "category": "Browsers",
-        "description": "Google Chrome is a widely used web browser known for its speed, simplicity, and seamless integration with Google services.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=google.com/chrome&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.google.com/chrome/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Maxon.CinebenchR23",
         "source": "winget",
         "name": "Cinebench R23",
@@ -6580,19 +6636,6 @@
         "size": ""
     },
     {
-        "id": "Kitware.CMake",
-        "source": "winget",
-        "name": "CMake",
-        "category": "Developer",
-        "description": "CMake is an open-source, cross-platform family of tools designed to build, test and package software.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=cmake.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://cmake.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "OpenAI.Codex",
         "source": "winget",
         "name": "Codex",
@@ -6602,71 +6645,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://developers.openai.com/codex/cli",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "CPUID.CPU-Z",
-        "source": "winget",
-        "name": "CPU-Z",
-        "category": "Utilities",
-        "description": "CPU-Z is a system monitoring and diagnostic tool for Windows. It provides detailed information about the computer's hardware components, including the CPU, memory, and motherboard.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=cpuid.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.cpuid.com/softwares/cpu-z.html",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "CrystalDewWorld.CrystalDiskInfo",
-        "source": "winget",
-        "name": "Crystal Disk Info",
-        "category": "Utilities",
-        "description": "Crystal Disk Info is a disk health monitoring tool that provides information about the status and performance of hard drives. It helps users anticipate potential issues and monitor drive health.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=crystalmark.info&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://crystalmark.info/en/software/crystaldiskinfo/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "CrystalDewWorld.CrystalDiskMark",
-        "source": "winget",
-        "name": "Crystal Disk Mark",
-        "category": "Utilities",
-        "description": "Crystal Disk Mark is a disk benchmarking tool that measures the read and write speeds of storage devices. It helps users assess the performance of their hard drives and SSDs.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=crystalmark.info&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://crystalmark.info/en/software/crystaldiskmark/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Wagnardsoft.DisplayDriverUninstaller",
-        "source": "winget",
-        "name": "Display Driver Uninstaller",
-        "category": "Utilities",
-        "description": "Display Driver Uninstaller (DDU) is a tool for completely uninstalling graphics drivers from NVIDIA, AMD, and Intel. It is useful for troubleshooting graphics driver-related issues.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=wagnardsoft.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.wagnardsoft.com/display-driver-uninstaller-DDU-",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Discord.Discord",
-        "source": "winget",
-        "name": "Discord",
-        "category": "Communication",
-        "description": "Discord is a popular communication platform with voice, video, and text chat, designed for gamers but used by a wide range of communities.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=discord.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://discord.com/",
         "version": "Latest",
         "size": ""
     },
@@ -6710,32 +6688,6 @@
         "size": ""
     },
     {
-        "id": "Docker.DockerDesktop",
-        "source": "winget",
-        "name": "Docker Desktop",
-        "category": "Developer",
-        "description": "Docker Desktop provides a local environment for building, running, and testing containerized applications on Windows.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=docker.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.docker.com/products/docker-desktop/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Microsoft.DotNet.DesktopRuntime.8",
-        "source": "winget",
-        "name": ".NET Desktop Runtime 8",
-        "category": "Developer",
-        "description": ".NET Desktop Runtime 8 is a runtime environment required for running applications developed with .NET 8.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=dotnet.microsoft.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://dotnet.microsoft.com/download/dotnet/8.0",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Microsoft.DotNet.DesktopRuntime.10",
         "source": "winget",
         "name": ".NET Desktop Runtime 10",
@@ -6745,45 +6697,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://dotnet.microsoft.com/download/dotnet/10.0",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Dropbox.Dropbox",
-        "source": "winget",
-        "name": "Dropbox",
-        "category": "Utilities",
-        "description": "Dropbox is a cloud storage client for syncing files, sharing content, and keeping documents available across devices.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=dropbox.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.dropbox.com/desktop",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "ElectronicArts.EADesktop",
-        "source": "winget",
-        "name": "EA App",
-        "category": "Gaming",
-        "description": "EA App is a platform for accessing and playing Electronic Arts games.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=ea.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.ea.com/ea-app",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Microsoft.Edge",
-        "source": "winget",
-        "name": "Edge",
-        "category": "Browsers",
-        "description": "Microsoft Edge is a modern web browser built on Chromium, offering performance, security, and integration with Microsoft services.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=microsoft.com/edge&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.microsoft.com/edge",
         "version": "Latest",
         "size": ""
     },
@@ -6814,19 +6727,6 @@
         "size": ""
     },
     {
-        "id": "EpicGames.EpicGamesLauncher",
-        "source": "winget",
-        "name": "Epic Games Launcher",
-        "category": "Gaming",
-        "description": "Epic Games Launcher is the client for accessing and playing games from the Epic Games Store.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=epicgames.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.epicgames.com/store/en-US/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "FilesCommunity.Files",
         "source": "winget",
         "name": "Files",
@@ -6853,19 +6753,6 @@
         "size": ""
     },
     {
-        "id": "Mozilla.Firefox",
-        "source": "winget",
-        "name": "Firefox",
-        "category": "Browsers",
-        "description": "Mozilla Firefox is an open-source web browser known for its customization options, privacy features, and extensions.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=mozilla.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.mozilla.org/en-US/firefox/new/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Schniz.fnm",
         "source": "winget",
         "name": "Fast Node Manager",
@@ -6875,19 +6762,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://github.com/Schniz/fnm",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Nvidia.GeForceNow",
-        "source": "winget",
-        "name": "GeForce NOW",
-        "category": "Gaming",
-        "description": "GeForce NOW is a cloud gaming service that allows you to play high-quality PC games on your device.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=nvidia.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.nvidia.com/en-us/geforce-now/",
         "version": "Latest",
         "size": ""
     },
@@ -6905,19 +6779,6 @@
         "size": ""
     },
     {
-        "id": "Git.Git",
-        "source": "winget",
-        "name": "Git",
-        "category": "Developer",
-        "description": "Git is a distributed version control system widely used for tracking changes in source code during software development.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=git-scm.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://git-scm.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "GitExtensionsTeam.GitExtensions",
         "source": "winget",
         "name": "Git Extensions",
@@ -6927,84 +6788,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://gitextensions.github.io/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "GitHub.cli",
-        "source": "winget",
-        "name": "GitHub CLI",
-        "category": "Developer",
-        "description": "GitHub CLI brings pull requests, issues, releases, and other GitHub workflows to the terminal.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=cli.github.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://cli.github.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "GitHub.GitHubDesktop",
-        "source": "winget",
-        "name": "GitHub Desktop",
-        "category": "Developer",
-        "description": "GitHub Desktop is a visual Git client that simplifies collaboration on GitHub repositories with an easy-to-use interface.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=desktop.github.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://desktop.github.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "GOG.Galaxy",
-        "source": "winget",
-        "name": "GOG Galaxy",
-        "category": "Gaming",
-        "description": "GOG Galaxy is a gaming client that offers DRM-free games, additional content, and more.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=gog.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.gog.com/galaxy",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "GoLang.Go",
-        "source": "winget",
-        "name": "Go",
-        "category": "Developer",
-        "description": "Go (or Golang) is a statically typed, compiled programming language designed for simplicity, reliability, and efficiency.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=go.dev&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://go.dev/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Google.GoogleDrive",
-        "source": "winget",
-        "name": "Google Drive",
-        "category": "Utilities",
-        "description": "File syncing across devices all tied to your Google account.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=drive.google.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.google.com/drive/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "TechPowerUp.GPU-Z",
-        "source": "winget",
-        "name": "GPU-Z",
-        "category": "Utilities",
-        "description": "GPU-Z provides detailed information about your graphics card and GPU.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=techpowerup.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.techpowerup.com/gpuz/",
         "version": "Latest",
         "size": ""
     },
@@ -7044,45 +6827,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://gohugo.io",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "HandBrake.HandBrake",
-        "source": "winget",
-        "name": "HandBrake",
-        "category": "Media & Streaming",
-        "description": "HandBrake is an open-source video transcoder, allowing you to convert video from nearly any format to a selection of widely supported codecs.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=handbrake.fr&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://handbrake.fr/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "REALiX.HWiNFO",
-        "source": "winget",
-        "name": "HWiNFO",
-        "category": "Utilities",
-        "description": "HWiNFO provides comprehensive hardware information and diagnostics for Windows.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=hwinfo.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.hwinfo.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "CPUID.HWMonitor",
-        "source": "winget",
-        "name": "HWMonitor",
-        "category": "Utilities",
-        "description": "HWMonitor is a hardware monitoring program that reads PC systems main health sensors.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=cpuid.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.cpuid.com/softwares/hwmonitor.html",
         "version": "Latest",
         "size": ""
     },
@@ -7191,19 +6935,6 @@
         "size": ""
     },
     {
-        "id": "JetBrains.Toolbox",
-        "source": "winget",
-        "name": "Jetbrains Toolbox",
-        "category": "Developer",
-        "description": "Jetbrains Toolbox is a platform for easy installation and management of JetBrains developer tools.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=jetbrains.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.jetbrains.com/toolbox/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "sylikc.JPEGView",
         "source": "winget",
         "name": "JPEG View",
@@ -7217,19 +6948,6 @@
         "size": ""
     },
     {
-        "id": "KeePassXCTeam.KeePassXC",
-        "source": "winget",
-        "name": "KeePassXC",
-        "category": "Utilities",
-        "description": "KeePassXC is a modern, secure, and open-source password manager that stores and manages your most sensitive information. You can run KeePassXC on Windows, macOS, and Linux systems. KeePassXC is for people with extremely high demands of secure personal data management. It saves many different types of information, such as usernames, passwords, URLs, attachments, and notes in an offline, encrypted file that can be stored in any location, including private and public cloud solutions. For easy identification and management, user-defined titles and icons can be specified for entries. In addition, entries are sorted into customizable groups. An integrated search function allows you to use advanced patterns to easily find any entry in your database. A customizable, fast, and easy-to-use password generator utility allows you to create passwords with any combination of characters or easy to remember passphrases.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=keepassxc.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://keepassxc.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "JesseDuffield.lazygit",
         "source": "winget",
         "name": "Lazygit",
@@ -7239,19 +6957,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://github.com/jesseduffield/lazygit/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "TheDocumentFoundation.LibreOffice",
-        "source": "winget",
-        "name": "LibreOffice",
-        "category": "Productivity",
-        "description": "LibreOffice is a powerful and free office suite, compatible with other major office suites.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=libreoffice.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.libreoffice.org/",
         "version": "Latest",
         "size": ""
     },
@@ -7308,19 +7013,6 @@
         "size": ""
     },
     {
-        "id": "MoonlightGameStreamingProject.Moonlight",
-        "source": "winget",
-        "name": "Moonlight/GameStream Client",
-        "category": "Networking",
-        "description": "Moonlight/GameStream Client allows you to stream PC games to other devices over your local network.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=moonlight-stream.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://moonlight-stream.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "rcmaehl.MSEdgeRedirect",
         "source": "winget",
         "name": "MSEdgeRedirect",
@@ -7330,19 +7022,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://github.com/rcmaehl/MSEdgeRedirect",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Guru3D.Afterburner",
-        "source": "winget",
-        "name": "MSI Afterburner",
-        "category": "Utilities",
-        "description": "MSI Afterburner is a graphics card overclocking utility with advanced features.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=msi.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.msi.com/Landing/afterburner",
         "version": "Latest",
         "size": ""
     },
@@ -7373,32 +7052,6 @@
         "size": ""
     },
     {
-        "id": "Tailscale.Tailscale",
-        "source": "winget",
-        "name": "Tailscale",
-        "category": "Utilities",
-        "description": "The Tailscale client allows you to connect all your devices using WireGuard®, without the hassle. Tailscale makes it as easy as installing an app and signing in.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=tailscale.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://tailscale.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Neovim.Neovim",
-        "source": "winget",
-        "name": "Neovim",
-        "category": "Developer",
-        "description": "Neovim is a highly extensible text editor and an improvement over the original Vim editor.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=neovim.io&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://neovim.io/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Nextcloud.NextcloudDesktop",
         "source": "winget",
         "name": "Nextcloud Desktop",
@@ -7425,45 +7078,6 @@
         "size": ""
     },
     {
-        "id": "OpenJS.NodeJS.LTS",
-        "source": "winget",
-        "name": "NodeJS LTS",
-        "category": "Developer",
-        "description": "NodeJS LTS provides Long-Term Support releases for stable and reliable server-side JavaScript development.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=nodejs.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://nodejs.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "pnpm.pnpm",
-        "source": "winget",
-        "name": "pnpm",
-        "category": "Developer",
-        "description": "pnpm is a fast and disk space efficient package manager for JavaScript and Node.js applications.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=pnpm.io&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://pnpm.io/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Notepad++.Notepad++",
-        "source": "winget",
-        "name": "Notepad++",
-        "category": "Media & Streaming",
-        "description": "Notepad++ is a free, open-source code editor and Notepad replacement with support for multiple languages.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=notepad-plus-plus.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://notepad-plus-plus.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Microsoft.NuGet",
         "source": "winget",
         "name": "NuGet",
@@ -7477,45 +7091,6 @@
         "size": ""
     },
     {
-        "id": "TechPowerUp.NVCleanstall",
-        "source": "winget",
-        "name": "NVCleanstall",
-        "category": "Utilities",
-        "description": "NVCleanstall is a tool designed to customize NVIDIA driver installations, allowing advanced users to control more aspects of the installation process.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=techpowerup.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.techpowerup.com/nvcleanstall/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "OBSProject.OBSStudio",
-        "source": "winget",
-        "name": "OBS Studio",
-        "category": "Media & Streaming",
-        "description": "OBS Studio is a free and open-source software for video recording and live streaming. It supports real-time video/audio capturing and mixing, making it popular among content creators.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=obsproject.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://obsproject.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Obsidian.Obsidian",
-        "source": "winget",
-        "name": "Obsidian",
-        "category": "Productivity",
-        "description": "Obsidian is a powerful note-taking and knowledge management application.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=obsidian.md&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://obsidian.md/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "KDE.Okular",
         "source": "winget",
         "name": "Okular",
@@ -7525,19 +7100,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://okular.kde.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Microsoft.OneDrive",
-        "source": "winget",
-        "name": "OneDrive",
-        "category": "Developer",
-        "description": "OneDrive is a cloud storage service provided by Microsoft, allowing users to store and share files securely across devices.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=onedrive.live.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://onedrive.live.com/",
         "version": "Latest",
         "size": ""
     },
@@ -7568,32 +7130,6 @@
         "size": ""
     },
     {
-        "id": "OpenVPNTechnologies.OpenVPNConnect",
-        "source": "winget",
-        "name": "OpenVPN Connect",
-        "category": "Utilities",
-        "description": "OpenVPN Connect is a VPN client that allows you to connect securely to a VPN server. It provides a secure and encrypted connection for protecting your online privacy.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=openvpn.net&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://openvpn.net/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Oracle.VirtualBox",
-        "source": "winget",
-        "name": "Oracle VirtualBox",
-        "category": "Utilities",
-        "description": "Oracle VirtualBox is a powerful and free open-source virtualization tool for x86 and AMD64/Intel64 architectures.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=virtualbox.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.virtualbox.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Fleex255.PolicyPlus",
         "source": "winget",
         "name": "Policy Plus",
@@ -7616,19 +7152,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://learn.microsoft.com/sysinternals/downloads/process-explorer",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Parsec.Parsec",
-        "source": "winget",
-        "name": "Parsec",
-        "category": "Utilities",
-        "description": "Parsec is a low-latency, high-quality remote desktop sharing application for collaborating and gaming across devices.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=parsec.app&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://parsec.app/",
         "version": "Latest",
         "size": ""
     },
@@ -7698,45 +7221,6 @@
         "size": ""
     },
     {
-        "id": "Postman.Postman",
-        "source": "winget",
-        "name": "Postman",
-        "category": "Developer",
-        "description": "Postman is an API platform and desktop client for designing, testing, documenting, and collaborating on APIs.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=postman.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.postman.com/downloads/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Microsoft.PowerShell",
-        "source": "winget",
-        "name": "PowerShell",
-        "category": "Developer",
-        "description": "PowerShell is a task automation framework and scripting language designed for system administrators, offering powerful command-line capabilities.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=microsoft.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://github.com/PowerShell/PowerShell",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Microsoft.PowerToys",
-        "source": "winget",
-        "name": "PowerToys",
-        "category": "Developer",
-        "description": "PowerToys is a set of utilities for power users to enhance productivity, featuring tools like FancyZones, PowerRename, and more.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=microsoft.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://github.com/microsoft/PowerToys",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "BitSum.ProcessLasso",
         "source": "winget",
         "name": "Process Lasso",
@@ -7789,19 +7273,6 @@
         "size": ""
     },
     {
-        "id": "PuTTY.PuTTY",
-        "source": "winget",
-        "name": "PuTTY",
-        "category": "Utilities",
-        "description": "PuTTY is a free and open-source terminal emulator, serial console, and network file transfer application. It supports various network protocols such as SSH, Telnet, and SCP.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=putty.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.chiark.greenend.org.uk/~sgtatham/putty/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Python.Python.3.14",
         "source": "winget",
         "name": "Python3",
@@ -7811,19 +7282,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://www.python.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "qBittorrent.qBittorrent",
-        "source": "winget",
-        "name": "qBittorrent",
-        "category": "Utilities",
-        "description": "qBittorrent is a free and open-source BitTorrent client that aims to provide a feature-rich and lightweight alternative to other torrent clients.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=qbittorrent.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.qbittorrent.org/",
         "version": "Latest",
         "size": ""
     },
@@ -7854,19 +7312,6 @@
         "size": ""
     },
     {
-        "id": "RevoUninstaller.RevoUninstaller",
-        "source": "winget",
-        "name": "Revo Uninstaller",
-        "category": "Utilities",
-        "description": "Revo Uninstaller is an advanced uninstaller tool that helps you remove unwanted software and clean up your system.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=revouninstaller.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.revouninstaller.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "WiseCleaner.WiseProgramUninstaller",
         "source": "winget",
         "name": "Wise Program Uninstaller (WiseCleaner)",
@@ -7876,19 +7321,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://www.wisecleaner.com/wise-program-uninstaller.html",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Rufus.Rufus",
-        "source": "winget",
-        "name": "Rufus Imager",
-        "category": "Utilities",
-        "description": "Rufus is a utility that helps format and create bootable USB drives, such as USB keys or pen drives.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=rufus.ie&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://rufus.ie/",
         "version": "Latest",
         "size": ""
     },
@@ -7906,19 +7338,6 @@
         "size": ""
     },
     {
-        "id": "ShareX.ShareX",
-        "source": "winget",
-        "name": "ShareX (Screenshots)",
-        "category": "Media & Streaming",
-        "description": "ShareX is a free and open-source screen capture and file sharing tool. It supports various capture methods and offers advanced features for editing and sharing screenshots.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=getsharex.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://getsharex.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "WhirlwindFX.SignalRgb",
         "source": "winget",
         "name": "SignalRGB",
@@ -7928,19 +7347,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://www.signalrgb.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "SlackTechnologies.Slack",
-        "source": "winget",
-        "name": "Slack",
-        "category": "Communication",
-        "description": "Slack is a collaboration hub that connects teams and facilitates communication through channels, messaging, and file sharing.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=slack.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://slack.com/",
         "version": "Latest",
         "size": ""
     },
@@ -7958,19 +7364,6 @@
         "size": ""
     },
     {
-        "id": "Valve.Steam",
-        "source": "winget",
-        "name": "Steam",
-        "category": "Gaming",
-        "description": "Steam is a digital distribution platform for purchasing and playing video games, offering multiplayer gaming, video streaming, and more.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=store.steampowered.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://store.steampowered.com/about/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Roblox.Roblox",
         "source": "winget",
         "name": "Roblox",
@@ -7980,19 +7373,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://www.roblox.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "SublimeHQ.SublimeText.4",
-        "source": "winget",
-        "name": "Sublime Text",
-        "category": "Developer",
-        "description": "Sublime Text is a sophisticated text editor for code, markup, and prose.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=sublimetext.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.sublimetext.com/",
         "version": "Latest",
         "size": ""
     },
@@ -8049,32 +7429,6 @@
         "size": ""
     },
     {
-        "id": "Microsoft.Teams",
-        "source": "winget",
-        "name": "Teams",
-        "category": "Communication",
-        "description": "Microsoft Teams is a collaboration platform that integrates with Office 365 and offers chat, video conferencing, file sharing, and more.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=microsoft.com/teams&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.microsoft.com/en-us/microsoft-teams/group-chat-software",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "TeamViewer.TeamViewer",
-        "source": "winget",
-        "name": "TeamViewer",
-        "category": "Utilities",
-        "description": "TeamViewer is a popular remote access and support software that allows you to connect to and control remote devices.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=teamviewer.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.teamviewer.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "TeamSpeakSystems.TeamSpeakClient",
         "source": "winget",
         "name": "TeamSpeak 3",
@@ -8101,32 +7455,6 @@
         "size": ""
     },
     {
-        "id": "Telegram.TelegramDesktop",
-        "source": "winget",
-        "name": "Telegram",
-        "category": "Communication",
-        "description": "Telegram is a cloud-based instant messaging app known for its security features, speed, and simplicity.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=telegram.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://telegram.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Microsoft.WindowsTerminal",
-        "source": "winget",
-        "name": "Windows Terminal",
-        "category": "Developer",
-        "description": "Windows Terminal is a modern, fast, and efficient terminal application for command-line users, supporting multiple tabs, panes, and more.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=microsoft.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://aka.ms/terminal",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Betterbird.Betterbird",
         "source": "winget",
         "name": "Betterbird",
@@ -8136,19 +7464,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://www.betterbird.eu/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "TorProject.TorBrowser",
-        "source": "winget",
-        "name": "Tor Browser",
-        "category": "Browsers",
-        "description": "Tor Browser is designed for anonymous web browsing, utilizing the Tor network to protect user privacy and security.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=torproject.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.torproject.org/",
         "version": "Latest",
         "size": ""
     },
@@ -8179,19 +7494,6 @@
         "size": ""
     },
     {
-        "id": "Ubisoft.Connect",
-        "source": "winget",
-        "name": "Ubisoft Connect",
-        "category": "Gaming",
-        "description": "Ubisoft Connect is Ubisoft's digital distribution and online gaming service, providing access to Ubisoft's games and services.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=ubisoft.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://ubisoftconnect.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "eloston.ungoogled-chromium",
         "source": "winget",
         "name": "Ungoogled Chromium",
@@ -8201,71 +7503,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://github.com/Eloston/ungoogled-chromium",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Unity.UnityHub",
-        "source": "winget",
-        "name": "Unity Game Engine",
-        "category": "Developer",
-        "description": "Unity is a powerful game development platform for creating 2D, 3D, augmented reality, and virtual reality games.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=unity.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://unity.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "voidtools.Everything",
-        "source": "winget",
-        "name": "Everything",
-        "category": "Utilities",
-        "description": "Everything is a search engine that locates files and folders by filename instantly for Windows. Unlike Windows search Everything initially displays every file and folder on your computer (hence the name Everything). You type in a search filter to limit what files and folders are displayed.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=voidtools.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.voidtools.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Microsoft.VCRedist.2015+.x86",
-        "source": "winget",
-        "name": "Visual C++ 2015-2022 32-bit",
-        "category": "Developer",
-        "description": "Visual C++ 2015-2022 32-bit redistributable package installs runtime components of Visual C++ libraries required to run 32-bit applications.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=microsoft.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Microsoft.VCRedist.2015+.x64",
-        "source": "winget",
-        "name": "Visual C++ 2015-2022 64-bit",
-        "category": "Developer",
-        "description": "Visual C++ 2015-2022 64-bit redistributable package installs runtime components of Visual C++ libraries required to run 64-bit applications.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=microsoft.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Ventoy.Ventoy",
-        "source": "winget",
-        "name": "Ventoy",
-        "category": "Utilities",
-        "description": "Ventoy is an open-source tool for creating bootable USB drives. It supports multiple ISO files on a single USB drive, making it a versatile solution for installing operating systems.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=ventoy.net&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.ventoy.net/",
         "version": "Latest",
         "size": ""
     },
@@ -8283,19 +7520,6 @@
         "size": ""
     },
     {
-        "id": "Microsoft.VisualStudio.2022.Community",
-        "source": "winget",
-        "name": "Visual Studio 2022",
-        "category": "Developer",
-        "description": "Visual Studio 2022 is an integrated development environment (IDE) for building, debugging, and deploying applications.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=visualstudio.microsoft.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://visualstudio.microsoft.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Microsoft.VisualStudio.Community",
         "source": "winget",
         "name": "Visual Studio 2026",
@@ -8309,32 +7533,6 @@
         "size": ""
     },
     {
-        "id": "Vivaldi.Vivaldi",
-        "source": "winget",
-        "name": "Vivaldi",
-        "category": "Browsers",
-        "description": "Vivaldi is a highly customizable web browser with a focus on user personalization and productivity features.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=vivaldi.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://vivaldi.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "VideoLAN.VLC",
-        "source": "winget",
-        "name": "VLC (Video Player)",
-        "category": "Media & Streaming",
-        "description": "VLC Media Player is a free and open-source multimedia player that supports a wide range of audio and video formats. It is known for its versatility and cross-platform compatibility.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=videolan.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.videolan.org/vlc/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "VirtualDesktop.Streamer",
         "source": "winget",
         "name": "Virtual Desktop Streamer",
@@ -8344,19 +7542,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://www.vrdesktop.net/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Microsoft.VisualStudioCode",
-        "source": "winget",
-        "name": "VS Code",
-        "category": "Developer",
-        "description": "Visual Studio Code is a free, open-source code editor with support for multiple programming languages.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=code.visualstudio.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://code.visualstudio.com/",
         "version": "Latest",
         "size": ""
     },
@@ -8387,71 +7572,6 @@
         "size": ""
     },
     {
-        "id": "RARLab.WinRAR",
-        "source": "winget",
-        "name": "WinRAR",
-        "category": "Utilities",
-        "description": "WinRAR is a powerful archive manager that allows you to create, manage, and extract compressed files.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=win-rar.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.win-rar.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "WinSCP.WinSCP",
-        "source": "winget",
-        "name": "WinSCP",
-        "category": "Utilities",
-        "description": "WinSCP is a popular open-source SFTP, FTP, and SCP client for Windows. It allows secure file transfers between a local and a remote computer.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=winscp.net&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://winscp.net/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "WireGuard.WireGuard",
-        "source": "winget",
-        "name": "WireGuard",
-        "category": "Utilities",
-        "description": "WireGuard is a fast and modern VPN (Virtual Private Network) protocol. It aims to be simpler and more efficient than other VPN protocols, providing secure and reliable connections.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=wireguard.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.wireguard.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "WiresharkFoundation.Wireshark",
-        "source": "winget",
-        "name": "Wireshark",
-        "category": "Utilities",
-        "description": "Wireshark is a widely-used open-source network protocol analyzer. It allows users to capture and analyze network traffic in real-time, providing detailed insights into network activities.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=wireshark.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.wireshark.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "AntibodySoftware.WizTree",
-        "source": "winget",
-        "name": "WizTree",
-        "category": "Utilities",
-        "description": "WizTree is a fast disk space analyzer that helps you quickly find the files and folders consuming the most space on your hard drive.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=diskanalyzer.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://wiztreefree.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "MHNexus.HxD",
         "source": "winget",
         "name": "HxD Hex Editor",
@@ -8474,32 +7594,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://xournalpp.github.io/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Yarn.Yarn",
-        "source": "winget",
-        "name": "Yarn",
-        "category": "Developer",
-        "description": "Yarn is a fast, reliable, and secure dependency management tool for JavaScript projects.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=yarnpkg.com&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://yarnpkg.com/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Zoom.Zoom",
-        "source": "winget",
-        "name": "Zoom",
-        "category": "Communication",
-        "description": "Zoom is a popular video conferencing and web conferencing service for online meetings, webinars, and collaborative projects.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=zoom.us&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://zoom.us/",
         "version": "Latest",
         "size": ""
     },
@@ -8595,19 +7689,6 @@
         "size": ""
     },
     {
-        "id": "DigitalScholar.Zotero",
-        "source": "winget",
-        "name": "Zotero",
-        "category": "Productivity",
-        "description": "Zotero is a free, easy-to-use tool to help you collect, organize, cite, and share your research materials.",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=zotero.org&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://www.zotero.org/",
-        "version": "Latest",
-        "size": ""
-    },
-    {
         "id": "Deskflow.Deskflow",
         "source": "winget",
         "name": "Deskflow",
@@ -8643,19 +7724,6 @@
         "accentColor": "#2FB6FF",
         "essential": false,
         "webUrl": "https://github.com/rjpcomputing/luaforwindows",
-        "version": "Latest",
-        "size": ""
-    },
-    {
-        "id": "Cloudflare.Warp",
-        "source": "winget",
-        "name": "Cloudflare WARP",
-        "category": "Utilities",
-        "description": "WARP is a freemium VPN service provided by Cloudflare. Includes usage of Cloudflare's DNS",
-        "iconUrl": "https://www.google.com/s2/favicons?domain=cloudflare.com/products/tunnel&sz=128",
-        "accentColor": "#2FB6FF",
-        "essential": false,
-        "webUrl": "https://one.one.one.one",
         "version": "Latest",
         "size": ""
     }
