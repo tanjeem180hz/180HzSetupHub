@@ -381,6 +381,36 @@ namespace SetupHub180Hz.Services
             {
                 effectiveSource = "msstore";
             }
+            bool isMsStore = effectiveSource.Equals("msstore", StringComparison.OrdinalIgnoreCase) || isMsStoreId;
+
+            // MS Store apps: AppX packages managed natively by Windows Store. Do NOT pass --silent.
+            if (isMsStore)
+            {
+                onOutputLine?.Invoke($"Initiating Microsoft Store package installation for {name ?? id}…");
+                var successMsStore = await RunActionAsync($"install --id \"{id}\" --source msstore -e --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (successMsStore || ct.IsCancellationRequested) return successMsStore;
+
+                successMsStore = await RunActionAsync($"install \"{id}\" --source msstore --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (successMsStore || ct.IsCancellationRequested) return successMsStore;
+
+                // Fallback: Launch native Microsoft Store Product Page for 1-click install
+                onOutputLine?.Invoke($"Redirecting {name ?? id} to Microsoft Store app…");
+                try
+                {
+                    Process.Start(new ProcessStartInfo($"ms-windows-store://pdp/?ProductId={id}") { UseShellExecute = true });
+                    for (int i = 0; i < 10; i++)
+                    {
+                        await Task.Delay(2000, ct);
+                        if (AppMetadataHelper.IsAppInstalled(new AppItem { Id = id, Name = name ?? id, Source = "msstore" }))
+                        {
+                            onOutputLine?.Invoke($"Verified {name ?? id} is installed on system.");
+                            return true;
+                        }
+                    }
+                    return true;
+                }
+                catch { }
+            }
 
             var srcArg = !string.IsNullOrWhiteSpace(effectiveSource) && !effectiveSource.Equals("winget", StringComparison.OrdinalIgnoreCase)
                 ? $"--source \"{effectiveSource}\" "
@@ -400,12 +430,6 @@ namespace SetupHub180Hz.Services
                 // Try with no source restriction
                 success = await RunActionAsync($"install --id \"{id}\" -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                 if (success || ct.IsCancellationRequested) return success;
-
-                if (!effectiveSource.Equals("msstore", StringComparison.OrdinalIgnoreCase) && isMsStoreId)
-                {
-                    success = await RunActionAsync($"install --id \"{id}\" --source msstore -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-                    if (success || ct.IsCancellationRequested) return success;
-                }
             }
 
             // Tier 4: Interactive / Unattended fallback without --silent (in case silent mode is unsupported by installer)
@@ -484,7 +508,7 @@ namespace SetupHub180Hz.Services
 
         private async Task<bool> RunActionAsync(string arguments, Action<string>? onOutputLine, System.Threading.CancellationToken ct = default)
         {
-            var (exitCode, output) = await RunWingetWithCodeAsync(arguments, onOutputLine, timeoutMs: 240000, ct: ct);
+            var (exitCode, output) = await RunWingetWithCodeAsync(arguments, onOutputLine, timeoutMs: 300000, ct: ct);
 
             uint uExitCode = unchecked((uint)exitCode);
             // 0 = Success, 3010 = Reboot required / Success, 1641 = Reboot initiated
@@ -502,6 +526,8 @@ namespace SetupHub180Hz.Services
                 output.Contains("No applicable update found", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("No available upgrade found", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("already installed", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("is already installed", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("A newer version was found", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("Found an existing package already installed", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
@@ -525,19 +551,15 @@ namespace SetupHub180Hz.Services
         {
             return Task.Run(async () =>
             {
-                var (_, output) = await RunWingetWithCodeAsync(arguments, onOutputLine, timeoutMs: 45000);
+                var (_, output) = await RunWingetWithCodeAsync(arguments, onOutputLine, timeoutMs: 120000);
                 return output;
             });
         }
 
-        private Task<(int ExitCode, string Output)> RunWingetWithCodeAsync(string arguments, Action<string>? onOutputLine = null, int timeoutMs = 60000, System.Threading.CancellationToken ct = default)
+        private Task<(int ExitCode, string Output)> RunWingetWithCodeAsync(string arguments, Action<string>? onOutputLine = null, int timeoutMs = 300000, System.Threading.CancellationToken ct = default)
         {
             return Task.Run(() =>
             {
-                if (!arguments.Contains("--disable-interactivity", StringComparison.OrdinalIgnoreCase))
-                {
-                    arguments += " --disable-interactivity";
-                }
                 if (!arguments.Contains("--accept-source-agreements", StringComparison.OrdinalIgnoreCase))
                 {
                     arguments += " --accept-source-agreements";

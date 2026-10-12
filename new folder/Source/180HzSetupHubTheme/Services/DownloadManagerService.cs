@@ -989,40 +989,62 @@ namespace SetupHub180Hz.Services
                 }
                 catch (Exception ex)
                 {
-                    ActivityLogger.Instance.Log($"Download interrupted for {app.Name}: {ex.Message}", ActivityType.Warning);
-
-                    var prev = CurrentProgressInfo;
-                    double preservedPct = prev != null && prev.Percentage > 0 ? prev.Percentage : app.DownloadProgress;
-                    long bytesDownloaded = prev?.BytesDownloaded ?? 0;
-                    long totalBytes = prev?.TotalBytes ?? 0;
-                    string sizeFormatted = prev?.SizeFormatted ?? "";
-
-                    app.Status = "Connection Error";
-                    Notify(new DownloadProgressInfo
+                    ActivityLogger.Instance.Log($"Direct CDN download for {app.Name} interrupted: {ex.Message}. Falling back to Winget engine.", ActivityType.Warning);
+                    try
                     {
-                        App = app,
-                        QueueIndex = queueIndex,
-                        QueueTotal = queueTotal,
-                        State = DownloadState.Error,
-                        BytesDownloaded = bytesDownloaded,
-                        TotalBytes = totalBytes,
-                        Percentage = preservedPct,
-                        SizeFormatted = sizeFormatted,
-                        StatusMessage = $"Connection interrupted: {ex.Message}. Download saved. Click Resume to continue.",
-                        SpeedFormatted = "0 MB/s",
-                        EtaFormatted = "Interrupted",
-                        ErrorMessage = ex.Message
-                    });
-
-                    _isPaused = true;
-                    _resumeTcs = new TaskCompletionSource<bool>();
-                    await _resumeTcs.Task;
-
-                    if (_isCancelled || _isSkipping) return false;
+                        if (File.Exists(partPath) && new FileInfo(partPath).Length == 0)
+                        {
+                            File.Delete(partPath);
+                        }
+                    }
+                    catch { }
+                    return false;
                 }
             }
 
             return false;
+        }
+
+        private static void UnblockFileSafe(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path)) return;
+
+            try
+            {
+                // 1. Delete NTFS alternate data stream (Zone.Identifier)
+                string zoneFile = path + ":Zone.Identifier";
+                if (File.Exists(zoneFile))
+                {
+                    File.Delete(zoneFile);
+                }
+            }
+            catch { }
+
+            try
+            {
+                // 2. PowerShell Unblock-File
+                var psi = new ProcessStartInfo
+                {
+                    FileName = "powershell.exe",
+                    Arguments = $"-NoProfile -NonInteractive -ExecutionPolicy Bypass -Command \"Unblock-File -LiteralPath '{path}'\"",
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                using var p = Process.Start(psi);
+                p?.WaitForExit(3000);
+            }
+            catch { }
+
+            try
+            {
+                // 3. Clear ReadOnly and Hidden attributes
+                var attrs = File.GetAttributes(path);
+                if ((attrs & FileAttributes.ReadOnly) != 0 || (attrs & FileAttributes.Hidden) != 0)
+                {
+                    File.SetAttributes(path, FileAttributes.Normal);
+                }
+            }
+            catch { }
         }
 
         private async Task InstallDownloadedPackageAsync(AppItem app, WingetService.WingetInstallerInfo info, int queueIndex, int queueTotal)
@@ -1049,6 +1071,9 @@ namespace SetupHub180Hz.Services
                 }
             }
 
+            // Remove Mark of the Web / Zone.Identifier before executing
+            UnblockFileSafe(finalPath);
+
             app.Status = "Installing…";
             Notify(new DownloadProgressInfo
             {
@@ -1057,7 +1082,7 @@ namespace SetupHub180Hz.Services
                 QueueTotal = queueTotal,
                 State = DownloadState.Installing,
                 Percentage = 100,
-                StatusMessage = $"Installing {app.Name} silently…",
+                StatusMessage = $"Installing {app.Name}…",
                 SpeedFormatted = "Ready",
                 EtaFormatted = "Installing…"
             });
@@ -1065,20 +1090,15 @@ namespace SetupHub180Hz.Services
             bool success = false;
             try
             {
-                var psi = new ProcessStartInfo
-                {
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                };
-
                 string lowerType = (info.Type ?? "").ToLowerInvariant();
+                var psi = new ProcessStartInfo();
 
                 if (lowerType == "wix" || lowerType == "msi" || ext.Equals(".msi", StringComparison.OrdinalIgnoreCase))
                 {
                     psi.FileName = "msiexec.exe";
                     psi.Arguments = $"/i \"{finalPath}\" /quiet /norestart";
+                    psi.UseShellExecute = true;
+                    psi.Verb = "runas";
                 }
                 else if (ext.Equals(".msix", StringComparison.OrdinalIgnoreCase) ||
                          ext.Equals(".appx", StringComparison.OrdinalIgnoreCase) ||
@@ -1087,26 +1107,30 @@ namespace SetupHub180Hz.Services
                 {
                     psi.FileName = "powershell.exe";
                     psi.Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"Add-AppxPackage -Path '{finalPath}' -ForceApplicationShutdown\"";
-                }
-                else if (lowerType == "inno")
-                {
-                    psi.FileName = finalPath;
-                    psi.Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-";
-                }
-                else if (lowerType == "nullsoft" || lowerType == "nsis")
-                {
-                    psi.FileName = finalPath;
-                    psi.Arguments = "/S";
-                }
-                else if (lowerType == "burn")
-                {
-                    psi.FileName = finalPath;
-                    psi.Arguments = "/quiet /norestart";
+                    psi.UseShellExecute = false;
+                    psi.CreateNoWindow = true;
                 }
                 else
                 {
                     psi.FileName = finalPath;
-                    psi.Arguments = DetectInstallerArguments(finalPath);
+                    if (lowerType == "inno")
+                    {
+                        psi.Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-";
+                    }
+                    else if (lowerType == "nullsoft" || lowerType == "nsis")
+                    {
+                        psi.Arguments = "/S";
+                    }
+                    else if (lowerType == "burn")
+                    {
+                        psi.Arguments = "/quiet /norestart";
+                    }
+                    else
+                    {
+                        psi.Arguments = DetectInstallerArguments(finalPath);
+                    }
+                    psi.UseShellExecute = true;
+                    psi.Verb = "runas";
                 }
 
                 using var proc = Process.Start(psi);
@@ -1119,6 +1143,32 @@ namespace SetupHub180Hz.Services
                 if (!success && AppMetadataHelper.IsAppInstalled(app))
                 {
                     success = true;
+                }
+
+                // If silent execution didn't report success and app is not yet installed, try running interactively
+                if (!success && !ext.Equals(".msix", StringComparison.OrdinalIgnoreCase) && !ext.Equals(".appx", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var interactivePsi = new ProcessStartInfo
+                        {
+                            FileName = finalPath,
+                            UseShellExecute = true,
+                            Verb = "runas"
+                        };
+                        using var iProc = Process.Start(interactivePsi);
+                        if (iProc != null)
+                        {
+                            await iProc.WaitForExitAsync();
+                            success = (iProc.ExitCode == 0 || iProc.ExitCode == 3010 || iProc.ExitCode == 1641);
+                        }
+                    }
+                    catch { }
+
+                    if (!success && AppMetadataHelper.IsAppInstalled(app))
+                    {
+                        success = true;
+                    }
                 }
             }
             catch (Exception ex)
@@ -1199,7 +1249,7 @@ namespace SetupHub180Hz.Services
             smoothTimer.Elapsed += (_, _) =>
             {
                 if (ct.IsCancellationRequested || _isCancelled || _isPaused) return;
-                if (currentPct >= 20 && currentPct < 75)
+                if (currentPct >= 15 && currentPct < 75)
                 {
                     currentPct = Math.Min(75, currentPct + 0.5);
                     double simulatedSpeed = _currentSpeedBps > 0 ? _currentSpeedBps : 12.5 * 1024 * 1024;
