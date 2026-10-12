@@ -69,7 +69,27 @@ namespace SetupHub180Hz.Views
                     foreach (var p in matches)
                     {
                         p.IsInstalled = isInstalled;
-                        p.Status = isInstalled ? "Installed" : "Install";
+                        if (isInstalled)
+                        {
+                            if (UpdateMonitorService.Instance.IsRecentlyUpdated(p.Id, p.Name))
+                            {
+                                p.IsRecentlyUpdated = true;
+                                p.AvailableVersion = "";
+                                p.IsUpgrade = false;
+                                p.Status = "✓ Up to Date";
+                            }
+                            else if (!p.HasUpdate)
+                            {
+                                p.Status = "Installed";
+                            }
+                        }
+                        else
+                        {
+                            p.IsRecentlyUpdated = false;
+                            p.AvailableVersion = "";
+                            p.IsUpgrade = false;
+                            p.Status = "Install";
+                        }
                     }
 
                     if (matches.Count > 0)
@@ -80,6 +100,17 @@ namespace SetupHub180Hz.Views
             };
 
             PackageCatalogService.AppUpdatesRefreshed += () =>
+            {
+                Dispatcher.InvokeAsync(async () =>
+                {
+                    if (_allPackages.Count > 0)
+                    {
+                        await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
+                    }
+                });
+            };
+
+            UpdateMonitorService.Instance.UpdatesChanged += (_, _) =>
             {
                 Dispatcher.InvokeAsync(async () =>
                 {
@@ -230,13 +261,16 @@ namespace SetupHub180Hz.Views
                 return;
             }
 
-            // Background async icon fetching & winget comprehensive status check
+            // Background async icon fetching & winget comprehensive status + update check
             _ = Task.Run(async () =>
             {
+                _ = _winget.EnsureSourcesUpdatedAsync();
+                _ = UpdateMonitorService.Instance.RefreshAsync();
+
                 // 1. Concurrently check installed status with winget list (covers MS Store / MSIX / Winget / updates)
                 await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
 
-                // 2. Redispatch ApplyFilter on UI thread so all detected apps immediately reflect as Installed
+                // 2. Redispatch ApplyFilter on UI thread so all detected apps immediately reflect as Installed / Update
                 await Dispatcher.InvokeAsync(() =>
                 {
                     ApplyFilter();
@@ -350,7 +384,8 @@ namespace SetupHub180Hz.Views
                     p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                     p.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                     p.Category.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                    p.Description.Contains(query, StringComparison.OrdinalIgnoreCase));
+                    p.Description.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    (p.DetectionNames != null && p.DetectionNames.Any(d => d.Contains(query, StringComparison.OrdinalIgnoreCase))));
             }
 
             var results = PackageCatalogService.DeduplicatePackages(
@@ -365,7 +400,7 @@ namespace SetupHub180Hz.Views
             {
                 StatusText.Text = string.IsNullOrWhiteSpace(query)
                     ? "No packages match your category filter."
-                    : $"No local packages found for '{query}'. Click '🌐 Deep Web Search' to find it online.";
+                    : $"Searching global software repositories for '{query}'…";
                 StatusText.Visibility = Visibility.Visible;
             }
             else
@@ -531,10 +566,25 @@ namespace SetupHub180Hz.Views
                     }
                 }
 
-                if (ct.IsCancellationRequested || onlineList == null || onlineList.Count == 0) return;
+                if (ct.IsCancellationRequested) return;
 
-                // Take top 6 online packages and enrich them
-                var topOnline = onlineList.Take(6).ToList();
+                if (onlineList == null || onlineList.Count == 0)
+                {
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        if (!string.Equals(SearchBox.Text.Trim(), query, StringComparison.OrdinalIgnoreCase)) return;
+                        var currentMain = (AppsListBox.ItemsSource as IEnumerable<AppItem>)?.ToList();
+                        if (currentMain == null || currentMain.Count == 0)
+                        {
+                            StatusText.Text = $"No local or online packages found for '{query}'.";
+                            StatusText.Visibility = Visibility.Visible;
+                        }
+                    });
+                    return;
+                }
+
+                // Take top 12 online packages, enrich metadata, and auto-detect Installed / Update / Not Installed status
+                var topOnline = onlineList.Take(12).ToList();
                 foreach (var app in topOnline)
                 {
                     AppMetadataHelper.EnrichAppItem(app, _allPackages);
@@ -544,6 +594,9 @@ namespace SetupHub180Hz.Views
                     }
                 }
 
+                await _catalog.CheckInstalledStatusAsync(_winget, topOnline);
+                if (ct.IsCancellationRequested) return;
+
                 await Dispatcher.InvokeAsync(() =>
                 {
                     if (ct.IsCancellationRequested) return;
@@ -551,9 +604,9 @@ namespace SetupHub180Hz.Views
 
                     var currentList = (SuggestionsListBox.ItemsSource as IEnumerable<AppItem>)?.ToList() ?? new List<AppItem>();
 
-                    // Merge online packages that aren't already present in currentList
+                    // Merge online packages that aren't already present in currentList (popup suggestions)
                     bool added = false;
-                    foreach (var onlineApp in topOnline)
+                    foreach (var onlineApp in topOnline.Take(6))
                     {
                         string normOnline = PackageCatalogService.NormalizeAppKey(onlineApp.Name);
                         if (!currentList.Any(m => string.Equals(m.Id, onlineApp.Id, StringComparison.OrdinalIgnoreCase) ||
@@ -562,6 +615,28 @@ namespace SetupHub180Hz.Views
                             currentList.Add(onlineApp);
                             added = true;
                         }
+                    }
+
+                    // Also merge online packages directly into the main AppsListBox so ANY software searched is immediately visible & ready to install!
+                    var mainList = (AppsListBox.ItemsSource as IEnumerable<AppItem>)?.ToList() ?? new List<AppItem>();
+                    bool addedToMain = false;
+                    foreach (var onlineApp in topOnline)
+                    {
+                        string normOnline = PackageCatalogService.NormalizeAppKey(onlineApp.Name);
+                        if (!mainList.Any(m => string.Equals(m.Id, onlineApp.Id, StringComparison.OrdinalIgnoreCase) ||
+                                               string.Equals(PackageCatalogService.NormalizeAppKey(m.Name), normOnline, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            mainList.Add(onlineApp);
+                            addedToMain = true;
+                        }
+                    }
+
+                    if (addedToMain)
+                    {
+                        mainList = PackageCatalogService.DeduplicatePackages(mainList);
+                        AppsListBox.ItemsSource = mainList;
+                        CatalogCountText.Text = $"{mainList.Count} Packages Ready";
+                        StatusText.Visibility = Visibility.Collapsed;
                     }
 
                     if (added || currentList.Count > 0)
@@ -580,24 +655,39 @@ namespace SetupHub180Hz.Views
 
                         SuggestionsListBox.ItemsSource = null;
                         SuggestionsListBox.ItemsSource = currentList;
-                        SearchSuggestionsPopup.IsOpen = true;
+                    }
 
-                        // Load icons for online items
-                        _ = Task.Run(async () =>
+                    // Load icons & resolve exact official website links for online items in background
+                    _ = Task.Run(async () =>
+                    {
+                        foreach (var item in topOnline)
                         {
-                            foreach (var item in topOnline)
+                            if (string.IsNullOrWhiteSpace(item.WebUrl) && !string.IsNullOrWhiteSpace(item.Id))
                             {
-                                if (item.IconImageSource == null && (!string.IsNullOrWhiteSpace(item.IconUrl) || !string.IsNullOrWhiteSpace(item.LocalIconPath)))
+                                var meta = await _winget.GetMetadataAsync(item.Id);
+                                if (meta?.BestLink != null)
                                 {
-                                    var img = await IconCacheService.GetImageAsync(item.IconUrl, item.LocalIconPath);
-                                    if (img != null)
+                                    await Dispatcher.InvokeAsync(() =>
                                     {
-                                        await Dispatcher.InvokeAsync(() => item.IconImageSource = img);
-                                    }
+                                        item.WebUrl = meta.BestLink;
+                                        if (string.IsNullOrWhiteSpace(item.IconUrl))
+                                        {
+                                            item.IconUrl = IconCacheService.DeriveFaviconUrl(item.WebUrl) ?? "";
+                                        }
+                                    });
                                 }
                             }
-                        });
-                    }
+
+                            if (item.IconImageSource == null && (!string.IsNullOrWhiteSpace(item.IconUrl) || !string.IsNullOrWhiteSpace(item.LocalIconPath)))
+                            {
+                                var img = await IconCacheService.GetImageAsync(item.IconUrl, item.LocalIconPath);
+                                if (img != null)
+                                {
+                                    await Dispatcher.InvokeAsync(() => item.IconImageSource = img);
+                                }
+                            }
+                        }
+                    });
                 });
             }
             catch (OperationCanceledException) { }
@@ -955,7 +1045,7 @@ namespace SetupHub180Hz.Views
                         StartSequentialQueue(new[] { app });
                         return;
                     }
-                    app.Status = "Installed";
+                    app.Status = "✓ Up to Date";
                     ShowAlreadyInstalledModal(app);
                     return;
                 }
@@ -975,9 +1065,19 @@ namespace SetupHub180Hz.Views
             UpdateSelectionUI();
         }
 
+        private List<AppItem> GetSelectedApps()
+        {
+            var currentItems = (AppsListBox.ItemsSource as IEnumerable<AppItem>) ?? Enumerable.Empty<AppItem>();
+            return _allPackages
+                .Concat(currentItems)
+                .Where(p => p.IsSelected)
+                .DistinctBy(p => p.Id ?? p.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
         private void UpdateSelectionUI()
         {
-            var selected = _allPackages.Where(p => p.IsSelected).ToList();
+            var selected = GetSelectedApps();
             int count = selected.Count;
 
             if (count > 0)
@@ -998,7 +1098,7 @@ namespace SetupHub180Hz.Views
             {
                 foreach (var item in currentItems)
                 {
-                    if (!item.IsInstalled) item.IsSelected = true;
+                    if (!item.IsInstalled || item.HasUpdate) item.IsSelected = true;
                 }
                 UpdateSelectionUI();
             }
@@ -1010,12 +1110,19 @@ namespace SetupHub180Hz.Views
             {
                 item.IsSelected = false;
             }
+            if (AppsListBox.ItemsSource is IEnumerable<AppItem> currentItems)
+            {
+                foreach (var item in currentItems)
+                {
+                    item.IsSelected = false;
+                }
+            }
             UpdateSelectionUI();
         }
 
         private void InstallSelected_Click(object sender, RoutedEventArgs e)
         {
-            var selected = _allPackages.Where(p => p.IsSelected).ToList();
+            var selected = GetSelectedApps();
             if (selected.Count == 0)
             {
                 ThemedMessageBox.Show("Please select at least one app to install.", "No Apps Selected", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -1036,7 +1143,7 @@ namespace SetupHub180Hz.Views
                 else if (CheckIfAppAlreadyInstalled(app))
                 {
                     app.IsInstalled = true;
-                    app.Status = "Installed";
+                    app.Status = "✓ Up to Date";
                     alreadyInstalled.Add(app);
                 }
                 else
@@ -1428,13 +1535,48 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private void WebLink_Click(object sender, RoutedEventArgs e)
+        private async void WebLink_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.DataContext is AppItem app && !string.IsNullOrWhiteSpace(app.WebUrl))
+            if (sender is Button btn && btn.DataContext is AppItem app)
+            {
+                string url = app.EffectiveWebUrl;
+                if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id))
+                {
+                    try
+                    {
+                        var meta = await _winget.GetMetadataAsync(app.Id);
+                        if (!string.IsNullOrWhiteSpace(meta?.BestLink))
+                        {
+                            app.WebUrl = meta.BestLink;
+                            url = meta.BestLink;
+                        }
+                    }
+                    catch { }
+                }
+
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                    }
+                    catch (Exception ex)
+                    {
+                        ThemedMessageBox.Show($"Could not open website: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+            }
+        }
+
+        private void ModalOfficialSite_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentModalApp == null) return;
+            string url = _currentModalApp.EffectiveWebUrl;
+            if (!string.IsNullOrWhiteSpace(url))
             {
                 try
                 {
-                    Process.Start(new ProcessStartInfo(app.WebUrl) { UseShellExecute = true });
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
                 }
                 catch (Exception ex)
                 {
@@ -1466,7 +1608,7 @@ namespace SetupHub180Hz.Views
                     else if (CheckIfAppAlreadyInstalled(app))
                     {
                         app.IsInstalled = true;
-                        app.Status = "Installed";
+                        app.Status = "✓ Up to Date";
                         installedApps.Add(app);
                     }
                     else
@@ -1563,7 +1705,7 @@ namespace SetupHub180Hz.Views
             if (detected)
             {
                 app.IsInstalled = true;
-                app.Status = "Installed";
+                app.Status = "✓ Up to Date";
                 PackageCatalogService.NotifyStatusChanged(app.Id, true);
             }
             return detected;
@@ -1575,28 +1717,30 @@ namespace SetupHub180Hz.Views
 
             ModalAppName.Text = app.Name;
             ModalAppIcon.Source = app.IconImageSource;
-            ModalAppVersion.Text = !string.IsNullOrWhiteSpace(app.FormattedVersion) ? app.FormattedVersion : "vLatest";
+            ModalAppVersion.Text = !string.IsNullOrWhiteSpace(app.FormattedVersion) ? app.FormattedVersion : "✓ Latest";
             ModalAppSize.Text = !string.IsNullOrWhiteSpace(app.FormattedSize) ? app.FormattedSize : "Installed";
             ModalPackageId.Text = !string.IsNullOrWhiteSpace(app.Id) ? app.Id : app.Name;
             ModalCategory.Text = !string.IsNullOrWhiteSpace(app.Category) ? app.Category : "General";
+            ModalOfficialSiteButton.ToolTip = $"Open Official Website: {app.EffectiveWebUrl}";
 
             var reg = AppMetadataHelper.GetRegistryInfo(app.Name, app.Id);
+            string displayVer = !string.IsNullOrWhiteSpace(reg?.DisplayVersion)
+                ? reg!.DisplayVersion
+                : (!string.IsNullOrWhiteSpace(app.Version) ? app.Version : "Latest");
+
             if (app.HasUpdate || app.IsUpgrade)
             {
+                ModalInstalledBadgeText.Text = "UPDATE AVAILABLE";
+                ModalStatusTitle.Text = "Newer Version Detected";
                 ModalReinstallButton.Content = $"⚡ Update to Latest ({app.AvailableVersion ?? "Latest"})";
-                ModalStatusMessage.Text = $"{app.Name} has a newer version available: v{app.AvailableVersion} (Installed: v{reg?.DisplayVersion ?? "Installed"}). Click Update to fetch and install the latest release.";
+                ModalStatusMessage.Text = $"{app.Name} has a newer version available: v{app.AvailableVersion} (Installed: v{displayVer}). Click Update to automatically fetch and install the latest official release.";
             }
             else
             {
-                ModalReinstallButton.Content = "🔄 Reinstall Anyway";
-                if (reg != null && !string.IsNullOrWhiteSpace(reg.DisplayVersion))
-                {
-                    ModalStatusMessage.Text = $"{app.Name} (v{reg.DisplayVersion}) is verified and ready to use on this PC.";
-                }
-                else
-                {
-                    ModalStatusMessage.Text = $"{app.Name} is verified and ready to use on this PC.";
-                }
+                ModalInstalledBadgeText.Text = "ALREADY UPDATED • LATEST VERSION";
+                ModalStatusTitle.Text = "Already Updated — You are in Latest Version";
+                ModalReinstallButton.Content = "🔄 Reinstall Latest";
+                ModalStatusMessage.Text = $"Already Updated! {app.Name} (v{displayVer}) is verified on this PC and you are in the latest version.";
             }
 
             AlreadyInstalledOverlay.Visibility = Visibility.Visible;
@@ -1607,12 +1751,12 @@ namespace SetupHub180Hz.Views
                 {
                     try
                     {
-                        var info = await _winget.GetInstallerInfoAsync(app.Id);
+                        var info = await _winget.GetInstallerInfoAsync(app.Id, forceRefresh: true, name: app.Name);
                         if (info != null && !string.IsNullOrWhiteSpace(info.Version))
                         {
-                            var installedVer = reg?.DisplayVersion;
+                            var installedVer = !string.IsNullOrWhiteSpace(reg?.DisplayVersion) ? reg!.DisplayVersion : app.Version;
                             if (!string.IsNullOrWhiteSpace(installedVer) &&
-                                !string.Equals(installedVer.Trim(), info.Version.Trim(), StringComparison.OrdinalIgnoreCase))
+                                AppMetadataHelper.IsNewerVersion(installedVer.Trim(), info.Version.Trim()))
                             {
                                 await Dispatcher.InvokeAsync(() =>
                                 {
@@ -1620,8 +1764,24 @@ namespace SetupHub180Hz.Views
                                     {
                                         app.AvailableVersion = info.Version;
                                         app.IsUpgrade = true;
+                                        ModalInstalledBadgeText.Text = "UPDATE AVAILABLE";
+                                        ModalStatusTitle.Text = "Newer Version Detected";
                                         ModalReinstallButton.Content = $"⚡ Update to Latest ({info.Version})";
-                                        ModalStatusMessage.Text = $"{app.Name} has a newer version available: v{info.Version} (Installed: v{installedVer}). Click Update to fetch and install the latest release.";
+                                        ModalStatusMessage.Text = $"{app.Name} has a newer version available: v{info.Version} (Installed: v{installedVer}). Click Update to automatically fetch and install the latest official release.";
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                await Dispatcher.InvokeAsync(() =>
+                                {
+                                    if (_currentModalApp == app && AlreadyInstalledOverlay.Visibility == Visibility.Visible)
+                                    {
+                                        app.Version = info.Version;
+                                        ModalAppVersion.Text = app.FormattedVersion;
+                                        ModalInstalledBadgeText.Text = "ALREADY UPDATED • LATEST VERSION";
+                                        ModalStatusTitle.Text = "Already Updated — You are in Latest Version";
+                                        ModalStatusMessage.Text = $"Already Updated! {app.Name} (v{info.Version}) is verified on this PC and you are in the latest version.";
                                     }
                                 });
                             }

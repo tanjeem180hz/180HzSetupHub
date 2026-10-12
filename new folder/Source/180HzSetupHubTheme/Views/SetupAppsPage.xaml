@@ -190,6 +190,47 @@
                                            FontWeight="SemiBold"
                                            Foreground="{DynamicResource BrushAccent}"/>
                             </Border>
+
+                            <!-- Auto-Detected Install / Update State Tag -->
+                            <Border CornerRadius="4"
+                                    Padding="6,1,6,1"
+                                    Margin="6,0,0,0"
+                                    VerticalAlignment="Center"
+                                    BorderThickness="1">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{DynamicResource BrushBackground}"/>
+                                        <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsInstalled}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource BrushSuccess}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding HasUpdate}" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                                <Setter Property="BorderBrush" Value="{DynamicResource BrushWarning}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock Text="{Binding InstallStateBadgeText}"
+                                           FontSize="9.5"
+                                           FontWeight="Bold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource BrushTextSecondary}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsInstalled}" Value="True">
+                                                    <Setter Property="Foreground" Value="{DynamicResource BrushSuccess}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding HasUpdate}" Value="True">
+                                                    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Border>
                         </StackPanel>
 
                         <!-- Description -->
@@ -199,7 +240,7 @@
                                    TextTrimming="CharacterEllipsis"
                                    Margin="0,0,0,5"/>
 
-                        <!-- Meta Row (Exact Version + Exact Size + Web Link) -->
+                        <!-- Meta Row (Exact Version + Exact Size + Official Link Tag) -->
                         <StackPanel Orientation="Horizontal">
                             <!-- Version Pill -->
                             <Border Background="{StaticResource BrushBackground}"
@@ -211,8 +252,21 @@
                                     VerticalAlignment="Center">
                                 <TextBlock Text="{Binding FormattedVersion}"
                                            FontSize="11"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource BrushTextSecondary}"/>
+                                           FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{DynamicResource BrushTextSecondary}"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsInstalled}" Value="True">
+                                                    <Setter Property="Foreground" Value="{DynamicResource BrushSuccess}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding HasUpdate}" Value="True">
+                                                    <Setter Property="Foreground" Value="{DynamicResource BrushWarning}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </Border>
 
                             <!-- Size Pill -->
@@ -228,12 +282,33 @@
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource BrushTextSecondary}"/>
                             </Border>
+
+                            <!-- Official Website Link Tag Pill -->
+                            <Button Style="{StaticResource WebLinkButton}"
+                                    Padding="8,2,8,2"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center"
+                                    ToolTip="{Binding EffectiveWebUrl}"
+                                    Click="WebLink_Click">
+                                <TextBlock Text="{Binding OfficialDomainTag}"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"/>
+                            </Button>
                         </StackPanel>
                     </StackPanel>
 
                     <!-- 3. Actions Button -->
                     <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                        <ContentControl Loaded="OfficialLinkContainer_Loaded" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <Button Style="{StaticResource WebLinkButton}"
+                                Padding="10,6,10,6"
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Center"
+                                ToolTip="{Binding EffectiveWebUrl}"
+                                Click="WebLink_Click">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="🌐 Official Site" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
                         <Button Content="{Binding Status}"
                                 Click="InstallButton_Click"
                                 Padding="18,7,18,7">
@@ -843,7 +918,7 @@
                             <TextBlock x:Name="ModalAppName" Text="Application Name" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" TextTrimming="CharacterEllipsis"/>
                             <StackPanel Orientation="Horizontal" Margin="0,5,0,0" VerticalAlignment="Center">
                                 <Border Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushSuccess}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
-                                    <TextBlock Text="INSTALLED" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}"/>
+                                    <TextBlock x:Name="ModalInstalledBadgeText" Text="INSTALLED • LATEST VERSION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushSuccess}"/>
                                 </Border>
                                 <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,8,0">
                                     <TextBlock x:Name="ModalAppVersion" Text="v1.0.0" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
@@ -869,7 +944,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="✅" FontSize="18" Margin="0,0,12,0" VerticalAlignment="Center"/>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="Application Already Installed" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource BrushTextPrimary}"/>
+                                <TextBlock x:Name="ModalStatusTitle" Text="Already Updated — You are in Latest Version" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource BrushTextPrimary}"/>
                                 <TextBlock x:Name="ModalStatusMessage" Text="This software is verified and active on your system." FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Grid>
@@ -881,6 +956,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -890,8 +966,13 @@
                             <TextBlock Text="Package ID:" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,8,4"/>
                             <TextBlock x:Name="ModalPackageId" Grid.Column="1" Text="Publisher.App" FontSize="11" Foreground="{DynamicResource BrushTextPrimary}" Margin="0,0,0,4" TextTrimming="CharacterEllipsis"/>
 
-                            <TextBlock Grid.Row="1" Text="Category:" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,8,0"/>
-                            <TextBlock x:Name="ModalCategory" Grid.Row="1" Grid.Column="1" Text="Browsers &amp; Web" FontSize="11" Foreground="{DynamicResource BrushTextPrimary}"/>
+                            <TextBlock Grid.Row="1" Text="Category:" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,8,4"/>
+                            <TextBlock x:Name="ModalCategory" Grid.Row="1" Grid.Column="1" Text="Browsers &amp; Web" FontSize="11" Foreground="{DynamicResource BrushTextPrimary}" Margin="0,0,0,4"/>
+
+                            <TextBlock Grid.Row="2" Text="Official Link:" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <Button x:Name="ModalOfficialSiteButton" Grid.Row="2" Grid.Column="1" Content="🌐 Open Official Website"
+                                    Style="{StaticResource WebLinkButton}" HorizontalAlignment="Left" Padding="8,2"
+                                    Click="ModalOfficialSite_Click"/>
                         </Grid>
                     </Border>
 

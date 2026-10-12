@@ -184,19 +184,39 @@ namespace SetupHub180Hz.Services
             try
             {
                 var itemList = items.ToList();
+                if (itemList.Count == 0) return;
 
-                // 1. Instant check via AppMetadataHelper
+                // 1. Instant check via AppMetadataHelper (Registry, Canonical Paths, AppPaths, Start Menu, AppX)
                 foreach (var item in itemList)
                 {
                     bool isInst = AppMetadataHelper.IsAppInstalled(item);
                     if (isInst)
                     {
                         item.IsInstalled = true;
-                        item.Status = "Installed";
+                        if (UpdateMonitorService.Instance.IsRecentlyUpdated(item.Id, item.Name))
+                        {
+                            item.IsRecentlyUpdated = true;
+                            item.AvailableVersion = "";
+                            item.IsUpgrade = false;
+                            item.Status = "✓ Up to Date";
+                        }
+                        else if (!item.HasUpdate)
+                        {
+                            item.Status = "Installed";
+                        }
+                    }
+                    else
+                    {
+                        item.IsInstalled = false;
+                        item.AvailableVersion = "";
+                        item.IsUpgrade = false;
+                        item.IsRecentlyUpdated = false;
+                        item.Status = "Install";
                     }
                 }
 
                 // 2. Comprehensive check via winget installed apps list (MS Store, MSIX, ARP, Winget)
+                // Always inspect even if Step 1 marked IsInstalled = true, so we capture exact Winget Version & AvailableVersion!
                 List<AppItem>? installedApps = null;
                 try
                 {
@@ -206,139 +226,126 @@ namespace SetupHub180Hz.Services
 
                 if (installedApps != null && installedApps.Count > 0)
                 {
-                    var instIdSet = new HashSet<string>(installedApps.Select(a => a.Id), StringComparer.OrdinalIgnoreCase);
-                    var instCleanIdSet = new HashSet<string>(installedApps.Select(a => AppMetadataHelper.CleanPackageId(a.Id)), StringComparer.OrdinalIgnoreCase);
-                    var instNameSet = new HashSet<string>(installedApps.Select(a => a.Name), StringComparer.OrdinalIgnoreCase);
-                    var instNormNameSet = new HashSet<string>(installedApps.Select(a => AppMetadataHelper.NormalizeAppName(a.Name)).Where(s => s.Length >= 3), StringComparer.OrdinalIgnoreCase);
-                    var instStrippedSet = new HashSet<string>(installedApps.Select(a => AppMetadataHelper.StripPublisherPrefix(AppMetadataHelper.NormalizeAppName(a.Name))).Where(s => s.Length >= 3), StringComparer.OrdinalIgnoreCase);
+                    var byId = new Dictionary<string, AppItem>(StringComparer.OrdinalIgnoreCase);
+                    var byCleanId = new Dictionary<string, AppItem>(StringComparer.OrdinalIgnoreCase);
+                    var byName = new Dictionary<string, AppItem>(StringComparer.OrdinalIgnoreCase);
+                    var byNormName = new Dictionary<string, AppItem>(StringComparer.OrdinalIgnoreCase);
+                    var byStrippedName = new Dictionary<string, AppItem>(StringComparer.OrdinalIgnoreCase);
+
+                    static void PutPreferred(Dictionary<string, AppItem> map, string key, AppItem candidate)
+                    {
+                        if (string.IsNullOrWhiteSpace(key)) return;
+                        if (!map.TryGetValue(key, out var existing) ||
+                            (string.IsNullOrWhiteSpace(existing.AvailableVersion) && !string.IsNullOrWhiteSpace(candidate.AvailableVersion)))
+                        {
+                            map[key] = candidate;
+                        }
+                    }
+
+                    foreach (var a in installedApps)
+                    {
+                        PutPreferred(byId, a.Id, a);
+                        PutPreferred(byCleanId, AppMetadataHelper.CleanPackageId(a.Id), a);
+                        PutPreferred(byName, a.Name, a);
+                        var norm = AppMetadataHelper.NormalizeAppName(a.Name);
+                        if (norm.Length >= 3)
+                        {
+                            PutPreferred(byNormName, norm, a);
+                            var stripped = AppMetadataHelper.StripPublisherPrefix(norm);
+                            if (stripped.Length >= 3)
+                            {
+                                PutPreferred(byStrippedName, stripped, a);
+                            }
+                        }
+                    }
 
                     foreach (var item in itemList)
                     {
-                        if (item.IsInstalled) continue;
-
-                        bool matched = false;
-
-                        // A. Exact or clean ID match
-                        if (!string.IsNullOrWhiteSpace(item.Id) && (instIdSet.Contains(item.Id) || instCleanIdSet.Contains(item.Id)))
-                        {
-                            matched = true;
-                        }
-
-                        // B. Known alias match
-                        if (!matched && !string.IsNullOrWhiteSpace(item.Id) && KnownPackageAliases.TryGetValue(item.Id, out var aliases))
-                        {
-                            if (aliases.Any(a => instIdSet.Contains(a) || instCleanIdSet.Contains(a) || instNameSet.Contains(a) || instNormNameSet.Contains(a)))
-                            {
-                                matched = true;
-                            }
-                        }
-
-                        // C. Exact Name match
-                        if (!matched && !string.IsNullOrWhiteSpace(item.Name) && instNameSet.Contains(item.Name))
-                        {
-                            matched = true;
-                        }
-
-                        // D. Normalized Name match
-                        if (!matched && !string.IsNullOrWhiteSpace(item.Name))
-                        {
-                            var norm = AppMetadataHelper.NormalizeAppName(item.Name);
-                            if (norm.Length >= 3 && instNormNameSet.Contains(norm))
-                            {
-                                matched = true;
-                            }
-                        }
-
-                        // E. Stripped Publisher Name match
-                        if (!matched && !string.IsNullOrWhiteSpace(item.Name))
-                        {
-                            var stripped = AppMetadataHelper.StripPublisherPrefix(AppMetadataHelper.NormalizeAppName(item.Name));
-                            if (stripped.Length >= 3 && instStrippedSet.Contains(stripped))
-                            {
-                                matched = true;
-                            }
-                        }
-
-                        // F. Word-bounded or alias matching across all installed apps
-                        if (!matched)
-                        {
-                            var itemCleanId = AppMetadataHelper.CleanPackageId(item.Id);
-                            var itemNorm = AppMetadataHelper.NormalizeAppName(item.Name);
-                            var itemStripped = AppMetadataHelper.StripPublisherPrefix(itemNorm);
-
-                            matched = installedApps.Any(a =>
-                            {
-                                if (!string.IsNullOrWhiteSpace(a.Id) && !string.IsNullOrWhiteSpace(item.Id))
-                                {
-                                    if (a.Id.Contains(item.Id, StringComparison.OrdinalIgnoreCase) ||
-                                        item.Id.Contains(a.Id, StringComparison.OrdinalIgnoreCase))
-                                        return true;
-
-                                    var cleanA = AppMetadataHelper.CleanPackageId(a.Id);
-                                    if (cleanA.Equals(itemCleanId, StringComparison.OrdinalIgnoreCase) ||
-                                        cleanA.Contains(itemCleanId, StringComparison.OrdinalIgnoreCase) ||
-                                        itemCleanId.Contains(cleanA, StringComparison.OrdinalIgnoreCase))
-                                        return true;
-                                }
-
-                                if (AreAliases(item.Id, a.Id) || AreAliases(item.Name, a.Name))
-                                    return true;
-
-                                if (!string.IsNullOrWhiteSpace(a.Name) && !string.IsNullOrWhiteSpace(itemNorm))
-                                {
-                                    var normA = AppMetadataHelper.NormalizeAppName(a.Name);
-                                    var strippedA = AppMetadataHelper.StripPublisherPrefix(normA);
-
-                                    if (normA.Equals(itemNorm, StringComparison.OrdinalIgnoreCase) ||
-                                        strippedA.Equals(itemStripped, StringComparison.OrdinalIgnoreCase))
-                                        return true;
-
-                                    if (normA.Length >= 4 && (normA.StartsWith(itemNorm + " ") || normA.EndsWith(" " + itemNorm) || normA.Contains(" " + itemNorm + " ")))
-                                        return true;
-                                    if (itemNorm.Length >= 4 && (itemNorm.StartsWith(normA + " ") || itemNorm.EndsWith(" " + normA) || itemNorm.Contains(" " + normA + " ")))
-                                        return true;
-
-                                    if (strippedA.Length >= 4 && (strippedA.StartsWith(itemStripped + " ") || strippedA.EndsWith(" " + itemStripped) || strippedA.Contains(" " + itemStripped + " ")))
-                                        return true;
-                                }
-
-                                return false;
-                            });
-                        }
-
-                        if (matched)
+                        var matchedApp = FindMatchingWingetApp(item, installedApps, byId, byCleanId, byName, byNormName, byStrippedName);
+                        if (matchedApp != null)
                         {
                             item.IsInstalled = true;
-                            item.Status = "Installed";
+
+                            if (!string.IsNullOrWhiteSpace(matchedApp.Version) &&
+                                !matchedApp.Version.Equals("Unknown", StringComparison.OrdinalIgnoreCase))
+                            {
+                                item.Version = matchedApp.Version;
+                            }
+
+                            bool recentlyUpdated = UpdateMonitorService.Instance.IsRecentlyUpdated(item.Id, item.Name);
+                            if (recentlyUpdated)
+                            {
+                                item.AvailableVersion = "";
+                                item.IsUpgrade = false;
+                                item.IsRecentlyUpdated = true;
+                                item.Status = "✓ Up to Date";
+                            }
+                            else if (!string.IsNullOrWhiteSpace(matchedApp.AvailableVersion) &&
+                                     !string.Equals(matchedApp.AvailableVersion.Trim(), item.Version?.Trim(), StringComparison.OrdinalIgnoreCase))
+                            {
+                                item.AvailableVersion = matchedApp.AvailableVersion;
+                                item.IsUpgrade = true;
+                                item.IsRecentlyUpdated = false;
+                                item.Status = "Update";
+                            }
+                            else if (!item.HasUpdate)
+                            {
+                                item.Status = item.IsRecentlyUpdated ? "✓ Up to Date" : "Installed";
+                            }
                         }
                     }
                 }
 
-                // 3. Correlate with detected updates from UpdateMonitorService
+                // 3. Correlate with detected updates from UpdateMonitorService (safe indexing without ToDictionary crash)
                 var upgradable = UpdateMonitorService.Instance.UpgradableApps.ToList();
                 if (upgradable.Count > 0)
                 {
-                    var upMap = upgradable.ToDictionary(u => u.Id, StringComparer.OrdinalIgnoreCase);
+                    var upById = new Dictionary<string, AppItem>(StringComparer.OrdinalIgnoreCase);
+                    var upByCleanId = new Dictionary<string, AppItem>(StringComparer.OrdinalIgnoreCase);
+                    var upByName = new Dictionary<string, AppItem>(StringComparer.OrdinalIgnoreCase);
+                    var upByNormName = new Dictionary<string, AppItem>(StringComparer.OrdinalIgnoreCase);
+                    var upByStripped = new Dictionary<string, AppItem>(StringComparer.OrdinalIgnoreCase);
+
+                    foreach (var u in upgradable)
+                    {
+                        if (!string.IsNullOrWhiteSpace(u.Id)) upById[u.Id] = u;
+                        var clean = AppMetadataHelper.CleanPackageId(u.Id);
+                        if (!string.IsNullOrWhiteSpace(clean)) upByCleanId[clean] = u;
+                        if (!string.IsNullOrWhiteSpace(u.Name)) upByName[u.Name] = u;
+                        var norm = AppMetadataHelper.NormalizeAppName(u.Name);
+                        if (norm.Length >= 3)
+                        {
+                            upByNormName[norm] = u;
+                            var stripped = AppMetadataHelper.StripPublisherPrefix(norm);
+                            if (stripped.Length >= 3) upByStripped[stripped] = u;
+                        }
+                    }
+
                     foreach (var item in itemList)
                     {
-                        if (item.IsInstalled)
+                        if (UpdateMonitorService.Instance.IsRecentlyUpdated(item.Id, item.Name))
                         {
-                            AppItem? match = null;
-                            if (upMap.TryGetValue(item.Id, out var up))
-                            {
-                                match = up;
-                            }
-                            else
-                            {
-                                match = upgradable.FirstOrDefault(u => string.Equals(u.Name, item.Name, StringComparison.OrdinalIgnoreCase));
-                            }
+                            item.IsInstalled = true;
+                            item.AvailableVersion = "";
+                            item.IsUpgrade = false;
+                            item.IsRecentlyUpdated = true;
+                            item.Status = "✓ Up to Date";
+                            continue;
+                        }
 
-                            if (match != null && !string.IsNullOrWhiteSpace(match.AvailableVersion))
+                        var match = FindMatchingWingetApp(item, upgradable, upById, upByCleanId, upByName, upByNormName, upByStripped);
+                        if (match != null && !string.IsNullOrWhiteSpace(match.AvailableVersion))
+                        {
+                            item.IsInstalled = true;
+                            if (!string.IsNullOrWhiteSpace(match.Version) &&
+                                !match.Version.Equals("Unknown", StringComparison.OrdinalIgnoreCase))
                             {
-                                item.AvailableVersion = match.AvailableVersion;
-                                item.IsUpgrade = true;
-                                item.Status = "Update";
+                                item.Version = match.Version;
                             }
+                            item.AvailableVersion = match.AvailableVersion;
+                            item.IsUpgrade = true;
+                            item.IsRecentlyUpdated = false;
+                            item.Status = "Update";
                         }
                     }
                 }
@@ -347,6 +354,102 @@ namespace SetupHub180Hz.Services
             {
                 // Best effort check
             }
+        }
+
+        private static AppItem? FindMatchingWingetApp(
+            AppItem item,
+            List<AppItem> pool,
+            Dictionary<string, AppItem> byId,
+            Dictionary<string, AppItem> byCleanId,
+            Dictionary<string, AppItem> byName,
+            Dictionary<string, AppItem> byNormName,
+            Dictionary<string, AppItem> byStrippedName)
+        {
+            // A. Exact or clean ID match
+            if (!string.IsNullOrWhiteSpace(item.Id))
+            {
+                if (byId.TryGetValue(item.Id, out var m)) return m;
+                if (byCleanId.TryGetValue(item.Id, out m)) return m;
+                var cleanItemId = AppMetadataHelper.CleanPackageId(item.Id);
+                if (!string.IsNullOrWhiteSpace(cleanItemId) && (byId.TryGetValue(cleanItemId, out m) || byCleanId.TryGetValue(cleanItemId, out m)))
+                    return m;
+            }
+
+            // B. Known alias match
+            if (!string.IsNullOrWhiteSpace(item.Id) && KnownPackageAliases.TryGetValue(item.Id, out var aliases))
+            {
+                foreach (var a in aliases)
+                {
+                    if (byId.TryGetValue(a, out var m) ||
+                        byCleanId.TryGetValue(a, out m) ||
+                        byName.TryGetValue(a, out m) ||
+                        byNormName.TryGetValue(a, out m))
+                    {
+                        return m;
+                    }
+                }
+            }
+
+            // C. Exact Name match
+            if (!string.IsNullOrWhiteSpace(item.Name) && byName.TryGetValue(item.Name, out var exactNameMatch))
+            {
+                return exactNameMatch;
+            }
+
+            // D. Normalized Name & Stripped Publisher Name match
+            var itemNorm = AppMetadataHelper.NormalizeAppName(item.Name);
+            var itemStripped = AppMetadataHelper.StripPublisherPrefix(itemNorm);
+            if (itemNorm.Length >= 3 && byNormName.TryGetValue(itemNorm, out var normMatch))
+            {
+                return normMatch;
+            }
+            if (itemStripped.Length >= 3 && byStrippedName.TryGetValue(itemStripped, out var strippedMatch))
+            {
+                return strippedMatch;
+            }
+
+            // E. Word-bounded or alias matching across pool
+            var itemCleanId = AppMetadataHelper.CleanPackageId(item.Id);
+            return pool.FirstOrDefault(a =>
+            {
+                if (!string.IsNullOrWhiteSpace(a.Id) && !string.IsNullOrWhiteSpace(item.Id))
+                {
+                    if (a.Id.Equals(item.Id, StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    var cleanA = AppMetadataHelper.CleanPackageId(a.Id);
+                    if (!string.IsNullOrWhiteSpace(cleanA) && !string.IsNullOrWhiteSpace(itemCleanId) &&
+                        cleanA.Equals(itemCleanId, StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+
+                if (AreAliases(item.Id, a.Id) || AreAliases(item.Name, a.Name))
+                    return true;
+
+                if (!string.IsNullOrWhiteSpace(a.Name) && !string.IsNullOrWhiteSpace(itemNorm))
+                {
+                    var normA = AppMetadataHelper.NormalizeAppName(a.Name);
+                    var strippedA = AppMetadataHelper.StripPublisherPrefix(normA);
+
+                    if (normA.Equals(itemNorm, StringComparison.OrdinalIgnoreCase) ||
+                        (itemStripped.Length >= 3 && strippedA.Equals(itemStripped, StringComparison.OrdinalIgnoreCase)))
+                        return true;
+
+                    if (normA.Length >= 4 && itemNorm.Length >= 4 &&
+                        (normA.StartsWith(itemNorm + " ", StringComparison.OrdinalIgnoreCase) ||
+                         normA.EndsWith(" " + itemNorm, StringComparison.OrdinalIgnoreCase) ||
+                         normA.Contains(" " + itemNorm + " ", StringComparison.OrdinalIgnoreCase)))
+                        return true;
+
+                    if (itemNorm.Length >= 4 && normA.Length >= 4 &&
+                        (itemNorm.StartsWith(normA + " ", StringComparison.OrdinalIgnoreCase) ||
+                         itemNorm.EndsWith(" " + normA, StringComparison.OrdinalIgnoreCase) ||
+                         itemNorm.Contains(" " + normA + " ", StringComparison.OrdinalIgnoreCase)))
+                        return true;
+                }
+
+                return false;
+            });
         }
 
         private static bool CheckLocalExeExists(AppItem item)

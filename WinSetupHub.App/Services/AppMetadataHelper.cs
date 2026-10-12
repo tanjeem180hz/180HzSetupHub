@@ -132,7 +132,7 @@ namespace SetupHub180Hz.Services
             var regInfo = GetRegistryInfo(app.Name, app.Id);
             if (regInfo != null)
             {
-                if (!string.IsNullOrWhiteSpace(regInfo.DisplayVersion) && (string.IsNullOrWhiteSpace(app.Version) || app.Version == "Latest"))
+                if (!string.IsNullOrWhiteSpace(regInfo.DisplayVersion))
                 {
                     app.Version = regInfo.DisplayVersion;
                 }
@@ -276,7 +276,7 @@ namespace SetupHub180Hz.Services
             var reg = GetRegistryInfo(app.Name, app.Id);
             if (reg != null)
             {
-                if (!string.IsNullOrWhiteSpace(reg.DisplayVersion) && (string.IsNullOrWhiteSpace(app.Version) || app.Version == "Latest"))
+                if (!string.IsNullOrWhiteSpace(reg.DisplayVersion))
                 {
                     app.Version = reg.DisplayVersion;
                 }
@@ -889,6 +889,11 @@ namespace SetupHub180Hz.Services
             if (string.IsNullOrWhiteSpace(id) && string.IsNullOrWhiteSpace(name)) return null;
 
             var cleanId = CleanPackageId(id);
+            if ((cleanId.Length == 12 || cleanId.Length == 14) && !cleanId.Contains('.') && !cleanId.Contains('-'))
+            {
+                return $"https://apps.microsoft.com/detail/{cleanId}";
+            }
+
             var parts = cleanId.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length >= 2)
@@ -914,6 +919,72 @@ namespace SetupHub180Hz.Services
             }
 
             return null;
+        }
+
+        public static bool IsNewerVersion(string? installedVer, string? availableVer)
+        {
+            if (string.IsNullOrWhiteSpace(availableVer)) return false;
+            var availClean = CleanVersionString(availableVer);
+            if (string.IsNullOrWhiteSpace(availClean) ||
+                availClean.Equals("latest", StringComparison.OrdinalIgnoreCase) ||
+                availClean.Equals("unknown", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(installedVer)) return false;
+            var instClean = CleanVersionString(installedVer);
+            if (string.IsNullOrWhiteSpace(instClean) ||
+                instClean.Equals("latest", StringComparison.OrdinalIgnoreCase) ||
+                instClean.Equals("unknown", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (string.Equals(instClean, availClean, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var instParts = ExtractNumericParts(instClean);
+            var availParts = ExtractNumericParts(availClean);
+
+            if (instParts.Count > 0 && availParts.Count > 0)
+            {
+                int max = Math.Max(instParts.Count, availParts.Count);
+                for (int i = 0; i < max; i++)
+                {
+                    long vInst = i < instParts.Count ? instParts[i] : 0;
+                    long vAvail = i < availParts.Count ? availParts[i] : 0;
+                    if (vAvail > vInst) return true;
+                    if (vAvail < vInst) return false;
+                }
+                return false;
+            }
+
+            return !string.Equals(instClean, availClean, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string CleanVersionString(string ver)
+        {
+            var s = ver.Trim();
+            if (s.StartsWith("v", StringComparison.OrdinalIgnoreCase) && s.Length > 1 && char.IsDigit(s[1]))
+            {
+                s = s.Substring(1).Trim();
+            }
+            return s;
+        }
+
+        private static List<long> ExtractNumericParts(string ver)
+        {
+            var list = new List<long>();
+            var matches = Regex.Matches(ver, @"\d+");
+            foreach (Match m in matches)
+            {
+                if (long.TryParse(m.Value, out long val))
+                {
+                    list.Add(val);
+                }
+            }
+            return list;
         }
 
         public static string NormalizeAppName(string? name)

@@ -268,17 +268,42 @@ namespace SetupHub180Hz.Services
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, CacheEntry<WingetInstallerInfo?>> _installerInfoCache =
             new(StringComparer.OrdinalIgnoreCase);
 
-        public async Task<WingetInstallerInfo?> GetInstallerInfoAsync(string id)
+        public async Task<WingetInstallerInfo?> GetInstallerInfoAsync(string id, bool forceRefresh = false, string? name = null)
         {
-            if (string.IsNullOrWhiteSpace(id)) return null;
-            if (_installerInfoCache.TryGetValue(id, out var cached) && !cached.IsExpired(30)) return cached.Value;
+            if (string.IsNullOrWhiteSpace(id) && string.IsNullOrWhiteSpace(name)) return null;
+            if (!forceRefresh && !string.IsNullOrWhiteSpace(id) && _installerInfoCache.TryGetValue(id, out var cached) && !cached.IsExpired(15))
+                return cached.Value;
 
             await _metadataSemaphore.WaitAsync();
             try
             {
-                if (_installerInfoCache.TryGetValue(id, out cached) && !cached.IsExpired(30)) return cached.Value;
+                if (!forceRefresh && !string.IsNullOrWhiteSpace(id) && _installerInfoCache.TryGetValue(id, out cached) && !cached.IsExpired(15))
+                    return cached.Value;
 
-                var output = await RunWingetAsync($"show --id \"{id}\" --exact --accept-source-agreements");
+                string output = "";
+                if (!string.IsNullOrWhiteSpace(id))
+                {
+                    output = await RunWingetAsync($"show --id \"{id}\" --exact --accept-source-agreements");
+                    if (string.IsNullOrWhiteSpace(output) || !output.Contains("Installer Url:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var fallbackIdOutput = await RunWingetAsync($"show \"{id}\" --accept-source-agreements");
+                        if (!string.IsNullOrWhiteSpace(fallbackIdOutput) && fallbackIdOutput.Contains("Installer Url:", StringComparison.OrdinalIgnoreCase))
+                        {
+                            output = fallbackIdOutput;
+                        }
+                    }
+                }
+
+                if ((string.IsNullOrWhiteSpace(output) || !output.Contains("Installer Url:", StringComparison.OrdinalIgnoreCase)) &&
+                    !string.IsNullOrWhiteSpace(name))
+                {
+                    var fallbackNameOutput = await RunWingetAsync($"show --name \"{name}\" --accept-source-agreements");
+                    if (!string.IsNullOrWhiteSpace(fallbackNameOutput))
+                    {
+                        output = fallbackNameOutput;
+                    }
+                }
+
                 if (string.IsNullOrWhiteSpace(output))
                 {
                     return null;
@@ -334,11 +359,11 @@ namespace SetupHub180Hz.Services
                     }
                 }
 
-                var result = !string.IsNullOrWhiteSpace(installerUrl)
+                var result = (!string.IsNullOrWhiteSpace(installerUrl) || !string.IsNullOrWhiteSpace(version) || !string.IsNullOrWhiteSpace(homepage))
                     ? new WingetInstallerInfo(installerUrl, installerType, sha256, homepage, publisherUrl, publisher, version)
                     : null;
 
-                if (result != null)
+                if (result != null && !string.IsNullOrWhiteSpace(id))
                 {
                     _installerInfoCache[id] = new CacheEntry<WingetInstallerInfo?>(result);
                 }
@@ -445,6 +470,10 @@ namespace SetupHub180Hz.Services
 
                 // Fuzzy Name
                 success = await RunActionAsync($"install --name \"{name}\" --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+
+                // Interactive Name fallback
+                success = await RunActionAsync($"install --name \"{name}\" --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                 if (success || ct.IsCancellationRequested) return success;
             }
 

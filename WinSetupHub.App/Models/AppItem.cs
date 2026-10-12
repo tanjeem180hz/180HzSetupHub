@@ -64,6 +64,7 @@ namespace SetupHub180Hz.Models
                     _version = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(FormattedVersion));
+                    OnPropertyChanged(nameof(InstallStateBadgeText));
                 }
             }
         }
@@ -79,6 +80,7 @@ namespace SetupHub180Hz.Models
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(HasUpdate));
                     OnPropertyChanged(nameof(FormattedVersion));
+                    OnPropertyChanged(nameof(InstallStateBadgeText));
                 }
             }
         }
@@ -160,9 +162,54 @@ namespace SetupHub180Hz.Models
                     _webUrl = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(HasWebUrl));
+                    OnPropertyChanged(nameof(EffectiveWebUrl));
+                    OnPropertyChanged(nameof(OfficialDomainTag));
                 }
             }
         }
+
+        public string EffectiveWebUrl
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(_webUrl) && _webUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    return _webUrl;
+
+                var resolved = Services.AppMetadataHelper.ResolveOfficialUrl(this);
+                if (!string.IsNullOrWhiteSpace(resolved) && resolved.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                {
+                    _webUrl = resolved;
+                    return resolved;
+                }
+
+                var target = !string.IsNullOrWhiteSpace(Name) ? Name : Id;
+                return $"https://www.google.com/search?q={Uri.EscapeDataString(target + " official website")}";
+            }
+        }
+
+        public string OfficialDomainTag
+        {
+            get
+            {
+                try
+                {
+                    var url = EffectiveWebUrl;
+                    if (!string.IsNullOrWhiteSpace(url) && Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                    {
+                        var host = uri.Host.StartsWith("www.", StringComparison.OrdinalIgnoreCase)
+                            ? uri.Host.Substring(4)
+                            : uri.Host;
+                        if (!string.IsNullOrWhiteSpace(host) && !host.Equals("google.com", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return $"🌐 {host}";
+                        }
+                    }
+                }
+                catch { }
+                return "🌐 Official Link";
+            }
+        }
+
         public string AccentColor { get; set; } = "#2FB6FF";
         public string Source { get; set; } = "winget";
         public bool Essential { get; set; }
@@ -172,6 +219,34 @@ namespace SetupHub180Hz.Models
         public bool HasWebUrl => !string.IsNullOrWhiteSpace(WebUrl);
         public bool HasSource => !string.IsNullOrWhiteSpace(Source);
         public string SourceTag => Source?.ToUpperInvariant() ?? "WINGET";
+
+        private bool _isRecentlyUpdated;
+        public bool IsRecentlyUpdated
+        {
+            get => _isRecentlyUpdated;
+            set
+            {
+                if (_isRecentlyUpdated != value)
+                {
+                    _isRecentlyUpdated = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(FormattedVersion));
+                    OnPropertyChanged(nameof(InstallStateBadgeText));
+                }
+            }
+        }
+
+        public string InstallStateBadgeText
+        {
+            get
+            {
+                if (HasUpdate) return "⚡ UPDATE AVAILABLE";
+                if (IsRecentlyUpdated) return "✓ ALREADY UPDATED (LATEST)";
+                if (IsInstalled) return "✓ INSTALLED (LATEST)";
+                return "NOT INSTALLED";
+            }
+        }
+
         public string FormattedVersion
         {
             get
@@ -179,7 +254,21 @@ namespace SetupHub180Hz.Models
                 if (HasUpdate && !string.IsNullOrWhiteSpace(AvailableVersion))
                 {
                     string current = string.IsNullOrWhiteSpace(Version) ? "Installed" : Version;
-                    return $"🏷️ {current} ➔ {AvailableVersion}";
+                    return $"⚡ {current} ➔ {AvailableVersion}";
+                }
+                if (IsRecentlyUpdated)
+                {
+                    string ver = string.IsNullOrWhiteSpace(Version) || Version.Equals("Latest", StringComparison.OrdinalIgnoreCase)
+                        ? "Latest"
+                        : Version;
+                    return $"✓ Latest ({ver})";
+                }
+                if (IsInstalled)
+                {
+                    string ver = string.IsNullOrWhiteSpace(Version) || Version.Equals("Latest", StringComparison.OrdinalIgnoreCase)
+                        ? "Latest"
+                        : Version;
+                    return $"✓ {ver} (Latest)";
                 }
                 return string.IsNullOrWhiteSpace(Version) ? "🏷️ Latest" : $"🏷️ {Version}";
             }
@@ -197,6 +286,7 @@ namespace SetupHub180Hz.Models
                 {
                     _isUpgrade = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(InstallStateBadgeText));
                 }
             }
         }
@@ -240,11 +330,13 @@ namespace SetupHub180Hz.Models
                 {
                     _isInstalled = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(FormattedVersion));
+                    OnPropertyChanged(nameof(InstallStateBadgeText));
                     if (_isInstalled && _status != "Installing…")
                     {
-                        Status = "Installed";
+                        Status = HasUpdate ? "Update" : (_isRecentlyUpdated ? "✓ Up to Date" : "Installed");
                     }
-                    else if (!_isInstalled && _status == "Installed")
+                    else if (!_isInstalled && (_status == "Installed" || _status == "✓ Up to Date"))
                     {
                         Status = "Install";
                     }

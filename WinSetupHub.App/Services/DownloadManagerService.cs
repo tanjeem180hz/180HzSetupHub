@@ -666,9 +666,11 @@ namespace SetupHub180Hz.Services
             }
 
             // 1. Attempt high-speed direct CDN download with byte-level progress and resume support
+            // Always force-refresh manifest info so vendor updates automatically update the install link & version
             try
             {
-                var installerInfo = await _winget.GetInstallerInfoAsync(app.Id);
+                _ = _winget.EnsureSourcesUpdatedAsync();
+                var installerInfo = await _winget.GetInstallerInfoAsync(app.Id, forceRefresh: true, name: app.Name);
                 if (installerInfo != null)
                 {
                     if (!string.IsNullOrWhiteSpace(installerInfo.Version))
@@ -1133,13 +1135,32 @@ namespace SetupHub180Hz.Services
                     psi.Verb = "runas";
                 }
 
-                using var proc = Process.Start(psi);
-                if (proc != null)
+                try
                 {
-                    await proc.WaitForExitAsync();
-                    success = (proc.ExitCode == 0 || proc.ExitCode == 3010 || proc.ExitCode == 1641);
+                    using var proc = Process.Start(psi);
+                    if (proc != null)
+                    {
+                        await proc.WaitForExitAsync();
+                        success = (proc.ExitCode == 0 || proc.ExitCode == 3010 || proc.ExitCode == 1641);
+                    }
+                }
+                catch
+                {
+                    // If UAC elevation was declined or user-scope installer rejected 'runas', retry with standard user privileges
+                    try
+                    {
+                        psi.Verb = "";
+                        using var userProc = Process.Start(psi);
+                        if (userProc != null)
+                        {
+                            await userProc.WaitForExitAsync();
+                            success = (userProc.ExitCode == 0 || userProc.ExitCode == 3010 || userProc.ExitCode == 1641);
+                        }
+                    }
+                    catch { }
                 }
 
+                AppMetadataHelper.InvalidateCache();
                 if (!success && AppMetadataHelper.IsAppInstalled(app))
                 {
                     success = true;
@@ -1153,8 +1174,7 @@ namespace SetupHub180Hz.Services
                         var interactivePsi = new ProcessStartInfo
                         {
                             FileName = finalPath,
-                            UseShellExecute = true,
-                            Verb = "runas"
+                            UseShellExecute = true
                         };
                         using var iProc = Process.Start(interactivePsi);
                         if (iProc != null)
@@ -1165,6 +1185,7 @@ namespace SetupHub180Hz.Services
                     }
                     catch { }
 
+                    AppMetadataHelper.InvalidateCache();
                     if (!success && AppMetadataHelper.IsAppInstalled(app))
                     {
                         success = true;
@@ -1367,6 +1388,36 @@ namespace SetupHub180Hz.Services
                 return;
             }
 
+            // Safety net: if automated CLI install reported false, check if a downloaded installer exists on disk and launch it interactively
+            if (!success && !AppMetadataHelper.IsAppInstalled(app))
+            {
+                try
+                {
+                    string safeId = MakeSafeFilename(app.Id);
+                    var downloadedFiles = Directory.GetFiles(_downloadDir, $"{safeId}_*_setup.*")
+                        .Where(f => !f.EndsWith(".part", StringComparison.OrdinalIgnoreCase))
+                        .OrderByDescending(File.GetLastWriteTimeUtc)
+                        .ToList();
+
+                    if (downloadedFiles.Count > 0)
+                    {
+                        string installerPath = downloadedFiles[0];
+                        UnblockFileSafe(installerPath);
+                        using var fallbackProc = Process.Start(new ProcessStartInfo
+                        {
+                            FileName = installerPath,
+                            UseShellExecute = true
+                        });
+                        if (fallbackProc != null)
+                        {
+                            await fallbackProc.WaitForExitAsync(ct);
+                            success = (fallbackProc.ExitCode == 0 || fallbackProc.ExitCode == 3010 || fallbackProc.ExitCode == 1641);
+                        }
+                    }
+                }
+                catch { }
+            }
+
             FinalizeAppStatus(app, success, queueIndex, queueTotal);
         }
 
@@ -1393,31 +1444,40 @@ namespace SetupHub180Hz.Services
             app.DownloadEta = "";
             app.IsPaused = false;
             _currentSpeedBps = 0;
+            bool wasUpgrade = app.IsUpgrade || app.HasUpdate;
+
             if (success)
             {
+                AppMetadataHelper.InvalidateCache();
+                var reg = AppMetadataHelper.GetRegistryInfo(app.Name, app.Id);
+
+                if (!string.IsNullOrWhiteSpace(app.AvailableVersion))
+                {
+                    app.Version = app.AvailableVersion;
+                }
+                else if (!string.IsNullOrWhiteSpace(reg?.DisplayVersion))
+                {
+                    app.Version = reg.DisplayVersion;
+                }
+
+                app.AvailableVersion = "";
+                app.IsUpgrade = false;
+                app.IsRecentlyUpdated = true;
                 app.IsInstalled = true;
-                app.Status = "Installed";
+                app.Status = wasUpgrade ? "✓ Up to Date" : "Installed";
                 app.IsSelected = false;
                 app.InstallDate = DateTime.Now;
 
-                bool wasUpgrade = app.IsUpgrade || app.HasUpdate;
+                UpdateMonitorService.Instance.MarkAsUpdated(app.Id, app.Name);
                 if (wasUpgrade)
                 {
-                    if (!string.IsNullOrWhiteSpace(app.AvailableVersion))
-                    {
-                        app.Version = app.AvailableVersion;
-                    }
-                    app.AvailableVersion = "";
-                    app.IsUpgrade = false;
-                    UpdateMonitorService.Instance.MarkAsUpdated(app.Id, app.Name);
                     _ = Task.Run(async () =>
                     {
                         try { await UpdateMonitorService.Instance.RefreshAsync(force: true); } catch { }
                     });
                 }
 
-                // Invalidate registry cache and notify catalog of newly installed app
-                AppMetadataHelper.InvalidateCache();
+                // Notify catalog of newly installed / updated app
                 PackageCatalogService.NotifyStatusChanged(app.Id, true);
                 PackageCatalogService.NotifyStatusChanged(app.Name, true);
                 var cleanId = AppMetadataHelper.CleanPackageId(app.Id);
@@ -1431,7 +1491,12 @@ namespace SetupHub180Hz.Services
                     PackageCatalogService.NotifyStatusChanged(normName, true);
                 }
 
-                ActivityLogger.Instance.Log($"Successfully deployed {app.Name}.", ActivityType.Success);
+                string verLabel = string.IsNullOrWhiteSpace(app.Version) ? "Latest" : app.Version;
+                string completionMsg = wasUpgrade
+                    ? $"Already Updated — You are in latest version ({verLabel})!"
+                    : $"Successfully installed {app.Name} ({verLabel} — Latest Version)!";
+
+                ActivityLogger.Instance.Log(completionMsg, ActivityType.Success);
                 Notify(new DownloadProgressInfo
                 {
                     App = app,
@@ -1439,7 +1504,7 @@ namespace SetupHub180Hz.Services
                     QueueTotal = queueTotal,
                     State = DownloadState.Completed,
                     Percentage = 100,
-                    StatusMessage = wasUpgrade ? $"Successfully updated {app.Name}!" : $"Successfully installed {app.Name}!"
+                    StatusMessage = completionMsg
                 });
             }
             else
@@ -1453,7 +1518,7 @@ namespace SetupHub180Hz.Services
                     QueueTotal = queueTotal,
                     State = DownloadState.Error,
                     Percentage = 0,
-                    StatusMessage = $"{(app.IsUpgrade ? "Update" : "Installation")} failed for {app.Name}."
+                    StatusMessage = $"{(wasUpgrade ? "Update" : "Installation")} failed for {app.Name}."
                 });
             }
 
@@ -1465,8 +1530,8 @@ namespace SetupHub180Hz.Services
                     CompletedAt = DateTime.Now,
                     Success = success,
                     Message = success
-                        ? (app.IsUpgrade ? "Updated successfully" : "Installed successfully")
-                        : (app.IsUpgrade ? "Update failed" : "Installation failed")
+                        ? (wasUpgrade ? $"Already Updated — Latest Version ({app.Version})" : $"Installed Latest Version ({app.Version})")
+                        : (wasUpgrade ? "Update failed" : "Installation failed")
                 });
             }
             QueueChanged?.Invoke();

@@ -77,6 +77,15 @@ namespace SetupHub180Hz.Services
 
         private readonly HashSet<string> _recentlyUpdated = new(StringComparer.OrdinalIgnoreCase);
 
+        public event EventHandler? UpdatesChanged;
+
+        public bool IsRecentlyUpdated(string? appId, string? appName = null)
+        {
+            if (!string.IsNullOrWhiteSpace(appId) && _recentlyUpdated.Contains(appId)) return true;
+            if (!string.IsNullOrWhiteSpace(appName) && _recentlyUpdated.Contains(appName)) return true;
+            return false;
+        }
+
         public void MarkAsUpdated(string appId, string? appName = null)
         {
             if (!string.IsNullOrWhiteSpace(appId)) _recentlyUpdated.Add(appId);
@@ -95,6 +104,8 @@ namespace SetupHub180Hz.Services
                 {
                     UpgradableApps.Remove(match);
                 }
+
+                UpdatesChanged?.Invoke(this, EventArgs.Empty);
             });
         }
 
@@ -184,6 +195,7 @@ namespace SetupHub180Hz.Services
                 }
 
                 PackageCatalogService.NotifyUpdatesRefreshed();
+                UpdatesChanged?.Invoke(this, EventArgs.Empty);
                 _lastRefresh = DateTime.UtcNow;
 
                 // Asynchronously fetch missing icons and websites in parallel
