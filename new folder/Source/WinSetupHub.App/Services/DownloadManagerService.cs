@@ -647,7 +647,8 @@ namespace SetupHub180Hz.Services
                 try
                 {
                     Process.Start(new ProcessStartInfo("ms-windows-store://") { UseShellExecute = true });
-                    app.Status = "Installed";
+                    app.Status = "✓ Up to Date";
+                    app.IsRecentlyUpdated = true;
                     app.IsInstalled = true;
                     app.IsBusy = false;
                     app.IsSelected = false;
@@ -665,56 +666,73 @@ namespace SetupHub180Hz.Services
                 catch { }
             }
 
-            // 1. Attempt high-speed direct CDN download with byte-level progress and resume support
+            bool isMsStoreId = (app.Id.Length == 12 || app.Id.Length == 14) && !app.Id.Contains('.') && !app.Id.Contains('-');
+            bool isMsStore = isMsStoreId || string.Equals(app.Source, "msstore", StringComparison.OrdinalIgnoreCase);
+
+            // 1. Attempt high-speed direct CDN download with byte-level progress and resume support (for non-Store packages)
             // Always force-refresh manifest info so vendor updates automatically update the install link & version
-            try
+            if (!isMsStore)
             {
-                _ = _winget.EnsureSourcesUpdatedAsync();
-                var installerInfo = await _winget.GetInstallerInfoAsync(app.Id, forceRefresh: true, name: app.Name);
-                if (installerInfo != null)
+                try
                 {
-                    if (!string.IsNullOrWhiteSpace(installerInfo.Version))
+                    _ = _winget.EnsureSourcesUpdatedAsync();
+                    var installerInfo = await _winget.GetInstallerInfoAsync(app.Id, forceRefresh: true, name: app.Name);
+                    if (installerInfo != null)
                     {
-                        if (app.IsInstalled)
+                        if (!string.IsNullOrWhiteSpace(installerInfo.Version))
                         {
-                            app.AvailableVersion = installerInfo.Version;
+                            if (app.IsInstalled)
+                            {
+                                app.AvailableVersion = installerInfo.Version;
+                            }
+                            else
+                            {
+                                app.Version = installerInfo.Version;
+                            }
                         }
-                        else
-                        {
-                            app.Version = installerInfo.Version;
-                        }
-                    }
 
-                    // Ensure the app is linked directly to its authentic official website without mismatch
-                    string? officialLink = installerInfo.Homepage ?? installerInfo.PublisherUrl;
-                    if (string.IsNullOrWhiteSpace(officialLink) && !string.IsNullOrWhiteSpace(installerInfo.Url))
-                    {
-                        try
+                        // Ensure the app is linked directly to its authentic official website without mismatch
+                        string? officialLink = installerInfo.Homepage ?? installerInfo.PublisherUrl;
+                        if (string.IsNullOrWhiteSpace(officialLink) && !string.IsNullOrWhiteSpace(installerInfo.Url))
                         {
-                            var u = new Uri(installerInfo.Url);
-                            officialLink = $"{u.Scheme}://{u.Host}";
+                            try
+                            {
+                                var u = new Uri(installerInfo.Url);
+                                officialLink = $"{u.Scheme}://{u.Host}";
+                            }
+                            catch { }
                         }
-                        catch { }
-                    }
-                    if (!string.IsNullOrWhiteSpace(officialLink))
-                    {
-                        app.WebUrl = officialLink;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(installerInfo.Url) && installerInfo.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                    {
-                        bool downloaded = await DownloadWithResumeAsync(app, installerInfo.Url, installerInfo.Type, installerInfo.Version, installerInfo.Sha256, queueIndex, queueTotal);
-                        if (downloaded)
+                        if (!string.IsNullOrWhiteSpace(officialLink))
                         {
-                            await InstallDownloadedPackageAsync(app, installerInfo, queueIndex, queueTotal);
-                            return;
+                            app.WebUrl = officialLink;
+                        }
+
+                        string lowerInstallerType = (installerInfo.Type ?? "").Trim().ToLowerInvariant();
+                        string extCheck = GetExtensionForType(installerInfo.Type, installerInfo.Url ?? "");
+                        bool isArchiveOrPortable = lowerInstallerType == "zip" ||
+                                                   lowerInstallerType == "portable" ||
+                                                   extCheck.Equals(".zip", StringComparison.OrdinalIgnoreCase) ||
+                                                   extCheck.Equals(".7z", StringComparison.OrdinalIgnoreCase) ||
+                                                   extCheck.Equals(".rar", StringComparison.OrdinalIgnoreCase);
+
+                        // Only direct-download standalone installers (.exe, .msi, .msix); let Winget extract & shim .zip/portable packages
+                        if (!isArchiveOrPortable &&
+                            !string.IsNullOrWhiteSpace(installerInfo.Url) &&
+                            installerInfo.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                        {
+                            bool downloaded = await DownloadWithResumeAsync(app, installerInfo.Url, installerInfo.Type, installerInfo.Version, installerInfo.Sha256, queueIndex, queueTotal);
+                            if (downloaded)
+                            {
+                                await InstallDownloadedPackageAsync(app, installerInfo, queueIndex, queueTotal);
+                                return;
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                ActivityLogger.Instance.Log($"Direct CDN download for {app.Name} interrupted: {ex.Message}. Falling back to Winget pipeline.", ActivityType.Warning);
+                catch (Exception ex)
+                {
+                    ActivityLogger.Instance.Log($"Direct CDN download for {app.Name} interrupted: {ex.Message}. Falling back to Winget pipeline.", ActivityType.Warning);
+                }
             }
 
             if (_isCancelled || _isSkipping) return;
@@ -760,10 +778,10 @@ namespace SetupHub180Hz.Services
             }
             catch { }
 
-            // If the verified latest installer is already complete on disk, verify SHA256, skip download and proceed to install
+            // If the verified latest installer is already complete on disk, verify SHA256 or binary integrity, skip download and proceed to install
             if (File.Exists(finalPath) && new FileInfo(finalPath).Length > 1024 * 50)
             {
-                if (!string.IsNullOrWhiteSpace(sha256) && !VerifyFileSha256(finalPath, sha256))
+                if (!string.IsNullOrWhiteSpace(sha256) && !VerifyFileSha256(finalPath, sha256) && !IsValidInstallerBinary(finalPath, ext))
                 {
                     try { File.Delete(finalPath); } catch { }
                 }
@@ -789,6 +807,8 @@ namespace SetupHub180Hz.Services
                     return true;
                 }
             }
+
+            bool retriedWithoutRange = false;
 
             while (!_isCancelled && !_isSkipping)
             {
@@ -820,11 +840,13 @@ namespace SetupHub180Hz.Services
                     bool isPartial = response.StatusCode == HttpStatusCode.PartialContent;
                     bool isOk = response.StatusCode == HttpStatusCode.OK;
 
-                    if (response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable)
+                    if (response.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable ||
+                        (existingBytes > 0 && !isPartial && !isOk && !retriedWithoutRange))
                     {
-                        // File might be already complete or server range invalid; restart fresh
+                        // Server rejected Range request on signed/redirected URL or partial file is stale; restart fresh once
+                        retriedWithoutRange = true;
                         existingBytes = 0;
-                        if (File.Exists(partPath)) File.Delete(partPath);
+                        try { if (File.Exists(partPath)) File.Delete(partPath); } catch { }
                         continue;
                     }
 
@@ -940,9 +962,17 @@ namespace SetupHub180Hz.Services
 
                     if (!string.IsNullOrWhiteSpace(sha256) && !VerifyFileSha256(finalPath, sha256))
                     {
-                        ActivityLogger.Instance.Log($"Hash verification failed for {app.Name}. Deleting corrupt file and falling back to Winget.", ActivityType.Warning);
-                        try { File.Delete(finalPath); } catch { }
-                        return false;
+                        // If vendor updated their evergreen CDN binary on the official link, verify it is a valid PE/MSI/MSIX binary before discarding
+                        if (IsValidInstallerBinary(finalPath, ext))
+                        {
+                            ActivityLogger.Instance.Log($"Detected newer vendor release binary on official CDN for {app.Name}; proceeding with latest binary.", ActivityType.Info);
+                        }
+                        else
+                        {
+                            ActivityLogger.Instance.Log($"Downloaded payload for {app.Name} is not a valid installer binary. Falling back to Winget.", ActivityType.Warning);
+                            try { File.Delete(finalPath); } catch { }
+                            return false;
+                        }
                     }
                     long finalFileSize = new FileInfo(finalPath).Length;
                     app.DownloadProgress = 100;
@@ -1005,6 +1035,33 @@ namespace SetupHub180Hz.Services
             }
 
             return false;
+        }
+
+        private static bool IsValidInstallerBinary(string filePath, string ext)
+        {
+            try
+            {
+                if (!File.Exists(filePath)) return false;
+                var fi = new FileInfo(filePath);
+                if (fi.Length < 50 * 1024) return false;
+
+                byte[] magic = new byte[4];
+                using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                if (fs.Read(magic, 0, 4) < 4) return false;
+
+                // PE Executable ("MZ")
+                if (magic[0] == 0x4D && magic[1] == 0x5A) return true;
+                // MSI Compound File (D0 CF 11 E0)
+                if (magic[0] == 0xD0 && magic[1] == 0xCF && magic[2] == 0x11 && magic[3] == 0xE0) return true;
+                // MSIX / APPX / ZIP (PK\x03\x04)
+                if (magic[0] == 0x50 && magic[1] == 0x4B && magic[2] == 0x03 && magic[3] == 0x04) return true;
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static void UnblockFileSafe(string path)
@@ -1098,7 +1155,9 @@ namespace SetupHub180Hz.Services
                 if (lowerType == "wix" || lowerType == "msi" || ext.Equals(".msi", StringComparison.OrdinalIgnoreCase))
                 {
                     psi.FileName = "msiexec.exe";
-                    psi.Arguments = $"/i \"{finalPath}\" /quiet /norestart";
+                    psi.Arguments = !string.IsNullOrWhiteSpace(info.SilentSwitch)
+                        ? $"/i \"{finalPath}\" {info.SilentSwitch}"
+                        : $"/i \"{finalPath}\" /quiet /norestart";
                     psi.UseShellExecute = true;
                     psi.Verb = "runas";
                 }
@@ -1115,7 +1174,11 @@ namespace SetupHub180Hz.Services
                 else
                 {
                     psi.FileName = finalPath;
-                    if (lowerType == "inno")
+                    if (!string.IsNullOrWhiteSpace(info.SilentSwitch))
+                    {
+                        psi.Arguments = info.SilentSwitch;
+                    }
+                    else if (lowerType == "inno")
                     {
                         psi.Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-";
                     }
@@ -1127,12 +1190,17 @@ namespace SetupHub180Hz.Services
                     {
                         psi.Arguments = "/quiet /norestart";
                     }
+                    else if (lowerType == "squirrel")
+                    {
+                        psi.Arguments = "--silent";
+                    }
                     else
                     {
                         psi.Arguments = DetectInstallerArguments(finalPath);
                     }
                     psi.UseShellExecute = true;
-                    psi.Verb = "runas";
+                    // Let Windows Shell honor the executable's embedded PE manifest (asInvoker for user installers, requireAdministrator for system installers)
+                    psi.Verb = "";
                 }
 
                 try
@@ -1146,15 +1214,15 @@ namespace SetupHub180Hz.Services
                 }
                 catch
                 {
-                    // If UAC elevation was declined or user-scope installer rejected 'runas', retry with standard user privileges
+                    // Fallback: if elevation was declined on msiexec or execution failed, retry toggling Verb
                     try
                     {
-                        psi.Verb = "";
-                        using var userProc = Process.Start(psi);
-                        if (userProc != null)
+                        psi.Verb = string.IsNullOrEmpty(psi.Verb) ? "runas" : "";
+                        using var retryProc = Process.Start(psi);
+                        if (retryProc != null)
                         {
-                            await userProc.WaitForExitAsync();
-                            success = (userProc.ExitCode == 0 || userProc.ExitCode == 3010 || userProc.ExitCode == 1641);
+                            await retryProc.WaitForExitAsync();
+                            success = (retryProc.ExitCode == 0 || retryProc.ExitCode == 3010 || retryProc.ExitCode == 1641);
                         }
                     }
                     catch { }
@@ -1164,6 +1232,28 @@ namespace SetupHub180Hz.Services
                 if (!success && AppMetadataHelper.IsAppInstalled(app))
                 {
                     success = true;
+                }
+
+                // If non-elevated silent execution returned non-zero and app is not installed yet, retry with explicit elevation
+                if (!success && string.IsNullOrEmpty(psi.Verb) && psi.UseShellExecute)
+                {
+                    try
+                    {
+                        psi.Verb = "runas";
+                        using var elevProc = Process.Start(psi);
+                        if (elevProc != null)
+                        {
+                            await elevProc.WaitForExitAsync();
+                            success = (elevProc.ExitCode == 0 || elevProc.ExitCode == 3010 || elevProc.ExitCode == 1641);
+                        }
+                    }
+                    catch { }
+
+                    AppMetadataHelper.InvalidateCache();
+                    if (!success && AppMetadataHelper.IsAppInstalled(app))
+                    {
+                        success = true;
+                    }
                 }
 
                 // If silent execution didn't report success and app is not yet installed, try running interactively
@@ -1226,6 +1316,10 @@ namespace SetupHub180Hz.Services
                     {
                         return "/S";
                     }
+                    if (header.Contains("Squirrel", StringComparison.OrdinalIgnoreCase) || header.Contains("Update.exe", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "--silent";
+                    }
                     if (header.Contains("WixBurn", StringComparison.OrdinalIgnoreCase) || header.Contains("Burn", StringComparison.OrdinalIgnoreCase))
                     {
                         return "/quiet /norestart";
@@ -1238,7 +1332,7 @@ namespace SetupHub180Hz.Services
             }
             catch { }
 
-            return "/VERYSILENT /NORESTART /S /quiet";
+            return "/S /quiet /norestart";
         }
 
         private async Task InstallViaWingetDirectAsync(AppItem app, int queueIndex, int queueTotal)
@@ -1423,6 +1517,7 @@ namespace SetupHub180Hz.Services
 
         private void FinalizeAppStatus(AppItem app, bool success, int queueIndex, int queueTotal)
         {
+            WingetService.InvalidateInstalledCache();
             if (!success)
             {
                 // Invalidate cache and retry checking IsAppInstalled with small delays to allow registry flush
@@ -1464,7 +1559,7 @@ namespace SetupHub180Hz.Services
                 app.IsUpgrade = false;
                 app.IsRecentlyUpdated = true;
                 app.IsInstalled = true;
-                app.Status = wasUpgrade ? "✓ Up to Date" : "Installed";
+                app.Status = "✓ Up to Date";
                 app.IsSelected = false;
                 app.InstallDate = DateTime.Now;
 
@@ -1492,9 +1587,7 @@ namespace SetupHub180Hz.Services
                 }
 
                 string verLabel = string.IsNullOrWhiteSpace(app.Version) ? "Latest" : app.Version;
-                string completionMsg = wasUpgrade
-                    ? $"Already Updated — You are in latest version ({verLabel})!"
-                    : $"Successfully installed {app.Name} ({verLabel} — Latest Version)!";
+                string completionMsg = $"Already Updated — You are in latest version ({verLabel})!";
 
                 ActivityLogger.Instance.Log(completionMsg, ActivityType.Success);
                 Notify(new DownloadProgressInfo
@@ -1530,7 +1623,7 @@ namespace SetupHub180Hz.Services
                     CompletedAt = DateTime.Now,
                     Success = success,
                     Message = success
-                        ? (wasUpgrade ? $"Already Updated — Latest Version ({app.Version})" : $"Installed Latest Version ({app.Version})")
+                        ? $"Already Updated — Latest Version ({app.Version})"
                         : (wasUpgrade ? "Update failed" : "Installation failed")
                 });
             }
@@ -1584,14 +1677,21 @@ namespace SetupHub180Hz.Services
 
         private static string GetExtensionForType(string? type, string url)
         {
-            if (url.EndsWith(".msi", StringComparison.OrdinalIgnoreCase)) return ".msi";
-            if (url.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) return ".exe";
-            if (url.EndsWith(".msixbundle", StringComparison.OrdinalIgnoreCase)) return ".msixbundle";
-            if (url.EndsWith(".msix", StringComparison.OrdinalIgnoreCase)) return ".msix";
-            if (url.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) return ".zip";
+            string cleanUrl = (url ?? "").Split('?', '#')[0];
+            if (cleanUrl.EndsWith(".msi", StringComparison.OrdinalIgnoreCase)) return ".msi";
+            if (cleanUrl.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) return ".exe";
+            if (cleanUrl.EndsWith(".msixbundle", StringComparison.OrdinalIgnoreCase)) return ".msixbundle";
+            if (cleanUrl.EndsWith(".msix", StringComparison.OrdinalIgnoreCase)) return ".msix";
+            if (cleanUrl.EndsWith(".appxbundle", StringComparison.OrdinalIgnoreCase)) return ".appxbundle";
+            if (cleanUrl.EndsWith(".appx", StringComparison.OrdinalIgnoreCase)) return ".appx";
+            if (cleanUrl.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) return ".zip";
+            if (cleanUrl.EndsWith(".7z", StringComparison.OrdinalIgnoreCase)) return ".7z";
+            if (cleanUrl.EndsWith(".rar", StringComparison.OrdinalIgnoreCase)) return ".rar";
 
             var lower = (type ?? "").ToLowerInvariant();
             if (lower == "wix" || lower == "msi") return ".msi";
+            if (lower == "zip" || lower == "portable") return ".zip";
+            if (lower == "msix" || lower == "appx") return ".msix";
             return ".exe";
         }
 

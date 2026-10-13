@@ -125,6 +125,36 @@
                                            Foreground="{StaticResource BrushTextSecondary}"/>
                             </Border>
 
+                            <!-- Official Website Link Tag Pill -->
+                            <Button Click="WebLink_Click"
+                                    ToolTip="{Binding EffectiveWebUrl}"
+                                    Cursor="Hand"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="TagBorder"
+                                                Background="#1438BDF8"
+                                                BorderBrush="#4538BDF8"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="8,2,8,2">
+                                            <TextBlock x:Name="TagText"
+                                                       Text="{Binding OfficialDomainTag}"
+                                                       FontSize="11"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="#38BDF8"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="TagBorder" Property="Background" Value="#2838BDF8"/>
+                                                <Setter TargetName="TagBorder" Property="BorderBrush" Value="#38BDF8"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+
                             <!-- ID Text -->
                             <TextBlock Text="{Binding Id}"
                                        Style="{StaticResource TextBody}"

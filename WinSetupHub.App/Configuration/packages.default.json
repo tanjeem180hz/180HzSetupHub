@@ -6597,19 +6597,6 @@
     "size": ""
   },
   {
-    "id": "9NT1R1C2HH7J",
-    "source": "msstore",
-    "name": "ChatGPT Desktop",
-    "category": "Developer",
-    "description": "The official ChatGPT desktop app for Windows, distributed through the Microsoft Store.",
-    "iconUrl": "https://www.google.com/s2/favicons?domain=microsoft.com&sz=128",
-    "accentColor": "#2FB6FF",
-    "essential": false,
-    "webUrl": "https://openai.com/chatgpt/download/",
-    "version": "Latest",
-    "size": ""
-  },
-  {
     "id": "ChatterinoTeam.Chatterino",
     "source": "winget",
     "name": "Chatterino",

@@ -58,7 +58,10 @@ namespace SetupHub180Hz.Views
                     string normQuery = AppMetadataHelper.NormalizeAppName(idOrName);
                     string cleanQuery = AppMetadataHelper.CleanPackageId(idOrName);
 
-                    var matches = _allPackages.Where(p =>
+                    var currentItems = (AppsListBox.ItemsSource as IEnumerable<AppItem>) ?? Enumerable.Empty<AppItem>();
+                    var pool = _allPackages.Concat(currentItems).Distinct().ToList();
+
+                    var matches = pool.Where(p =>
                         string.Equals(p.Id, idOrName, StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(p.Name, idOrName, StringComparison.OrdinalIgnoreCase) ||
                         (!string.IsNullOrWhiteSpace(cleanQuery) && string.Equals(AppMetadataHelper.CleanPackageId(p.Id), cleanQuery, StringComparison.OrdinalIgnoreCase)) ||
@@ -80,7 +83,7 @@ namespace SetupHub180Hz.Views
                             }
                             else if (!p.HasUpdate)
                             {
-                                p.Status = "Installed";
+                                p.Status = "✓ Up to Date";
                             }
                         }
                         else
@@ -92,27 +95,16 @@ namespace SetupHub180Hz.Views
                         }
                     }
 
-                    if (matches.Count > 0)
+                    if (matches.Count > 0 && string.IsNullOrWhiteSpace(SearchBox.Text))
                     {
                         ApplyFilter();
                     }
                 });
             };
 
-            PackageCatalogService.AppUpdatesRefreshed += () =>
-            {
-                Dispatcher.InvokeAsync(async () =>
-                {
-                    if (_allPackages.Count > 0)
-                    {
-                        await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
-                    }
-                });
-            };
-
             UpdateMonitorService.Instance.UpdatesChanged += (_, _) =>
             {
-                Dispatcher.InvokeAsync(async () =>
+                _ = Task.Run(async () =>
                 {
                     if (_allPackages.Count > 0)
                     {
@@ -142,7 +134,13 @@ namespace SetupHub180Hz.Views
                         await Task.Run(async () =>
                         {
                             await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
-                            await Dispatcher.InvokeAsync(() => ApplyFilter());
+                            await Dispatcher.InvokeAsync(() =>
+                            {
+                                if (string.IsNullOrWhiteSpace(SearchBox.Text))
+                                {
+                                    ApplyFilter();
+                                }
+                            });
                         });
                     }
                 }
@@ -245,7 +243,7 @@ namespace SetupHub180Hz.Views
                     if (AppMetadataHelper.IsAppInstalled(item))
                     {
                         item.IsInstalled = true;
-                        item.Status = "Installed";
+                        item.Status = "✓ Up to Date";
                     }
                 }
 
@@ -261,23 +259,10 @@ namespace SetupHub180Hz.Views
                 return;
             }
 
-            // Background async icon fetching & winget comprehensive status + update check
+            // 1. Immediately start high-res icon fetching in parallel (does not wait for winget CLI)
             _ = Task.Run(async () =>
             {
-                _ = _winget.EnsureSourcesUpdatedAsync();
-                _ = UpdateMonitorService.Instance.RefreshAsync();
-
-                // 1. Concurrently check installed status with winget list (covers MS Store / MSIX / Winget / updates)
-                await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
-
-                // 2. Redispatch ApplyFilter on UI thread so all detected apps immediately reflect as Installed / Update
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    ApplyFilter();
-                });
-
-                // 3. Fetch high-res icons in parallel
-                _ = Parallel.ForEachAsync(_allPackages, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (pkg, ct) =>
+                await Parallel.ForEachAsync(_allPackages, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async (pkg, ct) =>
                 {
                     if (pkg.IconImageSource == null)
                     {
@@ -294,6 +279,23 @@ namespace SetupHub180Hz.Views
                                 await Dispatcher.InvokeAsync(() => pkg.IconImageSource = img);
                             }
                         }
+                    }
+                });
+            });
+
+            // 2. Background winget comprehensive status + update check
+            _ = Task.Run(async () =>
+            {
+                _ = _winget.EnsureSourcesUpdatedAsync();
+                _ = UpdateMonitorService.Instance.RefreshAsync();
+
+                await _catalog.CheckInstalledStatusAsync(_winget, _allPackages);
+
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    if (string.IsNullOrWhiteSpace(SearchBox.Text))
+                    {
+                        ApplyFilter();
                     }
                 });
             });
@@ -1840,68 +1842,26 @@ namespace SetupHub180Hz.Views
         {
             try
             {
-                // 1. Direct local executable from icon path
-                if (!string.IsNullOrWhiteSpace(app.LocalIconPath) && app.LocalIconPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && File.Exists(app.LocalIconPath))
+                bool launched = AppMetadataHelper.LaunchApp(app);
+                if (launched)
                 {
-                    Process.Start(new ProcessStartInfo(app.LocalIconPath) { UseShellExecute = true });
+                    ActivityLogger.Instance.Log($"Successfully launched {app.Name}.", ActivityType.Info);
                     return;
                 }
 
-                // 2. Query registry install location for main executable
-                var reg = AppMetadataHelper.GetRegistryInfo(app.Name, app.Id);
-                if (reg != null && !string.IsNullOrWhiteSpace(reg.InstallLocation) && Directory.Exists(reg.InstallLocation))
+                // If launch failed, check whether it is verified installed on PC:
+                bool isInstalled = AppMetadataHelper.IsAppInstalled(app);
+                if (isInstalled)
                 {
-                    var exes = Directory.GetFiles(reg.InstallLocation, "*.exe", SearchOption.TopDirectoryOnly);
-                    var mainExe = exes.FirstOrDefault(f => !Path.GetFileName(f).Contains("uninstall", StringComparison.OrdinalIgnoreCase) &&
-                                                           !Path.GetFileName(f).Contains("update", StringComparison.OrdinalIgnoreCase) &&
-                                                           !Path.GetFileName(f).Contains("helper", StringComparison.OrdinalIgnoreCase)) ?? exes.FirstOrDefault();
-                    if (mainExe != null && File.Exists(mainExe))
-                    {
-                        Process.Start(new ProcessStartInfo(mainExe) { UseShellExecute = true });
-                        return;
-                    }
+                    ThemedMessageBox.Show(
+                        $"Unable to automatically launch {app.Name}.\nYou can launch it directly from your Windows Start Menu.",
+                        $"Open {app.Name}",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                    return;
                 }
 
-                // 3. Search Start Menu shortcuts
-                string[] startDirs = {
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"),
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
-                };
-                string normName = AppMetadataHelper.NormalizeAppName(app.Name);
-                foreach (var dir in startDirs)
-                {
-                    if (Directory.Exists(dir))
-                    {
-                        var lnks = Directory.GetFiles(dir, $"*{normName}*.lnk", SearchOption.AllDirectories);
-                        if (lnks.Length > 0)
-                        {
-                            Process.Start(new ProcessStartInfo(lnks[0]) { UseShellExecute = true });
-                            return;
-                        }
-                    }
-                }
-
-                // 4. Try App Paths registry
-                using var appPathsKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths");
-                if (appPathsKey != null)
-                {
-                    foreach (var sub in appPathsKey.GetSubKeyNames())
-                    {
-                        if (sub.Contains(app.Name, StringComparison.OrdinalIgnoreCase) || (!string.IsNullOrWhiteSpace(app.Id) && sub.Contains(app.Id, StringComparison.OrdinalIgnoreCase)))
-                        {
-                            using var k = appPathsKey.OpenSubKey(sub);
-                            string? exe = k?.GetValue("") as string;
-                            if (!string.IsNullOrWhiteSpace(exe) && File.Exists(exe))
-                            {
-                                Process.Start(new ProcessStartInfo(exe) { UseShellExecute = true });
-                                return;
-                            }
-                        }
-                    }
-                }
-
-                // 5. App executable was not found on system (uninstalled or moved).
-                // Do NOT open the website! Reset status and offer reinstallation prompt.
+                // App executable was truly not found on system (uninstalled or moved).
                 app.IsInstalled = false;
                 app.Status = "Install";
 

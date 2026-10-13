@@ -59,7 +59,23 @@ namespace SetupHub180Hz.Services
                     continue;
                 }
 
+                if (KnownPackageAliases.TryGetValue(idKey, out var aliases))
+                {
+                    if (aliases.Any(a => seenIds.Contains(a)))
+                    {
+                        continue;
+                    }
+                }
+
                 seenIds.Add(idKey);
+                if (aliases != null)
+                {
+                    foreach (var a in aliases)
+                    {
+                        seenIds.Add(a);
+                    }
+                }
+
                 if (!string.IsNullOrWhiteSpace(normName))
                 {
                     seenNames.Add(normName);
@@ -74,6 +90,7 @@ namespace SetupHub180Hz.Services
         {
             if (string.IsNullOrWhiteSpace(name)) return "";
             var clean = System.Text.RegularExpressions.Regex.Replace(name, @"\s*\([^)]*\)", "").Trim();
+            clean = System.Text.RegularExpressions.Regex.Replace(clean, @"\s+(desktop|client|for windows|windows|app|official|edition|community|professional)\b", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Trim();
             clean = System.Text.RegularExpressions.Regex.Replace(clean, @"[^a-zA-Z0-9]", "").ToLowerInvariant();
             return clean;
         }
@@ -130,8 +147,11 @@ namespace SetupHub180Hz.Services
             ["9NZTWSQNTD0S"] = new[] { "Telegram.TelegramDesktop", "Telegram", "Telegram Desktop" },
             ["Discord.Discord"] = new[] { "XPDC2RH70K22MN", "Discord" },
             ["XPDC2RH70K22MN"] = new[] { "Discord.Discord", "Discord" },
-            ["OpenAI.ChatGPT"] = new[] { "9PLM9XGG6VKS", "ChatGPT", "OpenAI.Codex", "OpenAI ChatGPT" },
-            ["9PLM9XGG6VKS"] = new[] { "OpenAI.ChatGPT", "ChatGPT", "OpenAI.Codex" },
+            ["OpenAI.ChatGPT"] = new[] { "9PLM9XGG6VKS", "ChatGPT", "OpenAI.Codex", "9NT1R1C2HH7J", "ChatGPT Desktop", "OpenAI ChatGPT" },
+            ["9PLM9XGG6VKS"] = new[] { "OpenAI.ChatGPT", "ChatGPT", "OpenAI.Codex", "9NT1R1C2HH7J", "ChatGPT Desktop" },
+            ["9NT1R1C2HH7J"] = new[] { "9PLM9XGG6VKS", "OpenAI.ChatGPT", "ChatGPT", "OpenAI.Codex", "ChatGPT Desktop" },
+            ["OpenAI.Codex"] = new[] { "9PLM9XGG6VKS", "OpenAI.ChatGPT", "ChatGPT", "9NT1R1C2HH7J" },
+            ["ChatGPT"] = new[] { "9PLM9XGG6VKS", "OpenAI.ChatGPT", "OpenAI.Codex", "9NT1R1C2HH7J", "ChatGPT Desktop" },
             ["Anthropic.Claude"] = new[] { "Claude", "Claude Desktop" },
             ["OpenJS.NodeJS"] = new[] { "OpenJS.NodeJS.LTS", "Node.js", "NodeJS", "Node.js LTS", "NodeJS LTS" },
             ["OpenJS.NodeJS.LTS"] = new[] { "OpenJS.NodeJS", "Node.js", "NodeJS", "Node.js LTS", "NodeJS LTS" },

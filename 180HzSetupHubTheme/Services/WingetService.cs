@@ -88,10 +88,43 @@ namespace SetupHub180Hz.Services
             }
         }
 
-        public async Task<List<AppItem>> GetInstalledAppsAsync()
+        private static CacheEntry<List<AppItem>>? _installedAppsCache;
+        private static readonly System.Threading.SemaphoreSlim _installedListSemaphore = new(1, 1);
+
+        public static void InvalidateInstalledCache()
         {
-            var output = await RunWingetAsync("list --accept-source-agreements");
-            return ParseTable(output);
+            _installedAppsCache = null;
+        }
+
+        public async Task<List<AppItem>> GetInstalledAppsAsync(bool forceRefresh = false)
+        {
+            var cached = _installedAppsCache;
+            if (!forceRefresh && cached != null && (DateTime.UtcNow - cached.CachedAt).TotalSeconds < 25)
+            {
+                return cached.Value;
+            }
+
+            await _installedListSemaphore.WaitAsync();
+            try
+            {
+                cached = _installedAppsCache;
+                if (!forceRefresh && cached != null && (DateTime.UtcNow - cached.CachedAt).TotalSeconds < 25)
+                {
+                    return cached.Value;
+                }
+
+                var output = await RunWingetAsync("list --accept-source-agreements");
+                var parsed = ParseTable(output);
+                if (parsed.Count > 0)
+                {
+                    _installedAppsCache = new CacheEntry<List<AppItem>>(parsed);
+                }
+                return parsed;
+            }
+            finally
+            {
+                _installedListSemaphore.Release();
+            }
         }
 
         public async Task<List<AppItem>> GetUpgradableAppsAsync()
@@ -263,7 +296,8 @@ namespace SetupHub180Hz.Services
             string? Homepage = null,
             string? PublisherUrl = null,
             string? Publisher = null,
-            string? Version = null);
+            string? Version = null,
+            string? SilentSwitch = null);
 
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, CacheEntry<WingetInstallerInfo?>> _installerInfoCache =
             new(StringComparer.OrdinalIgnoreCase);
@@ -316,6 +350,7 @@ namespace SetupHub180Hz.Services
                 string? publisherUrl = null;
                 string? publisher = null;
                 string? version = null;
+                string? silentSwitch = null;
 
                 using var reader = new System.IO.StringReader(output);
                 string? line;
@@ -357,10 +392,20 @@ namespace SetupHub180Hz.Services
                         var val = trimmed.Substring("Version:".Length).Trim();
                         if (!string.IsNullOrWhiteSpace(val)) version = val;
                     }
+                    else if (trimmed.StartsWith("Silent:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var val = trimmed.Substring("Silent:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) silentSwitch = val;
+                    }
+                    else if (trimmed.StartsWith("SilentWithProgress:", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(silentSwitch))
+                    {
+                        var val = trimmed.Substring("SilentWithProgress:".Length).Trim();
+                        if (!string.IsNullOrWhiteSpace(val)) silentSwitch = val;
+                    }
                 }
 
                 var result = (!string.IsNullOrWhiteSpace(installerUrl) || !string.IsNullOrWhiteSpace(version) || !string.IsNullOrWhiteSpace(homepage))
-                    ? new WingetInstallerInfo(installerUrl, installerType, sha256, homepage, publisherUrl, publisher, version)
+                    ? new WingetInstallerInfo(installerUrl, installerType, sha256, homepage, publisherUrl, publisher, version, silentSwitch)
                     : null;
 
                 if (result != null && !string.IsNullOrWhiteSpace(id))
@@ -385,152 +430,196 @@ namespace SetupHub180Hz.Services
         public async Task<bool> InstallAsync(string id, string? source, string? name, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default)
         {
             _ = Task.Run(() => EnsureSourcesUpdatedAsync());
-            if (id.Equals("Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                try
+                if (id.Equals("Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))
                 {
-                    Process.Start(new ProcessStartInfo("ms-windows-store://") { UseShellExecute = true });
-                    onOutputLine?.Invoke("Opened Microsoft Store.");
-                    return true;
-                }
-                catch
-                {
-                    // Fallback to winget install
-                }
-            }
-
-            // Detect source if missing
-            bool isMsStoreId = (id.Length == 12 || id.Length == 14) && !id.Contains('.') && !id.Contains('-');
-            string effectiveSource = source ?? "";
-            if (string.IsNullOrWhiteSpace(effectiveSource) && isMsStoreId)
-            {
-                effectiveSource = "msstore";
-            }
-            bool isMsStore = effectiveSource.Equals("msstore", StringComparison.OrdinalIgnoreCase) || isMsStoreId;
-
-            // MS Store apps: AppX packages managed natively by Windows Store. Do NOT pass --silent.
-            if (isMsStore)
-            {
-                onOutputLine?.Invoke($"Initiating Microsoft Store package installation for {name ?? id}…");
-                var successMsStore = await RunActionAsync($"install --id \"{id}\" --source msstore -e --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-                if (successMsStore || ct.IsCancellationRequested) return successMsStore;
-
-                successMsStore = await RunActionAsync($"install \"{id}\" --source msstore --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-                if (successMsStore || ct.IsCancellationRequested) return successMsStore;
-
-                // Fallback: Launch native Microsoft Store Product Page for 1-click install
-                onOutputLine?.Invoke($"Redirecting {name ?? id} to Microsoft Store app…");
-                try
-                {
-                    Process.Start(new ProcessStartInfo($"ms-windows-store://pdp/?ProductId={id}") { UseShellExecute = true });
-                    for (int i = 0; i < 10; i++)
+                    try
                     {
-                        await Task.Delay(2000, ct);
-                        if (AppMetadataHelper.IsAppInstalled(new AppItem { Id = id, Name = name ?? id, Source = "msstore" }))
-                        {
-                            onOutputLine?.Invoke($"Verified {name ?? id} is installed on system.");
-                            return true;
-                        }
+                        Process.Start(new ProcessStartInfo("ms-windows-store://") { UseShellExecute = true });
+                        onOutputLine?.Invoke("Opened Microsoft Store.");
+                        return true;
                     }
+                    catch
+                    {
+                        // Fallback to winget install
+                    }
+                }
+
+                // Detect source if missing
+                bool isMsStoreId = (id.Length == 12 || id.Length == 14) && !id.Contains('.') && !id.Contains('-');
+                string effectiveSource = source ?? "";
+                if (string.IsNullOrWhiteSpace(effectiveSource) && isMsStoreId)
+                {
+                    effectiveSource = "msstore";
+                }
+                bool isMsStore = effectiveSource.Equals("msstore", StringComparison.OrdinalIgnoreCase) || isMsStoreId;
+
+                // MS Store apps: AppX packages managed natively by Windows Store. Do NOT pass --silent.
+                if (isMsStore)
+                {
+                    onOutputLine?.Invoke($"Initiating Microsoft Store package installation for {name ?? id}…");
+                    var successMsStore = await RunActionAsync($"install --id \"{id}\" --source msstore -e --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    if (successMsStore || ct.IsCancellationRequested) return successMsStore;
+
+                    successMsStore = await RunActionAsync($"install \"{id}\" --source msstore --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    if (successMsStore || ct.IsCancellationRequested) return successMsStore;
+
+                    // Fallback: Launch native Microsoft Store Product Page for 1-click install
+                    onOutputLine?.Invoke($"Redirecting {name ?? id} to Microsoft Store app…");
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo($"ms-windows-store://pdp/?ProductId={id}") { UseShellExecute = true });
+                        for (int i = 0; i < 10; i++)
+                        {
+                            await Task.Delay(2000, ct);
+                            if (AppMetadataHelper.IsAppInstalled(new AppItem { Id = id, Name = name ?? id, Source = "msstore" }))
+                            {
+                                onOutputLine?.Invoke($"Verified {name ?? id} is installed on system.");
+                                return true;
+                            }
+                        }
+                        return true;
+                    }
+                    catch { }
+                }
+
+                var srcArg = !string.IsNullOrWhiteSpace(effectiveSource) && !effectiveSource.Equals("winget", StringComparison.OrdinalIgnoreCase)
+                    ? $"--source \"{effectiveSource}\" "
+                    : (!string.IsNullOrWhiteSpace(effectiveSource) ? "--source winget " : "");
+
+                // Tier 1: Exact ID match with silent & force
+                var success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+
+                // Tier 1b: Exact ID match with --ignore-security-hash (handles evergreen vendor hotfixes before manifest hash sync)
+                success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --force --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+
+                // Tier 2: Non-exact ID match with silent & force
+                success = await RunActionAsync($"install \"{id}\" {srcArg}--silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+
+                // Tier 3: Source fallback (if specific source was specified, try without source restriction)
+                if (!string.IsNullOrWhiteSpace(effectiveSource))
+                {
+                    success = await RunActionAsync($"install --id \"{id}\" -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    if (success || ct.IsCancellationRequested) return success;
+                }
+
+                // Tier 4: Interactive / Unattended fallback without --silent (in case silent mode is unsupported by installer)
+                success = await RunActionAsync($"install --id \"{id}\" {srcArg}--force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+
+                // Tier 5: Fallback search and install by Name
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    // Exact Name
+                    success = await RunActionAsync($"install --name \"{name}\" -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    if (success || ct.IsCancellationRequested) return success;
+
+                    // Fuzzy Name
+                    success = await RunActionAsync($"install --name \"{name}\" --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    if (success || ct.IsCancellationRequested) return success;
+
+                    // Interactive Name fallback
+                    success = await RunActionAsync($"install --name \"{name}\" --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    if (success || ct.IsCancellationRequested) return success;
+                }
+
+                // Tier 6: Final check - verify if app is already installed on the machine
+                if (AppMetadataHelper.IsAppInstalled(new AppItem { Id = id, Name = name ?? id, Source = source ?? "" }))
+                {
+                    onOutputLine?.Invoke($"Verified {name ?? id} is installed on system.");
                     return true;
                 }
-                catch { }
+
+                return false;
             }
-
-            var srcArg = !string.IsNullOrWhiteSpace(effectiveSource) && !effectiveSource.Equals("winget", StringComparison.OrdinalIgnoreCase)
-                ? $"--source \"{effectiveSource}\" "
-                : (!string.IsNullOrWhiteSpace(effectiveSource) ? "--source winget " : "");
-
-            // Tier 1: Exact ID match with silent & force
-            var success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-            if (success || ct.IsCancellationRequested) return success;
-
-            // Tier 2: Non-exact ID match with silent & force
-            success = await RunActionAsync($"install \"{id}\" {srcArg}--silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-            if (success || ct.IsCancellationRequested) return success;
-
-            // Tier 3: Source fallback (if specific source was specified, try without source restriction or opposite source)
-            if (!string.IsNullOrWhiteSpace(effectiveSource))
+            finally
             {
-                // Try with no source restriction
-                success = await RunActionAsync($"install --id \"{id}\" -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-                if (success || ct.IsCancellationRequested) return success;
+                InvalidateInstalledCache();
             }
-
-            // Tier 4: Interactive / Unattended fallback without --silent (in case silent mode is unsupported by installer)
-            success = await RunActionAsync($"install --id \"{id}\" {srcArg}--force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-            if (success || ct.IsCancellationRequested) return success;
-
-            // Tier 5: Fallback search and install by Name
-            if (!string.IsNullOrWhiteSpace(name))
-            {
-                // Exact Name
-                success = await RunActionAsync($"install --name \"{name}\" -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-                if (success || ct.IsCancellationRequested) return success;
-
-                // Fuzzy Name
-                success = await RunActionAsync($"install --name \"{name}\" --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-                if (success || ct.IsCancellationRequested) return success;
-
-                // Interactive Name fallback
-                success = await RunActionAsync($"install --name \"{name}\" --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-                if (success || ct.IsCancellationRequested) return success;
-            }
-
-            // Tier 6: Final check - verify if app is already installed on the machine
-            if (AppMetadataHelper.IsAppInstalled(new AppItem { Id = id, Name = name ?? id, Source = source ?? "" }))
-            {
-                onOutputLine?.Invoke($"Verified {name ?? id} is installed on system.");
-                return true;
-            }
-
-            return false;
         }
 
         public async Task<bool> UpgradeAsync(string id, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default)
         {
             _ = Task.Run(() => EnsureSourcesUpdatedAsync());
-            // Tier 1: Exact ID upgrade with force & include-unknown
-            var success = await RunActionAsync($"upgrade --id \"{id}\" -e --silent --force --include-unknown --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-            if (success || ct.IsCancellationRequested) return success;
+            try
+            {
+                bool isMsStoreId = (id.Length == 12 || id.Length == 14) && !id.Contains('.') && !id.Contains('-');
+                if (isMsStoreId)
+                {
+                    var storeSuccess = await RunActionAsync($"upgrade --id \"{id}\" --source msstore -e --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    if (storeSuccess || ct.IsCancellationRequested) return storeSuccess;
+                }
 
-            // Tier 2: Non-exact ID upgrade
-            success = await RunActionAsync($"upgrade \"{id}\" --silent --force --include-unknown --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-            if (success || ct.IsCancellationRequested) return success;
+                // Tier 1: Exact ID upgrade with force & include-unknown
+                var success = await RunActionAsync($"upgrade --id \"{id}\" -e --silent --force --include-unknown --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
 
-            // Tier 3: Fallback to install with --force (Winget will pull latest version and overwrite)
-            success = await InstallAsync(id, source: null, name: null, onOutputLine, ct);
-            return success;
+                // Tier 1b: Exact ID upgrade with --ignore-security-hash (handles vendor hotfix updates)
+                success = await RunActionAsync($"upgrade --id \"{id}\" -e --silent --force --include-unknown --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+
+                // Tier 2: Non-exact ID upgrade
+                success = await RunActionAsync($"upgrade \"{id}\" --silent --force --include-unknown --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+
+                // Tier 3: Fallback to install with --force (Winget will pull latest version and overwrite)
+                success = await InstallAsync(id, source: null, name: null, onOutputLine, ct);
+                return success;
+            }
+            finally
+            {
+                InvalidateInstalledCache();
+            }
         }
 
-        public Task<bool> UpgradeAllAsync(Action<string>? onOutputLine = null) =>
-            RunActionAsync("upgrade --all --silent --accept-package-agreements --accept-source-agreements", onOutputLine);
+        public async Task<bool> UpgradeAllAsync(Action<string>? onOutputLine = null)
+        {
+            try
+            {
+                return await RunActionAsync("upgrade --all --silent --accept-package-agreements --accept-source-agreements", onOutputLine);
+            }
+            finally
+            {
+                InvalidateInstalledCache();
+            }
+        }
 
         public async Task<bool> UninstallAsync(string id, string? name = null, Action<string>? onOutputLine = null)
         {
-            // 1. Try exact match by ID with silent mode and force
-            var success = await RunActionAsync($"uninstall --id \"{id}\" -e --silent --force --accept-source-agreements", onOutputLine);
-            if (!success)
+            try
             {
-                // 2. Try partial/case-insensitive match by ID with silent mode and force
-                success = await RunActionAsync($"uninstall --id \"{id}\" --silent --force --accept-source-agreements", onOutputLine);
-            }
-            if (!success && !string.IsNullOrWhiteSpace(name))
-            {
-                // 3. Try exact match by Name with silent mode and force
-                success = await RunActionAsync($"uninstall --name \"{name}\" -e --silent --force --accept-source-agreements", onOutputLine);
+                // 1. Try exact match by ID with silent mode and force
+                var success = await RunActionAsync($"uninstall --id \"{id}\" -e --silent --force --accept-source-agreements", onOutputLine);
                 if (!success)
                 {
-                    // 4. Try partial match by Name
-                    success = await RunActionAsync($"uninstall --name \"{name}\" --silent --force --accept-source-agreements", onOutputLine);
+                    // 2. Try partial/case-insensitive match by ID with silent mode and force
+                    success = await RunActionAsync($"uninstall --id \"{id}\" --silent --force --accept-source-agreements", onOutputLine);
                 }
+                if (!success && !string.IsNullOrWhiteSpace(name))
+                {
+                    // 3. Try exact match by Name with silent mode and force
+                    success = await RunActionAsync($"uninstall --name \"{name}\" -e --silent --force --accept-source-agreements", onOutputLine);
+                    if (!success)
+                    {
+                        // 4. Try partial match by Name
+                        success = await RunActionAsync($"uninstall --name \"{name}\" --silent --force --accept-source-agreements", onOutputLine);
+                    }
+                }
+                if (!success)
+                {
+                    // 5. Fallback: interactive mode with force (in case uninstaller displays confirmation)
+                    success = await RunActionAsync($"uninstall --id \"{id}\" --force --accept-source-agreements", onOutputLine);
+                }
+                return success;
             }
-            if (!success)
+            finally
             {
-                // 5. Fallback: interactive mode with force (in case uninstaller displays confirmation)
-                success = await RunActionAsync($"uninstall --id \"{id}\" --force --accept-source-agreements", onOutputLine);
+                InvalidateInstalledCache();
             }
-            return success;
         }
 
         // ---- internals ----
@@ -634,12 +723,12 @@ namespace SetupHub180Hz.Services
                                     {
                                         if (lineBuf.Length > 0)
                                         {
-                                            string line = lineBuf.ToString().Trim();
+                                            string line = lineBuf.ToString().TrimEnd();
                                             lineBuf.Clear();
-                                            if (!string.IsNullOrWhiteSpace(line))
+                                            if (!string.IsNullOrWhiteSpace(line) && line.Trim().Length > 1)
                                             {
                                                 lock (sb) sb.AppendLine(line);
-                                                onOutputLine?.Invoke(line);
+                                                onOutputLine?.Invoke(line.Trim());
                                             }
                                         }
                                     }
@@ -651,11 +740,11 @@ namespace SetupHub180Hz.Services
                             }
                             if (lineBuf.Length > 0)
                             {
-                                string line = lineBuf.ToString().Trim();
-                                if (!string.IsNullOrWhiteSpace(line))
+                                string line = lineBuf.ToString().TrimEnd();
+                                if (!string.IsNullOrWhiteSpace(line) && line.Trim().Length > 1)
                                 {
                                     lock (sb) sb.AppendLine(line);
-                                    onOutputLine?.Invoke(line);
+                                    onOutputLine?.Invoke(line.Trim());
                                 }
                             }
                         }
@@ -719,7 +808,7 @@ namespace SetupHub180Hz.Services
         /// <summary>
         /// winget prints a fixed-width, column-aligned table. We find the header row,
         /// use its column start offsets to slice every following line, and skip the
-        /// "----" separator row beneath it.
+        /// "----" separator row beneath it. Supports multiple tables in `winget upgrade`.
         /// </summary>
         private static List<AppItem> ParseTable(string raw)
         {
@@ -734,7 +823,7 @@ namespace SetupHub180Hz.Services
             int headerIndex = -1;
             for (int i = 0; i < lines.Length; i++)
             {
-                if (lines[i].Contains("Name") && lines[i].Contains("Id"))
+                if (lines[i].Contains("Name") && lines[i].Contains("Id") && lines[i].Contains("Version"))
                 {
                     headerIndex = i;
                     break;
@@ -742,51 +831,85 @@ namespace SetupHub180Hz.Services
             }
             if (headerIndex == -1 || headerIndex + 1 >= lines.Length) return items;
 
-            var header = lines[headerIndex];
-            int nameCol = header.IndexOf("Name", StringComparison.Ordinal);
-            int idCol = header.IndexOf("Id", StringComparison.Ordinal);
-            int versionCol = header.IndexOf("Version", StringComparison.Ordinal);
-            int matchCol = header.IndexOf("Match", StringComparison.Ordinal);
-            int availCol = header.IndexOf("Available", StringComparison.Ordinal);
-            int sourceCol = header.IndexOf("Source", StringComparison.Ordinal);
+            int nameCol = -1, idCol = -1, versionCol = -1, matchCol = -1, availCol = -1, sourceCol = -1, versionEnd = -1;
 
-            string Slice(string line, int start, int end)
+            void ParseHeaderColumns(string hdr)
+            {
+                nameCol = hdr.IndexOf("Name", StringComparison.Ordinal);
+                idCol = hdr.IndexOf("Id", StringComparison.Ordinal);
+                versionCol = hdr.IndexOf("Version", StringComparison.Ordinal);
+                matchCol = hdr.IndexOf("Match", StringComparison.Ordinal);
+                availCol = hdr.IndexOf("Available", StringComparison.Ordinal);
+                sourceCol = hdr.IndexOf("Source", StringComparison.Ordinal);
+
+                versionEnd = sourceCol > 0 ? sourceCol : -1;
+                if (availCol > 0 && (versionEnd <= 0 || availCol < versionEnd)) versionEnd = availCol;
+                if (matchCol > 0 && (versionEnd <= 0 || matchCol < versionEnd)) versionEnd = matchCol;
+            }
+
+            ParseHeaderColumns(lines[headerIndex]);
+
+            static string Slice(string line, int start, int end)
             {
                 if (start < 0 || start >= line.Length) return "";
                 int safeEnd = end < 0 ? line.Length : Math.Min(end, line.Length);
                 return safeEnd <= start ? "" : line[start..safeEnd].Trim();
             }
 
-            int versionEnd = sourceCol > 0 ? sourceCol : -1;
-            if (availCol > 0 && (versionEnd <= 0 || availCol < versionEnd)) versionEnd = availCol;
-            if (matchCol > 0 && (versionEnd <= 0 || matchCol < versionEnd)) versionEnd = matchCol;
-
-            // headerIndex + 1 is the "----" separator line, so data starts at + 2.
-            for (int i = headerIndex + 2; i < lines.Length; i++)
+            for (int i = headerIndex + 1; i < lines.Length; i++)
             {
                 var line = lines[i];
-                if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("-")) continue;
+                var trimmed = line.Trim();
+                if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith("-")) continue;
+
+                // Handle secondary table headers in `winget upgrade` output
+                if (line.Contains("Name") && line.Contains("Id") && line.Contains("Version") &&
+                    line.IndexOf("Name", StringComparison.Ordinal) <= 2)
+                {
+                    ParseHeaderColumns(line);
+                    continue;
+                }
+
+                // Skip summary / prose lines printed by winget at bottom of tables
+                if (trimmed.EndsWith("upgrades available.", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.EndsWith("upgrade available.", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.StartsWith("The following packages", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.StartsWith("No installed package", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.StartsWith("No package found", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Contains("package(s) have version numbers", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Contains("package(s) have pins", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
 
                 var rawVer = Slice(line, versionCol, versionEnd);
                 if (rawVer.Contains("Tag:", StringComparison.OrdinalIgnoreCase))
                 {
                     rawVer = rawVer.Split("Tag:")[0].Trim();
                 }
+                rawVer = rawVer.TrimStart('<', '>', ' ').TrimEnd('…').Trim();
+
+                var availVer = availCol > 0 ? Slice(line, availCol, sourceCol).TrimEnd('…').Trim() : "";
+                var nameStr = Slice(line, nameCol, idCol).TrimEnd('…').Trim();
+                var idStr = Slice(line, idCol, versionCol).TrimEnd('…').Trim();
+
+                // Filter out non-package rows (valid Winget/Store/ARP IDs do not contain spaces)
+                if (string.IsNullOrWhiteSpace(nameStr) || string.IsNullOrWhiteSpace(idStr) || idStr.Contains(' '))
+                    continue;
 
                 var item = new AppItem
                 {
-                    Name = Slice(line, nameCol, idCol),
-                    Id = Slice(line, idCol, versionCol),
+                    Name = nameStr,
+                    Id = idStr,
                     Version = rawVer,
-                    AvailableVersion = availCol > 0 ? Slice(line, availCol, sourceCol) : "",
+                    AvailableVersion = availVer,
                     Source = sourceCol > 0 ? Slice(line, sourceCol, -1) : "winget",
                     Category = "Online"
                 };
 
                 if (string.IsNullOrWhiteSpace(item.Source)) item.Source = "winget";
 
-                if (!string.IsNullOrWhiteSpace(item.Name) && !string.IsNullOrWhiteSpace(item.Id))
-                    items.Add(item);
+                items.Add(item);
             }
 
             return items;

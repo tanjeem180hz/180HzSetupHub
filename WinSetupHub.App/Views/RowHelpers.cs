@@ -43,66 +43,48 @@ namespace SetupHub180Hz.Views
                 FontWeight = FontWeights.SemiBold,
                 Padding = new Thickness(8, 4, 10, 4),
                 Cursor = System.Windows.Input.Cursors.Hand,
-                IsEnabled = false,
-                ToolTip = "Opening official website…"
+                IsEnabled = true
             };
+
+            btn.SetBinding(FrameworkElement.ToolTipProperty, new System.Windows.Data.Binding("EffectiveWebUrl"));
 
             if (Application.Current?.TryFindResource("OutlineButton") is Style outlineStyle)
             {
                 btn.Style = outlineStyle;
             }
 
-            // 1. Instant Synchronous Check (0ms): Already known or mapped in KnownDomainMap / Registry
-            string? url = app.WebUrl;
-            if (string.IsNullOrWhiteSpace(url))
+            btn.Click += async (_, _) =>
             {
-                url = AppMetadataHelper.ResolveOfficialUrl(app);
-                if (!string.IsNullOrWhiteSpace(url))
-                {
-                    app.WebUrl = url;
-                    if (string.IsNullOrWhiteSpace(app.IconUrl))
-                    {
-                        app.IconUrl = IconCacheService.DeriveFaviconUrl(url) ?? "";
-                    }
-                }
-            }
+                var currentApp = (btn.DataContext as AppItem) ?? app;
+                string targetUrl = currentApp.EffectiveWebUrl;
 
-            if (!string.IsNullOrWhiteSpace(url))
-            {
-                WireButtonSuccess(btn, url);
-                return btn;
-            }
-
-            // 2. Asynchronous Winget Manifest Discovery (Throttled via Semaphore)
-            _ = Task.Run(async () =>
-            {
-                if (!string.IsNullOrWhiteSpace(app.Id))
+                if (string.IsNullOrWhiteSpace(currentApp.WebUrl) && !string.IsNullOrWhiteSpace(currentApp.Id))
                 {
-                    var meta = await winget.GetMetadataAsync(app.Id);
-                    url = meta?.BestLink;
-                    if (!string.IsNullOrWhiteSpace(url))
+                    try
                     {
-                        app.WebUrl = url;
-                        if (string.IsNullOrWhiteSpace(app.IconUrl))
+                        var meta = await winget.GetMetadataAsync(currentApp.Id);
+                        if (!string.IsNullOrWhiteSpace(meta?.BestLink))
                         {
-                            app.IconUrl = IconCacheService.DeriveFaviconUrl(url) ?? "";
+                            currentApp.WebUrl = meta.BestLink;
+                            targetUrl = meta.BestLink;
                         }
                     }
+                    catch { }
                 }
 
-                // 3. Guaranteed 100% Accuracy Fallback: Direct Official Site Search Query
-                if (string.IsNullOrWhiteSpace(url))
+                if (!string.IsNullOrWhiteSpace(targetUrl))
                 {
-                    var targetName = !string.IsNullOrWhiteSpace(app.Name) ? app.Name : app.Id;
-                    url = $"https://www.google.com/search?q={Uri.EscapeDataString(targetName + " official website")}";
-                    app.WebUrl = url;
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo(targetUrl) { UseShellExecute = true });
+                    }
+                    catch (Exception ex)
+                    {
+                        ThemedMessageBox.Show($"Could not open browser: {ex.Message}", "Browser Error",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
-
-                await btn.Dispatcher.InvokeAsync(() =>
-                {
-                    WireButtonSuccess(btn, url);
-                });
-            });
+            };
 
             return btn;
         }

@@ -59,10 +59,7 @@ namespace SetupHub180Hz.Views
             var appsToUpgrade = new List<AppItem>(UpdateMonitorService.Instance.UpgradableApps);
             if (appsToUpgrade.Count == 0) return;
 
-            foreach (var app in appsToUpgrade)
-            {
-                UpdateMonitorService.Instance.MarkAsUpdated(app.Id, app.Name);
-            }
+            UpdateMonitorService.Instance.UpgradableApps.Clear();
 
             DownloadManagerService.Instance.EnqueueRange(appsToUpgrade, isUpgrade: true);
             ActivityLogger.Instance.Log($"Enqueued {appsToUpgrade.Count} application updates to the download queue.", ActivityType.Info);
@@ -77,13 +74,46 @@ namespace SetupHub180Hz.Views
         {
             if (sender is Button btn && btn.DataContext is AppItem app)
             {
-                UpdateMonitorService.Instance.MarkAsUpdated(app.Id, app.Name);
+                UpdateMonitorService.Instance.UpgradableApps.Remove(app);
                 DownloadManagerService.Instance.Enqueue(app, isUpgrade: true);
                 ActivityLogger.Instance.Log($"Enqueued update for {app.Name} to the download queue.", ActivityType.Info);
 
                 // Route to Downloads section
                 var mw = Window.GetWindow(this) as MainWindow;
                 mw?.GoToPage("Downloads");
+            }
+        }
+
+        private async void WebLink_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.DataContext is AppItem app)
+            {
+                string url = app.EffectiveWebUrl;
+                if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id))
+                {
+                    try
+                    {
+                        var meta = await _winget.GetMetadataAsync(app.Id);
+                        if (!string.IsNullOrWhiteSpace(meta?.BestLink))
+                        {
+                            app.WebUrl = meta.BestLink;
+                            url = meta.BestLink;
+                        }
+                    }
+                    catch { }
+                }
+
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+                    }
+                    catch (Exception ex)
+                    {
+                        ThemedMessageBox.Show($"Could not open website: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
             }
         }
 

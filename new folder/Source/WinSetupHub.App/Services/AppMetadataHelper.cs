@@ -21,21 +21,43 @@ namespace SetupHub180Hz.Services
             public string? Publisher { get; set; }
             public string? WebUrl { get; set; }
             public DateTime? InstallDate { get; set; }
+            public string? AppUserModelId { get; set; }
+            public bool IsPackagedApp { get; set; }
+        }
+
+        public class AppxPackageInfo
+        {
+            public string PackageFullName { get; set; } = "";
+            public string PackageFamilyName { get; set; } = "";
+            public string DisplayName { get; set; } = "";
+            public string Version { get; set; } = "";
+            public string PackageRootFolder { get; set; } = "";
+            public string? AppUserModelId { get; set; }
+            public string? MainExecutablePath { get; set; }
+            public string? ExecutionAliasPath { get; set; }
+            public string? Publisher { get; set; }
         }
 
         private static Dictionary<string, RegistryAppInfo>? _registryCache;
+        private static Dictionary<string, AppxPackageInfo>? _appxInfoMap;
         private static HashSet<string>? _appxPackageCache;
         private static DateTime _appxCacheTime = DateTime.MinValue;
         private static HashSet<string>? _startMenuLinksCache;
+        private static Dictionary<string, string>? _startMenuLinkPathsCache;
         private static HashSet<string>? _installedProgramFoldersCache;
         private static DateTime _diskScanTime = DateTime.MinValue;
+        private static Dictionary<string, string>? _comAppsFolderCache;
+        private static DateTime _comAppsFolderTime = DateTime.MinValue;
 
         public static void InvalidateCache()
         {
             _registryCache = null;
+            _appxInfoMap = null;
             _appxPackageCache = null;
             _startMenuLinksCache = null;
+            _startMenuLinkPathsCache = null;
             _installedProgramFoldersCache = null;
+            _comAppsFolderCache = null;
         }
 
         private static void EnsureDiskFolderCaches()
@@ -44,6 +66,7 @@ namespace SetupHub180Hz.Services
                 return;
 
             var linkSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var linkPaths = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             string[] startDirs = {
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs"),
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs")
@@ -60,12 +83,18 @@ namespace SetupHub180Hz.Services
                             if (!string.IsNullOrWhiteSpace(name))
                             {
                                 linkSet.Add(name);
+                                if (!linkPaths.ContainsKey(name)) linkPaths[name] = lnk;
                                 var norm = NormalizeAppName(name);
                                 if (!string.IsNullOrWhiteSpace(norm))
                                 {
                                     linkSet.Add(norm);
+                                    if (!linkPaths.ContainsKey(norm)) linkPaths[norm] = lnk;
                                     var stripped = StripPublisherPrefix(norm);
-                                    if (!string.IsNullOrWhiteSpace(stripped)) linkSet.Add(stripped);
+                                    if (!string.IsNullOrWhiteSpace(stripped))
+                                    {
+                                        linkSet.Add(stripped);
+                                        if (!linkPaths.ContainsKey(stripped)) linkPaths[stripped] = lnk;
+                                    }
                                 }
                             }
                         }
@@ -74,6 +103,7 @@ namespace SetupHub180Hz.Services
                 }
             }
             _startMenuLinksCache = linkSet;
+            _startMenuLinkPathsCache = linkPaths;
 
             var folderSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             string[] baseDirs = {
@@ -352,6 +382,21 @@ namespace SetupHub180Hz.Services
                 return true;
             }
 
+            // 9. Check WindowsApps execution aliases
+            var aliasExe = FindWindowsAppsAlias(app.Name, app.Id);
+            if (!string.IsNullOrWhiteSpace(aliasExe) && File.Exists(aliasExe))
+            {
+                if (string.IsNullOrWhiteSpace(app.LocalIconPath)) app.LocalIconPath = aliasExe;
+                return true;
+            }
+
+            // 10. Check COM shell:AppsFolder
+            var comAumid = ResolveComAppsFolderAumid(app.Name, app.Id);
+            if (!string.IsNullOrWhiteSpace(comAumid))
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -371,55 +416,209 @@ namespace SetupHub180Hz.Services
 
         private static readonly Dictionary<string, string[]> StorePackageNameMap = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["9PLM9XGG6VKS"] = new[] { "OpenAI.Codex", "ChatGPT" },
+            ["9PLM9XGG6VKS"] = new[] { "OpenAI.Codex", "ChatGPT", "OpenAI.ChatGPT" },
+            ["9NT1R1C2HH7J"] = new[] { "OpenAI.Codex", "ChatGPT", "OpenAI.ChatGPT" },
             ["OpenAI.ChatGPT"] = new[] { "OpenAI.Codex", "ChatGPT" },
+            ["OpenAI.Codex"] = new[] { "OpenAI.Codex", "ChatGPT" },
+            ["ChatGPT"] = new[] { "OpenAI.Codex", "ChatGPT" },
             ["9NCBCSZSJRSB"] = new[] { "SpotifyAB.SpotifyMusic", "Spotify" },
             ["Spotify.Spotify"] = new[] { "SpotifyAB.SpotifyMusic", "Spotify" },
+            ["Spotify"] = new[] { "SpotifyAB.SpotifyMusic", "Spotify" },
             ["9NKSQGP7F2NH"] = new[] { "5319275A.WhatsAppDesktop", "WhatsApp" },
             ["WhatsApp.WhatsApp"] = new[] { "5319275A.WhatsAppDesktop", "WhatsApp" },
+            ["WhatsApp"] = new[] { "5319275A.WhatsAppDesktop", "WhatsApp" },
             ["9NZTWSQNTD0S"] = new[] { "Telegram", "TelegramDesktop" },
             ["Telegram.TelegramDesktop"] = new[] { "Telegram", "TelegramDesktop" },
             ["XP89DCGQ3K6VLD"] = new[] { "Microsoft.PowerToys", "PowerToys" },
             ["Microsoft.PowerToys"] = new[] { "Microsoft.PowerToys", "PowerToys" },
             ["9N0DX20HK701"] = new[] { "Microsoft.WindowsTerminal", "WindowsTerminal" },
             ["Microsoft.WindowsTerminal"] = new[] { "Microsoft.WindowsTerminal", "WindowsTerminal" },
-            ["Anthropic.Claude"] = new[] { "Claude" }
+            ["Anthropic.Claude"] = new[] { "Claude", "Claude Desktop" },
+            ["Claude"] = new[] { "Claude", "Claude Desktop" },
+            ["12030rocksdanister.LivelyWallpaper"] = new[] { "Lively Wallpaper" },
+            ["XP9KHM4BK9FZ7Q"] = new[] { "Microsoft.VisualStudioCode", "Visual Studio Code", "Code" },
+            ["XPDM1ZW6815MQM"] = new[] { "VideoLAN.VLC", "VLC" },
+            ["9NBLGGH4VVNH"] = new[] { "VideoLAN.VLC", "VLC" },
+            ["XPDC2RH70K22MN"] = new[] { "Discord.Discord", "Discord" }
         };
+
+        public static void EnsureAppxPackageCache()
+        {
+            if (_appxInfoMap != null && _appxPackageCache != null && (DateTime.UtcNow - _appxCacheTime).TotalSeconds < 30)
+                return;
+
+            var infoMap = new Dictionary<string, AppxPackageInfo>(StringComparer.OrdinalIgnoreCase);
+            var nameSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            try
+            {
+                using var repoKey = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages");
+                if (repoKey != null)
+                {
+                    foreach (var pkgFullName in repoKey.GetSubKeyNames())
+                    {
+                        nameSet.Add(pkgFullName);
+                        try
+                        {
+                            using var sub = repoKey.OpenSubKey(pkgFullName);
+                            if (sub == null) continue;
+
+                            var dispName = (sub.GetValue("DisplayName") as string) ?? "";
+                            var rootFolder = (sub.GetValue("PackageRootFolder") as string) ?? "";
+                            var apps = sub.GetSubKeyNames();
+                            var appId = apps.FirstOrDefault(a => !a.Contains("command", StringComparison.OrdinalIgnoreCase)) ?? apps.FirstOrDefault() ?? "App";
+
+                            // Parse: <PackageName>_<Version>_<Arch>_<ResourceId>_<PublisherId>
+                            var parts = pkgFullName.Split('_');
+                            string pkgName = parts.Length > 0 ? parts[0] : pkgFullName;
+                            string version = parts.Length > 1 ? parts[1] : "";
+                            string pubId = parts.Length > 4 ? parts[4] : "";
+                            string familyName = (!string.IsNullOrWhiteSpace(pkgName) && !string.IsNullOrWhiteSpace(pubId)) ? $"{pkgName}_{pubId}" : pkgFullName;
+                            string aumid = $"{familyName}!${appId}".Replace("$", "");
+
+                            string? mainExe = null;
+                            if (!string.IsNullOrWhiteSpace(rootFolder) && Directory.Exists(rootFolder))
+                            {
+                                try
+                                {
+                                    var appDir = Path.Combine(rootFolder, "app");
+                                    if (Directory.Exists(appDir))
+                                    {
+                                        var appExes = Directory.GetFiles(appDir, "*.exe", SearchOption.TopDirectoryOnly);
+                                        mainExe = appExes.FirstOrDefault(f => !Path.GetFileName(f).StartsWith("codex-", StringComparison.OrdinalIgnoreCase) &&
+                                                                              !Path.GetFileName(f).Contains("helper", StringComparison.OrdinalIgnoreCase) &&
+                                                                              !Path.GetFileName(f).Contains("chrome", StringComparison.OrdinalIgnoreCase)) ?? appExes.FirstOrDefault();
+                                    }
+                                    if (string.IsNullOrWhiteSpace(mainExe))
+                                    {
+                                        var topExes = Directory.GetFiles(rootFolder, "*.exe", SearchOption.TopDirectoryOnly);
+                                        mainExe = topExes.FirstOrDefault(f => !Path.GetFileName(f).StartsWith("unins", StringComparison.OrdinalIgnoreCase)) ?? topExes.FirstOrDefault();
+                                    }
+                                }
+                                catch { }
+                            }
+
+                            string? aliasExe = null;
+                            var localAppsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "WindowsApps");
+                            if (Directory.Exists(localAppsDir))
+                            {
+                                var familyDir = Path.Combine(localAppsDir, familyName);
+                                if (Directory.Exists(familyDir))
+                                {
+                                    try
+                                    {
+                                        var fExes = Directory.GetFiles(familyDir, "*.exe", SearchOption.TopDirectoryOnly);
+                                        if (fExes.Length > 0) aliasExe = fExes[0];
+                                    }
+                                    catch { }
+                                }
+                            }
+
+                            var info = new AppxPackageInfo
+                            {
+                                PackageFullName = pkgFullName,
+                                PackageFamilyName = familyName,
+                                DisplayName = dispName,
+                                Version = version,
+                                PackageRootFolder = rootFolder,
+                                AppUserModelId = aumid,
+                                MainExecutablePath = mainExe,
+                                ExecutionAliasPath = aliasExe
+                            };
+
+                            infoMap[pkgFullName] = info;
+                            infoMap[familyName] = info;
+                            if (!string.IsNullOrWhiteSpace(pkgName)) infoMap[pkgName] = info;
+
+                            if (!string.IsNullOrWhiteSpace(dispName) && !dispName.StartsWith("@{") && !dispName.StartsWith("ms-resource"))
+                            {
+                                nameSet.Add(dispName);
+                                infoMap[dispName] = info;
+                                var normDisp = NormalizeAppName(dispName);
+                                if (!string.IsNullOrWhiteSpace(normDisp))
+                                {
+                                    nameSet.Add(normDisp);
+                                    infoMap[normDisp] = info;
+                                    var stripped = StripPublisherPrefix(normDisp);
+                                    if (!string.IsNullOrWhiteSpace(stripped)) infoMap[stripped] = info;
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch { }
+
+            _appxInfoMap = infoMap;
+            _appxPackageCache = nameSet;
+            _appxCacheTime = DateTime.UtcNow;
+        }
+
+        public static AppxPackageInfo? FindAppxPackage(string? id, string? name)
+        {
+            EnsureAppxPackageCache();
+            if (_appxInfoMap == null || _appxInfoMap.Count == 0) return null;
+
+            if (!string.IsNullOrWhiteSpace(id) && _appxInfoMap.TryGetValue(id.Trim(), out var directIdMatch))
+                return directIdMatch;
+
+            if (!string.IsNullOrWhiteSpace(id) && StorePackageNameMap.TryGetValue(id.Trim(), out var mappedIds))
+            {
+                foreach (var m in mappedIds)
+                {
+                    if (_appxInfoMap.TryGetValue(m, out var mappedMatch)) return mappedMatch;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                if (_appxInfoMap.TryGetValue(name.Trim(), out var nameMatch)) return nameMatch;
+                var normName = NormalizeAppName(name);
+                if (!string.IsNullOrWhiteSpace(normName) && _appxInfoMap.TryGetValue(normName, out var normMatch)) return normMatch;
+                var stripped = StripPublisherPrefix(normName);
+                if (!string.IsNullOrWhiteSpace(stripped) && _appxInfoMap.TryGetValue(stripped, out var stripMatch)) return stripMatch;
+
+                if (StorePackageNameMap.TryGetValue(name.Trim(), out var mappedNames))
+                {
+                    foreach (var m in mappedNames)
+                    {
+                        if (_appxInfoMap.TryGetValue(m, out var mappedMatch)) return mappedMatch;
+                    }
+                }
+            }
+
+            var tokens = new List<string>();
+            if (!string.IsNullOrWhiteSpace(id)) tokens.Add(id);
+            if (!string.IsNullOrWhiteSpace(name)) tokens.Add(name);
+            var n = NormalizeAppName(name);
+            if (!string.IsNullOrWhiteSpace(n) && n.Length >= 4) tokens.Add(n);
+
+            foreach (var kvp in _appxInfoMap)
+            {
+                var entry = kvp.Value;
+                foreach (var tok in tokens)
+                {
+                    if (tok.Length >= 4 && (entry.DisplayName.Contains(tok, StringComparison.OrdinalIgnoreCase) ||
+                                            entry.PackageFamilyName.Contains(tok, StringComparison.OrdinalIgnoreCase) ||
+                                            entry.PackageFullName.Contains(tok, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return entry;
+                    }
+                }
+            }
+
+            return null;
+        }
 
         public static bool IsAppxInstalled(string id, string name, string normName, string cleanAlphaName)
         {
             try
             {
-                if (_appxPackageCache == null || (DateTime.UtcNow - _appxCacheTime).TotalSeconds > 30)
-                {
-                    var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                    string[] subKeys = {
-                        @"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages",
-                        @"SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Applications"
-                    };
+                var pkg = FindAppxPackage(id, name);
+                if (pkg != null) return true;
 
-                    foreach (var root in new[] { Registry.CurrentUser, Registry.LocalMachine })
-                    {
-                        foreach (var path in subKeys)
-                        {
-                            try
-                            {
-                                using var key = root.OpenSubKey(path);
-                                if (key != null)
-                                {
-                                    foreach (var sub in key.GetSubKeyNames())
-                                    {
-                                        set.Add(sub);
-                                    }
-                                }
-                            }
-                            catch { }
-                        }
-                    }
-                    _appxPackageCache = set;
-                    _appxCacheTime = DateTime.UtcNow;
-                }
-
+                EnsureAppxPackageCache();
                 if (_appxPackageCache == null || _appxPackageCache.Count == 0) return false;
 
                 var tokens = new List<string>();
@@ -436,11 +635,11 @@ namespace SetupHub180Hz.Services
                     tokens.AddRange(mappedName);
                 }
 
-                foreach (var pkg in _appxPackageCache)
+                foreach (var p in _appxPackageCache)
                 {
                     foreach (var token in tokens)
                     {
-                        if (token.Length >= 3 && pkg.Contains(token, StringComparison.OrdinalIgnoreCase))
+                        if (token.Length >= 3 && p.Contains(token, StringComparison.OrdinalIgnoreCase))
                         {
                             return true;
                         }
@@ -451,7 +650,7 @@ namespace SetupHub180Hz.Services
             return false;
         }
 
-        public static bool CheckCanonicalInstallationPath(string id, string name)
+        public static string? GetCanonicalExecutablePath(string id, string name)
         {
             var candidates = new List<string>();
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -462,106 +661,527 @@ namespace SetupHub180Hz.Services
             var norm = NormalizeAppName(name).ToLowerInvariant();
             var lowerId = (id ?? "").ToLowerInvariant();
 
+            // ChatGPT
+            if (norm.Contains("chatgpt") || lowerId.Contains("chatgpt") || lowerId.Contains("openai") || lowerId.Contains("9plm9xgg6vks"))
+            {
+                try
+                {
+                    var winAppsDir = Path.Combine(progFiles, "WindowsApps");
+                    if (Directory.Exists(winAppsDir))
+                    {
+                        foreach (var sub in Directory.EnumerateDirectories(winAppsDir, "*OpenAI.Codex*"))
+                        {
+                            candidates.Add(Path.Combine(sub, "app", "ChatGPT.exe"));
+                            candidates.Add(Path.Combine(sub, "ChatGPT.exe"));
+                        }
+                    }
+                }
+                catch { }
+                candidates.Add(Path.Combine(localAppData, "Programs", "ChatGPT", "ChatGPT.exe"));
+                candidates.Add(Path.Combine(localAppData, "Microsoft", "WindowsApps", "ChatGPT.exe"));
+            }
+
+            // Claude
+            if (norm.Contains("claude") || lowerId.Contains("claude"))
+            {
+                candidates.Add(Path.Combine(localAppData, "Programs", "Claude", "Claude.exe"));
+                candidates.Add(Path.Combine(localAppData, "Microsoft", "WindowsApps", "claude-desktop.exe"));
+            }
+
+            // Cursor
+            if (norm.Contains("cursor") || lowerId.Contains("cursor"))
+            {
+                candidates.Add(Path.Combine(localAppData, "Programs", "cursor", "Cursor.exe"));
+            }
+
+            // Windsurf
+            if (norm.Contains("windsurf") || lowerId.Contains("windsurf"))
+            {
+                candidates.Add(Path.Combine(localAppData, "Programs", "Windsurf", "Windsurf.exe"));
+            }
+
+            // LM Studio
+            if (norm.Contains("lmstudio") || norm.Contains("lm studio") || lowerId.Contains("lmstudio"))
+            {
+                candidates.Add(Path.Combine(localAppData, "Programs", "LM Studio", "LM Studio.exe"));
+            }
+
+            // Ollama
+            if (norm.Contains("ollama") || lowerId.Contains("ollama"))
+            {
+                candidates.Add(Path.Combine(localAppData, "Programs", "Ollama", "ollama app.exe"));
+                candidates.Add(Path.Combine(progFiles, "Ollama", "ollama.exe"));
+            }
+
+            // VS Code
             if (norm.Contains("code") || lowerId.Contains("visualstudiocode"))
             {
                 candidates.Add(Path.Combine(localAppData, "Programs", "Microsoft VS Code", "Code.exe"));
                 candidates.Add(Path.Combine(progFiles, "Microsoft VS Code", "Code.exe"));
             }
+
+            // Chrome
             if (norm.Contains("chrome") || lowerId.Contains("google.chrome"))
             {
                 candidates.Add(Path.Combine(progFiles, "Google", "Chrome", "Application", "chrome.exe"));
                 candidates.Add(Path.Combine(progFilesX86, "Google", "Chrome", "Application", "chrome.exe"));
             }
+
+            // Firefox
             if (norm.Contains("firefox") || lowerId.Contains("mozilla.firefox"))
             {
                 candidates.Add(Path.Combine(progFiles, "Mozilla Firefox", "firefox.exe"));
                 candidates.Add(Path.Combine(progFilesX86, "Mozilla Firefox", "firefox.exe"));
             }
+
+            // Brave
             if (norm.Contains("brave") || lowerId.Contains("brave.brave"))
             {
                 candidates.Add(Path.Combine(progFiles, "BraveSoftware", "Brave-Browser", "Application", "brave.exe"));
                 candidates.Add(Path.Combine(localAppData, "BraveSoftware", "Brave-Browser", "Application", "brave.exe"));
             }
+
+            // Opera / Opera GX
             if (norm.Contains("opera") || lowerId.Contains("opera.opera"))
             {
                 candidates.Add(Path.Combine(localAppData, "Programs", "Opera", "launcher.exe"));
                 candidates.Add(Path.Combine(localAppData, "Programs", "Opera GX", "launcher.exe"));
                 candidates.Add(Path.Combine(progFiles, "Opera", "launcher.exe"));
             }
+
+            // Discord
             if (norm.Contains("discord") || lowerId.Contains("discord.discord"))
             {
                 candidates.Add(Path.Combine(localAppData, "Discord", "Update.exe"));
             }
+
+            // Telegram
             if (norm.Contains("telegram") || lowerId.Contains("telegram.telegramdesktop"))
             {
                 candidates.Add(Path.Combine(appData, "Telegram Desktop", "Telegram.exe"));
             }
+
+            // WhatsApp
+            if (norm.Contains("whatsapp") || lowerId.Contains("whatsapp"))
+            {
+                candidates.Add(Path.Combine(localAppData, "WhatsApp", "WhatsApp.exe"));
+            }
+
+            // Steam
             if (norm.Contains("steam") || lowerId.Contains("valve.steam"))
             {
                 candidates.Add(Path.Combine(progFilesX86, "Steam", "steam.exe"));
                 candidates.Add(Path.Combine(progFiles, "Steam", "steam.exe"));
             }
+
+            // VLC
             if (norm.Contains("vlc") || lowerId.Contains("videolan.vlc"))
             {
                 candidates.Add(Path.Combine(progFiles, "VideoLAN", "VLC", "vlc.exe"));
                 candidates.Add(Path.Combine(progFilesX86, "VideoLAN", "VLC", "vlc.exe"));
             }
+
+            // Spotify
             if (norm.Contains("spotify") || lowerId.Contains("spotify.spotify"))
             {
                 candidates.Add(Path.Combine(appData, "Spotify", "Spotify.exe"));
+                candidates.Add(Path.Combine(localAppData, "Microsoft", "WindowsApps", "Spotify.exe"));
             }
+
+            // MSI Afterburner
             if (norm.Contains("afterburner") || lowerId.Contains("afterburner"))
             {
                 candidates.Add(Path.Combine(progFilesX86, "MSI Afterburner", "MSIAfterburner.exe"));
             }
+
+            // RTSS
             if (norm.Contains("rtss") || lowerId.Contains("rtss") || norm.Contains("statistics server"))
             {
                 candidates.Add(Path.Combine(progFilesX86, "RivaTuner Statistics Server", "RTSS.exe"));
             }
+
+            // 7-Zip
             if (norm.Contains("7-zip") || lowerId.Contains("7zip"))
             {
                 candidates.Add(Path.Combine(progFiles, "7-Zip", "7zFM.exe"));
                 candidates.Add(Path.Combine(progFilesX86, "7-Zip", "7zFM.exe"));
             }
+
+            // WinRAR
             if (norm.Contains("winrar") || lowerId.Contains("winrar"))
             {
                 candidates.Add(Path.Combine(progFiles, "WinRAR", "WinRAR.exe"));
             }
+
+            // Everything
             if (norm.Contains("everything") || lowerId.Contains("everything"))
             {
                 candidates.Add(Path.Combine(progFiles, "Everything", "Everything.exe"));
                 candidates.Add(Path.Combine(progFilesX86, "Everything", "Everything.exe"));
             }
+
+            // Notepad++
             if (norm.Contains("notepad++") || lowerId.Contains("notepad++"))
             {
                 candidates.Add(Path.Combine(progFiles, "Notepad++", "notepad++.exe"));
                 candidates.Add(Path.Combine(progFilesX86, "Notepad++", "notepad++.exe"));
             }
+
+            // Git
             if (norm.Contains("git") || lowerId.Contains("git.git"))
             {
                 candidates.Add(Path.Combine(progFiles, "Git", "cmd", "git.exe"));
+                candidates.Add(Path.Combine(progFiles, "Git", "bin", "git.exe"));
             }
+
+            // Node.js
             if (norm.Contains("node") || lowerId.Contains("nodejs"))
             {
                 candidates.Add(Path.Combine(progFiles, "nodejs", "node.exe"));
             }
+
+            // Zoom
             if (norm.Contains("zoom") || lowerId.Contains("zoom.zoom"))
             {
                 candidates.Add(Path.Combine(appData, "Zoom", "bin", "Zoom.exe"));
             }
+
+            // OBS Studio
             if (norm.Contains("obs") || lowerId.Contains("obsstudio"))
             {
                 candidates.Add(Path.Combine(progFiles, "obs-studio", "bin", "64bit", "obs64.exe"));
+            }
+
+            // Windows Terminal
+            if (norm.Contains("terminal") || lowerId.Contains("windowsterminal"))
+            {
+                candidates.Add(Path.Combine(localAppData, "Microsoft", "WindowsApps", "wt.exe"));
+            }
+
+            // PowerToys
+            if (norm.Contains("powertoys") || lowerId.Contains("powertoys"))
+            {
+                candidates.Add(Path.Combine(progFiles, "PowerToys", "PowerToys.exe"));
             }
 
             foreach (var c in candidates)
             {
                 try
                 {
-                    if (File.Exists(c)) return true;
+                    if (File.Exists(c)) return c;
                 }
                 catch { }
             }
+            return null;
+        }
+
+        public static bool CheckCanonicalInstallationPath(string id, string name)
+        {
+            return GetCanonicalExecutablePath(id, name) != null;
+        }
+
+        public static string? FindWindowsAppsAlias(string name, string id)
+        {
+            try
+            {
+                var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "WindowsApps");
+                if (!Directory.Exists(dir)) return null;
+
+                var candidates = new List<string>();
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    candidates.Add(name);
+                    var norm = NormalizeAppName(name);
+                    if (!string.IsNullOrWhiteSpace(norm)) candidates.Add(norm);
+                    var firstWord = name.Split(' ', '-', '_').FirstOrDefault();
+                    if (!string.IsNullOrWhiteSpace(firstWord)) candidates.Add(firstWord);
+                }
+                if (!string.IsNullOrWhiteSpace(id))
+                {
+                    var cleanId = CleanPackageId(id);
+                    if (!string.IsNullOrWhiteSpace(cleanId)) candidates.Add(cleanId);
+                    var last = id.Split('.').LastOrDefault();
+                    if (!string.IsNullOrWhiteSpace(last)) candidates.Add(last);
+                }
+
+                foreach (var c in candidates.Distinct(StringComparer.OrdinalIgnoreCase))
+                {
+                    var exe = c.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? c : c + ".exe";
+                    var directPath = Path.Combine(dir, exe);
+                    if (File.Exists(directPath)) return directPath;
+                }
+
+                foreach (var sub in Directory.EnumerateDirectories(dir))
+                {
+                    var subName = Path.GetFileName(sub);
+                    foreach (var c in candidates)
+                    {
+                        if (subName.Contains(c, StringComparison.OrdinalIgnoreCase))
+                        {
+                            var subExes = Directory.GetFiles(sub, "*.exe", SearchOption.TopDirectoryOnly);
+                            if (subExes.Length > 0) return subExes[0];
+                        }
+                    }
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        public static string? FindStartMenuShortcut(string name, string id)
+        {
+            EnsureDiskFolderCaches();
+            if (_startMenuLinkPathsCache != null)
+            {
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    if (_startMenuLinkPathsCache.TryGetValue(name.Trim(), out var p1) && File.Exists(p1)) return p1;
+                    var norm = NormalizeAppName(name);
+                    if (!string.IsNullOrWhiteSpace(norm) && _startMenuLinkPathsCache.TryGetValue(norm, out var p2) && File.Exists(p2)) return p2;
+                    var stripped = StripPublisherPrefix(norm);
+                    if (!string.IsNullOrWhiteSpace(stripped) && _startMenuLinkPathsCache.TryGetValue(stripped, out var p3) && File.Exists(p3)) return p3;
+
+                    foreach (var kvp in _startMenuLinkPathsCache)
+                    {
+                        if (kvp.Key.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+                            (!string.IsNullOrWhiteSpace(norm) && kvp.Key.Contains(norm, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            if (File.Exists(kvp.Value)) return kvp.Value;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        public static string? GetProtocolUri(string name, string id)
+        {
+            var key = (name ?? id ?? "").ToLowerInvariant();
+            if (key.Contains("chatgpt")) return "chatgpt://";
+            if (key.Contains("spotify")) return "spotify:";
+            if (key.Contains("whatsapp")) return "whatsapp:";
+            if (key.Contains("discord")) return "discord:";
+            if (key.Contains("slack")) return "slack:";
+            if (key.Contains("steam")) return "steam:";
+            if (key.Contains("telegram")) return "tg:";
+            if (key.Contains("code") || key.Contains("visualstudio")) return "vscode:";
+            return null;
+        }
+
+        public static string? ResolveComAppsFolderAumid(string name, string id)
+        {
+            try
+            {
+                if (_comAppsFolderCache == null || (DateTime.UtcNow - _comAppsFolderTime).TotalMinutes > 5)
+                {
+                    var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    var shellType = Type.GetTypeFromProgID("Shell.Application");
+                    if (shellType != null)
+                    {
+                        dynamic? shell = Activator.CreateInstance(shellType);
+                        if (shell != null)
+                        {
+                            dynamic? folder = shell.Namespace("shell:AppsFolder");
+                            if (folder != null)
+                            {
+                                foreach (dynamic item in folder.Items())
+                                {
+                                    try
+                                    {
+                                        string itemName = item.Name?.ToString() ?? "";
+                                        string itemPath = item.Path?.ToString() ?? "";
+                                        if (!string.IsNullOrWhiteSpace(itemName) && !string.IsNullOrWhiteSpace(itemPath))
+                                        {
+                                            map[itemName] = itemPath;
+                                            var norm = NormalizeAppName(itemName);
+                                            if (!string.IsNullOrWhiteSpace(norm) && !map.ContainsKey(norm)) map[norm] = itemPath;
+                                            var stripped = StripPublisherPrefix(norm);
+                                            if (!string.IsNullOrWhiteSpace(stripped) && !map.ContainsKey(stripped)) map[stripped] = itemPath;
+                                            map[itemPath] = itemPath;
+                                        }
+                                    }
+                                    catch { }
+                                }
+                            }
+                        }
+                    }
+                    _comAppsFolderCache = map;
+                    _comAppsFolderTime = DateTime.UtcNow;
+                }
+
+                if (_comAppsFolderCache != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        if (_comAppsFolderCache.TryGetValue(name.Trim(), out var p1)) return p1;
+                        var n = NormalizeAppName(name);
+                        if (!string.IsNullOrWhiteSpace(n) && _comAppsFolderCache.TryGetValue(n, out var p2)) return p2;
+                        var s = StripPublisherPrefix(n);
+                        if (!string.IsNullOrWhiteSpace(s) && _comAppsFolderCache.TryGetValue(s, out var p3)) return p3;
+                    }
+                    if (!string.IsNullOrWhiteSpace(id))
+                    {
+                        if (_comAppsFolderCache.TryGetValue(id.Trim(), out var p4)) return p4;
+                    }
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        public static bool LaunchApp(AppItem app)
+        {
+            if (app == null) return false;
+            try
+            {
+                // 1. Direct local executable from icon path
+                if (!string.IsNullOrWhiteSpace(app.LocalIconPath) && app.LocalIconPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) && File.Exists(app.LocalIconPath))
+                {
+                    try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(app.LocalIconPath) { UseShellExecute = true }); return true; } catch { }
+                }
+
+                // 2. Modern AppX / MSIX Package check (ChatGPT, WhatsApp, Spotify, Windows Terminal, Claude, etc.)
+                var appx = FindAppxPackage(app.Id, app.Name);
+                if (appx != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(appx.AppUserModelId))
+                    {
+                        try
+                        {
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $@"shell:AppsFolder\{appx.AppUserModelId}") { UseShellExecute = true });
+                            return true;
+                        }
+                        catch { }
+                    }
+                    if (!string.IsNullOrWhiteSpace(appx.ExecutionAliasPath) && File.Exists(appx.ExecutionAliasPath))
+                    {
+                        try
+                        {
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(appx.ExecutionAliasPath) { UseShellExecute = true });
+                            return true;
+                        }
+                        catch { }
+                    }
+                    if (!string.IsNullOrWhiteSpace(appx.MainExecutablePath) && File.Exists(appx.MainExecutablePath))
+                    {
+                        try
+                        {
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(appx.MainExecutablePath) { UseShellExecute = true });
+                            return true;
+                        }
+                        catch { }
+                    }
+                }
+
+                // 3. Registry install location or AppUserModelId
+                var reg = GetRegistryInfo(app.Name, app.Id);
+                if (reg != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(reg.AppUserModelId))
+                    {
+                        try
+                        {
+                            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $@"shell:AppsFolder\{reg.AppUserModelId}") { UseShellExecute = true });
+                            return true;
+                        }
+                        catch { }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(reg.InstallLocation) && Directory.Exists(reg.InstallLocation))
+                    {
+                        try
+                        {
+                            var exes = Directory.GetFiles(reg.InstallLocation, "*.exe", SearchOption.TopDirectoryOnly);
+                            var mainExe = exes.FirstOrDefault(f => !Path.GetFileName(f).Contains("uninstall", StringComparison.OrdinalIgnoreCase) &&
+                                                                   !Path.GetFileName(f).Contains("update", StringComparison.OrdinalIgnoreCase) &&
+                                                                   !Path.GetFileName(f).Contains("helper", StringComparison.OrdinalIgnoreCase)) ?? exes.FirstOrDefault();
+                            if (mainExe != null && File.Exists(mainExe))
+                            {
+                                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(mainExe) { UseShellExecute = true });
+                                return true;
+                            }
+                        }
+                        catch { }
+                    }
+                }
+
+                // 4. Canonical known installation paths on disk
+                var canonicalExe = GetCanonicalExecutablePath(app.Id, app.Name);
+                if (!string.IsNullOrWhiteSpace(canonicalExe) && File.Exists(canonicalExe))
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(canonicalExe) { UseShellExecute = true });
+                        return true;
+                    }
+                    catch { }
+                }
+
+                // 5. App Paths registry (HKLM + HKCU + WOW6432Node)
+                var appPathExe = ResolveFromAppPaths(app.Name) ?? ResolveFromAppPaths(CleanPackageId(app.Id));
+                if (!string.IsNullOrWhiteSpace(appPathExe) && File.Exists(appPathExe))
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(appPathExe) { UseShellExecute = true });
+                        return true;
+                    }
+                    catch { }
+                }
+
+                // 6. WindowsApps execution aliases (%LOCALAPPDATA%\Microsoft\WindowsApps)
+                var aliasExe2 = FindWindowsAppsAlias(app.Name, app.Id);
+                if (!string.IsNullOrWhiteSpace(aliasExe2) && File.Exists(aliasExe2))
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(aliasExe2) { UseShellExecute = true });
+                        return true;
+                    }
+                    catch { }
+                }
+
+                // 7. Start Menu shortcuts
+                var lnkPath = FindStartMenuShortcut(app.Name, app.Id);
+                if (!string.IsNullOrWhiteSpace(lnkPath) && File.Exists(lnkPath))
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(lnkPath) { UseShellExecute = true });
+                        return true;
+                    }
+                    catch { }
+                }
+
+                // 8. Protocol URI fallback
+                var proto = GetProtocolUri(app.Name, app.Id);
+                if (!string.IsNullOrWhiteSpace(proto))
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(proto) { UseShellExecute = true });
+                        return true;
+                    }
+                    catch { }
+                }
+
+                // 9. Shell.Application COM fallback
+                var comAumid2 = ResolveComAppsFolderAumid(app.Name, app.Id);
+                if (!string.IsNullOrWhiteSpace(comAumid2))
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("explorer.exe", $@"shell:AppsFolder\{comAumid2}") { UseShellExecute = true });
+                        return true;
+                    }
+                    catch { }
+                }
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Launch failed for {app.Name}: {ex.Message}", ActivityType.Warning);
+            }
+
             return false;
         }
 
@@ -571,6 +1191,13 @@ namespace SetupHub180Hz.Services
             {
                 var match = catalog.FirstOrDefault(c => string.Equals(c.Id, app.Id, StringComparison.OrdinalIgnoreCase));
                 if (match != null) return match;
+
+                if (StorePackageNameMap.TryGetValue(app.Id, out var aliases))
+                {
+                    match = catalog.FirstOrDefault(c => aliases.Any(a => string.Equals(c.Id, a, StringComparison.OrdinalIgnoreCase) ||
+                                                                         string.Equals(c.Name, a, StringComparison.OrdinalIgnoreCase)));
+                    if (match != null) return match;
+                }
 
                 var cleanId = CleanPackageId(app.Id);
                 if (!string.IsNullOrWhiteSpace(cleanId))
@@ -1431,6 +2058,52 @@ namespace SetupHub180Hz.Services
                     }
                 }
                 catch { }
+            }
+
+            // 2. Ingest modern AppX / MSIX applications (ChatGPT, WhatsApp, Spotify, Claude, Windows Terminal, etc.)
+            EnsureAppxPackageCache();
+            if (_appxInfoMap != null)
+            {
+                foreach (var info in _appxInfoMap.Values)
+                {
+                    var entry = new RegistryAppInfo
+                    {
+                        DisplayName = !string.IsNullOrWhiteSpace(info.DisplayName) ? info.DisplayName : info.PackageFamilyName,
+                        DisplayVersion = info.Version,
+                        InstallLocation = info.PackageRootFolder,
+                        DisplayIcon = info.MainExecutablePath ?? info.ExecutionAliasPath,
+                        AppUserModelId = info.AppUserModelId,
+                        Publisher = info.Publisher,
+                        IsPackagedApp = true
+                    };
+
+                    void AddCacheKey(string? k)
+                    {
+                        if (string.IsNullOrWhiteSpace(k) || _registryCache == null) return;
+                        var lower = k.Trim().ToLowerInvariant();
+                        if (!_registryCache.ContainsKey(lower)) _registryCache[lower] = entry;
+                        var norm = NormalizeAppName(k).ToLowerInvariant();
+                        if (!string.IsNullOrWhiteSpace(norm) && !_registryCache.ContainsKey(norm)) _registryCache[norm] = entry;
+                        var stripped = StripPublisherPrefix(norm);
+                        if (!string.IsNullOrWhiteSpace(stripped) && !_registryCache.ContainsKey(stripped)) _registryCache[stripped] = entry;
+                        var compact = CompactAlpha(k);
+                        if (compact.Length >= 4 && !_registryCache.ContainsKey(compact)) _registryCache[compact] = entry;
+                    }
+
+                    AddCacheKey(info.DisplayName);
+                    AddCacheKey(info.PackageFamilyName);
+                    AddCacheKey(info.PackageFullName);
+
+                    foreach (var (storeId, aliases) in StorePackageNameMap)
+                    {
+                        if (aliases.Any(a => a.Equals(info.DisplayName, StringComparison.OrdinalIgnoreCase) ||
+                                             info.PackageFullName.Contains(a, StringComparison.OrdinalIgnoreCase) ||
+                                             info.PackageFamilyName.Contains(a, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            AddCacheKey(storeId);
+                        }
+                    }
+                }
             }
         }
     }
