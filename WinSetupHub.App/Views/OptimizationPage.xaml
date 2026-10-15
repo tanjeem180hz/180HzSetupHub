@@ -265,6 +265,12 @@
                             Content="🔄 RESTORE ALL" Padding="10,7" Margin="0,0,6,4"
                             Click="BtnRestoreDefault_Click" ToolTip="Restore all tweaks in this section back to factory defaults"/>
 
+                    <!-- 🚀 100% EXTREME BOOST (Force 100% PC Performance) -->
+                    <Button x:Name="BtnExtremeBoost" Style="{StaticResource ApplyButton}"
+                            Background="{DynamicResource BrushAccent}" Foreground="#0A0E17"
+                            Content="🚀 100% EXTREME BOOST" Padding="15,7" Margin="0,0,6,4"
+                            Click="BtnExtremeBoost_Click" ToolTip="Force 100% PC Performance: One-click deploy all high-impact latency, CPU unparking, GPU overdrive, zero-ping network &amp; bloatware elimination tweaks!"/>
+
                     <!-- Apply Selected (Primary Action) -->
                     <Button x:Name="BtnApplySelected" Style="{StaticResource ApplyButton}"
                             Content="⚡ APPLY SELECTED" Padding="14,7" Margin="0,0,6,4"

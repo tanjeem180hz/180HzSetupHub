@@ -1,0 +1,1843 @@
+﻿[
+    {
+        "id":  "RegTweakEmulBlueStacks",
+        "name":  "BlueStacks Realtime CPU \u0026 IO Priority (HD-Player.exe)",
+        "description":  "Configures Windows kernel scheduler IFEO to automatically run BlueStacks with High CPU Priority and High I/O Priority for maximum emulator FPS.",
+        "category":  "Emulator \u0026 VM Acceleration",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Player.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Player.exe\\PerfOptions",
+                             "Name":  "IoPriority",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakEmulLDPlayer",
+        "name":  "LDPlayer Realtime CPU \u0026 IO Priority (dnplayer.exe \u0026 LdBox)",
+        "description":  "Configures Windows IFEO to run LDPlayer and LDBox VM core with High CPU Priority and High I/O Priority for stutter-free 120Hz/240Hz Android gaming.",
+        "category":  "Emulator \u0026 VM Acceleration",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dnplayer.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dnplayer.exe\\PerfOptions",
+                             "Name":  "IoPriority",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LdBoxHeadless.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LdBoxHeadless.exe\\PerfOptions",
+                             "Name":  "IoPriority",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakEmulNoxMemu",
+        "name":  "NoxPlayer \u0026 MEMU Realtime CPU Priority (Nox.exe \u0026 MEmu.exe)",
+        "description":  "Configures Windows IFEO to execute NoxPlayer and MEMU emulator processes with High CPU Priority and high thread scheduling preference.",
+        "category":  "Emulator \u0026 VM Acceleration",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\Nox.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\MEmu.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakEmulGpuDirectX",
+        "name":  "Force Discrete High-Performance GPU for All Android Emulators",
+        "description":  "Forces Windows DirectX graphics runtime to route all Android emulator rendering through your high-power discrete GPU.",
+        "category":  "Emulator \u0026 VM Acceleration",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+                             "Name":  "HD-Player.exe",
+                             "Value":  "GpuPreference=2;",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+                             "Name":  "dnplayer.exe",
+                             "Value":  "GpuPreference=2;",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+                             "Name":  "LdBoxHeadless.exe",
+                             "Value":  "GpuPreference=2;",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+                             "Name":  "Nox.exe",
+                             "Value":  "GpuPreference=2;",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+                             "Name":  "MEmu.exe",
+                             "Value":  "GpuPreference=2;",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakEmulPowerThrottling",
+        "name":  "Disable CPU Power Throttling \u0026 EcoQoS for Emulators",
+        "description":  "Stops Windows 10/11 from throttling multi-threaded Android emulator processes to slow efficiency states.",
+        "category":  "Emulator \u0026 VM Acceleration",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+                             "Name":  "PowerThrottlingOff",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMPO",
+        "name":  "Disable Multi-Plane Overlay (MPO) Micro-Stutter Fix",
+        "description":  "Eliminates infamous Desktop Window Manager multi-plane overlay frame drops, black screens, and micro-stutters across NVIDIA, AMD, and Intel GPUs.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
+                             "Name":  "OverlayTestMode",
+                             "Value":  "5",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakShaderCache",
+        "name":  "DirectX Shader Cache Maximize (1GB+ for Zero Stutter)",
+        "description":  "Sets the global DirectX shader disk cache to 1GB to prevent in-game shader compilation stutters in modern games and 3D emulators.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Direct3D",
+                             "Name":  "DirectXDriverCacheSize",
+                             "Value":  "1073741824",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakVisualFXPerformance",
+        "name":  "Windows Visual Effects - Ultimate Gaming Performance Mode",
+        "description":  "Disables window animations, menu fade delays, drop shadows, and taskbar transition latency while keeping crisp ClearType font rendering.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+                             "Name":  "VisualFXSetting",
+                             "Value":  "2",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Desktop\\WindowMetrics",
+                             "Name":  "MinAnimate",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Desktop",
+                             "Name":  "UserPreferencesMask",
+                             "Value":  "90 12 03 80 10 00 00 00",
+                             "OriginalValue":  "9e 1e 07 80 12 00 00 00",
+                             "Type":  "Binary"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMouseRaw",
+        "name":  "Mouse 1:1 Raw Response (No Acceleration)",
+        "description":  "Disables Windows mouse acceleration curves and smoothing thresholds for true 1:1 pixel-perfect pointer tracking.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Mouse",
+                             "Name":  "MouseSpeed",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Mouse",
+                             "Name":  "MouseThreshold1",
+                             "Value":  "0",
+                             "OriginalValue":  "6",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Mouse",
+                             "Name":  "MouseThreshold2",
+                             "Value":  "0",
+                             "OriginalValue":  "10",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakGameDVR",
+        "name":  "Disable Xbox Game Bar \u0026 Background DVR",
+        "description":  "Stops background game clip broadcasting and game overlay capture hooks that cause frame stutters and input lag.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\System\\GameConfigStore",
+                             "Name":  "GameDVR_Enabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\System\\GameConfigStore",
+                             "Name":  "GameDVR_FSEBehaviorMode",
+                             "Value":  "2",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR",
+                             "Name":  "AllowGameDVR",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMMCSS",
+        "name":  "MMCSS High-Priority Gaming Scheduler",
+        "description":  "Directs Windows Multimedia Class Scheduler Service to allocate maximum CPU and GPU cycles to active game threads.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "Name":  "GPU Priority",
+                             "Value":  "8",
+                             "OriginalValue":  "8",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "Name":  "Priority",
+                             "Value":  "6",
+                             "OriginalValue":  "2",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "Name":  "Scheduling Category",
+                             "Value":  "High",
+                             "OriginalValue":  "Medium",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "Name":  "SFIO Priority",
+                             "Value":  "High",
+                             "OriginalValue":  "Normal",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakKeyboardRate",
+        "name":  "Fast Keyboard Repeat Response (Low Delay)",
+        "description":  "Sets shortest repeat delay (0) and max repeat rate (31) for immediate movement and key engagement in esports titles.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Keyboard",
+                             "Name":  "KeyboardDelay",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Keyboard",
+                             "Name":  "KeyboardSpeed",
+                             "Value":  "31",
+                             "OriginalValue":  "31",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakFullscreenOptimization",
+        "name":  "Disable Global Fullscreen Optimizations",
+        "description":  "Enforces exclusive fullscreen display presentation in DirectX games, bypassing desktop compositor buffering lag.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  true,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\System\\GameConfigStore",
+                             "Name":  "GameDVR_DXGIHonorFSEWindowsCompatible",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\System\\GameConfigStore",
+                             "Name":  "GameDVR_EFSEFeatureFlags",
+                             "Value":  "0",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNetworkThrottling",
+        "name":  "Disable Windows Network Throttling",
+        "description":  "Removes the default 10 packet/ms network traffic throttling limit, unleashing maximum network throughput and lower ping.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+                             "Name":  "NetworkThrottlingIndex",
+                             "Value":  "4294967295",
+                             "OriginalValue":  "10",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakSystemResponsiveness",
+        "name":  "Zero Network System Responsiveness Reserve",
+        "description":  "Eliminates the 20% system/network bandwidth reserved for background Windows tasks, allocating 100% to your active game.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+                             "Name":  "SystemResponsiveness",
+                             "Value":  "0",
+                             "OriginalValue":  "20",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakTcpNoDelay",
+        "name":  "TCP NoDelay \u0026 Disable Delayed ACK",
+        "description":  "Disables Nagle\u0027s algorithm and delayed packet acknowledgment for immediate packet transmission with zero buffering queue.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  true,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces",
+                             "Name":  "TcpAckFrequency",
+                             "Value":  "1",
+                             "OriginalValue":  "2",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces",
+                             "Name":  "TCPNoDelay",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakTcp1323Opts",
+        "name":  "TCP Window Auto-Tuning \u0026 High-Performance Scaling",
+        "description":  "Enables RFC 1323 TCP timestamps and window scaling for maximum bandwidth utilization and stable low-jitter connections.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "Tcp1323Opts",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "DefaultTTL",
+                             "Value":  "64",
+                             "OriginalValue":  "128",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNetBios",
+        "name":  "Disable NetBIOS Peer Discovery Broadcast Delays",
+        "description":  "Stops local subnet broadcast resolution queries that cause periodic network spikes during online gaming.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\NetBT\\Parameters",
+                             "Name":  "NodeType",
+                             "Value":  "2",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakPrioritySeparation",
+        "name":  "Win32 Priority Separation (Foreground Quantum Boost)",
+        "description":  "Sets process scheduling quantum to 26 (0x1A), allocating maximum CPU execution slices to active foreground apps and games.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+                             "Name":  "Win32PrioritySeparation",
+                             "Value":  "26",
+                             "OriginalValue":  "2",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisablePagingExecutive",
+        "name":  "Disable Paging Executive (Lock Kernel in RAM)",
+        "description":  "Forces Windows kernel drivers and system executive code to reside in high-speed physical RAM rather than pagefile on disk.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+                             "Name":  "DisablePagingExecutive",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakLargeSystemCache",
+        "name":  "Prioritize App Memory Over System File Cache",
+        "description":  "Sets LargeSystemCache=0 to ensure working set memory is dedicated to running games rather than Windows file system caching.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+                             "Name":  "LargeSystemCache",
+                             "Value":  "0",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakUnparkCores",
+        "name":  "Disable CPU Core Parking (Unpark All Cores)",
+        "description":  "Prevents Windows power manager from sleeping secondary CPU cores, avoiding micro-stutter when cores wake up under load.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  true,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\0cc5b647-c641-45cc-8e41-0b0188327a47",
+                             "Name":  "ValueMin",
+                             "Value":  "100",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\0cc5b647-c641-45cc-8e41-0b0188327a47",
+                             "Name":  "ValueMax",
+                             "Value":  "100",
+                             "OriginalValue":  "100",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMemoryCompression",
+        "name":  "Disable Memory Compression (16GB+ RAM Systems)",
+        "description":  "Disables background RAM page compression, reducing CPU overhead and eliminating compression micro-spikes on high-RAM rigs.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  true,
+        "isRecommended":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+                             "Name":  "MemoryCompression",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMenuShowDelay",
+        "name":  "Zero Menu Show Delay (Instant Context Menus)",
+        "description":  "Eliminates the built-in 400ms delay when hovering and opening context menus, making Windows feel instantaneous.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Desktop",
+                             "Name":  "MenuShowDelay",
+                             "Value":  "0",
+                             "OriginalValue":  "400",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakFastHungAppKill",
+        "name":  "Fast Hung App \u0026 Service Termination (2s Timeout)",
+        "description":  "Reduces hung application and service termination delays from 12-20s down to 2s, enabling swift restarts and shutdowns.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Desktop",
+                             "Name":  "WaitToKillAppTimeout",
+                             "Value":  "2000",
+                             "OriginalValue":  "20000",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Desktop",
+                             "Name":  "HungAppTimeout",
+                             "Value":  "1000",
+                             "OriginalValue":  "5000",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control",
+                             "Name":  "WaitToKillServiceTimeout",
+                             "Value":  "2000",
+                             "OriginalValue":  "5000",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Desktop",
+                             "Name":  "AutoEndTasks",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisallowShaking",
+        "name":  "Disable Aero Shake Window Minimization",
+        "description":  "Stops Windows from minimizing all other open background windows when quickly shaking or dragging a title bar.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                             "Name":  "DisallowShaking",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMinAnimate",
+        "name":  "Instant Window Minimize \u0026 Maximize Animations",
+        "description":  "Disables slow window zoom and expand animations so application windows snap open and close instantaneously.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Desktop\\WindowMetrics",
+                             "Name":  "MinAnimate",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNoShortcutPrefix",
+        "name":  "Disable \u0027Shortcut to\u0027 Prefix on Shortcuts",
+        "description":  "Prevents Windows Explorer from automatically adding \u0027- Shortcut\u0027 to the title of new desktop and start menu shortcuts.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer",
+                             "Name":  "link",
+                             "Value":  "0",
+                             "OriginalValue":  "16",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableWerFault",
+        "name":  "Disable Windows Error Reporting Popups",
+        "description":  "Suppresses sluggish WerFault.exe crash report dialogs and background dump writes when an application encounters an error.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting",
+                             "Name":  "Disabled",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting",
+                             "Name":  "DontShowUI",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakHAGS",
+        "name":  "Hardware-Accelerated GPU Scheduling (HAGS)",
+        "description":  "Allows the graphics card to manage its own video memory directly, significantly reducing rendering latency in modern titles.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+                             "Name":  "HwSchMode",
+                             "Value":  "2",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableMPO",
+        "name":  "Disable Multi-Plane Overlay (Fix Stutter \u0026 Blackscreens)",
+        "description":  "Disables buggy Windows Desktop Window Manager MPO overlays, fixing cursor flickering, hitching, and black screens on NVIDIA/AMD GPUs.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  true,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
+                             "Name":  "OverlayTestMode",
+                             "Value":  "5",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakPreferHighPerfGpu",
+        "name":  "Prefer Discrete High-Performance GPU Everywhere",
+        "description":  "Forces Windows Desktop Window Manager and 3D graphics applications to default to the discrete dedicated GPU.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+                             "Name":  "DirectXUserGpuPolicy",
+                             "Value":  "2",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakGpuPowerThrottling",
+        "name":  "Disable GPU Driver Energy Throttling",
+        "description":  "Prevents Windows PowerThrottling subsystem from forcing display adapter and graphics driver threads into power-saving states.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+                             "Name":  "PowerThrottlingOff",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDiagTrack",
+        "name":  "Disable Diagnostic Data Telemetry (AllowTelemetry = 0)",
+        "description":  "Completely stops Windows diagnostic tracking and automated background telemetric telemetry uploads to Microsoft.",
+        "category":  "Privacy \u0026 Telemetry",
+        "categoryOrder":  5,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+                             "Name":  "AllowTelemetry",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakCeip",
+        "name":  "Disable Customer Experience Improvement Program",
+        "description":  "Stops CEIP anonymous application usage telemetry and background scheduled SQM collection tasks.",
+        "category":  "Privacy \u0026 Telemetry",
+        "categoryOrder":  5,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows",
+                             "Name":  "CEIPEnable",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakStartBingSearch",
+        "name":  "Disable Start Menu Bing Web Search \u0026 Cortana",
+        "description":  "Removes online Bing web search latency from the Start Menu, providing lightning-fast 0ms local file and app search.",
+        "category":  "Privacy \u0026 Telemetry",
+        "categoryOrder":  5,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer",
+                             "Name":  "DisableSearchBoxSuggestions",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Search",
+                             "Name":  "BingSearchEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Search",
+                             "Name":  "CortanaConsent",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakAdvertisingId",
+        "name":  "Disable Windows Advertising ID Profile",
+        "description":  "Prevents Windows and installed applications from tracking your activity across apps for targeted advertising.",
+        "category":  "Privacy \u0026 Telemetry",
+        "categoryOrder":  5,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
+                             "Name":  "Enabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNtfs8dot3",
+        "name":  "Disable NTFS 8.3 Short Name Creation",
+        "description":  "Disables legacy MS-DOS 8.3 filename generation on NTFS volumes, boosting folder traversal and file creation speed.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  6,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "NtfsDisable8dot3NameCreation",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNtfsLastAccess",
+        "name":  "Disable NTFS Last Access Time Updates",
+        "description":  "Eliminates disk write overhead every time a directory or file is read by games and applications.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  6,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "NtfsDisableLastAccessUpdate",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNtfsMftZone",
+        "name":  "Increase NTFS Master File Table Reservation",
+        "description":  "Expands MFT zone allocation (Reservation=2), preventing fragmentation of the file table on SSDs and gaming drives.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  6,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "NtfsMftZoneReservation",
+                             "Value":  "2",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakSpectreMeltdown",
+        "name":  "Spectre \u0026 Meltdown Speculative Execution Bypass (Game Overdrive)",
+        "description":  "Disables Spectre Variant 2 and Meltdown mitigations via Memory Management registry flags, unlocking 5-15% raw CPU compute throughput.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  true,
+        "isRecommended":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+                             "Name":  "FeatureSettingsOverride",
+                             "Value":  "3",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+                             "Name":  "FeatureSettingsOverrideMask",
+                             "Value":  "3",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDirectFlipIFlip",
+        "name":  "Enable DirectFlip \u0026 Low Latency Independent Flip (IFlip)",
+        "description":  "Forces DirectFlip on all DWM swapchains to eliminate borderless display latency.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
+                             "Name":  "DirectFlip",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+                             "Name":  "DirectXUserGlobalSettings",
+                             "Value":  "DirectFlip=1;IFlip=1;",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakGameBarPresenceKiller",
+        "name":  "Disable GameBar Presence Writer (DirectX Frame Hook Killer)",
+        "description":  "Eliminates the GameBarPresenceWriter background hook that causes FPS drops and micro-stutter in games.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\WindowsRuntime\\ActivatableClassId\\Windows.Gaming.GameBar.PresenceServer.Internal.PresenceWriter",
+                             "Name":  "ActivationType",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR",
+                             "Name":  "AppCaptureEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakCsrssPriority",
+        "name":  "CSRSS Client-Server Runtime High Priority (Input Response)",
+        "description":  "Boosts csrss.exe to High CPU priority class and High IO priority class for instantaneous cursor and keyboard response.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions",
+                             "Name":  "IoPriority",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDwmPriority",
+        "name":  "DWM Desktop Window Manager High Priority (Display Engine)",
+        "description":  "Sets dwm.exe to High CPU and IO priority to guarantee smooth 180Hz+ frame presentation without compositor drops.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dwm.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dwm.exe\\PerfOptions",
+                             "Name":  "IoPriority",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakFaultTolerantHeap",
+        "name":  "Disable Fault Tolerant Heap (FTH Performance Sandbox)",
+        "description":  "Stops Windows from running high-load games and apps in a slow Fault Tolerant Heap sandbox.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\FTH",
+                             "Name":  "Enabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakQoSZeroReserve",
+        "name":  "Zero QoS Reserved Bandwidth (100% Download \u0026 Game Bandwidth)",
+        "description":  "Eliminates the 20% QoS packet scheduler bandwidth reservation, unlocking 100% maximum line speed.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched",
+                             "Name":  "NonBestEffortLimit",
+                             "Value":  "0",
+                             "OriginalValue":  "20",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDnsMaxSpeed",
+        "name":  "Ultra-Fast DNS Cache TTL \u0026 Zero Negative Lookup Wait",
+        "description":  "Configures DNS Cache service with 86400s positive TTL and 0s failure penalty for instantaneous server connection.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Dnscache\\Parameters",
+                             "Name":  "MaxCacheTtl",
+                             "Value":  "86400",
+                             "OriginalValue":  "86400",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Dnscache\\Parameters",
+                             "Name":  "MaxNegativeCacheTtl",
+                             "Value":  "5",
+                             "OriginalValue":  "30",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Dnscache\\Parameters",
+                             "Name":  "NetFailureCacheTime",
+                             "Value":  "0",
+                             "OriginalValue":  "30",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakHungAppInstantKill",
+        "name":  "Ultra-Fast Hung App Timeout \u0026 Instant Shutdown",
+        "description":  "Reduces hung application wait timeout to 1000ms and enables auto-end tasks on system shutdown.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Desktop",
+                             "Name":  "HungAppTimeout",
+                             "Value":  "1000",
+                             "OriginalValue":  "5000",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Desktop",
+                             "Name":  "WaitToKillAppTimeout",
+                             "Value":  "2000",
+                             "OriginalValue":  "20000",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Desktop",
+                             "Name":  "AutoEndTasks",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakEmulGameloopMuMu",
+        "name":  "Gameloop, MuMu Player \u0026 Google Play Games Realtime Priority",
+        "description":  "Sets High CPU \u0026 IO priority for Gameloop (AppMarket.exe, AndroidProcess.exe), MuMu Player (MuMuPlayer.exe), and Google Play PC (crosvm.exe).",
+        "category":  "Emulator \u0026 VM Acceleration",
+        "categoryOrder":  5,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\AppMarket.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\AppMarket.exe\\PerfOptions",
+                             "Name":  "IoPriority",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\AndroidProcess.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\MuMuPlayer.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\crosvm.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakGlobalPowerThrottling",
+        "name":  "Disable Windows Global Power Throttling \u0026 EcoQoS",
+        "description":  "Completely disables Windows kernel power throttling, preventing background or foreground task frequency capping.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+                             "Name":  "PowerThrottlingOff",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMMCSSGamesUltimate",
+        "name":  "MMCSS Extreme Gaming Scheduling Category (Priority 6 \u0026 GPU 8)",
+        "description":  "Configures Multimedia Class Scheduler Service to grant games 100% CPU reservation, High scheduling category, and GPU Priority 8.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "Name":  "GPU Priority",
+                             "Value":  "8",
+                             "OriginalValue":  "8",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "Name":  "Priority",
+                             "Value":  "6",
+                             "OriginalValue":  "2",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "Name":  "Scheduling Category",
+                             "Value":  "High",
+                             "OriginalValue":  "Medium",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "Name":  "SFIO Priority",
+                             "Value":  "High",
+                             "OriginalValue":  "Normal",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "Name":  "Background Only",
+                             "Value":  "False",
+                             "OriginalValue":  "True",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNvTelemetryOptOut",
+        "name":  "NVIDIA Control Panel Telemetry Opt-Out",
+        "description":  "Disables telemetry tracking inside the NVIDIA Control Panel and Display driver.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\NVIDIA Corporation\\NvControlPanel2\\Client",
+                             "Name":  "OptInOrOutPreference",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableCopilotRecall",
+        "name":  "Disable Windows Copilot \u0026 Recall AI Background Analysis",
+        "description":  "Disables Windows Copilot AI, Recall screenshot analysis, and background neural engine scanning.",
+        "category":  "Privacy \u0026 Telemetry",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+                             "Name":  "TurnOffWindowsCopilot",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+                             "Name":  "TurnOffWindowsCopilot",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    }
+]

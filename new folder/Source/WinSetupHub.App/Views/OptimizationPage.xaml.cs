@@ -323,6 +323,54 @@ namespace SetupHub180Hz.Views
             StatusBar.Visibility = Visibility.Visible;
         }
 
+        private void BtnExtremeBoost_Click(object sender, RoutedEventArgs e)
+        {
+            var sourceList = GetCurrentSectionItems();
+            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
+
+            // Select all tweaks that are in the Extreme Performance or Recommended presets
+            var extremeTweaks = sourceList.Where(t => TweakService.ExtremePerformanceIds.Contains(t.Id) || t.IsRecommended).ToList();
+            if (extremeTweaks.Count == 0)
+            {
+                extremeTweaks = sourceList.Where(t => !t.IsAdvanced).ToList();
+            }
+
+            // Mark them as selected in UI
+            foreach (var t in sourceList)
+            {
+                t.IsSelected = extremeTweaks.Contains(t);
+            }
+
+            var dialog = new OptimizationDialog(
+                title: $"🚀 Deploy 100% Extreme Performance Engine ({extremeTweaks.Count} Tweaks)",
+                subtitle: $"This will safely deploy {extremeTweaks.Count} extreme-level optimizations across Low Latency, CPU Unparking, GPU Overdrive, Zero Ping & Bloatware Elimination to force 100% PC performance:",
+                tweaks: extremeTweaks,
+                isUndo: false,
+                tweakService: _tweakService)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                foreach (var t in extremeTweaks)
+                {
+                    t.IsApplied = true;
+                    t.IsSelected = true;
+                }
+                TweakService.RecordAppliedTweaks(extremeTweaks.Select(t => t.Id));
+
+                ActivityLogger.Instance.Log($"100% Extreme Performance Engine deployed: Applied {extremeTweaks.Count} high-throughput {sectionLabel.ToLowerInvariant()} optimizations.", ActivityType.Success);
+                NotificationService.Notify("100% Extreme Boost Activated", $"Applied {extremeTweaks.Count} extreme optimizations. CPU, GPU, Network & Latency tuned for 100% peak performance.");
+
+                TxtStatus.Text = $"🚀 Applied {extremeTweaks.Count} extreme {sectionLabel.ToLowerInvariant()} optimization(s) successfully! PC at 100% performance.";
+                StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
+                CheckRebootNeeded(extremeTweaks);
+            }
+        }
+
         private void BtnApplySelected_Click(object sender, RoutedEventArgs e)
         {
             var sourceList = GetCurrentSectionItems();

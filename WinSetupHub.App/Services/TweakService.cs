@@ -63,6 +63,7 @@ namespace SetupHub180Hz.Services
             "EmulTweakCpuPriority",
             "EmulTweakGpuPreference",
             "EmulTweakPowerThrottling",
+            "EmulTweakGameloopMuMu",
 
             // 🖥️ Graphical & Visual Responsiveness
             "GfxTweakVisualFX",
@@ -70,26 +71,169 @@ namespace SetupHub180Hz.Services
             "GfxTweakShaderCache",
             "GfxTweakFSE",
             "GfxTweakMPO",
+            "GfxTweakDirectFlip",
+            "GfxTweakNvTelemetry",
+            "GfxTweakDisableGameBarPresence",
 
             // ⚡ Extreme Low Latency & Kernel Timers
             "KernelTweakDynamicTick",
             "KernelTweakTSCClock",
             "KernelTweakTSCSync",
             "KernelTweakSysResponsiveness",
+            "KernelTweakMSIGpu",
+            "KernelTweakCSRSSPriority",
+            "KernelTweakDisableDwmGhosting",
 
             // 🧠 CPU, RAM & Power Tuning
             "CpuTweakUnparkCores",
             "CpuTweakWin32Priority",
             "CpuTweakDisablePaging",
+            "CpuTweakPowerPlanLock",
+            "CpuTweakDisableFTH",
             "MemTweakFlushStandby",
 
             // 🌐 Network & Ping Tuning
             "NetTweakTcpAckNoDelay",
             "NetTweakNetshRss",
+            "NetTweakQoSBandwidth",
+            "NetTweakDnsCache",
+            "NetTweakECNHeuristics",
 
             // 💾 Storage & NVMe Throughput
             "DiskTweakNtfsFast",
-            "DiskTweakEnableTrim"
+            "DiskTweakEnableTrim",
+            "DiskTweakNvmeWriteCache",
+
+            // 🧹 Background Bloatware & Services Elimination
+            "ServiceTweakSysMain",
+            "ServiceTweakDiagnosticTracking",
+            "ServiceTweakXboxServices",
+            "ServiceTweakErrorReporting",
+            "ServiceTweakPcaSvc",
+
+            // 🗃️ Dedicated Registry Optimization Recommendations
+            "RegTweakDirectFlipIFlip",
+            "RegTweakGameBarPresenceKiller",
+            "RegTweakCsrssPriority",
+            "RegTweakDwmPriority",
+            "RegTweakFaultTolerantHeap",
+            "RegTweakQoSZeroReserve",
+            "RegTweakDnsMaxSpeed",
+            "RegTweakHungAppInstantKill",
+            "RegTweakEmulGameloopMuMu",
+            "RegTweakGlobalPowerThrottling",
+            "RegTweakMMCSSGamesUltimate",
+            "RegTweakNvTelemetryOptOut",
+            "RegTweakDisableCopilotRecall"
+        };
+
+        // Extreme Performance Preset - forces 100% PC Performance & Ultra-Low Latency
+        public static readonly HashSet<string> ExtremePerformanceIds = new(StringComparer.OrdinalIgnoreCase)
+        {
+            // Latency & Kernel Timers
+            "KernelTweakDynamicTick",
+            "KernelTweakTSCClock",
+            "KernelTweakTSCSync",
+            "KernelTweakSysResponsiveness",
+            "KernelTweakMSIGpu",
+            "KernelTweakCSRSSPriority",
+            "KernelTweakDisableDwmGhosting",
+
+            // CPU & Scheduling
+            "CpuTweakUnparkCores",
+            "CpuTweakWin32Priority",
+            "CpuTweakDisablePaging",
+            "CpuTweakPowerPlanLock",
+            "CpuTweakDisableFTH",
+            "MemTweakFlushStandby",
+
+            // GPU & DirectX
+            "GfxTweakVisualFX",
+            "GfxTweakHAGS",
+            "GfxTweakShaderCache",
+            "GfxTweakFSE",
+            "GfxTweakMPO",
+            "GfxTweakDirectFlip",
+            "GfxTweakNvTelemetry",
+            "GfxTweakDisableGameBarPresence",
+
+            // Network & Ping
+            "NetTweakTcpAckNoDelay",
+            "NetTweakNetshRss",
+            "NetTweakQoSBandwidth",
+            "NetTweakDnsCache",
+            "NetTweakECNHeuristics",
+
+            // Storage
+            "DiskTweakNtfsFast",
+            "DiskTweakEnableTrim",
+            "DiskTweakNvmeWriteCache",
+
+            // Services & Bloatware
+            "ServiceTweakSysMain",
+            "ServiceTweakDiagnosticTracking",
+            "ServiceTweakXboxServices",
+            "ServiceTweakErrorReporting",
+            "ServiceTweakPcaSvc",
+            "WPFTweaksServices",
+            "WPFTweaksTelemetry",
+
+            // Power
+            "WPFAddUltPerf",
+
+            // Emulators
+            "EmulTweakHypervisorVBS",
+            "EmulTweakCpuPriority",
+            "EmulTweakGpuPreference",
+            "EmulTweakPowerThrottling",
+            "EmulTweakGameloopMuMu",
+
+            // Registry Optimizations
+            "RegTweakDirectFlipIFlip",
+            "RegTweakGameBarPresenceKiller",
+            "RegTweakCsrssPriority",
+            "RegTweakDwmPriority",
+            "RegTweakFaultTolerantHeap",
+            "RegTweakQoSZeroReserve",
+            "RegTweakDnsMaxSpeed",
+            "RegTweakHungAppInstantKill",
+            "RegTweakEmulGameloopMuMu",
+            "RegTweakGlobalPowerThrottling",
+            "RegTweakMMCSSGamesUltimate",
+            "RegTweakNvTelemetryOptOut",
+            "RegTweakDisableCopilotRecall",
+            "RegTweakMouseRaw",
+            "RegTweakGameDVR",
+            "RegTweakMMCSS",
+            "RegTweakKeyboardRate",
+            "RegTweakFullscreenOptimization",
+            "RegTweakNetworkThrottling",
+            "RegTweakSystemResponsiveness",
+            "RegTweakTcpNoDelay",
+            "RegTweakTcp1323Opts",
+            "RegTweakNetBios",
+            "RegTweakPrioritySeparation",
+            "RegTweakDisablePagingExecutive",
+            "RegTweakLargeSystemCache",
+            "RegTweakUnparkCores",
+            "RegTweakMemoryCompression",
+            "RegTweakMenuShowDelay",
+            "RegTweakFastHungAppKill",
+            "RegTweakDisallowShaking",
+            "RegTweakMinAnimate",
+            "RegTweakNoShortcutPrefix",
+            "RegTweakDisableWerFault",
+            "RegTweakHAGS",
+            "RegTweakDisableMPO",
+            "RegTweakPreferHighPerfGpu",
+            "RegTweakGpuPowerThrottling",
+            "RegTweakDiagTrack",
+            "RegTweakCeip",
+            "RegTweakStartBingSearch",
+            "RegTweakAdvertisingId",
+            "RegTweakNtfs8dot3",
+            "RegTweakNtfsLastAccess",
+            "RegTweakNtfsMftZone"
         };
 
         private List<TweakItem>? _cache;

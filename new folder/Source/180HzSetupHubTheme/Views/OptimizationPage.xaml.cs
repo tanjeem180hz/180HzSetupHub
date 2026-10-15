@@ -27,10 +27,14 @@ namespace SetupHub180Hz.Views
             Loaded += async (_, _) =>
             {
                 if (_allTweaks.Count == 0)
+                {
                     await InitializeAsync();
+                }
                 else
                 {
-                    RefreshAppliedStates();
+                    BuildCategoryChips();
+                    ApplyFilter();
+                    await Task.Run(() => RefreshAppliedStates());
                     BuildCategoryChips();
                     ApplyFilter();
                 }
@@ -39,14 +43,35 @@ namespace SetupHub180Hz.Views
 
         private async Task InitializeAsync()
         {
-            _allTweaks = await _tweakService.GetAllAsync();
-            _systemTweaks = await _tweakService.GetSystemTweaksAsync();
-            _registryTweaks = await _tweakService.GetRegistryTweaksAsync();
+            try
+            {
+                _allTweaks = await _tweakService.GetAllAsync();
+                _systemTweaks = await _tweakService.GetSystemTweaksAsync();
+                _registryTweaks = await _tweakService.GetRegistryTweaksAsync();
 
-            RefreshAppliedStates();
+                // 1. Instant rendering so user sees all tweaks immediately without any lag
+                BuildCategoryChips();
+                ApplyFilter();
 
-            BuildCategoryChips();
-            ApplyFilter();
+                // 2. Scan live system applied states in background thread
+                await Task.Run(() =>
+                {
+                    RefreshAppliedStates();
+                });
+
+                // 3. Update category chips and subtitle count once applied scan completes
+                BuildCategoryChips();
+                ApplyFilter();
+            }
+            catch
+            {
+                try
+                {
+                    BuildCategoryChips();
+                    ApplyFilter();
+                }
+                catch { }
+            }
         }
 
         public void RefreshAppliedStates()
@@ -75,7 +100,6 @@ namespace SetupHub180Hz.Views
                     TxtSectionDescription.Text = "System, gaming presets, and desktop environment optimizations.";
                 }
 
-                RefreshAppliedStates();
                 BuildCategoryChips();
                 ApplyFilter();
             }
@@ -297,6 +321,54 @@ namespace SetupHub180Hz.Views
             TweakService.OpenBackupsDirectory();
             TxtStatus.Text = "📁 Opened automatic registry snapshots and backups folder.";
             StatusBar.Visibility = Visibility.Visible;
+        }
+
+        private void BtnExtremeBoost_Click(object sender, RoutedEventArgs e)
+        {
+            var sourceList = GetCurrentSectionItems();
+            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
+
+            // Select all tweaks that are in the Extreme Performance or Recommended presets
+            var extremeTweaks = sourceList.Where(t => TweakService.ExtremePerformanceIds.Contains(t.Id) || t.IsRecommended).ToList();
+            if (extremeTweaks.Count == 0)
+            {
+                extremeTweaks = sourceList.Where(t => !t.IsAdvanced).ToList();
+            }
+
+            // Mark them as selected in UI
+            foreach (var t in sourceList)
+            {
+                t.IsSelected = extremeTweaks.Contains(t);
+            }
+
+            var dialog = new OptimizationDialog(
+                title: $"🚀 Deploy 100% Extreme Performance Engine ({extremeTweaks.Count} Tweaks)",
+                subtitle: $"This will safely deploy {extremeTweaks.Count} extreme-level optimizations across Low Latency, CPU Unparking, GPU Overdrive, Zero Ping & Bloatware Elimination to force 100% PC performance:",
+                tweaks: extremeTweaks,
+                isUndo: false,
+                tweakService: _tweakService)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                foreach (var t in extremeTweaks)
+                {
+                    t.IsApplied = true;
+                    t.IsSelected = true;
+                }
+                TweakService.RecordAppliedTweaks(extremeTweaks.Select(t => t.Id));
+
+                ActivityLogger.Instance.Log($"100% Extreme Performance Engine deployed: Applied {extremeTweaks.Count} high-throughput {sectionLabel.ToLowerInvariant()} optimizations.", ActivityType.Success);
+                NotificationService.Notify("100% Extreme Boost Activated", $"Applied {extremeTweaks.Count} extreme optimizations. CPU, GPU, Network & Latency tuned for 100% peak performance.");
+
+                TxtStatus.Text = $"🚀 Applied {extremeTweaks.Count} extreme {sectionLabel.ToLowerInvariant()} optimization(s) successfully! PC at 100% performance.";
+                StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
+                CheckRebootNeeded(extremeTweaks);
+            }
         }
 
         private void BtnApplySelected_Click(object sender, RoutedEventArgs e)

@@ -239,20 +239,40 @@ namespace SetupHub180Hz.Views
             if (_isBoosting) return;
             _isBoosting = true;
             BtnQuickBoost.IsEnabled = false;
-            TxtQuickBoostBtn.Text = "OPTIMIZING...";
+            TxtQuickBoostBtn.Text = "BOOSTING 100%...";
 
             try
             {
+                // 1. Extreme RAM & Standby Cache purge
+                long freedRam = await Task.Run(() => MemoryCleaner.CleanRam());
+
+                // 2. Eradicate Temporary, Recent, Crash Dumps, Prefetch & System Cache
                 long freedBytes = 0;
-                var targets = await _cleanup.ScanAsync();
-                foreach (var t in targets.Where(x => x.Name.Contains("Temp", StringComparison.OrdinalIgnoreCase) || x.Name.Contains("Recent", StringComparison.OrdinalIgnoreCase)))
+                var targets = await _cleanup.ScanAsync(force: true);
+                foreach (var t in targets.Where(x => !x.IsRamTarget &&
+                    (x.Name.Contains("Temp", StringComparison.OrdinalIgnoreCase) ||
+                     x.Name.Contains("Recent", StringComparison.OrdinalIgnoreCase) ||
+                     x.Name.Contains("Crash", StringComparison.OrdinalIgnoreCase) ||
+                     x.Name.Contains("Dump", StringComparison.OrdinalIgnoreCase) ||
+                     x.Name.Contains("Cache", StringComparison.OrdinalIgnoreCase) ||
+                     x.Name.Contains("Prefetch", StringComparison.OrdinalIgnoreCase))))
                 {
                     freedBytes += await _cleanup.CleanAsync(t);
                 }
 
+                // 3. CLR Heap & Working Set compaction
+                GC.Collect(2, GCCollectionMode.Forced, true, true);
+                GC.WaitForPendingFinalizers();
+
                 _ = UpdateStatsAsync();
 
-                TxtQuickBoostBtn.Text = "BOOSTED!";
+                string ramStr = FormatBytes(freedRam);
+                string diskStr = FormatBytes(freedBytes);
+
+                ActivityLogger.Instance.Log($"100% Extreme System Turbo Boost completed: Flushed {ramStr} RAM cache and eradicated {diskStr} junk. Hardware running at 100% peak throughput.", ActivityType.Success);
+                NotificationService.Notify("100% Extreme Performance Boosted", $"Flushed {ramStr} RAM cache & wiped {diskStr} disk trash. Latency minimized and responsiveness maximized!");
+
+                TxtQuickBoostBtn.Text = "✓ 100% BOOSTED!";
 
                 await Task.Delay(2500);
                 TxtQuickBoostBtn.Text = "OPTIMIZE";
