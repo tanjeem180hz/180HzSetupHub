@@ -4403,5 +4403,608 @@
         "undoScript":  [
 
                        ]
+    },
+    {
+        "id":  "NetTweakTcpFastOpen",
+        "name":  "TCP Fast Open (TFO) Internet Acceleration (Instant Handshake)",
+        "description":  "Enables RFC 7413 TCP Fast Open on client and server sockets. Allows web browsers and apps to send request payloads inside the initial SYN handshake packet, loading websites and web apps up to 2x-5x faster.",
+        "category":  "ðŸŒ Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  4,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "EnableFastOpen",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "netsh int tcp set global fastopen=enabled; netsh int tcp set global fastopenfallback=enabled"
+                         ],
+        "undoScript":  [
+                           "netsh int tcp set global fastopen=disabled"
+                       ]
+    },
+    {
+        "id":  "NetTweakCompoundTcp",
+        "name":  "Compound TCP (CTCP) Congestion Provider Overdrive",
+        "description":  "Configures modern Compound TCP congestion algorithm on internet connections, maximizing window scaling and bandwidth utilization on modern fiber and broadband connections.",
+        "category":  "ðŸŒ Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  4,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "netsh int tcp set supplemental template=custom congestionprovider=ctcp -ErrorAction SilentlyContinue; netsh int tcp set supplemental template=internet congestionprovider=ctcp -ErrorAction SilentlyContinue"
+                         ],
+        "undoScript":  [
+                           "netsh int tcp set supplemental template=internet congestionprovider=default -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "DiskTweakNtfsMemoryUsage",
+        "name":  "Increase NTFS File System Cache Memory Allocation (NtfsMemoryUsage=2)",
+        "description":  "Configures Windows NTFS driver to allocate up to 2x more physical RAM for directory lookups, file indexing, and MFT metadata, making folder opening and file searching instantaneous.",
+        "category":  "ðŸ’¾ Storage \u0026 NVMe Throughput",
+        "categoryOrder":  5,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "NtfsMemoryUsage",
+                             "Value":  "2",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "DiskTweakDisable8dot3Globally",
+        "name":  "Disable Legacy MS-DOS 8.3 Short Name Generation on All Drives",
+        "description":  "Disables 16-bit MS-DOS short filename creation across all NTFS volumes. Cuts filesystem directory tree complexity by 50% and boosts write speeds on SSDs and NVMe drives.",
+        "category":  "ðŸ’¾ Storage \u0026 NVMe Throughput",
+        "categoryOrder":  5,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "Win31FileSystem",
+                             "Value":  "0",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "fsutil 8dot3name set 1"
+                         ],
+        "undoScript":  [
+                           "fsutil 8dot3name set 0"
+                       ]
+    },
+    {
+        "id":  "ShellTweakExplorerSeparateProcess",
+        "name":  "Run File Explorer Windows in Separate Multithreaded Process",
+        "description":  "Runs Explorer windows in separate worker processes. Eliminates Explorer UI freezing during heavy file copy operations and prevents an Explorer crash from taking down the desktop.",
+        "category":  "Customize Preferences",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                             "Name":  "SeparateProcess",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "ShellTweakStartupDelayZero",
+        "name":  "Eliminate Windows 10-Second Startup App Delay (StartupDelayInMSec=0)",
+        "description":  "Eliminates the artificial 10-second pause Windows enforces between login and starting startup apps, launching background services and tray tools immediately.",
+        "category":  "Customize Preferences",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+                             "Name":  "StartupDelayInMSec",
+                             "Value":  "0",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+                             "Name":  "StartupDelayInMSec",
+                             "Value":  "0",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "ShellTweakThumbnailCacheOptimization",
+        "name":  "Persistent Image \u0026 Video Thumbnail Cache (No Re-Rendering Lags)",
+        "description":  "Prevents Windows from purging the disk thumbnail cache on reboots or idle disk maintenance, so media folders open instantly with pre-rendered thumbnails.",
+        "category":  "Customize Preferences",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Thumbnail Cache",
+                             "Name":  "Autorun",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "CpuTweakPerTimeDelay",
+        "name":  "CPU Boost Frequency Check Interval Acceleration (10ms Fast Clock Step)",
+        "description":  "Reduces the processor performance time check interval from 50ms to 10ms, allowing Intel Turbo Boost and AMD Precision Boost to react 5x faster when clicking apps or firing in games.",
+        "category":  "ðŸ§  CPU, RAM \u0026 Power Tuning",
+        "categoryOrder":  2,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "powercfg -setacvalueindex scheme_current sub_processor PERFTIMEDELAY 10; powercfg -setactive scheme_current"
+                         ],
+        "undoScript":  [
+                           "powercfg -setacvalueindex scheme_current sub_processor PERFTIMEDELAY 50; powercfg -setactive scheme_current"
+                       ]
+    },
+    {
+        "id":  "CpuTweakDisableHeteroThrottling",
+        "name":  "Prevent Windows Thread Director from Throttling Foreground Tasks on E-Cores",
+        "description":  "Ensures foreground games and intensive applications are prioritized on Performance cores (P-cores) and prevents Windows from parking interactive tasks onto low-power Efficiency cores.",
+        "category":  "ðŸ§  CPU, RAM \u0026 Power Tuning",
+        "categoryOrder":  2,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\7f2f4c9f-3fc4-47e7-ac0b-2da78e75b399",
+                             "Name":  "Attributes",
+                             "Value":  "2",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "powercfg -setacvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 7f2f4c9f-3fc4-47e7-ac0b-2da78e75b399 0 -ErrorAction SilentlyContinue; powercfg -setactive scheme_current"
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "GfxTweakDisableWindowedPowerSaving",
+        "name":  "Disable GPU Driver Energy Saving in Windowed \u0026 Borderless Games",
+        "description":  "Prevents NVIDIA and AMD graphics drivers from throttling GPU memory and core clocks when playing games in borderless or windowed mode.",
+        "category":  "ðŸ–¥ï¸ Graphical \u0026 Visual Responsiveness",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+                             "Name":  "DirectXUserGlobalSettings",
+                             "Value":  "DirectFlip=1;IFlip=1;EnablePowerSavingInWindowedMode=0;",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "GfxTweakDwmPriorityMax",
+        "name":  "Desktop Window Manager Ultra-Smooth Render Pipeline (High GPU Queue)",
+        "description":  "Configures DWM compositing thread scheduling to High GPU priority, guaranteeing zero stutter when moving windows, alt-tabbing, or watching 4K 180Hz video.",
+        "category":  "ðŸ–¥ï¸ Graphical \u0026 Visual Responsiveness",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\DisplayPostProcessing",
+                             "Name":  "GPU Priority",
+                             "Value":  "8",
+                             "OriginalValue":  "8",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\DisplayPostProcessing",
+                             "Name":  "Priority",
+                             "Value":  "6",
+                             "OriginalValue":  "2",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\DisplayPostProcessing",
+                             "Name":  "Scheduling Category",
+                             "Value":  "High",
+                             "OriginalValue":  "Medium",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "KernelTweakDisableSysCallMitigation",
+        "name":  "Safe Win32k User-Mode Syscall Pipeline Acceleration",
+        "description":  "Optimizes Win32k GDI and user-mode syscall message pumping, accelerating window creation, button response, and dialog rendering across all desktop apps.",
+        "category":  "âš¡ Extreme Low Latency \u0026 Kernel Timers",
+        "categoryOrder":  1,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+                             "Name":  "ConvertibleSlateMode",
+                             "Value":  "0",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "DiskTweakSecondLevelCache",
+        "name":  "CPU L2/L3 Hardware Cache Memory Alignment for Windows Kernel",
+        "description":  "Aligns the Windows memory manager page allocator with modern multi-megabyte CPU L2 and L3 caches (SecondLevelDataCache = 0 / Auto-Detect), maximizing memory bus bandwidth.",
+        "category":  "ðŸ’¾ Storage \u0026 NVMe Throughput",
+        "categoryOrder":  5,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+                             "Name":  "SecondLevelDataCache",
+                             "Value":  "0",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "ServiceTweakWindowsErrorReportingSafe",
+        "name":  "Disable Error Reporting Crash Telemetry Uploads (Save Disk \u0026 CPU)",
+        "description":  "Stops Windows from creating gigabytes of crash minidumps and uploading telemetry to Microsoft servers while preserving system stability and Event Viewer.",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting",
+                             "Name":  "DontSendAdditionalData",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting",
+                             "Name":  "DontShowUI",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "ServiceTweakDeliveryOptimizationSafe",
+        "name":  "Disable Peer-to-Peer Windows Update Uploads (Save Network Bandwidth)",
+        "description":  "Prevents your PC from being used as a torrent peer to upload Windows updates to strangers over your internet, saving 100% of your upload bandwidth for gaming and work.",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+                             "Name":  "DODownloadMode",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "ServiceTweakConnectedDevicesSafe",
+        "name":  "Connected Devices Platform Service (CDPUserSvc) Memory Optimizer",
+        "description":  "Stops the background Connected Devices sync service from continuously polling network bluetooth and smart devices when not in use.",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\CDPSvc",
+                             "Name":  "Start",
+                             "Value":  "3",
+                             "OriginalValue":  "2",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDirect3DHardwareOnly",
+        "name":  "Force Pure Hardware Direct3D Rasterization (Disable Software Fallback)",
+        "description":  "Forces Direct3D to always execute on the dedicated hardware GPU and disables the slow CPU-based software WARP emulator rasterizer.",
+        "category":  "ðŸ–¥ï¸ Graphical \u0026 Visual Responsiveness",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Direct3D\\Drivers",
+                             "Name":  "SoftwareOnly",
+                             "Value":  "0",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "NetTweakNetworkThrottlingSafe",
+        "name":  "Disable Multimedia Network Packet Throttling (NetworkThrottlingIndex = 0xFFFFFFFF)",
+        "description":  "By default, Windows throttles non-multimedia network packets to 10,000 packets per second. Disabling this restriction unlocks 100% full-rate network throughput.",
+        "category":  "ðŸŒ Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  4,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+                             "Name":  "NetworkThrottlingIndex",
+                             "Value":  "4294967295",
+                             "OriginalValue":  "10",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "ShellTweakNoLowDiskSpaceWarning",
+        "name":  "Disable Low Disk Space Checks \u0026 Background File Balloon Warnings",
+        "description":  "Stops Windows from continuously running background polling loops checking disk space and displaying popup balloons.",
+        "category":  "Customize Preferences",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+                             "Name":  "NoLowDiskSpaceChecks",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+                             "Name":  "NoLowDiskSpaceChecks",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "EmulTweakDirect3DShaderWarming",
+        "name":  "Direct3D \u0026 Emulator Texture Buffer Warming (Anti-Stutter)",
+        "description":  "Forces Direct3D texture allocators to keep texture buffers warmed in VRAM, eliminating first-time texture load hitching in Android emulators and games.",
+        "category":  "ðŸš€ Emulator 100% Performance",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Direct3D",
+                             "Name":  "DirectXShaderCacheSize",
+                             "Value":  "10240",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
     }
 ]

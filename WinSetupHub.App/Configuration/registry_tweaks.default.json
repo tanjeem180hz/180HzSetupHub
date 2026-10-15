@@ -2364,5 +2364,474 @@
         "undoScript":  [
 
                        ]
+    },
+    {
+        "id":  "RegTweakTcpFastOpen",
+        "name":  "TCP Fast Open (TFO) Client \u0026 Server Acceleration",
+        "description":  "Enables RFC 7413 TCP Fast Open, allowing data transmission in the very first SYN packet.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "EnableFastOpen",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNtfsMemoryWorker",
+        "name":  "Double NTFS Directory \u0026 MFT Cache in RAM (NtfsMemoryUsage=2)",
+        "description":  "Allocates 2x physical memory for filesystem metadata caching, making folder navigation instant.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  6,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "NtfsMemoryUsage",
+                             "Value":  "2",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakExplorerSeparateProcess",
+        "name":  "Run File Explorer in Separate Multithreaded Process",
+        "description":  "Decouples File Explorer windows from desktop thread for crash protection and multi-core responsiveness.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                             "Name":  "SeparateProcess",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakStartupDelayZero",
+        "name":  "Eliminate 10-Second Windows Startup App Launch Delay",
+        "description":  "Removes artificial 10-second pause before startup apps begin loading.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+                             "Name":  "StartupDelayInMSec",
+                             "Value":  "0",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakThumbnailCachePersistent",
+        "name":  "Persistent Disk Thumbnail Cache (Zero Reload Lag)",
+        "description":  "Prevents automatic thumbnail database purge on reboot.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VolumeCaches\\Thumbnail Cache",
+                             "Name":  "Autorun",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDwmPriorityHigh",
+        "name":  "DWM Display Compositor High GPU Priority (Priority=8)",
+        "description":  "Ensures window drawing and animations never drop below monitor refresh rate.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\DisplayPostProcessing",
+                             "Name":  "GPU Priority",
+                             "Value":  "8",
+                             "OriginalValue":  "8",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\DisplayPostProcessing",
+                             "Name":  "Priority",
+                             "Value":  "6",
+                             "OriginalValue":  "2",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\DisplayPostProcessing",
+                             "Name":  "Scheduling Category",
+                             "Value":  "High",
+                             "OriginalValue":  "Medium",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableWindowedGpuThrottle",
+        "name":  "Disable GPU Driver Downclocking in Windowed Mode",
+        "description":  "Keeps GPU in full 3D performance clock state during borderless windowed gameplay.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+                             "Name":  "DirectXUserGlobalSettings",
+                             "Value":  "DirectFlip=1;IFlip=1;EnablePowerSavingInWindowedMode=0;",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDeliveryOptimizationP2POff",
+        "name":  "Disable Windows Update P2P Background Upload Leeching",
+        "description":  "Prevents Windows from uploading updates to other computers over your internet.",
+        "category":  "Privacy \u0026 Telemetry",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+                             "Name":  "DODownloadMode",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableErrorReportingData",
+        "name":  "Disable Additional Error Reporting Diagnostic Dumps",
+        "description":  "Stops background crash memory dumps from thrashing SSD space.",
+        "category":  "Privacy \u0026 Telemetry",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting",
+                             "Name":  "DontSendAdditionalData",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting",
+                             "Name":  "DontShowUI",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakCpuPerfTimeDelay",
+        "name":  "CPU Boost Clock Check Interval Acceleration (10ms)",
+        "description":  "Accelerates processor performance time check interval from 50ms to 10ms for 5x faster turbo reaction.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\4d2b9012-9e04-4aa3-bd42-9c40a0d4761d",
+                             "Name":  "Attributes",
+                             "Value":  "2",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakIoPrioritySeparation",
+        "name":  "Prioritize Foreground App Disk \u0026 NVMe I/O Over Background",
+        "description":  "Grants foreground applications priority access to storage channels over background disk writes.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+                             "Name":  "IoPrioritySeparation",
+                             "Value":  "2",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNoLowDiskSpaceChecks",
+        "name":  "Disable Background Low Disk Space Notification Loops",
+        "description":  "Eliminates periodic disk scanning thread for low space warnings.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer",
+                             "Name":  "NoLowDiskSpaceChecks",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDirect3DNoSoftware",
+        "name":  "Disable Software Direct3D WARP Emulation",
+        "description":  "Guarantees Direct3D always runs directly on hardware silicon.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Direct3D\\Drivers",
+                             "Name":  "SoftwareOnly",
+                             "Value":  "0",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNetworkThrottlingFull",
+        "name":  "Disable Windows 10,000 Packet/Sec Network Throttling Limit",
+        "description":  "Sets NetworkThrottlingIndex to 0xFFFFFFFF for unlimited network packet throughput.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+                             "Name":  "NetworkThrottlingIndex",
+                             "Value":  "4294967295",
+                             "OriginalValue":  "10",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakSecondLevelCacheAligned",
+        "name":  "Auto-Align Windows Memory Manager to Hardware L2/L3 Cache",
+        "description":  "Enables hardware L2/L3 cache memory boundary alignment for memory allocations.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+                             "Name":  "SecondLevelDataCache",
+                             "Value":  "0",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakCdpSvcManual",
+        "name":  "Connected Devices Platform (CDPUserSvc) Set to Manual",
+        "description":  "Prevents continuous background device synchronization when not using cross-device features.",
+        "category":  "Privacy \u0026 Telemetry",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\CDPSvc",
+                             "Name":  "Start",
+                             "Value":  "3",
+                             "OriginalValue":  "2",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
     }
 ]
