@@ -375,6 +375,70 @@ namespace SetupHub180Hz.Views
             }
         }
 
+        private async void Btn2xFpsOverdrive_Click(object sender, RoutedEventArgs e)
+        {
+            var gameTweaks = _allTweaks.Where(t =>
+                t.Category.Contains("2X FPS", StringComparison.OrdinalIgnoreCase) ||
+                t.Category.Contains("Low Latency", StringComparison.OrdinalIgnoreCase) ||
+                t.Category.Contains("GPU", StringComparison.OrdinalIgnoreCase) ||
+                t.Category.Contains("Emulator", StringComparison.OrdinalIgnoreCase) ||
+                TweakService.ExtremePerformanceIds.Contains(t.Id)).ToList();
+
+            var choice = ThemedMessageBox.Show(
+                $"🎮 2X FPS ULTRA GAMING & LOW-LATENCY OVERDRIVE\n\nThis will activate real-time competitive gaming acceleration:\n\n" +
+                $"• ⚡ Lock 0.500ms High-Precision Kernel Timer Resolution (Eliminates Frame Stutter)\n" +
+                $"• 🧹 Auto-Purge Standby RAM Cache (Eliminates 1-Second Game Freezes)\n" +
+                $"• 🚀 Force MMCSS GPU Priority 8 & System Responsiveness 0% (100% CPU to Games)\n" +
+                $"• ⚡ Deploy 180Hz Ultimate Gaming Power Scheme (All CPU Cores Unparked)\n" +
+                $"• 🎯 Auto-Elevate Running Game Processes to High Priority\n" +
+                $"• 🛠️ Apply {gameTweaks.Count} Dedicated 2X FPS & Low Latency Optimizations\n\n" +
+                $"Would you like to activate 2X FPS Overdrive now?",
+                "Activate 2X FPS Gaming Overdrive", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (choice != MessageBoxResult.Yes) return;
+
+            // 1. Immediately activate Real-Time 0.5ms Timer, Standby Memory Purge, 180Hz Power Plan & Game Process Boost
+            var boostResult = await GameBoosterService.Instance.Activate2xFpsOverdriveAsync();
+
+            // 2. Select and apply all game & latency tweaks
+            foreach (var t in gameTweaks)
+            {
+                t.IsSelected = true;
+            }
+
+            var dialog = new OptimizationDialog(
+                title: $"🎮 Deploy 2X FPS Gaming Overdrive ({gameTweaks.Count} Optimizations)",
+                subtitle: $"Deploying 0.500ms Timer, GPU Priority 8, Standby RAM Cleaner & {gameTweaks.Count} latency optimizations:",
+                tweaks: gameTweaks,
+                isUndo: false,
+                tweakService: _tweakService)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                foreach (var t in gameTweaks)
+                {
+                    t.IsApplied = true;
+                    t.IsSelected = true;
+                }
+                TweakService.RecordAppliedTweaks(gameTweaks.Select(t => t.Id));
+
+                string ramStr = boostResult.FreedRamBytes > 0 ? $" • Reclaimed {boostResult.FreedRamBytes / 1024 / 1024} MB RAM" : "";
+                string procStr = boostResult.BoostedProcessesCount > 0 ? $" • {boostResult.BoostedProcessesCount} Game(s) Boosted" : "";
+
+                ActivityLogger.Instance.Log($"2X FPS Gaming Overdrive deployed: 0.500ms timer active, Standby RAM cleared, {gameTweaks.Count} optimizations applied.", ActivityType.Success);
+                NotificationService.Notify("🎮 2X FPS Gaming Overdrive Active!", $"0.500ms Timer Locked • GPU Priority 8 • Standby RAM Purged{ramStr}{procStr}. 2X smoother FPS unlocked!");
+
+                TxtStatus.Text = $"🎮 2X FPS Gaming Overdrive Active! (0.500ms Timer Locked • Standby Memory Purged • {gameTweaks.Count} Game Tweaks Applied)";
+                StatusBar.Visibility = Visibility.Visible;
+                BuildCategoryChips();
+                ApplyFilter();
+                CheckRebootNeeded(gameTweaks);
+            }
+        }
+
         private void BtnApplySelected_Click(object sender, RoutedEventArgs e)
         {
             var sourceList = GetCurrentSectionItems();

@@ -271,6 +271,12 @@
                             Content="🚀 100% EXTREME BOOST" Padding="15,7" Margin="0,0,6,4"
                             Click="BtnExtremeBoost_Click" ToolTip="Force 100% PC Performance: One-click deploy all high-impact latency, CPU unparking, GPU overdrive, zero-ping network &amp; bloatware elimination tweaks!"/>
 
+                    <!-- 🎮 2X FPS GAMING OVERDRIVE (0.5ms Timer + Max FPS) -->
+                    <Button x:Name="Btn2xFpsOverdrive" Style="{StaticResource ApplyButton}"
+                            Background="#FF0055" Foreground="#FFFFFF"
+                            Content="🎮 2X FPS GAMING OVERDRIVE" Padding="15,7" Margin="0,0,6,4"
+                            Click="Btn2xFpsOverdrive_Click" ToolTip="Lock 0.500ms High-Precision Timer, purge Standby RAM, set GPU Priority 8 &amp; activate 180Hz 2X FPS Power Scheme for silky smooth stutter-free gaming!"/>
+
                     <!-- Apply Selected (Primary Action) -->
                     <Button x:Name="BtnApplySelected" Style="{StaticResource ApplyButton}"
                             Content="⚡ APPLY SELECTED" Padding="14,7" Margin="0,0,6,4"

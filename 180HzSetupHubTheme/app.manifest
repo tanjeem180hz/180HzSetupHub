@@ -4,8 +4,8 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <!-- Allow flexible launch in any user/automation context; elevation handled gracefully at runtime if needed -->
-        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
+        <!-- Always require administrator privileges so all HKLM, powercfg, and kernel low-latency tweaks apply successfully -->
+        <requestedExecutionLevel level="requireAdministrator" uiAccess="false"/>
       </requestedPrivileges>
     </security>
   </trustInfo>

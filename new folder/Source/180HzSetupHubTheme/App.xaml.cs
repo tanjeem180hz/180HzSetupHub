@@ -13,27 +13,25 @@ namespace SetupHub180Hz
         {
             base.OnStartup(e);
 
-            // Automatic Run as Administrator:
-            // Ensure 180Hz Setup Hub always runs with Administrator rights
-            // for system package installation, updates, uninstallation, and cleanup.
-            if (!IsRunningAsAdministrator())
+            // Ensure full Administrator privileges for low-latency kernel, HKLM, powercfg & memory operations
+            if (!IsRunningAsAdministrator() && !Array.Exists(e.Args, a => string.Equals(a, "--no-elevate", StringComparison.OrdinalIgnoreCase)))
             {
                 if (TryRestartAsAdministrator(e.Args))
                 {
-                    Shutdown();
+                    Shutdown(0);
                     return;
                 }
             }
 
-            // Ensure Windows marks this application to always launch elevated
-            EnsureAppCompatRunAsAdmin();
+            // Immediately lock 0.500ms high-precision kernel timer resolution for ultra-low latency gaming & physics
+            GameBoosterService.Instance.Enable05msTimerResolution();
 
             // Don't let one bad Task/UI exception crash the whole app —
             // log it and keep the shell alive.
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
-            ActivityLogger.Instance.Log("Application started (Administrator).", ActivityType.Info);
+            ActivityLogger.Instance.Log(IsRunningAsAdministrator() ? "Application started (Administrator - 100% Hardware Permissions Active)." : "Application started (Standard User).", ActivityType.Info);
             ThemeService.ApplyTheme(SettingsService.Instance.Current.DarkTheme);
 
             if (Array.Exists(e.Args, a => string.Equals(a, "--auto-check", StringComparison.OrdinalIgnoreCase)))
@@ -42,8 +40,8 @@ namespace SetupHub180Hz
                 return;
             }
 
-            // Set shutdown mode to OnMainWindowClose so closing SplashScreen doesn't terminate process
-            ShutdownMode = ShutdownMode.OnMainWindowClose;
+            // Set shutdown mode to OnExplicitShutdown so closing SplashScreen does not terminate process
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             // Launch futuristic Cyber Toxic Splash Screen immediately
             SplashScreenWindow? splash = null;
@@ -90,6 +88,11 @@ namespace SetupHub180Hz
                 var mainWindow = new MainWindow();
                 MainWindow = mainWindow;
                 mainWindow.Opacity = 0;
+                mainWindow.Closed += (_, _) =>
+                {
+                    try { Current?.Shutdown(); } catch { }
+                    Environment.Exit(0);
+                };
                 mainWindow.Show();
 
                 // Smoothly fade in MainWindow

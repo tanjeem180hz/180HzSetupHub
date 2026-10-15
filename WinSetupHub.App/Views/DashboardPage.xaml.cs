@@ -243,8 +243,9 @@ namespace SetupHub180Hz.Views
 
             try
             {
-                // 1. Extreme RAM & Standby Cache purge
-                long freedRam = await Task.Run(() => MemoryCleaner.CleanRam());
+                // 1. Extreme 2X FPS Game Overdrive (0.5ms Timer Lock + Standby RAM Purge + GPU Priority 8 + 180Hz Power Scheme)
+                var gameBoost = await GameBoosterService.Instance.Activate2xFpsOverdriveAsync();
+                long freedRam = gameBoost.FreedRamBytes;
 
                 // 2. Eradicate Temporary, Recent, Crash Dumps, Prefetch & System Cache
                 long freedBytes = 0;
@@ -268,11 +269,12 @@ namespace SetupHub180Hz.Views
 
                 string ramStr = FormatBytes(freedRam);
                 string diskStr = FormatBytes(freedBytes);
+                string procStr = gameBoost.BoostedProcessesCount > 0 ? $" • {gameBoost.BoostedProcessesCount} Game(s) Priority Elevated" : "";
 
-                ActivityLogger.Instance.Log($"100% Extreme System Turbo Boost completed: Flushed {ramStr} RAM cache and eradicated {diskStr} junk. Hardware running at 100% peak throughput.", ActivityType.Success);
-                NotificationService.Notify("100% Extreme Performance Boosted", $"Flushed {ramStr} RAM cache & wiped {diskStr} disk trash. Latency minimized and responsiveness maximized!");
+                ActivityLogger.Instance.Log($"2X FPS Extreme Turbo Boost completed: 0.500ms Timer Locked, Flushed {ramStr} RAM cache and wiped {diskStr} junk.{procStr}", ActivityType.Success);
+                NotificationService.Notify("🎮 2X FPS Turbo Boost Activated!", $"Locked 0.500ms Timer Resolution • Purged {ramStr} Standby Cache • Wiped {diskStr} trash{procStr}. Ultra-smooth gameplay active!");
 
-                TxtQuickBoostBtn.Text = "✓ 100% BOOSTED!";
+                TxtQuickBoostBtn.Text = "✓ 2X BOOSTED!";
 
                 await Task.Delay(2500);
                 TxtQuickBoostBtn.Text = "OPTIMIZE";

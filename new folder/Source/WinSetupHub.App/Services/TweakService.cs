@@ -307,7 +307,39 @@ namespace SetupHub180Hz.Services
             "RegTweakKeyboardBuffer512",
             "RegTweakMouseBuffer512",
             "RegTweakGameBarPresenceServerDisabled",
-            "RegTweakDeviceGuardVBSOff"
+            "RegTweakDeviceGuardVBSOff",
+
+            // 🎮 2X FPS Ultra Gaming & Esports Overdrive Tweaks
+            "GameTweakTimerResolution05ms",
+            "GameTweakMMCSSGpuPriorityMax",
+            "GameTweakSystemResponsivenessZero",
+            "GameTweakAutoGameModeForce",
+            "GameTweakDisableGameDVRGlobal",
+            "GameTweakDirectXShaderCache10GB",
+            "GameTweakPowerPlan180HzUltimate",
+            "GameTweakDisableFullscreenOptimizationsDXGI",
+            "GameTweakDisableNvidiaPowerMizer",
+            "GameTweakRawLinearMousePrecision",
+            "GameTweakDisableWindowedGpuPowerSaving",
+            "GameTweakIntelAmdThreadDirector",
+            "GameTweakCsrssRealtimeScheduling",
+            "GameTweakDwmRenderBufferSingle",
+            "GameTweakStandbyListAutoPurge",
+            "GameTweakNetworkPacketPacingZero",
+            "RegTweakMMCSSGpuPriority8",
+            "RegTweakMMCSSCpuPriority6",
+            "RegTweakSystemResponsivenessZero",
+            "RegTweakNetworkThrottlingDisabled",
+            "RegTweakAutoGameModeEnabled",
+            "RegTweakGameDVRBackgroundDisabled",
+            "RegTweakGameDVRFSEBehavior",
+            "RegTweakShaderCache10GBOverdrive",
+            "RegTweakDirectFlipEnabled",
+            "RegTweakMouseAccelerationZero",
+            "RegTweakHwSchModeHardware",
+            "RegTweakCsrssPriorityRealtime",
+            "RegTweakDwmSingleBuffer",
+            "RegTweakNoLazyModeMMCSS"
         };
 
         // Extreme Performance Preset - forces 100% PC Performance & Ultra-Low Latency
@@ -578,7 +610,39 @@ namespace SetupHub180Hz.Services
             "RegTweakKeyboardBuffer512",
             "RegTweakMouseBuffer512",
             "RegTweakGameBarPresenceServerDisabled",
-            "RegTweakDeviceGuardVBSOff"
+            "RegTweakDeviceGuardVBSOff",
+
+            // 🎮 2X FPS Ultra Gaming & Esports Overdrive Tweaks
+            "GameTweakTimerResolution05ms",
+            "GameTweakMMCSSGpuPriorityMax",
+            "GameTweakSystemResponsivenessZero",
+            "GameTweakAutoGameModeForce",
+            "GameTweakDisableGameDVRGlobal",
+            "GameTweakDirectXShaderCache10GB",
+            "GameTweakPowerPlan180HzUltimate",
+            "GameTweakDisableFullscreenOptimizationsDXGI",
+            "GameTweakDisableNvidiaPowerMizer",
+            "GameTweakRawLinearMousePrecision",
+            "GameTweakDisableWindowedGpuPowerSaving",
+            "GameTweakIntelAmdThreadDirector",
+            "GameTweakCsrssRealtimeScheduling",
+            "GameTweakDwmRenderBufferSingle",
+            "GameTweakStandbyListAutoPurge",
+            "GameTweakNetworkPacketPacingZero",
+            "RegTweakMMCSSGpuPriority8",
+            "RegTweakMMCSSCpuPriority6",
+            "RegTweakSystemResponsivenessZero",
+            "RegTweakNetworkThrottlingDisabled",
+            "RegTweakAutoGameModeEnabled",
+            "RegTweakGameDVRBackgroundDisabled",
+            "RegTweakGameDVRFSEBehavior",
+            "RegTweakShaderCache10GBOverdrive",
+            "RegTweakDirectFlipEnabled",
+            "RegTweakMouseAccelerationZero",
+            "RegTweakHwSchModeHardware",
+            "RegTweakCsrssPriorityRealtime",
+            "RegTweakDwmSingleBuffer",
+            "RegTweakNoLazyModeMMCSS"
         };
 
         private List<TweakItem>? _cache;

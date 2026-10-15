@@ -13,14 +13,25 @@ namespace SetupHub180Hz
         {
             base.OnStartup(e);
 
-            // Check administrator privileges; shortcuts automatically request elevation when needed.
+            // Ensure full Administrator privileges for low-latency kernel, HKLM, powercfg & memory operations
+            if (!IsRunningAsAdministrator() && !Array.Exists(e.Args, a => string.Equals(a, "--no-elevate", StringComparison.OrdinalIgnoreCase)))
+            {
+                if (TryRestartAsAdministrator(e.Args))
+                {
+                    Shutdown(0);
+                    return;
+                }
+            }
+
+            // Immediately lock 0.500ms high-precision kernel timer resolution for ultra-low latency gaming & physics
+            GameBoosterService.Instance.Enable05msTimerResolution();
 
             // Don't let one bad Task/UI exception crash the whole app —
             // log it and keep the shell alive.
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
-            ActivityLogger.Instance.Log(IsRunningAsAdministrator() ? "Application started (Administrator)." : "Application started (Standard User).", ActivityType.Info);
+            ActivityLogger.Instance.Log(IsRunningAsAdministrator() ? "Application started (Administrator - 100% Hardware Permissions Active)." : "Application started (Standard User).", ActivityType.Info);
             ThemeService.ApplyTheme(SettingsService.Instance.Current.DarkTheme);
 
             if (Array.Exists(e.Args, a => string.Equals(a, "--auto-check", StringComparison.OrdinalIgnoreCase)))
