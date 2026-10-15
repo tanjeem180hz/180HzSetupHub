@@ -3369,5 +3369,585 @@
         "undoScript":  [
 
                        ]
+    },
+    {
+        "id":  "RegTweakAudioMmcssSchedulingHigh",
+        "name":  "Elevate Audio MMCSS Task Scheduler to High",
+        "description":  "Elevates Windows Multimedia Class Scheduler Service audio task scheduling priority to High, preventing audio crackles.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Audio",
+                             "Name":  "Scheduling Category",
+                             "Value":  "High",
+                             "OriginalValue":  "Medium",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakAudioMmcssNoBackgroundOnly",
+        "name":  "Disable Audio Task Background-Only Limiter",
+        "description":  "Forces Windows Audio engine to remain at full priority even when apps run in foreground or windowed mode.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Audio",
+                             "Name":  "Background Only",
+                             "Value":  "False",
+                             "OriginalValue":  "True",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakWddmPowerSavingOff",
+        "name":  "Disable WDDM Display Power Saving Policy",
+        "description":  "Prevents graphics driver from downclocking GPU core and memory clocks during 3D gaming.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+                             "Name":  "PowerSavingPolicy",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDirectFlipIndependent",
+        "name":  "Enable Direct3D Independent Flip Queue",
+        "description":  "Enables Independent Flip mode in Direct3D for borderless games, matching exclusive fullscreen latency.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Direct3D",
+                             "Name":  "EnableDirectFlip",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisallowAeroShaking",
+        "name":  "Disable Aero Shake Window Minimization Gesture",
+        "description":  "Stops sudden mouse shakes from accidentally minimizing all background windows and overlays.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                             "Name":  "DisallowShaking",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableTransparencyAcrylic",
+        "name":  "Disable Fluent Acrylic Window Transparency",
+        "description":  "Turns off translucent window blur effects to conserve GPU fill rate and VRAM.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                             "Name":  "EnableTransparency",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakPowerThrottlingGlobalOff",
+        "name":  "Disable Global Windows Power Throttling",
+        "description":  "Disables aggressive process throttling on background game launchers and utilities.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  5,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+                             "Name":  "PowerThrottlingOff",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakLargePageMinimumMax",
+        "name":  "Enable Large Page Allocation (2MB Pages)",
+        "description":  "Reduces TLB cache misses by enabling large memory pages for high-throughput gaming engines.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  5,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+                             "Name":  "LargePageMinimum",
+                             "Value":  "4294967295",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakFaultTolerantHeapOff",
+        "name":  "Disable Fault Tolerant Heap (FTH) Memory Layer",
+        "description":  "Stops FTH memory tracking overhead on games and intensive apps, eliminating heap stutter.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  5,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\FTH",
+                             "Name":  "Enabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakTcpRssEnabledRegistry",
+        "name":  "Enable Receive Side Scaling (RSS) in Registry",
+        "description":  "Configures TCP stack to distribute inbound packets evenly across all available CPU cores.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "EnableRSS",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakTcpWindowAutoTuningNormal",
+        "name":  "Set TCP Auto-Tuning Level to Normal",
+        "description":  "Ensures optimal TCP window scaling across high-speed gigabit and fiber internet lines.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "TcpAutotuning",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMaxUserPortAlloc65534",
+        "name":  "Expand User Port Pool to 65534",
+        "description":  "Increases available ephemeral outbound TCP ports to 65534 to prevent connection lockouts.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "MaxUserPort",
+                             "Value":  "65534",
+                             "OriginalValue":  "5000",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakTcpNumConnectionsMax",
+        "name":  "Set Max TCP Connections to 16 Million",
+        "description":  "Maximizes system simultaneous TCP connection limits for heavy multitasking and downloading.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "TcpNumConnections",
+                             "Value":  "16777214",
+                             "OriginalValue":  "1000",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDiskTimeoutValueOptimized",
+        "name":  "Set Disk Timeout Value to 30 Seconds",
+        "description":  "Configures disk request timeout to 30 seconds for faster failure recovery and lower latency.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\disk",
+                             "Name":  "TimeOutValue",
+                             "Value":  "30",
+                             "OriginalValue":  "60",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNtfsDisable8dot3GlobalPartitions",
+        "name":  "Disable 8.3 Short Names on All NTFS Partitions",
+        "description":  "Disables creation of 8.3 MS-DOS names across all mounted NTFS drives, improving disk speed.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "NtfsDisable8dot3NameCreation",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakPrefetcherSSDMode",
+        "name":  "Tune Prefetcher for Solid-State Storage",
+        "description":  "Configures Windows Prefetcher to optimize SSD launch performance without excessive NAND wear.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters",
+                             "Name":  "EnablePrefetcher",
+                             "Value":  "3",
+                             "OriginalValue":  "3",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakKeyboardBuffer512",
+        "name":  "Expand Keyboard Ring Buffer to 512 Entries",
+        "description":  "Expands keyboard input queue to 512 entries for zero dropped keys in fast gaming combos.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters",
+                             "Name":  "KeyboardDataQueueSize",
+                             "Value":  "512",
+                             "OriginalValue":  "100",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMouseBuffer512",
+        "name":  "Expand Mouse Ring Buffer to 512 Entries",
+        "description":  "Increases mouse data buffer to 512 entries to support 4000Hz-8000Hz esports mice with zero jitter.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
+                             "Name":  "MouseDataQueueSize",
+                             "Value":  "512",
+                             "OriginalValue":  "100",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakGameBarPresenceServerDisabled",
+        "name":  "Disable GameBar Presence Server Background Writer",
+        "description":  "Disables GameBarPresenceWriter process injection, removing FPS stutters in games.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\WindowsRuntime\\ActivatableClassId\\Windows.Gaming.GameBar.PresenceServer.Internal.PresenceWriter",
+                             "Name":  "ActivationType",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDeviceGuardVBSOff",
+        "name":  "Disable Device Guard Virtualization-Based Security (VBS)",
+        "description":  "Disables VBS virtualization overhead to unleash maximum raw hardware performance in games.",
+        "category":  "Emulator \u0026 VM Acceleration",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\DeviceGuard",
+                             "Name":  "EnableVirtualizationBasedSecurity",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
     }
 ]
