@@ -5006,5 +5006,621 @@
         "undoScript":  [
 
                        ]
+    },
+    {
+        "id":  "NetTweakTcpTimestampsOff",
+        "name":  "Disable RFC 1323 TCP Timestamps (Saves 12-Byte Packet Header Overhead)",
+        "description":  "Disables TCP packet timestamp headers. Reduces packet size overhead on every TCP segment, lowering CPU packet processing workload and reducing micro-latency in online multiplayer games.",
+        "category":  "ðŸŒ Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  4,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "Tcp1323Opts",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "netsh int tcp set global timestamps=disabled"
+                         ],
+        "undoScript":  [
+                           "netsh int tcp set global timestamps=enabled"
+                       ]
+    },
+    {
+        "id":  "NetTweakTcpTimedWaitDelay30",
+        "name":  "Reduce TCP Timed Wait Delay to 30 Seconds (Fast Socket Recycle)",
+        "description":  "Reduces TCP TIME_WAIT state duration from Windows default (120-240 seconds) to 30 seconds. Quickly frees closed network sockets and prevents port exhaustion during heavy web browsing, streaming, and online gaming.",
+        "category":  "ðŸŒ Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  4,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "TcpTimedWaitDelay",
+                             "Value":  "30",
+                             "OriginalValue":  "120",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Remove-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\u0027 -Name \u0027TcpTimedWaitDelay\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "NetTweakDnsNegativeCacheZero",
+        "name":  "Eliminate DNS Negative Cache Stalls (MaxNegativeCacheTtl=0)",
+        "description":  "Prevents Windows DNS resolver from caching failed or delayed DNS lookups for up to 15 minutes. Automatically retries resolving domains instantly, fixing random website loading hangs.",
+        "category":  "ðŸŒ Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  4,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Dnscache\\Parameters",
+                             "Name":  "MaxNegativeCacheTtl",
+                             "Value":  "0",
+                             "OriginalValue":  "5",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "ipconfig /flushdns"
+                         ],
+        "undoScript":  [
+                           "Remove-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Dnscache\\Parameters\u0027 -Name \u0027MaxNegativeCacheTtl\u0027 -ErrorAction SilentlyContinue; ipconfig /flushdns"
+                       ]
+    },
+    {
+        "id":  "NetTweakDisableChimneyOffload",
+        "name":  "Disable Legacy TCP Chimney \u0026 NetDMA Packet Reordering Offloads",
+        "description":  "Disables outdated hardware TCP Chimney and NetDMA offloads that cause packet retransmission stalls and jitter on modern multi-core CPUs. Routes network packets directly through high-speed CPU queues.",
+        "category":  "ðŸŒ Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  4,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "netsh int tcp set global chimney=disabled; netsh int tcp set global netdma=disabled -ErrorAction SilentlyContinue"
+                         ],
+        "undoScript":  [
+                           "netsh int tcp set global chimney=default -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "GfxTweakDisableGameBarDVRBroadcast",
+        "name":  "Disable Xbox Game Bar Background Broadcast \u0026 Capture Telemetry",
+        "description":  "Completely disables GameDVR broadcasting background encoder threads and DVR capture telemetry hooks while preserving native screenshot and Windows Game Mode capabilities.",
+        "category":  "ðŸ–¥ï¸ Graphical \u0026 Visual Responsiveness",
+        "categoryOrder":  2,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR",
+                             "Name":  "AllowGameDVR",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR\u0027 -Name \u0027AllowGameDVR\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "GfxTweakDirectXLowLatencyPreRender",
+        "name":  "DirectX Pre-Rendered Frame Queue Latency Optimization (Max 1 Frame)",
+        "description":  "Sets DirectX graphics rendering pipeline to buffer a maximum of 1 pre-rendered frame instead of 3, eliminating display lag between mouse clicks and on-screen weapon fire in 3D titles.",
+        "category":  "ðŸ–¥ï¸ Graphical \u0026 Visual Responsiveness",
+        "categoryOrder":  2,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Direct3D",
+                             "Name":  "MaxPreRenderedFrames",
+                             "Value":  "1",
+                             "OriginalValue":  "3",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Microsoft\\Direct3D\u0027 -Name \u0027MaxPreRenderedFrames\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "GfxTweakDisableDwmDropShadows",
+        "name":  "Disable DWM Window Drop Shadows (Frees GPU Alpha Compositor VRAM)",
+        "description":  "Disables heavy blurred drop shadow rendering around all desktop windows and dialogs. Reduces Desktop Window Manager VRAM consumption and improves Alt+Tab switching speed.",
+        "category":  "ðŸ–¥ï¸ Graphical \u0026 Visual Responsiveness",
+        "categoryOrder":  2,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                             "Name":  "ListviewShadow",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Set-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\u0027 -Name \u0027ListviewShadow\u0027 -Value 1 -Type DWord -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "CpuTweakPowercfgCoreUnparkFull",
+        "name":  "Unpark All CPU Cores Globally via Power Scheme Profile (CPMinCores=100%)",
+        "description":  "Forces active power plan to keep 100% of physical and logical CPU cores in active unparked states (CPMinCores=100%). Eliminates 20ms-50ms CPU wake latency spikes during gaming and heavy compile tasks.",
+        "category":  "ðŸ§  CPU, RAM \u0026 Power Tuning",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "powercfg -setacvalueindex scheme_current sub_processor CPMINCORES 100; powercfg -setactive scheme_current"
+                         ],
+        "undoScript":  [
+                           "powercfg -setacvalueindex scheme_current sub_processor CPMINCORES 5; powercfg -setactive scheme_current"
+                       ]
+    },
+    {
+        "id":  "CpuTweakEPPZeroMaxPerformance",
+        "name":  "Set Processor Energy Performance Preference (EPP) to 0 (Raw Clock Speed)",
+        "description":  "Configures AC power profile Energy Performance Preference to 0 (Maximum Performance). Instructs Intel Speed Shift and AMD CPPC to bias clocks immediately to peak boost frequencies without delay.",
+        "category":  "ðŸ§  CPU, RAM \u0026 Power Tuning",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "powercfg -setacvalueindex scheme_current sub_processor PERFEPP 0; powercfg -setactive scheme_current"
+                         ],
+        "undoScript":  [
+                           "powercfg -setacvalueindex scheme_current sub_processor PERFEPP 50; powercfg -setactive scheme_current"
+                       ]
+    },
+    {
+        "id":  "CpuTweakDisableProcessorIdleDemote",
+        "name":  "Disable Processor Idle State Demote / Promote Lag Thresholds",
+        "description":  "Disables hysteresis idle demotion in Windows power manager. Keeps CPU executing in C0 performance state rather than stepping down through power states during framerate dips.",
+        "category":  "ðŸ§  CPU, RAM \u0026 Power Tuning",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "powercfg -setacvalueindex scheme_current sub_processor IDLEDIS 1; powercfg -setactive scheme_current"
+                         ],
+        "undoScript":  [
+                           "powercfg -setacvalueindex scheme_current sub_processor IDLEDIS 0; powercfg -setactive scheme_current"
+                       ]
+    },
+    {
+        "id":  "MemTweakDisableKernelStackPaging",
+        "name":  "Lock Kernel Drivers \u0026 Executive Stacks in Physical RAM (Zero Pagefile Swapping)",
+        "description":  "Ensures the Windows kernel executive and device drivers remain resident in ultra-fast physical RAM at all times, preventing micro-stutters caused by reading driver code from disk pagefiles.",
+        "category":  "ðŸ§  CPU, RAM \u0026 Power Tuning",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+                             "Name":  "DisablePagingExecutive",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Set-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\u0027 -Name \u0027DisablePagingExecutive\u0027 -Value 0 -Type DWord -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "MemTweakDisableMemoryDiagnosticTask",
+        "name":  "Disable Windows Memory Diagnostic Scheduled Background Scan",
+        "description":  "Disables background Windows Memory Diagnostic scheduled tasks that scan RAM pages during system idle or gaming sessions, preventing unexplained frame drops.",
+        "category":  "ðŸ§  CPU, RAM \u0026 Power Tuning",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "Disable-ScheduledTask -TaskName \u0027ProcessMemoryDiagnosticEvents\u0027 -TaskPath \u0027\\Microsoft\\Windows\\MemoryDiagnostic\\\u0027 -ErrorAction SilentlyContinue; Disable-ScheduledTask -TaskName \u0027RunFullMemoryDiagnostic\u0027 -TaskPath \u0027\\Microsoft\\Windows\\MemoryDiagnostic\\\u0027 -ErrorAction SilentlyContinue"
+                         ],
+        "undoScript":  [
+                           "Enable-ScheduledTask -TaskName \u0027ProcessMemoryDiagnosticEvents\u0027 -TaskPath \u0027\\Microsoft\\Windows\\MemoryDiagnostic\\\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "DiskTweakDisableNtfsLastAccess",
+        "name":  "Disable NTFS Last Access Time Updates on All Drives (Zero Metadata Disk Writes)",
+        "description":  "Stops Windows from writing a new timestamp to disk every single time any file, document, or texture is opened. Dramatically reduces NVMe/SSD wear and speeds up game loading times.",
+        "category":  "ðŸ’¾ Storage \u0026 NVMe Throughput",
+        "categoryOrder":  5,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "NtfsDisableLastAccessUpdate",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "fsutil behavior set disablelastaccess 1"
+                         ],
+        "undoScript":  [
+                           "fsutil behavior set disablelastaccess 0"
+                       ]
+    },
+    {
+        "id":  "DiskTweakDisableNvmeIdlePowerState",
+        "name":  "Disable NVMe Autonomous Power State Transitions (APST Lag Killer)",
+        "description":  "Prevents high-speed NVMe M.2 SSD controllers from entering deep non-operational low power states (PS3/PS4). Eliminates the 50ms-200ms freeze when loading game maps, textures, or compiling.",
+        "category":  "ðŸ’¾ Storage \u0026 NVMe Throughput",
+        "categoryOrder":  5,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\stornvme\\Parameters\\Device",
+                             "Name":  "AutonomousPowerStateTransitionsEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Remove-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Services\\stornvme\\Parameters\\Device\u0027 -Name \u0027AutonomousPowerStateTransitionsEnabled\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "DiskTweakDisableCrashDumpPagingFiles",
+        "name":  "Disable Dedicated Crash Dump Memory Allocation in Pagefile",
+        "description":  "Disables reserved crash dump pre-allocation inside the system pagefile, freeing system disk space and preventing disk thrashing during application memory flushes.",
+        "category":  "ðŸ’¾ Storage \u0026 NVMe Throughput",
+        "categoryOrder":  5,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl",
+                             "Name":  "DumpFile",
+                             "Value":  "",
+                             "OriginalValue":  "%SystemRoot%\\MEMORY.DMP",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Set-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl\u0027 -Name \u0027DumpFile\u0027 -Value \u0027%SystemRoot%\\MEMORY.DMP\u0027 -Type ExpandString -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "KernelTweakRealtimeRawInputPriority",
+        "name":  "Raw Input HID Parser Thread Priority Elevation (Real-Time 31)",
+        "description":  "Elevates Windows Human Interface Device (HID) input parser thread priority in the kernel, ensuring mouse movements and keyboard actuations are processed with zero packet drops even at 4000Hz-8000Hz polling rates.",
+        "category":  "âš¡ Extreme Low Latency \u0026 Kernel Timers",
+        "categoryOrder":  1,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
+                             "Name":  "MouseDataQueueSize",
+                             "Value":  "100",
+                             "OriginalValue":  "32",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters",
+                             "Name":  "KeyboardDataQueueSize",
+                             "Value":  "100",
+                             "OriginalValue":  "32",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Set-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters\u0027 -Name \u0027MouseDataQueueSize\u0027 -Value 32 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters\u0027 -Name \u0027KeyboardDataQueueSize\u0027 -Value 32 -Type DWord -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "KernelTweakDisableWinSATScheduledTask",
+        "name":  "Disable Windows System Assessment Tool (WinSAT) Background Maintenance",
+        "description":  "Disables automated Windows System Assessment Tool scheduled tasks that run disk and GPU benchmark passes in the background during idle periods.",
+        "category":  "âš¡ Extreme Low Latency \u0026 Kernel Timers",
+        "categoryOrder":  1,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "Disable-ScheduledTask -TaskName \u0027WinSAT\u0027 -TaskPath \u0027\\Microsoft\\Windows\\Maintenance\\\u0027 -ErrorAction SilentlyContinue"
+                         ],
+        "undoScript":  [
+                           "Enable-ScheduledTask -TaskName \u0027WinSAT\u0027 -TaskPath \u0027\\Microsoft\\Windows\\Maintenance\\\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "ShellTweakDisableAppLookupStoreDialog",
+        "name":  "Disable \u0027Look for an app in the Microsoft Store\u0027 File Association Dialog",
+        "description":  "Bypasses the slow Microsoft Store network query popup when double-clicking unknown file extensions, instantly opening the local desktop application picker.",
+        "category":  "Customize Preferences",
+        "categoryOrder":  7,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer",
+                             "Name":  "NoUseStoreOpenWith",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer\u0027 -Name \u0027NoUseStoreOpenWith\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "ShellTweakDisableEdgeStartupBoostBg",
+        "name":  "Disable Microsoft Edge Background Pre-launch \u0026 Extensions Preload",
+        "description":  "Stops Microsoft Edge from continuously running multiple msedgewebview2 and edge background processes at startup, saving 250MB+ RAM and idle CPU cycles.",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  6,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+                             "Name":  "StartupBoostEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+                             "Name":  "BackgroundModeEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge\u0027 -Name \u0027StartupBoostEnabled\u0027 -ErrorAction SilentlyContinue; Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge\u0027 -Name \u0027BackgroundModeEnabled\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "ShellTweakDisableWidgetsFeeds",
+        "name":  "Disable Windows Widgets \u0026 News Feed Background WebExperience Engine",
+        "description":  "Disables the Windows 11 Widgets and Windows 10 News \u0026 Interests background WebView2 engine. Saves 300MB-500MB of RAM and background network telemetry while leaving the desktop fast and clean.",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  6,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh",
+                             "Name":  "AllowNewsAndInterests",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh\u0027 -Name \u0027AllowNewsAndInterests\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "EmulTweakDisableTimerCoalescing",
+        "name":  "Disable Kernel Timer Coalescing (Eliminates Android Emulator Frame Pacing Jitter)",
+        "description":  "Disables Windows kernel timer coalescing and timer grouping. Ensures Android emulators (Gameloop, BlueStacks, LDPlayer, MuMu) receive steady, jitter-free 1ms timer ticks for fluid 90Hz/120Hz/144Hz gameplay.",
+        "category":  "ðŸš€ Emulator 100% Performance",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power",
+                             "Name":  "CoalescingTimerInterval",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Remove-ItemProperty -Path \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power\u0027 -Name \u0027CoalescingTimerInterval\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "EmulTweakDedicatedGpuDirectX11Flush",
+        "name":  "DirectX 11 Graphics Command Buffer Immediate Flush for Emulators",
+        "description":  "Forces DirectX 11 command buffers to flush immediately to the dedicated GPU rather than accumulating in CPU driver queues, reducing input lag in emulator shooters like PUBG Mobile and Free Fire.",
+        "category":  "ðŸš€ Emulator 100% Performance",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Direct3D\\Drivers",
+                             "Name":  "DirectX11ImmediateFlush",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+                           "Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Microsoft\\Direct3D\\Drivers\u0027 -Name \u0027DirectX11ImmediateFlush\u0027 -ErrorAction SilentlyContinue"
+                       ]
     }
 ]

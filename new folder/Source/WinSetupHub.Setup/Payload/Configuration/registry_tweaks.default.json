@@ -2833,5 +2833,541 @@
         "undoScript":  [
 
                        ]
+    },
+    {
+        "id":  "RegTweakTcpTimestampsDisabled",
+        "name":  "Disable RFC 1323 TCP Timestamps Header Overhead",
+        "description":  "Eliminates 12-byte timestamp overhead in every TCP packet header, reducing network processing latency.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "Tcp1323Opts",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakTcpTimedWaitDelayFast",
+        "name":  "Reduce TCP Timed Wait Delay to 30 Seconds",
+        "description":  "Recycles closed TCP connection sockets 4x faster, preventing socket exhaustion during high network activity.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "TcpTimedWaitDelay",
+                             "Value":  "30",
+                             "OriginalValue":  "120",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDnsMaxNegativeCacheZero",
+        "name":  "Disable DNS Negative Cache Lookup Freezes",
+        "description":  "Sets MaxNegativeCacheTtl to 0 to prevent Windows from caching failed domain queries, ensuring instantaneous domain retries.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Dnscache\\Parameters",
+                             "Name":  "MaxNegativeCacheTtl",
+                             "Value":  "0",
+                             "OriginalValue":  "5",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDirect3DLowLatencyPreRender",
+        "name":  "DirectX Max Pre-Rendered Frames to 1",
+        "description":  "Limits DirectX GPU frame buffering to 1 frame, minimizing mouse click to photon latency.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Direct3D",
+                             "Name":  "MaxPreRenderedFrames",
+                             "Value":  "1",
+                             "OriginalValue":  "3",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakGameDVRAllowBroadcastOff",
+        "name":  "Disable Xbox GameDVR Background Broadcasting Engine",
+        "description":  "Completely turns off background broadcast recording threads while preserving high-performance gaming.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR",
+                             "Name":  "AllowGameDVR",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakExplorerNoDropShadows",
+        "name":  "Disable DWM Window Drop Shadow Blur",
+        "description":  "Disables desktop window shadows to conserve GPU memory and accelerate window redraw operations.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                             "Name":  "ListviewShadow",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNoUseStoreOpenWith",
+        "name":  "Disable Store Prompt for Unknown File Extensions",
+        "description":  "Instantly opens the local program chooser when launching unknown file extensions, avoiding Store network delay.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer",
+                             "Name":  "NoUseStoreOpenWith",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableWidgetsEngine",
+        "name":  "Disable Windows Widgets \u0026 News Feed Engine",
+        "description":  "Stops background news and widget telemetry engine, saving 300MB+ RAM and CPU cycles.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh",
+                             "Name":  "AllowNewsAndInterests",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakEdgeNoStartupBoost",
+        "name":  "Disable Edge Startup Boost \u0026 Background Extensions",
+        "description":  "Stops Edge from holding background system processes at boot, freeing RAM and startup time.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+                             "Name":  "StartupBoostEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+                             "Name":  "BackgroundModeEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisablePagingExecutiveActive",
+        "name":  "Lock Kernel Executive \u0026 Drivers in RAM",
+        "description":  "Locks core Windows kernel drivers in physical RAM, avoiding pagefile I/O pauses.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  5,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+                             "Name":  "DisablePagingExecutive",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableCrashControlDumpPaging",
+        "name":  "Disable Dedicated Crash Dump Memory Reservation",
+        "description":  "Disables automatic memory dump pre-allocation in pagefile, preserving physical disk space and I/O.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl",
+                             "Name":  "DumpFile",
+                             "Value":  "",
+                             "OriginalValue":  "%SystemRoot%\\MEMORY.DMP",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNvmeDisableAPST",
+        "name":  "Disable NVMe Autonomous Power Transitions (APST)",
+        "description":  "Keeps NVMe drives in high-speed operational states, eliminating controller wake latency.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\stornvme\\Parameters\\Device",
+                             "Name":  "AutonomousPowerStateTransitionsEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNtfsDisableLastAccessGlobal",
+        "name":  "Disable NTFS Last Access Timestamp Writes",
+        "description":  "Eliminates file access timestamp updates across all NTFS volumes, boosting SSD write speeds.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "NtfsDisableLastAccessUpdate",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakRawInputMouseQueue100",
+        "name":  "High-Rate Mouse HID Data Queue Buffer (100 Entries)",
+        "description":  "Expands kernel mouse driver data buffer to 100 entries, preventing input drops on 1000Hz-8000Hz gaming mice.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
+                             "Name":  "MouseDataQueueSize",
+                             "Value":  "100",
+                             "OriginalValue":  "32",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakRawInputKeyboardQueue100",
+        "name":  "High-Rate Keyboard HID Data Queue Buffer (100 Entries)",
+        "description":  "Expands kernel keyboard driver data buffer to 100 entries for zero dropped inputs during fast WASD/combo keystrokes.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters",
+                             "Name":  "KeyboardDataQueueSize",
+                             "Value":  "100",
+                             "OriginalValue":  "32",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakKeyboardSpeedMax",
+        "name":  "Set Keyboard Repeat Rate to Maximum (Speed=31, Delay=0)",
+        "description":  "Sets keyboard key repetition speed to maximum hardware rate with zero input delay.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Keyboard",
+                             "Name":  "KeyboardDelay",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Keyboard",
+                             "Name":  "KeyboardSpeed",
+                             "Value":  "31",
+                             "OriginalValue":  "31",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakEmulDisableTimerCoalescing",
+        "name":  "Disable Kernel Timer Coalescing for Emulators",
+        "description":  "Guarantees precision 1ms timer ticks for Android emulators, eliminating frame stutter in PUBG and Free Fire.",
+        "category":  "Emulator \u0026 VM Acceleration",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power",
+                             "Name":  "CoalescingTimerInterval",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakEmulDx11ImmediateFlush",
+        "name":  "DirectX 11 Emulator Draw Flush Acceleration",
+        "description":  "Forces DirectX 11 draw batches to flush immediately to the GPU, minimizing click-to-render latency.",
+        "category":  "Emulator \u0026 VM Acceleration",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Direct3D\\Drivers",
+                             "Name":  "DirectX11ImmediateFlush",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
     }
 ]
