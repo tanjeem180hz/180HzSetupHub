@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -217,6 +219,33 @@ namespace SetupHub180Hz.Services
                 catch { }
                 return count;
             });
+        }
+
+        public static List<string> GetRunningGameProcessNames()
+        {
+            var list = new List<string>();
+            try
+            {
+                var processes = Process.GetProcesses();
+                foreach (var p in processes)
+                {
+                    try
+                    {
+                        string name = p.ProcessName.ToLowerInvariant();
+                        foreach (var g in KnownGameExes)
+                        {
+                            if (name.Contains(g))
+                            {
+                                list.Add(p.ProcessName);
+                                break;
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+            return list.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         }
 
         private static void RunCmd(string cmd)

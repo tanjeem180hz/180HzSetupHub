@@ -729,17 +729,36 @@
                                     </StackPanel>
                                 </Grid>
 
-                                <!-- Bottom Row: Quick Boost Button -->
-                                <Button Grid.Row="1" x:Name="BtnQuickBoost" Style="{StaticResource AccentButton}" Click="BtnQuickBoost_Click"
-                                        Height="34" Padding="12,0"
-                                        ToolTip="Instantly sweep temporary junk files and refresh telemetry">
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <TextBlock x:Name="BoostIcon" Text="⚡" FontSize="12" FontWeight="Bold" Margin="0,0,6,0"
-                                                   Foreground="{DynamicResource BrushAccentForeground}"/>
-                                        <TextBlock x:Name="TxtQuickBoostBtn" Text="OPTIMIZE" FontSize="11.5" FontWeight="Bold"
-                                                   Foreground="{DynamicResource BrushAccentForeground}" FontFamily="{StaticResource AppFont}"/>
-                                    </StackPanel>
-                                </Button>
+                                <!-- Bottom Row: 1-Click Pre-Game Boost & Permanent Lock -->
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Button 1: 1-Click Pre-Game Boost -->
+                                    <Button Grid.Row="0" x:Name="BtnQuickBoost" Style="{StaticResource AccentButton}" Click="BtnQuickBoost_Click"
+                                            Height="34" Padding="10,0" Margin="0,0,0,7"
+                                            ToolTip="1-Click apply after PC boot or before gaming: 0.5ms Timer, Standby RAM purge &amp; 2X FPS!">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock x:Name="BoostIcon" Text="🎮" FontSize="12" FontWeight="Bold" Margin="0,0,6,0"
+                                                       Foreground="{DynamicResource BrushAccentForeground}"/>
+                                            <TextBlock x:Name="TxtQuickBoostBtn" Text="1-CLICK PRE-GAME BOOST" FontSize="11" FontWeight="Bold"
+                                                       Foreground="{DynamicResource BrushAccentForeground}" FontFamily="{StaticResource AppFont}"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <!-- Button 2: Permanent Boot Lock (Survives Reboot) -->
+                                    <Button Grid.Row="1" x:Name="BtnPermanentSafeguard" Style="{StaticResource OutlineButton}" Click="BtnPermanentSafeguard_Click"
+                                            Height="32" Padding="10,0"
+                                            ToolTip="Lock CPU unparking, power plan, BCD &amp; network permanently into Windows Startup Safeguard!">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock Text="🔒" FontSize="11" Margin="0,0,6,0" Foreground="{DynamicResource BrushAccent}"/>
+                                            <TextBlock x:Name="TxtPermanentSafeguardBtn" Text="LOCK PERMANENT (SURVIVES REBOOT)" FontSize="10" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource BrushAccent}" FontFamily="{StaticResource AppFont}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
                             </Grid>
                         </Border>
                     </Grid>

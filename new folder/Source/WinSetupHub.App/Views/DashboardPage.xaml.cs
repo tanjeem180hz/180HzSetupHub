@@ -41,6 +41,12 @@ namespace SetupHub180Hz.Views
                 _statsTimer.Start();
                 await CheckEngineAsync();
                 UpdateSummary();
+
+                if (TxtPermanentSafeguardBtn != null)
+                {
+                    bool isLocked = PermanenceService.Instance.IsPermanenceLocked();
+                    TxtPermanentSafeguardBtn.Text = isLocked ? "✓ PERMANENTLY LOCKED" : "LOCK PERMANENT (SURVIVES REBOOT)";
+                }
             };
 
             Unloaded += (_, _) =>
@@ -277,17 +283,82 @@ namespace SetupHub180Hz.Views
                 TxtQuickBoostBtn.Text = "✓ 2X BOOSTED!";
 
                 await Task.Delay(2500);
-                TxtQuickBoostBtn.Text = "OPTIMIZE";
+                TxtQuickBoostBtn.Text = "1-CLICK PRE-GAME BOOST";
             }
             catch
             {
-                TxtQuickBoostBtn.Text = "OPTIMIZE";
+                TxtQuickBoostBtn.Text = "1-CLICK PRE-GAME BOOST";
             }
             finally
             {
                 BtnQuickBoost.IsEnabled = true;
                 _isBoosting = false;
             }
+        }
+
+        private async void BtnPermanentSafeguard_Click(object sender, RoutedEventArgs e)
+        {
+            if (BtnPermanentSafeguard == null || TxtPermanentSafeguardBtn == null) return;
+
+            bool isLocked = PermanenceService.Instance.IsPermanenceLocked();
+            if (isLocked)
+            {
+                var viewChoice = ThemedMessageBox.Show(
+                    "🔒 PERMANENT BOOT SAFEGUARD IS ACTIVE!\n\n" +
+                    "Your system already has the 180Hz Boot Persistence Safeguard installed and running.\n\n" +
+                    "• CPU Core Unparking (100% min/max): Active\n" +
+                    "• Zero-Ping Network Heuristics: Active\n" +
+                    "• MMCSS GPU Priority 8: Active\n" +
+                    "• Survives Every Restart: Active\n\n" +
+                    "Would you like to open the Permanent Optimization Hub to review or customize tweaks?",
+                    "Boot Safeguard Active", MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                if (viewChoice == MessageBoxResult.Yes)
+                {
+                    _mainWindow.GoToPage("Optimization");
+                }
+                return;
+            }
+
+            var choice = ThemedMessageBox.Show(
+                "🔒 LOCK PERMANENT SYSTEM OPTIMIZATIONS\n\n" +
+                "This will deploy the 180Hz Boot Persistence Safeguard:\n\n" +
+                "• Creates Windows Startup Scheduled Task '180Hz_Permanence_Guard' (Highest Privileges)\n" +
+                "• Unparks 100% CPU cores & locks 0ms boost delay permanently on every boot\n" +
+                "• Locks TCP Fast Open, RSS, Autotuning & Zero-Ping Heuristics permanently\n" +
+                "• Sets MMCSS GPU Priority 8, Priority 6 & SystemResponsiveness 0%\n" +
+                "• Locks BCD high precision tick & disables dynamic tick\n\n" +
+                "Once locked, your PC will stay 100% optimized after every restart!\n\n" +
+                "Lock permanent optimizations now?",
+                "Lock Permanent Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (choice != MessageBoxResult.Yes) return;
+
+            BtnPermanentSafeguard.IsEnabled = false;
+            TxtPermanentSafeguardBtn.Text = "LOCKING PERMANENT...";
+
+            bool ok = await PermanenceService.Instance.DeployPermanentSafeguardAsync();
+
+            if (ok)
+            {
+                ActivityLogger.Instance.Log("Permanent Boot Safeguard deployed from Dashboard.", ActivityType.Success);
+                NotificationService.Notify("🔒 Permanent Optimization Locked!", "180Hz Boot Safeguard active. Unparked CPU cores, 0-ping network & GPU priorities locked across all future restarts.");
+
+                TxtPermanentSafeguardBtn.Text = "✓ PERMANENTLY LOCKED";
+                ThemedMessageBox.Show(
+                    "✓ PERMANENT SYSTEM OPTIMIZATION LOCKED!\n\n" +
+                    "The 180Hz Boot Persistence Safeguard is now active.\n\n" +
+                    "• All power, CPU unparking, network heuristics and scheduler settings are locked.\n" +
+                    "• The task executes automatically with highest privileges on every Windows startup.\n" +
+                    "• You do NOT need to apply optimizations again after restarting your PC!",
+                    "Permanent Safeguard Active", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                TxtPermanentSafeguardBtn.Text = "LOCK PERMANENT (SURVIVES REBOOT)";
+            }
+
+            BtnPermanentSafeguard.IsEnabled = true;
         }
 
         private void TileSetupApps_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("SetupApps");

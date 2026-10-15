@@ -271,6 +271,12 @@
                             Content="🚀 100% EXTREME BOOST" Padding="15,7" Margin="0,0,6,4"
                             Click="BtnExtremeBoost_Click" ToolTip="Force 100% PC Performance: One-click deploy all high-impact latency, CPU unparking, GPU overdrive, zero-ping network &amp; bloatware elimination tweaks!"/>
 
+                    <!-- 🔒 LOCK PERMANENT (Survives Reboot) -->
+                    <Button x:Name="BtnHeaderLockPermanence" Style="{StaticResource ApplyButton}"
+                            Background="#00C853" Foreground="#0A0E17"
+                            Content="🔒 LOCK PERMANENT" Padding="14,7" Margin="0,0,6,4"
+                            Click="BtnLockPermanence_Click" ToolTip="Lock power unparking, network zero-ping heuristics &amp; scheduling permanently across every PC restart!"/>
+
                     <!-- 🎮 2X FPS GAMING OVERDRIVE (0.5ms Timer + Max FPS) -->
                     <Button x:Name="Btn2xFpsOverdrive" Style="{StaticResource ApplyButton}"
                             Background="#FF0055" Foreground="#FFFFFF"
@@ -309,17 +315,25 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- 2-Section Segmented Pill Switcher -->
+                    <!-- 4-Section Segmented Pill Switcher -->
                     <Border Grid.Column="0" Background="{DynamicResource BrushBackground}"
                             BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
                             CornerRadius="8" Padding="3">
                         <StackPanel Orientation="Horizontal">
+                            <RadioButton x:Name="TabPermanent" Style="{StaticResource OptimizationSectionTab}"
+                                         Content="🔒 Permanent System (Survives Reboot)" IsChecked="True"
+                                         Checked="SectionTab_Checked" Tag="Permanent"
+                                         ToolTip="Lock core CPU unparking, power plan, BCD, and network tweaks permanently so they survive every PC restart!"/>
+                            <RadioButton x:Name="TabPreGame" Style="{StaticResource OptimizationSectionTab}"
+                                         Content="🎮 Pre-Game Booster (1-Click Boost)"
+                                         Checked="SectionTab_Checked" Tag="PreGame"
+                                         ToolTip="1-Click apply after PC startup or before entering games: 0.5ms Timer, Standby RAM purge, GPU Priority 8 &amp; game priority boost!"/>
                             <RadioButton x:Name="TabSystemTweaks" Style="{StaticResource OptimizationSectionTab}"
-                                         Content="⚡ System Tweaks" IsChecked="True"
+                                         Content="⚡ System Tweaks"
                                          Checked="SectionTab_Checked" Tag="System"
                                          ToolTip="Comprehensive Windows system, gaming, and app optimizations"/>
                             <RadioButton x:Name="TabRegistryTweaks" Style="{StaticResource OptimizationSectionTab}"
-                                         Content="🗃️ Registry Optimization"
+                                         Content="🗃️ Registry Tweaks"
                                          Checked="SectionTab_Checked" Tag="Registry"
                                          ToolTip="Dedicated Windows Registry tweaks for latency, ping, and hardware speed"/>
                         </StackPanel>
@@ -414,6 +428,153 @@
                                                             services:LottieHelper.AssetName="rocket.json"
                                                             VerticalAlignment="Center" Visibility="Collapsed"/>
                             </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- 🔒 PERMANENT BOOT SAFEGUARD BANNER (Survives PC Restart) -->
+                    <Border x:Name="PermanentSafeguardBanner" Margin="0,0,0,16"
+                            Background="#0B1612" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1.5"
+                            CornerRadius="10" Padding="18,16" Visibility="Visible">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Header Row -->
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="🔒" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="PERMANENT BOOT SAFEGUARD ENGINE"
+                                               FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="Bold"
+                                               Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <Border Grid.Column="1" x:Name="BadgePermanentStatus" Background="#1A00FF66" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1"
+                                        CornerRadius="6" Padding="10,4" VerticalAlignment="Center">
+                                    <TextBlock x:Name="TxtPermanentStatus" Text="STATUS: 🔒 ACTIVE &amp; LOCKED"
+                                               FontFamily="{StaticResource AppFont}" FontSize="11" FontWeight="Bold"
+                                               Foreground="{DynamicResource BrushAccent}"/>
+                                </Border>
+                            </Grid>
+
+                            <!-- Description Row -->
+                            <TextBlock Grid.Row="1" Margin="0,8,0,12" TextWrapping="Wrap"
+                                       FontFamily="{StaticResource AppFont}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}">
+                                Locks core CPU unparking (100% min/max cores), 0ms turbo boost delay, zero-ping network heuristics, low-latency I/O, and multimedia GPU priorities into a high-privilege Windows Startup Task (<Run FontFamily="Consolas" Foreground="{DynamicResource BrushAccent}">180Hz_Permanence_Guard</Run>).
+                                <LineBreak/>
+                                <Run FontWeight="SemiBold" Foreground="{DynamicResource BrushTextPrimary}">Once locked, these optimizations automatically survive every PC restart or Windows shutdown permanently without ever needing to re-open the app!</Run>
+                            </TextBlock>
+
+                            <!-- Actions Row -->
+                            <WrapPanel Grid.Row="2" Orientation="Horizontal">
+                                <Button x:Name="BtnLockPermanence" Style="{StaticResource ApplyButton}"
+                                        Content="🔒 LOCK PERMANENT OPTIMIZATIONS (SURVIVES RESTART)"
+                                        Padding="18,9" Margin="0,0,10,6" Click="BtnLockPermanence_Click"
+                                        ToolTip="Registers the Windows Boot Safeguard Task and locks all power, network, timer and scheduler optimizations permanently!"/>
+                                <Button x:Name="BtnUnlockPermanence" Style="{StaticResource DangerButton}"
+                                        Content="🔓 REMOVE BOOT SAFEGUARD"
+                                        Padding="14,9" Margin="0,0,10,6" Click="BtnUnlockPermanence_Click"
+                                        ToolTip="Removes the automatic boot persistence scheduled task"/>
+                                <Button x:Name="BtnTestBootScript" Style="{StaticResource UndoButton}"
+                                        Content="⚡ TEST BOOT SCRIPT"
+                                        Padding="12,9" Margin="0,0,0,6" Click="BtnTestBootScript_Click"
+                                        ToolTip="Runs the boot persistence script immediately to verify 100% core unparking &amp; network locks"/>
+                            </WrapPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- 🎮 PRE-GAME LAUNCH CONTROL BANNER (1-Click Boost Before Gaming) -->
+                    <Border x:Name="PreGameBoosterBanner" Margin="0,0,0,16"
+                            Background="#160B14" BorderBrush="#FF0055" BorderThickness="1.5"
+                            CornerRadius="10" Padding="18,16" Visibility="Collapsed">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Header Row -->
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="🎮" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="1-CLICK PRE-GAME LAUNCH OVERDRIVE"
+                                               FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="Bold"
+                                               Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <Border Grid.Column="1" Background="#2A0015" BorderBrush="#FF0055" BorderThickness="1"
+                                        CornerRadius="6" Padding="10,4" VerticalAlignment="Center">
+                                    <TextBlock Text="⚡ INSTANT 2X FPS GAMING ENGINE"
+                                               FontFamily="{StaticResource AppFont}" FontSize="11" FontWeight="Bold"
+                                               Foreground="#FF0055"/>
+                                </Border>
+                            </Grid>
+
+                            <!-- Description Row -->
+                            <TextBlock Grid.Row="1" Margin="0,8,0,12" TextWrapping="Wrap"
+                                       FontFamily="{StaticResource AppFont}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}">
+                                Just turned on your PC or about to launch a game? Click once below to lock <Run FontWeight="Bold" Foreground="#00FF66">0.500ms high-precision kernel timer resolution</Run>, flush <Run FontWeight="Bold" Foreground="#00FF66">Standby RAM stutter cache</Run>, activate <Run FontWeight="Bold" Foreground="#00FF66">GPU Priority 8</Run>, and elevate all detected games to High priority for silk-smooth stutter-free gameplay.
+                            </TextBlock>
+
+                            <!-- Live Telemetry Badges Grid -->
+                            <UniformGrid Grid.Row="2" Columns="3" Margin="0,0,0,14">
+                                <!-- Badge 1: Timer Res -->
+                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                                        CornerRadius="8" Padding="12,10" Margin="0,0,6,0">
+                                    <StackPanel>
+                                        <TextBlock Text="KERNEL TIMER RESOLUTION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                        <TextBlock x:Name="TxtLiveTimerRes" Text="0.500 ms (Locked)" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,3,0,0"/>
+                                        <TextBlock Text="Eliminates frame pacing jitter" FontSize="10" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Badge 2: Standby RAM -->
+                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                                        CornerRadius="8" Padding="12,10" Margin="3,0,3,0">
+                                    <StackPanel>
+                                        <TextBlock Text="STANDBY MEMORY PURGE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                        <TextBlock x:Name="TxtLiveStandbyRam" Text="Clean &amp; Optimized" FontSize="15" FontWeight="Bold" Foreground="#00E5FF" Margin="0,3,0,0"/>
+                                        <TextBlock Text="Prevents 1-sec game freezes" FontSize="10" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Badge 3: Active Game Detection -->
+                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                                        CornerRadius="8" Padding="12,10" Margin="6,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="DETECTED RUNNING GAMES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                        <TextBlock x:Name="TxtLiveDetectedGames" Text="Ready for Game Launch" FontSize="14" FontWeight="Bold" Foreground="#FFD700" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="Auto-boosted to High Priority" FontSize="10" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+
+                            <!-- Actions Row -->
+                            <WrapPanel Grid.Row="3" Orientation="Horizontal">
+                                <Button x:Name="BtnRunPreGameBoost" Style="{StaticResource ApplyButton}"
+                                        Background="#FF0055" Foreground="#FFFFFF"
+                                        Content="🚀 1-CLICK PRE-GAME TURBO BOOST (ACTIVATE NOW)"
+                                        Padding="18,9" Margin="0,0,10,6" Click="BtnRunPreGameBoost_Click"
+                                        ToolTip="Instantly locks 0.500ms kernel timer, clears Standby RAM, activates 180Hz power scheme, and sets game process priority!"/>
+                                <Button x:Name="BtnPurgeStandbyRam" Style="{StaticResource UndoButton}"
+                                        Content="🧹 PURGE RAM CACHE ONLY"
+                                        Padding="14,9" Margin="0,0,10,6" Click="BtnPurgeStandbyRam_Click"
+                                        ToolTip="Instantly purges standby list memory and working sets to free up RAM before gaming"/>
+                                <Button x:Name="BtnRefreshPreGameStats" Style="{StaticResource UndoButton}"
+                                        Content="🔄 REFRESH GAME SCAN"
+                                        Padding="12,9" Margin="0,0,0,6" Click="BtnRefreshPreGameStats_Click"
+                                        ToolTip="Scan running processes for active games and refresh timer resolution telemetry"/>
+                            </WrapPanel>
                         </Grid>
                     </Border>
 
