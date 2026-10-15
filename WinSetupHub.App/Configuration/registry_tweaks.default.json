@@ -1839,5 +1839,530 @@
         "undoScript":  [
 
                        ]
+    },
+    {
+        "id":  "RegTweakUsbSelectiveSuspend",
+        "name":  "Disable USB Selective Suspend (Zero Mouse Sleep Delay)",
+        "description":  "Forces USB hub ports to stay in high-power state at all times, preventing gaming mice and keyboards from micro-sleeping.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\USB",
+                             "Name":  "DisableSelectiveSuspend",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakAudioDgRealtime",
+        "name":  "Audiodg.exe Realtime CPU \u0026 I/O Priority (DPC Latency Fix)",
+        "description":  "Sets Windows Audio Device Graph Isolation to High Priority, eliminating audio crackling and DPC spikes.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\audiodg.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\audiodg.exe\\PerfOptions",
+                             "Name":  "IoPriority",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakTimerResolution05ms",
+        "name":  "Enforce 0.5ms Global Hardware Timer Resolution",
+        "description":  "Enables GlobalTimerResolutionRequests in kernel session manager to maximize frametime smoothness.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel",
+                             "Name":  "GlobalTimerResolutionRequests",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakLinearMouseCurve",
+        "name":  "Linear 1:1 Raw Mouse Tracking Curve (Zero Curve Bias)",
+        "description":  "Configures true linear mouse curves for exact 1:1 hardware sensor translation.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Mouse",
+                             "Name":  "MouseSpeed",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Mouse",
+                             "Name":  "MouseThreshold1",
+                             "Value":  "0",
+                             "OriginalValue":  "6",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Mouse",
+                             "Name":  "MouseThreshold2",
+                             "Value":  "0",
+                             "OriginalValue":  "10",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakAccessibilityPopups",
+        "name":  "Disable Sticky Keys \u0026 Filter Keys Shift Shortcut Popups",
+        "description":  "Prevents Shift key spamming in games from triggering Windows accessibility popups.",
+        "category":  "Gaming \u0026 Input",
+        "categoryOrder":  3,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Accessibility\\StickyKeys",
+                             "Name":  "Flags",
+                             "Value":  "506",
+                             "OriginalValue":  "510",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Accessibility\\Keyboard Response",
+                             "Name":  "Flags",
+                             "Value":  "122",
+                             "OriginalValue":  "126",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Accessibility\\ToggleKeys",
+                             "Name":  "Flags",
+                             "Value":  "58",
+                             "OriginalValue":  "62",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakShaderCache10GB",
+        "name":  "10GB DirectX \u0026 Vulkan Disk Shader Cache (Anti-Stutter)",
+        "description":  "Allocates 10GB for DirectX shader cache to eliminate in-game shader compiling stutter.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\DirectX",
+                             "Name":  "ShaderCacheMaxDiskSize",
+                             "Value":  "10240",
+                             "OriginalValue":  "1024",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDwmMaxQueuedFrames1",
+        "name":  "DWM Max Queued Frames = 1 (Ultra-Low Compositor Latency)",
+        "description":  "Eliminates compositor buffer lag by limiting queued frames to 1.",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
+                             "Name":  "MaxQueuedFrames",
+                             "Value":  "1",
+                             "OriginalValue":  "3",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\Dwm",
+                             "Name":  "MaxQueuedFrames",
+                             "Value":  "1",
+                             "OriginalValue":  "3",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableDynamicRefreshRate",
+        "name":  "Disable Dynamic Refresh Rate (DRR) Downclocking",
+        "description":  "Forces display to lock to its maximum refresh rate (144Hz, 180Hz, 240Hz, 360Hz).",
+        "category":  "GPU \u0026 DirectX",
+        "categoryOrder":  1,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+                             "Name":  "EnableDynamicRefreshRate",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMaxUserPort65534",
+        "name":  "Max User Ports (65534) \u0026 Fast TCP Socket Reuse (30s)",
+        "description":  "Unlocks maximum available TCP ports and cuts TCP TIME_WAIT socket delay.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "MaxUserPort",
+                             "Value":  "65534",
+                             "OriginalValue":  "5000",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "TcpTimedWaitDelay",
+                             "Value":  "30",
+                             "OriginalValue":  "240",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakTcpHashSize",
+        "name":  "TCP Max Hash Table Size \u0026 Free TCB Expansion (65536)",
+        "description":  "Expands TCP control blocks to 65536 for zero packet buffer drops under high network load.",
+        "category":  "Network \u0026 Ping",
+        "categoryOrder":  4,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "MaxFreeTcbs",
+                             "Value":  "65536",
+                             "OriginalValue":  "1000",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "MaxHashTableSize",
+                             "Value":  "65536",
+                             "OriginalValue":  "512",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakNtfsTunnelingCache",
+        "name":  "Disable NTFS File Tunneling Cache",
+        "description":  "Eliminates NTFS file tunneling overhead on modern SSD storage.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  6,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "MaximumTunnelEntries",
+                             "Value":  "0",
+                             "OriginalValue":  "1024",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakStorageIoWorkers",
+        "name":  "Increase Storage Subsystem I/O Worker Threads (Count=64)",
+        "description":  "Expands Windows I/O system worker thread pool for high-throughput PCIe SSDs.",
+        "category":  "Filesystem \u0026 Disk",
+        "categoryOrder":  6,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\I/O System",
+                             "Name":  "Count",
+                             "Value":  "64",
+                             "OriginalValue":  "4",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableCrashDumpPaging",
+        "name":  "Disable Kernel Crash Dump RAM Reservation",
+        "description":  "Stops the Windows kernel from locking physical RAM pages for crash dump collection.",
+        "category":  "CPU \u0026 RAM Scheduling",
+        "categoryOrder":  2,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl",
+                             "Name":  "CrashDumpEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakEmulGameloopAow",
+        "name":  "Gameloop AOW Engine Realtime CPU \u0026 I/O Priority",
+        "description":  "Grants High CPU and High IO priority to `aow_exe.exe` and `TXPlatform.exe` for PUBG Mobile \u0026 Free Fire.",
+        "category":  "Emulator \u0026 VM Acceleration",
+        "categoryOrder":  5,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\aow_exe.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\aow_exe.exe\\PerfOptions",
+                             "Name":  "IoPriority",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\TXPlatform.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableWpnPush",
+        "name":  "Disable Windows Push Notifications Background Dispatcher",
+        "description":  "Disables background notification polling and toasts that disrupt gaming sessions.",
+        "category":  "Windows UI \u0026 Shell",
+        "categoryOrder":  0,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications",
+                             "Name":  "ToastEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableEdgePreload",
+        "name":  "Disable Microsoft Edge Background Pre-launch \u0026 Tab Preloading",
+        "description":  "Stops Microsoft Edge from silently preloading in background memory at Windows startup.",
+        "category":  "Privacy \u0026 Telemetry",
+        "categoryOrder":  7,
+        "section":  "Registry",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+                             "Name":  "AllowPrelaunch",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+                             "Name":  "TabPreloaderEnabled",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
     }
 ]

@@ -3733,5 +3733,675 @@
         "undoScript":  [
 
                        ]
+    },
+    {
+        "id":  "KernelTweakUsbPolling",
+        "name":  "USB Controller \u0026 High-Polling Gaming Mouse Response (1000Hz-8000Hz)",
+        "description":  "Disables USB selective suspend, USB root hub power management, and optimizes xHCI controller interrupt polling so 1000Hz-8000Hz gaming mice (Razer, Logitech, Finalmouse) deliver true zero-delay 1:1 tracking without packet drops.",
+        "category":  "âš¡ Extreme Low Latency \u0026 Kernel Timers",
+        "categoryOrder":  1,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\USB",
+                             "Name":  "DisableSelectiveSuspend",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "powercfg /setacvalueindex scheme_current 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4760-a579-e4c11415fb47 0; powercfg /setactive scheme_current; Get-PnpDevice -Class USB -ErrorAction SilentlyContinue | ForEach-Object { $path = \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Enum\\\u0027 + $_.DeviceID + \u0027\\Device Parameters\u0027; if (Test-Path $path) { Set-ItemProperty -Path $path -Name \u0027EnhancedPowerManagementEnabled\u0027 -Value 0 -Type DWord -Force -ErrorAction SilentlyContinue } }"
+                         ],
+        "undoScript":  [
+                           "powercfg /setacvalueindex scheme_current 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4760-a579-e4c11415fb47 1; powercfg /setactive scheme_current"
+                       ]
+    },
+    {
+        "id":  "KernelTweakAudioLatency",
+        "name":  "Windows Audio Engine Realtime Priority \u0026 MMCSS Latency Fix",
+        "description":  "Boosts Windows Audio service (Audiosrv / audiodg.exe) thread priority and prevents audio buffer underruns, eliminating DPC latency spikes caused by audio rendering in Discord, OBS, and games.",
+        "category":  "âš¡ Extreme Low Latency \u0026 Kernel Timers",
+        "categoryOrder":  1,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\audiodg.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\audiodg.exe\\PerfOptions",
+                             "Name":  "IoPriority",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Audio",
+                             "Name":  "Priority",
+                             "Value":  "6",
+                             "OriginalValue":  "2",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Audio",
+                             "Name":  "Scheduling Category",
+                             "Value":  "High",
+                             "OriginalValue":  "Medium",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "KernelTweakTimerResolution",
+        "name":  "Enforce 0.5ms Global Hardware Timer Resolution",
+        "description":  "Forces Windows to enforce a 0.5ms global timer resolution rather than the 15.6ms default, cutting frame rendering latency and improving frametime consistency.",
+        "category":  "âš¡ Extreme Low Latency \u0026 Kernel Timers",
+        "categoryOrder":  1,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel",
+                             "Name":  "GlobalTimerResolutionRequests",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "CpuTweakEppPerformance",
+        "name":  "Intel Speed Shift \u0026 AMD CPPC Energy Performance Preference (EPP = 0)",
+        "description":  "Configures CPU Energy Performance Preference (EPP) to 0 (Pure Performance), forcing Intel Speed Shift and AMD CPPC to keep cores at maximum boost clocks with zero downclocking latency.",
+        "category":  "ðŸ§  CPU, RAM \u0026 Power Tuning",
+        "categoryOrder":  2,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "powercfg -setacvalueindex scheme_current sub_processor PERFEPP 0; powercfg -setacvalueindex scheme_current sub_processor PERFEPP1 0; powercfg -setactive scheme_current"
+                         ],
+        "undoScript":  [
+                           "powercfg -setacvalueindex scheme_current sub_processor PERFEPP 50; powercfg -setacvalueindex scheme_current sub_processor PERFEPP1 50; powercfg -setactive scheme_current"
+                       ]
+    },
+    {
+        "id":  "CpuTweakDisableIdleDemote",
+        "name":  "Disable CPU Idle Core Demotion \u0026 Promotion Delays",
+        "description":  "Disables processor idle demote and promote thresholds in Windows power management, preventing the OS from putting active game threads onto lower frequency states.",
+        "category":  "ðŸ§  CPU, RAM \u0026 Power Tuning",
+        "categoryOrder":  2,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "powercfg -setacvalueindex scheme_current sub_processor IDLEDEMOTE 0; powercfg -setacvalueindex scheme_current sub_processor IDLEPROMOTE 100; powercfg -setactive scheme_current"
+                         ],
+        "undoScript":  [
+                           "powercfg -setacvalueindex scheme_current sub_processor IDLEDEMOTE 40; powercfg -setacvalueindex scheme_current sub_processor IDLEPROMOTE 60; powercfg -setactive scheme_current"
+                       ]
+    },
+    {
+        "id":  "GfxTweakShaderCache10GB",
+        "name":  "DirectX \u0026 Vulkan Shader Cache Maximize (10GB / Unlimited Disk Allocation)",
+        "description":  "Expands the DirectX 11/12 and Vulkan shader cache size to 10GB+, preventing heavy titles (Unreal Engine 5, Warzone, Apex, Cyberpunk) from constantly evicting and re-compiling shaders during gameplay.",
+        "category":  "ðŸ–¥ï¸ Graphical \u0026 Visual Responsiveness",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\DirectX",
+                             "Name":  "ShaderCacheMaxDiskSize",
+                             "Value":  "10240",
+                             "OriginalValue":  "1024",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+                             "Name":  "DirectXShaderCacheSize",
+                             "Value":  "10240",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "GfxTweakDwmMaxQueuedFrames",
+        "name":  "Prerendered Frames = 1 (Zero Desktop Window Compositor Latency)",
+        "description":  "Restricts maximum prerendered frames in Desktop Window Manager (DWM) and DirectX presentation pipelines to 1, delivering instant mouse-to-pixel click response.",
+        "category":  "ðŸ–¥ï¸ Graphical \u0026 Visual Responsiveness",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
+                             "Name":  "MaxQueuedFrames",
+                             "Value":  "1",
+                             "OriginalValue":  "3",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKCU:\\Software\\Microsoft\\Windows\\Dwm",
+                             "Name":  "MaxQueuedFrames",
+                             "Value":  "1",
+                             "OriginalValue":  "3",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "GfxTweakDisableDRR",
+        "name":  "Disable Dynamic Refresh Rate (DRR) Downshifting",
+        "description":  "Prevents Windows 11 from dynamically downshifting your high refresh rate display (144Hz, 180Hz, 240Hz) to 60Hz when idle or when running non-fullscreen apps.",
+        "category":  "ðŸ–¥ï¸ Graphical \u0026 Visual Responsiveness",
+        "categoryOrder":  3,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+                             "Name":  "EnableDynamicRefreshRate",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "NetTweakLowRto",
+        "name":  "Ultra-Fast TCP Retransmission Timeout (InitialRto 1000ms / MinRto 200ms)",
+        "description":  "Drops TCP Retransmission Timeout (RTO) from 3000ms to 1000ms and MinRto to 200ms, enabling instant recovery from dropped packets without noticeable ping spikes or game rubber-banding.",
+        "category":  "ðŸŒ Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  4,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "netsh int tcp set global initialRto=1000 minRto=200"
+                         ],
+        "undoScript":  [
+                           "netsh int tcp set global initialRto=3000 minRto=300"
+                       ]
+    },
+    {
+        "id":  "NetTweakDisableLso",
+        "name":  "Disable Large Send Offload (LSO) \u0026 Packet Coalescing",
+        "description":  "Disables IPv4/IPv6 Large Send Offload and packet coalescing across network adapters, preventing packet burst buffering that causes input lag in competitive multiplayer games.",
+        "category":  "ðŸŒ Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  4,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+                             "Get-NetAdapterAdvancedProperty -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match \u0027Large Send Offload\u0027 -or $_.DisplayName -match \u0027Packet Coalescing\u0027 } | Set-NetAdapterAdvancedProperty -DisplayValue \u0027Disabled\u0027 -ErrorAction SilentlyContinue"
+                         ],
+        "undoScript":  [
+                           "Get-NetAdapterAdvancedProperty -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -match \u0027Large Send Offload\u0027 } | Set-NetAdapterAdvancedProperty -DisplayValue \u0027Enabled\u0027 -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "NetTweakMaxUserPort",
+        "name":  "Max Dynamic TCP Ports (65534) \u0026 Fast Socket Recycling (30s Wait)",
+        "description":  "Expands the available user TCP socket pool from 5000 to 65534 and sets TcpTimedWaitDelay to 30 seconds, preventing port exhaustion during heavy downloads, Discord calls, and multiplayer gaming.",
+        "category":  "ðŸŒ Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  4,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "MaxUserPort",
+                             "Value":  "65534",
+                             "OriginalValue":  "5000",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "TcpTimedWaitDelay",
+                             "Value":  "30",
+                             "OriginalValue":  "240",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "MaxFreeTcbs",
+                             "Value":  "65536",
+                             "OriginalValue":  "1000",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
+                             "Name":  "MaxHashTableSize",
+                             "Value":  "65536",
+                             "OriginalValue":  "512",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "DiskTweakNtfsTunneling",
+        "name":  "Disable NTFS File Tunneling Cache \u0026 8.3 Creation Overhead",
+        "description":  "Disables NTFS filesystem tunneling cache and short name generation, speeding up game asset directory navigation and file access times by up to 25%.",
+        "category":  "ðŸ’¾ Storage \u0026 NVMe Throughput",
+        "categoryOrder":  5,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "MaximumTunnelEntries",
+                             "Value":  "0",
+                             "OriginalValue":  "1024",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+                             "Name":  "NtfsDisable8dot3NameCreation",
+                             "Value":  "1",
+                             "OriginalValue":  "0",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "DiskTweakIncreaseIoThreads",
+        "name":  "Increase Windows Storage Subsystem I/O Worker Threads",
+        "description":  "Increases the worker thread limit for storage driver I/O queues, enhancing multi-threaded read/write throughput for high-speed NVMe Gen4/Gen5 SSDs.",
+        "category":  "ðŸ’¾ Storage \u0026 NVMe Throughput",
+        "categoryOrder":  5,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  true,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\I/O System",
+                             "Name":  "Count",
+                             "Value":  "64",
+                             "OriginalValue":  "4",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "ServiceTweakWSearch",
+        "name":  "Windows Search Indexer (WSearch) Complete CPU \u0026 SSD Deactivator",
+        "description":  "Disables Windows Search indexing service (SearchIndexer.exe). Completely stops background SSD read/writes and saves 10% to 30% background CPU consumption.",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+                        {
+                            "Name":  "WSearch",
+                            "StartupType":  "Disabled",
+                            "OriginalType":  "Automatic"
+                        }
+                    ],
+        "invokeScript":  [
+                             "Stop-Service -Name WSearch -Force -ErrorAction SilentlyContinue"
+                         ],
+        "undoScript":  [
+                           "Set-Service -Name WSearch -StartupType Automatic -ErrorAction SilentlyContinue; Start-Service -Name WSearch -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "ServiceTweakWpnService",
+        "name":  "Windows Push Notifications System Service (WpnService) Deactivator",
+        "description":  "Disables Windows Push Notifications service and system tray notification hooks, stopping background cloud polling and preventing notification banners from stealing game focus.",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+                        {
+                            "Name":  "WpnService",
+                            "StartupType":  "Disabled",
+                            "OriginalType":  "Automatic"
+                        }
+                    ],
+        "invokeScript":  [
+                             "Stop-Service -Name WpnService -Force -ErrorAction SilentlyContinue"
+                         ],
+        "undoScript":  [
+                           "Set-Service -Name WpnService -StartupType Automatic -ErrorAction SilentlyContinue; Start-Service -Name WpnService -ErrorAction SilentlyContinue"
+                       ]
+    },
+    {
+        "id":  "ServiceTweakRemoteServices",
+        "name":  "Remote Registry \u0026 Remote Desktop Assistance Deactivator",
+        "description":  "Disables Remote Registry and Remote Desktop assistance services, securing open network ports and freeing system RAM.",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+                        {
+                            "Name":  "RemoteRegistry",
+                            "StartupType":  "Disabled",
+                            "OriginalType":  "Manual"
+                        },
+                        {
+                            "Name":  "SessionEnv",
+                            "StartupType":  "Disabled",
+                            "OriginalType":  "Manual"
+                        }
+                    ],
+        "invokeScript":  [
+                             "Stop-Service -Name RemoteRegistry -Force -ErrorAction SilentlyContinue; Stop-Service -Name SessionEnv -Force -ErrorAction SilentlyContinue"
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "ServiceTweakLocationService",
+        "name":  "Windows Geolocation \u0026 Sensor Services (lfsvc) Deactivator",
+        "description":  "Disables Windows Geolocation service (lfsvc) and Sensor Monitoring, eliminating background Wi-Fi and location scans that trigger sudden multiplayer ping spikes.",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+
+                     ],
+        "service":  [
+                        {
+                            "Name":  "lfsvc",
+                            "StartupType":  "Disabled",
+                            "OriginalType":  "Manual"
+                        },
+                        {
+                            "Name":  "SensorService",
+                            "StartupType":  "Disabled",
+                            "OriginalType":  "Manual"
+                        }
+                    ],
+        "invokeScript":  [
+                             "Stop-Service -Name lfsvc -Force -ErrorAction SilentlyContinue"
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakMouseCurvesRaw",
+        "name":  "Linear 1:1 Raw Mouse Tracking (Zero Acceleration)",
+        "description":  "Sets mouse threshold speed to zero for exact 1:1 hardware sensor translation and pixel-perfect aim in FPS titles.",
+        "category":  "Customize Preferences",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Mouse",
+                             "Name":  "MouseSpeed",
+                             "Value":  "0",
+                             "OriginalValue":  "1",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Mouse",
+                             "Name":  "MouseThreshold1",
+                             "Value":  "0",
+                             "OriginalValue":  "6",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Mouse",
+                             "Name":  "MouseThreshold2",
+                             "Value":  "0",
+                             "OriginalValue":  "10",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "RegTweakDisableStickyKeysPopups",
+        "name":  "Disable Sticky Keys, Filter Keys \u0026 Toggle Keys Popups",
+        "description":  "Disables the accessibility shortcut dialog that pops up when pressing Shift 5 times or holding NumLock, preventing accidental alt-tabs during competitive matches.",
+        "category":  "Customize Preferences",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Accessibility\\StickyKeys",
+                             "Name":  "Flags",
+                             "Value":  "506",
+                             "OriginalValue":  "510",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Accessibility\\Keyboard Response",
+                             "Name":  "Flags",
+                             "Value":  "122",
+                             "OriginalValue":  "126",
+                             "Type":  "String"
+                         },
+                         {
+                             "Path":  "HKCU:\\Control Panel\\Accessibility\\ToggleKeys",
+                             "Name":  "Flags",
+                             "Value":  "58",
+                             "OriginalValue":  "62",
+                             "Type":  "String"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
+    },
+    {
+        "id":  "EmulTweakGameloopAow",
+        "name":  "Gameloop AOW Engine \u0026 Android Direct 3D Priority",
+        "description":  "Configures IFEO high CPU and high I/O priority for Gameloop AOW engine components (`aow_exe.exe`, `TXPlatform.exe`, `TBSWebRenderer.exe`), eliminating stutter in PUBG Mobile and Free Fire.",
+        "category":  "ðŸš€ Emulator 100% Performance",
+        "categoryOrder":  0,
+        "section":  "System",
+        "isAdvanced":  false,
+        "isRecommended":  true,
+        "requiresReboot":  false,
+        "registry":  [
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\aow_exe.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\aow_exe.exe\\PerfOptions",
+                             "Name":  "IoPriority",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\TXPlatform.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         },
+                         {
+                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\TBSWebRenderer.exe\\PerfOptions",
+                             "Name":  "CpuPriorityClass",
+                             "Value":  "3",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
+                             "Type":  "DWord"
+                         }
+                     ],
+        "service":  [
+
+                    ],
+        "invokeScript":  [
+
+                         ],
+        "undoScript":  [
+
+                       ]
     }
 ]

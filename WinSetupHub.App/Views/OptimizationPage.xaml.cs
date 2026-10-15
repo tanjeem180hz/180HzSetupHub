@@ -328,23 +328,27 @@ namespace SetupHub180Hz.Views
             var sourceList = GetCurrentSectionItems();
             string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
 
-            // Select all tweaks that are in the Extreme Performance or Recommended presets
-            var extremeTweaks = sourceList.Where(t => TweakService.ExtremePerformanceIds.Contains(t.Id) || t.IsRecommended).ToList();
-            if (extremeTweaks.Count == 0)
-            {
-                extremeTweaks = sourceList.Where(t => !t.IsAdvanced).ToList();
-            }
+            var sectionTweaks = sourceList.Where(t => TweakService.ExtremePerformanceIds.Contains(t.Id) || t.IsRecommended || !t.IsAdvanced).ToList();
+            var allCombined = _allTweaks.Where(t => TweakService.ExtremePerformanceIds.Contains(t.Id) || t.IsRecommended || !t.IsAdvanced).ToList();
+
+            var choice = ThemedMessageBox.Show(
+                $"🚀 100% EXTREME PERFORMANCE ENGINE\n\nWould you like to deploy ALL {allCombined.Count} Extreme Optimizations across BOTH System Tweaks & Registry Optimization to double PC performance?\n\n• Click 'Yes' to deploy ALL {allCombined.Count} System + Registry Optimizations (Recommended)\n• Click 'No' to deploy {sectionTweaks.Count} optimizations in {sectionLabel} only",
+                "Deploy 100% Extreme Performance Engine", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+            if (choice == MessageBoxResult.Cancel) return;
+
+            List<TweakItem> targetTweaks = choice == MessageBoxResult.Yes ? allCombined : sectionTweaks;
 
             // Mark them as selected in UI
-            foreach (var t in sourceList)
+            foreach (var t in targetTweaks)
             {
-                t.IsSelected = extremeTweaks.Contains(t);
+                t.IsSelected = true;
             }
 
             var dialog = new OptimizationDialog(
-                title: $"🚀 Deploy 100% Extreme Performance Engine ({extremeTweaks.Count} Tweaks)",
-                subtitle: $"This will safely deploy {extremeTweaks.Count} extreme-level optimizations across Low Latency, CPU Unparking, GPU Overdrive, Zero Ping & Bloatware Elimination to force 100% PC performance:",
-                tweaks: extremeTweaks,
+                title: $"🚀 Deploy 100% Extreme Performance Engine ({targetTweaks.Count} Optimizations)",
+                subtitle: $"This will safely deploy {targetTweaks.Count} extreme-level optimizations across Low Latency, CPU Unparking, GPU Overdrive, Zero Ping & Bloatware Elimination to force 100% doubled PC performance:",
+                tweaks: targetTweaks,
                 isUndo: false,
                 tweakService: _tweakService)
             {
@@ -353,21 +357,21 @@ namespace SetupHub180Hz.Views
 
             if (dialog.ShowDialog() == true)
             {
-                foreach (var t in extremeTweaks)
+                foreach (var t in targetTweaks)
                 {
                     t.IsApplied = true;
                     t.IsSelected = true;
                 }
-                TweakService.RecordAppliedTweaks(extremeTweaks.Select(t => t.Id));
+                TweakService.RecordAppliedTweaks(targetTweaks.Select(t => t.Id));
 
-                ActivityLogger.Instance.Log($"100% Extreme Performance Engine deployed: Applied {extremeTweaks.Count} high-throughput {sectionLabel.ToLowerInvariant()} optimizations.", ActivityType.Success);
-                NotificationService.Notify("100% Extreme Boost Activated", $"Applied {extremeTweaks.Count} extreme optimizations. CPU, GPU, Network & Latency tuned for 100% peak performance.");
+                ActivityLogger.Instance.Log($"100% Extreme Performance Engine deployed: Applied {targetTweaks.Count} high-throughput optimizations.", ActivityType.Success);
+                NotificationService.Notify("100% Extreme Boost Activated", $"Applied {targetTweaks.Count} extreme optimizations. CPU, GPU, Network & Latency tuned for doubled peak performance.");
 
-                TxtStatus.Text = $"🚀 Applied {extremeTweaks.Count} extreme {sectionLabel.ToLowerInvariant()} optimization(s) successfully! PC at 100% performance.";
+                TxtStatus.Text = $"🚀 Applied {targetTweaks.Count} extreme optimization(s) successfully! PC at 100% performance.";
                 StatusBar.Visibility = Visibility.Visible;
                 BuildCategoryChips();
                 ApplyFilter();
-                CheckRebootNeeded(extremeTweaks);
+                CheckRebootNeeded(targetTweaks);
             }
         }
 
@@ -526,24 +530,58 @@ namespace SetupHub180Hz.Views
         private void BtnApplyAll_Click(object sender, RoutedEventArgs e)
         {
             var sourceList = GetCurrentSectionItems();
-            List<TweakItem> targetTweaks;
             string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
+
+            List<TweakItem> targetTweaks;
             string scopeText;
 
-            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase) || !string.IsNullOrWhiteSpace(_searchQuery))
             {
-                targetTweaks = GetCurrentItems().ToList();
-                scopeText = $"all {targetTweaks.Count} tweaks in {_activeCategory}";
+                var filtered = GetCurrentItems().ToList();
+                var prompt = ThemedMessageBox.Show(
+                    $"You are currently viewing '{_activeCategory}' ({filtered.Count} tweaks).\n\n• Click 'Yes' to apply ALL {sourceList.Count} {sectionLabel} optimizations\n• Click 'No' to apply only the {filtered.Count} visible tweaks in '{_activeCategory}'",
+                    $"Apply All {sectionLabel} Optimizations", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                if (prompt == MessageBoxResult.Cancel) return;
+                if (prompt == MessageBoxResult.No)
+                {
+                    targetTweaks = filtered;
+                    scopeText = $"{filtered.Count} tweaks in {_activeCategory}";
+                }
+                else
+                {
+                    targetTweaks = sourceList;
+                    scopeText = $"all {sourceList.Count} {sectionLabel.ToLowerInvariant()} optimizations";
+                }
             }
             else
             {
-                targetTweaks = sourceList;
-                scopeText = $"all {sourceList.Count} {sectionLabel.ToLowerInvariant()} optimizations";
+                var prompt = ThemedMessageBox.Show(
+                    $"Apply all {sourceList.Count} {sectionLabel} optimizations, or apply ALL {_allTweaks.Count} System & Registry optimizations across the entire system?\n\n• Click 'Yes' to apply ALL {_allTweaks.Count} optimizations across BOTH System & Registry\n• Click 'No' to apply all {sourceList.Count} {sectionLabel} optimizations only",
+                    $"Apply All Optimizations", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+                if (prompt == MessageBoxResult.Cancel) return;
+                if (prompt == MessageBoxResult.Yes)
+                {
+                    targetTweaks = _allTweaks;
+                    scopeText = $"all {_allTweaks.Count} system and registry optimizations";
+                }
+                else
+                {
+                    targetTweaks = sourceList;
+                    scopeText = $"all {sourceList.Count} {sectionLabel.ToLowerInvariant()} optimizations";
+                }
+            }
+
+            // Visually select every tweak being applied
+            foreach (var t in targetTweaks)
+            {
+                t.IsSelected = true;
             }
 
             var dialog = new OptimizationDialog(
-                title: $"Apply {sectionLabel} Optimizations",
-                subtitle: $"This will apply {scopeText} to your system:",
+                title: $"Apply {scopeText.ToUpperInvariant()}",
+                subtitle: $"This will safely apply {scopeText} to maximize your PC performance:",
                 tweaks: targetTweaks,
                 isUndo: false,
                 tweakService: _tweakService)
@@ -560,7 +598,10 @@ namespace SetupHub180Hz.Views
                 }
                 TweakService.RecordAppliedTweaks(targetTweaks.Select(t => t.Id));
 
-                TxtStatus.Text = $"✓ Applied {targetTweaks.Count} {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
+                ActivityLogger.Instance.Log($"Applied {targetTweaks.Count} optimizations across system successfully.", ActivityType.Success);
+                NotificationService.Notify("Optimizations Applied", $"Applied {targetTweaks.Count} optimizations successfully. PC performance maximized!");
+
+                TxtStatus.Text = $"✓ Applied {targetTweaks.Count} optimization(s) successfully.";
                 StatusBar.Visibility = Visibility.Visible;
                 BuildCategoryChips();
                 ApplyFilter();

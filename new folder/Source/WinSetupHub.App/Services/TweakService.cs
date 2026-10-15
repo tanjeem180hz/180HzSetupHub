@@ -83,6 +83,9 @@ namespace SetupHub180Hz.Services
             "KernelTweakMSIGpu",
             "KernelTweakCSRSSPriority",
             "KernelTweakDisableDwmGhosting",
+            "KernelTweakUsbPolling",
+            "KernelTweakAudioLatency",
+            "KernelTweakTimerResolution",
 
             // 🧠 CPU, RAM & Power Tuning
             "CpuTweakUnparkCores",
@@ -90,7 +93,22 @@ namespace SetupHub180Hz.Services
             "CpuTweakDisablePaging",
             "CpuTweakPowerPlanLock",
             "CpuTweakDisableFTH",
+            "CpuTweakEppPerformance",
+            "CpuTweakDisableIdleDemote",
             "MemTweakFlushStandby",
+
+            // 🖥️ Graphical & Visual Responsiveness
+            "GfxTweakVisualFX",
+            "GfxTweakHAGS",
+            "GfxTweakShaderCache",
+            "GfxTweakFSE",
+            "GfxTweakMPO",
+            "GfxTweakDirectFlip",
+            "GfxTweakNvTelemetry",
+            "GfxTweakDisableGameBarPresence",
+            "GfxTweakShaderCache10GB",
+            "GfxTweakDwmMaxQueuedFrames",
+            "GfxTweakDisableDRR",
 
             // 🌐 Network & Ping Tuning
             "NetTweakTcpAckNoDelay",
@@ -98,11 +116,16 @@ namespace SetupHub180Hz.Services
             "NetTweakQoSBandwidth",
             "NetTweakDnsCache",
             "NetTweakECNHeuristics",
+            "NetTweakLowRto",
+            "NetTweakDisableLso",
+            "NetTweakMaxUserPort",
 
             // 💾 Storage & NVMe Throughput
             "DiskTweakNtfsFast",
             "DiskTweakEnableTrim",
             "DiskTweakNvmeWriteCache",
+            "DiskTweakNtfsTunneling",
+            "DiskTweakIncreaseIoThreads",
 
             // 🧹 Background Bloatware & Services Elimination
             "ServiceTweakSysMain",
@@ -110,6 +133,22 @@ namespace SetupHub180Hz.Services
             "ServiceTweakXboxServices",
             "ServiceTweakErrorReporting",
             "ServiceTweakPcaSvc",
+            "ServiceTweakWSearch",
+            "ServiceTweakWpnService",
+            "ServiceTweakRemoteServices",
+            "ServiceTweakLocationService",
+
+            // 🎯 Input & Preferences
+            "RegTweakMouseCurvesRaw",
+            "RegTweakDisableStickyKeysPopups",
+
+            // 🚀 Emulator 100% Extreme Performance
+            "EmulTweakHypervisorVBS",
+            "EmulTweakCpuPriority",
+            "EmulTweakGpuPreference",
+            "EmulTweakPowerThrottling",
+            "EmulTweakGameloopMuMu",
+            "EmulTweakGameloopAow",
 
             // 🗃️ Dedicated Registry Optimization Recommendations
             "RegTweakDirectFlipIFlip",
@@ -124,7 +163,23 @@ namespace SetupHub180Hz.Services
             "RegTweakGlobalPowerThrottling",
             "RegTweakMMCSSGamesUltimate",
             "RegTweakNvTelemetryOptOut",
-            "RegTweakDisableCopilotRecall"
+            "RegTweakDisableCopilotRecall",
+            "RegTweakUsbSelectiveSuspend",
+            "RegTweakAudioDgRealtime",
+            "RegTweakTimerResolution05ms",
+            "RegTweakLinearMouseCurve",
+            "RegTweakAccessibilityPopups",
+            "RegTweakShaderCache10GB",
+            "RegTweakDwmMaxQueuedFrames1",
+            "RegTweakDisableDynamicRefreshRate",
+            "RegTweakMaxUserPort65534",
+            "RegTweakTcpHashSize",
+            "RegTweakNtfsTunnelingCache",
+            "RegTweakStorageIoWorkers",
+            "RegTweakDisableCrashDumpPaging",
+            "RegTweakEmulGameloopAow",
+            "RegTweakDisableWpnPush",
+            "RegTweakDisableEdgePreload"
         };
 
         // Extreme Performance Preset - forces 100% PC Performance & Ultra-Low Latency
@@ -138,6 +193,9 @@ namespace SetupHub180Hz.Services
             "KernelTweakMSIGpu",
             "KernelTweakCSRSSPriority",
             "KernelTweakDisableDwmGhosting",
+            "KernelTweakUsbPolling",
+            "KernelTweakAudioLatency",
+            "KernelTweakTimerResolution",
 
             // CPU & Scheduling
             "CpuTweakUnparkCores",
@@ -145,6 +203,8 @@ namespace SetupHub180Hz.Services
             "CpuTweakDisablePaging",
             "CpuTweakPowerPlanLock",
             "CpuTweakDisableFTH",
+            "CpuTweakEppPerformance",
+            "CpuTweakDisableIdleDemote",
             "MemTweakFlushStandby",
 
             // GPU & DirectX
@@ -156,6 +216,9 @@ namespace SetupHub180Hz.Services
             "GfxTweakDirectFlip",
             "GfxTweakNvTelemetry",
             "GfxTweakDisableGameBarPresence",
+            "GfxTweakShaderCache10GB",
+            "GfxTweakDwmMaxQueuedFrames",
+            "GfxTweakDisableDRR",
 
             // Network & Ping
             "NetTweakTcpAckNoDelay",
@@ -163,11 +226,16 @@ namespace SetupHub180Hz.Services
             "NetTweakQoSBandwidth",
             "NetTweakDnsCache",
             "NetTweakECNHeuristics",
+            "NetTweakLowRto",
+            "NetTweakDisableLso",
+            "NetTweakMaxUserPort",
 
             // Storage
             "DiskTweakNtfsFast",
             "DiskTweakEnableTrim",
             "DiskTweakNvmeWriteCache",
+            "DiskTweakNtfsTunneling",
+            "DiskTweakIncreaseIoThreads",
 
             // Services & Bloatware
             "ServiceTweakSysMain",
@@ -175,6 +243,10 @@ namespace SetupHub180Hz.Services
             "ServiceTweakXboxServices",
             "ServiceTweakErrorReporting",
             "ServiceTweakPcaSvc",
+            "ServiceTweakWSearch",
+            "ServiceTweakWpnService",
+            "ServiceTweakRemoteServices",
+            "ServiceTweakLocationService",
             "WPFTweaksServices",
             "WPFTweaksTelemetry",
 
@@ -187,6 +259,7 @@ namespace SetupHub180Hz.Services
             "EmulTweakGpuPreference",
             "EmulTweakPowerThrottling",
             "EmulTweakGameloopMuMu",
+            "EmulTweakGameloopAow",
 
             // Registry Optimizations
             "RegTweakDirectFlipIFlip",
@@ -202,6 +275,22 @@ namespace SetupHub180Hz.Services
             "RegTweakMMCSSGamesUltimate",
             "RegTweakNvTelemetryOptOut",
             "RegTweakDisableCopilotRecall",
+            "RegTweakUsbSelectiveSuspend",
+            "RegTweakAudioDgRealtime",
+            "RegTweakTimerResolution05ms",
+            "RegTweakLinearMouseCurve",
+            "RegTweakAccessibilityPopups",
+            "RegTweakShaderCache10GB",
+            "RegTweakDwmMaxQueuedFrames1",
+            "RegTweakDisableDynamicRefreshRate",
+            "RegTweakMaxUserPort65534",
+            "RegTweakTcpHashSize",
+            "RegTweakNtfsTunnelingCache",
+            "RegTweakStorageIoWorkers",
+            "RegTweakDisableCrashDumpPaging",
+            "RegTweakEmulGameloopAow",
+            "RegTweakDisableWpnPush",
+            "RegTweakDisableEdgePreload",
             "RegTweakMouseRaw",
             "RegTweakGameDVR",
             "RegTweakMMCSS",
