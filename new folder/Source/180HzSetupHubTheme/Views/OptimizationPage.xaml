@@ -230,10 +230,16 @@
 
                 <!-- Actions WrapPanel -->
                 <WrapPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="12,0,0,0">
-                    <!-- 🚀 APPLY ALL (Primary Action: 1-Click 100% Performance) -->
+                    <!-- 🚀 APPLY ALL (Primary Action: 1-Click 100% Performance + PC Clean) -->
                     <Button x:Name="BtnApplyAll" Style="{StaticResource ApplyButton}"
                             Content="🚀 APPLY ALL" Padding="16,8" Margin="0,0,8,4"
-                            Click="BtnApplyAll_Click" ToolTip="1-Click Apply ALL Optimizations: Deploys 5.0GHz Dynamic Boost, 100% GPU mode, 0.500ms Timer, RAM purge &amp; Permanent Boot Safeguard!"/>
+                            Click="BtnApplyAll_Click" ToolTip="1-Click Apply ALL Optimizations + Deep PC Clean: Deploys 5.0GHz Dynamic Boost, 100% GPU mode, 0.500ms Timer, Standby RAM purge, disk cleanup &amp; Permanent Boot Safeguard!"/>
+
+                    <!-- 🧹 CLEAN PC & RAM (1-Click Instant Junk, Cache & RAM Cleaner) -->
+                    <Button x:Name="BtnCleanPc" Style="{StaticResource UndoButton}"
+                            BorderBrush="#00E5FF" BorderThickness="1" Foreground="#00E5FF"
+                            Content="🧹 CLEAN PC &amp; RAM" Padding="14,8" Margin="0,0,8,4"
+                            Click="BtnCleanPc_Click" ToolTip="1-Click Deep Clean: Clears user/windows temp files, update cache, prefetch, shader cache &amp; purges Standby RAM!"/>
 
                     <!-- ⚡ APPLY SELECTED -->
                     <Button x:Name="BtnApplySelected" Style="{StaticResource UndoButton}"
@@ -461,8 +467,8 @@
                                 <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
                                         CornerRadius="8" Padding="10,10" Margin="4,0,0,0">
                                     <StackPanel>
-                                        <TextBlock Text="RAM &amp; EMULATORS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
-                                        <TextBlock x:Name="TxtLiveDetectedGames" Text="Auto-Boosted ✓" FontSize="13" FontWeight="Bold" Foreground="#FFD700" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="PC CLEAN &amp; RAM" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                        <TextBlock x:Name="TxtLiveDetectedGames" Text="Purged &amp; Boosted ✓" FontSize="13" FontWeight="Bold" Foreground="#FFD700" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
                                         <TextBlock x:Name="TxtLiveStandbyRam" Text="High I/O • No Throttling" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </Border>

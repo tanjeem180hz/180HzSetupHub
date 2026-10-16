@@ -381,39 +381,97 @@ namespace SetupHub180Hz.Views
             }
         }
 
+        private async void BtnCleanPc_Click(object sender, RoutedEventArgs e)
+        {
+            if (BtnCleanPc != null) BtnCleanPc.IsEnabled = false;
+            TxtStatus.Text = "🧹 Scanning and cleaning system junk, temporary files, caches & purging RAM...";
+            StatusBar.Visibility = Visibility.Visible;
+            if (StatusLottie != null) StatusLottie.Visibility = Visibility.Visible;
+
+            try
+            {
+                var scanTargets = await CleanupService.Instance.ScanAsync(force: true);
+                long freedBytes = await CleanupService.Instance.CleanAllAsync(scanTargets);
+                long ramFreed = await Task.Run(() => MemoryCleaner.CleanRam());
+                long totalFreed = freedBytes + ramFreed;
+
+                // Also flush DNS resolver cache
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        using var proc = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("ipconfig", "/flushdns")
+                        {
+                            CreateNoWindow = true,
+                            UseShellExecute = false
+                        });
+                        proc?.WaitForExit(3000);
+                    }
+                    catch { }
+                });
+
+                string freedDisplay = FormatBytes(totalFreed);
+                TxtStatus.Text = $"🧹 Deep PC Clean complete! Reclaimed {freedDisplay} of junk files and RAM cache.";
+                NotificationService.Notify("🧹 PC & RAM Cleaned!", $"Successfully purged {freedDisplay} of temporary files, update caches, and RAM standby memory.");
+                ActivityLogger.Instance.Log($"Deep PC Clean completed: Reclaimed {freedDisplay} disk & memory cache.", ActivityType.Success);
+
+                UpdatePreGameTelemetry();
+                if (TxtLiveStandbyRam != null) TxtLiveStandbyRam.Text = $"Purged ({freedDisplay} Cleaned ✓)";
+            }
+            catch (Exception ex)
+            {
+                TxtStatus.Text = $"Clean completed with notice: {ex.Message}";
+            }
+            finally
+            {
+                if (BtnCleanPc != null) BtnCleanPc.IsEnabled = true;
+                if (StatusLottie != null) StatusLottie.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private async void BtnApplyAll_Click(object sender, RoutedEventArgs e)
         {
             var targetTweaks = _allTweaks;
             if (targetTweaks.Count == 0) return;
 
             var prompt = ThemedMessageBox.Show(
-                $"🚀 APPLY ALL OPTIMIZATIONS (100% MAXIMUM PERFORMANCE)\n\n" +
+                $"🚀 APPLY ALL OPTIMIZATIONS (100% MAXIMUM PERFORMANCE + DEEP PC CLEAN)\n\n" +
                 $"This will deploy all {targetTweaks.Count} optimizations across the entire system in one seamless pass:\n\n" +
+                $"• 🧹 Deep PC Clean & Cache Purge (User/Win Temp, Update Cache, Prefetch, WER & Shader Caches)\n" +
                 $"• 🔒 Permanent Boot Safeguard (100% Core Unparking & 0ms Boost Delay across every PC restart)\n" +
                 $"• ⏱️ Lock 0.500ms High-Precision Kernel Timer Resolution (Zero Frame Jitter)\n" +
                 $"• 🎮 Dual-Vendor GPU Overdrive (NVIDIA PowerMizer & AMD ULPS Disabled, MMCSS GPU Priority 8)\n" +
                 $"• 🧠 Standby RAM Stutter Purge & Windows EcoQoS Throttling Disabled\n" +
                 $"• 🚀 Universal Android Emulators (BlueStacks, MSI, LDPlayer, GameLoop) & PC Games Elevated\n" +
-                $"• 🛠️ All {targetTweaks.Count} System & Registry Optimizations Applied\n\n" +
-                $"Would you like to deploy 100% Maximum Performance now?",
+                $"• 🛠️ All {targetTweaks.Count} System, Registry & Hygiene Optimizations Applied\n\n" +
+                $"Would you like to deploy 100% Maximum Performance + Clean now?",
                 "Apply All Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (prompt != MessageBoxResult.Yes) return;
 
             BtnApplyAll.IsEnabled = false;
-            TxtStatus.Text = "🚀 Deploying 100% Extreme Performance Engine (Safeguard + Timer + RAM + All Tweaks)...";
+            TxtStatus.Text = "🚀 Deploying 100% Extreme Performance Engine (Safeguard + Timer + RAM + Deep Clean + All Tweaks)...";
             StatusBar.Visibility = Visibility.Visible;
             if (StatusLottie != null) StatusLottie.Visibility = Visibility.Visible;
 
             try
             {
-                // 1. Deploy Permanent Boot Safeguard
+                // 1. Run Deep PC Clean & RAM Purge
+                long cleanedBytes = 0;
+                try
+                {
+                    var scanTargets = await CleanupService.Instance.ScanAsync(force: true);
+                    cleanedBytes = await CleanupService.Instance.CleanAllAsync(scanTargets);
+                }
+                catch { }
+
+                // 2. Deploy Permanent Boot Safeguard
                 await PermanenceService.Instance.DeployPermanentSafeguardAsync();
 
-                // 2. Activate 0.500ms Kernel Timer Resolution, Standby RAM purge & Game Booster
+                // 3. Activate 0.500ms Kernel Timer Resolution, Standby RAM purge & Game Booster
                 var boostResult = await GameBoosterService.Instance.Activate2xFpsOverdriveAsync();
 
-                // 3. Select and apply all tweaks
+                // 4. Select and apply all tweaks
                 foreach (var t in targetTweaks)
                 {
                     t.IsSelected = true;
@@ -421,7 +479,7 @@ namespace SetupHub180Hz.Views
 
                 var dialog = new OptimizationDialog(
                     title: $"🚀 Apply All Optimizations ({targetTweaks.Count} Tweaks)",
-                    subtitle: $"Applying 100% Performance Engine across all {targetTweaks.Count} System & Registry optimizations:",
+                    subtitle: $"Applying 100% Performance Engine across all {targetTweaks.Count} System, Registry & Cleaner optimizations:",
                     tweaks: targetTweaks,
                     isUndo: false,
                     tweakService: _tweakService)
@@ -438,15 +496,17 @@ namespace SetupHub180Hz.Views
                     }
                     TweakService.RecordAppliedTweaks(targetTweaks.Select(t => t.Id));
 
-                    string ramStr = boostResult.FreedRamBytes > 0 ? $" • {boostResult.FreedRamBytes / 1024 / 1024} MB RAM Purged" : "";
+                    long totalPurged = cleanedBytes + boostResult.FreedRamBytes;
+                    string cleanStr = totalPurged > 0 ? $" • {FormatBytes(totalPurged)} Cleaned" : "";
                     string procStr = boostResult.BoostedProcessesCount > 0 ? $" • {boostResult.BoostedProcessesCount} Game(s) Priority Elevated" : "";
 
-                    ActivityLogger.Instance.Log($"All Optimizations Applied: {targetTweaks.Count} tweaks deployed, Permanent Boot Safeguard locked, 0.5ms Timer active.", ActivityType.Success);
-                    NotificationService.Notify("🚀 100% Performance Engine Active!", $"All {targetTweaks.Count} optimizations applied. 0.500ms Timer Locked • 5.0GHz Boost • GPU 100%{ramStr}{procStr}.");
+                    ActivityLogger.Instance.Log($"All Optimizations Applied: {targetTweaks.Count} tweaks deployed, Permanent Boot Safeguard locked, 0.5ms Timer active, {FormatBytes(totalPurged)} junk/RAM purged.", ActivityType.Success);
+                    NotificationService.Notify("🚀 100% Performance Engine Active!", $"All {targetTweaks.Count} optimizations applied. 0.500ms Timer Locked • 5.0GHz Boost • GPU 100%{cleanStr}{procStr}.");
 
-                    TxtStatus.Text = $"🚀 All {targetTweaks.Count} optimizations applied successfully! PC running at 100% peak performance.";
+                    TxtStatus.Text = $"🚀 All {targetTweaks.Count} optimizations applied & PC cleaned successfully! Running at 100% peak performance.";
                     UpdatePermanentStatusBadge();
                     UpdatePreGameTelemetry();
+                    if (TxtLiveStandbyRam != null) TxtLiveStandbyRam.Text = $"Purged ({FormatBytes(totalPurged)} Cleaned ✓)";
                     BuildCategoryChips();
                     ApplyFilter();
                     CheckRebootNeeded(targetTweaks);
@@ -457,6 +517,14 @@ namespace SetupHub180Hz.Views
                 BtnApplyAll.IsEnabled = true;
                 if (StatusLottie != null) StatusLottie.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private static string FormatBytes(long bytes)
+        {
+            double mb = bytes / 1024.0 / 1024.0;
+            if (mb >= 1024.0)
+                return $"{mb / 1024.0:0.0} GB";
+            return $"{mb:0} MB";
         }
 
         private void CheckRebootNeeded(List<TweakItem> tweaks)

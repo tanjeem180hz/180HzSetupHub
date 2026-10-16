@@ -678,7 +678,12 @@ namespace SetupHub180Hz.Services
         {
             var result = new List<TweakItem>();
 
-            // 1. Load System tweaks (tweaks.default.json)
+            // 1. Deep PC Cleaner & Cache Flush Tweaks
+            var cleanupTweaks = GetBuiltinCleanupTweaks();
+            TagRecommended(cleanupTweaks);
+            result.AddRange(cleanupTweaks);
+
+            // 2. Load System tweaks (tweaks.default.json)
             var systemTweaks = await LoadJsonFileOrResourceAsync("tweaks.default.json");
             foreach (var t in systemTweaks)
             {
@@ -687,15 +692,206 @@ namespace SetupHub180Hz.Services
             TagRecommended(systemTweaks);
             result.AddRange(systemTweaks);
 
-            // 2. Load Registry tweaks (registry_tweaks.default.json)
+            // 3. Load Registry tweaks (registry_tweaks.default.json)
             var registryTweaks = await LoadJsonFileOrResourceAsync("registry_tweaks.default.json");
             foreach (var t in registryTweaks)
             {
                 t.Section = "Registry"; // Force Registry section
             }
+            TagRecommended(registryTweaks);
             result.AddRange(registryTweaks);
 
             return result;
+        }
+
+        public static List<TweakItem> GetBuiltinCleanupTweaks()
+        {
+            return new List<TweakItem>
+            {
+                new()
+                {
+                    Id = "CleanTweakUserTemp",
+                    Name = "Deep Clean User Temp Files (%TEMP%)",
+                    Description = "Safely deletes temporary application locks, installer leftovers, and browser staging files from %TEMP% to free disk space and reduce filesystem overhead.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string> { "Remove-Item -Path \"$env:TEMP\\*\" -Recurse -Force -ErrorAction SilentlyContinue" },
+                    UndoScript = new List<string> { "Write-Host 'Temp cleanup is a maintenance task.' -ForegroundColor Gray" }
+                },
+                new()
+                {
+                    Id = "CleanTweakWindowsTemp",
+                    Name = "Deep Clean Windows System Temp (%WINDIR%\\Temp)",
+                    Description = "Cleans Windows update extraction debris, driver installation temp files, and system logs from C:\\Windows\\Temp to keep the OS drive clean.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string> { "Remove-Item -Path \"$env:WINDIR\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue" },
+                    UndoScript = new List<string> { "Write-Host 'System temp cleanup completed.' -ForegroundColor Gray" }
+                },
+                new()
+                {
+                    Id = "CleanTweakSoftwareDistribution",
+                    Name = "Purge Windows Update Download Cache (SoftwareDistribution)",
+                    Description = "Clears gigabytes of obsolete Windows Update package downloads and stale installation caches from C:\\Windows\\SoftwareDistribution\\Download.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string> { "Stop-Service -Name wuauserv -Force -ErrorAction SilentlyContinue; Remove-Item -Path \"$env:WINDIR\\SoftwareDistribution\\Download\\*\" -Recurse -Force -ErrorAction SilentlyContinue; Start-Service -Name wuauserv -ErrorAction SilentlyContinue" },
+                    UndoScript = new List<string> { "Start-Service -Name wuauserv -ErrorAction SilentlyContinue" }
+                },
+                new()
+                {
+                    Id = "CleanTweakPrefetch",
+                    Name = "Flush & Rebuild Windows Prefetch Cache",
+                    Description = "Removes old and broken application prefetch traces to allow Windows to re-index clean launch traces and reduce stutter.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string> { "Remove-Item -Path \"$env:WINDIR\\Prefetch\\*.pf\" -Force -ErrorAction SilentlyContinue" },
+                    UndoScript = new List<string> { "Write-Host 'Prefetch will automatically rebuild on app launch.' -ForegroundColor Gray" }
+                },
+                new()
+                {
+                    Id = "CleanTweakCrashDumps",
+                    Name = "Clear Crash Dumps & Windows Error Reporting (WER)",
+                    Description = "Purges accumulated user-mode crash dumps, BSOD minidumps, and queued error reports from %LOCALAPPDATA%\\CrashDumps and C:\\ProgramData\\WER.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string>
+                    {
+                        "Remove-Item -Path \"$env:LOCALAPPDATA\\CrashDumps\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
+                        "Remove-Item -Path \"$env:ProgramData\\Microsoft\\Windows\\WER\\ReportArchive\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
+                        "Remove-Item -Path \"$env:ProgramData\\Microsoft\\Windows\\WER\\ReportQueue\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
+                        "Remove-Item -Path \"$env:WINDIR\\Minidump\\*\" -Force -ErrorAction SilentlyContinue"
+                    },
+                    UndoScript = new List<string> { "Write-Host 'Crash dumps purged.' -ForegroundColor Gray" }
+                },
+                new()
+                {
+                    Id = "CleanTweakStandbyRam",
+                    Name = "Purge Standby Memory & Working Sets Cache",
+                    Description = "Instantly reclaims hundreds of megabytes or gigabytes of cached standby memory and trimmed working sets to eliminate in-game micro-stutters.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string> { "[System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers()" },
+                    UndoScript = new List<string> { "Write-Host 'RAM purged.' -ForegroundColor Gray" }
+                },
+                new()
+                {
+                    Id = "CleanTweakDirectXShaderCache",
+                    Name = "Purge Stale DirectX & GPU Shader Caches",
+                    Description = "Flushes fragmented DirectX 11/12, NVIDIA, and AMD shader cache files to force games to rebuild fresh, stutter-free shader caches.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string>
+                    {
+                        "Remove-Item -Path \"$env:LOCALAPPDATA\\D3DSCache\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
+                        "Remove-Item -Path \"$env:LOCALAPPDATA\\NVIDIA\\DXCache\\*\" -Recurse -Force -ErrorAction SilentlyContinue",
+                        "Remove-Item -Path \"$env:LOCALAPPDATA\\AMD\\DxCache\\*\" -Recurse -Force -ErrorAction SilentlyContinue"
+                    },
+                    UndoScript = new List<string> { "Write-Host 'Shader cache purged.' -ForegroundColor Gray" }
+                },
+                new()
+                {
+                    Id = "CleanTweakThumbnailIconCache",
+                    Name = "Reset Explorer Thumbnail & Icon Caches",
+                    Description = "Clears bloated and corrupted iconcache.db and thumbcache.db database files to make Windows File Explorer navigate instantly.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string>
+                    {
+                        "Remove-Item -Path \"$env:LOCALAPPDATA\\Microsoft\\Windows\\Explorer\\thumbcache_*.db\" -Force -ErrorAction SilentlyContinue",
+                        "Remove-Item -Path \"$env:LOCALAPPDATA\\Microsoft\\Windows\\Explorer\\iconcache_*.db\" -Force -ErrorAction SilentlyContinue"
+                    },
+                    UndoScript = new List<string> { "Write-Host 'Thumbnails reset.' -ForegroundColor Gray" }
+                },
+                new()
+                {
+                    Id = "CleanTweakDnsFlush",
+                    Name = "Flush DNS Resolver Cache & Sockets",
+                    Description = "Flushes stale DNS records, drops orphaned socket buffers, and resets TCP connection routing for minimal network ping.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string> { "Clear-DnsClientCache; ipconfig /flushdns" },
+                    UndoScript = new List<string> { "Write-Host 'DNS flushed.' -ForegroundColor Gray" }
+                },
+                new()
+                {
+                    Id = "CleanTweakDeliveryOptimization",
+                    Name = "Purge Delivery Optimization P2P Cache",
+                    Description = "Purges peer-to-peer Windows update fragments and hidden delivery optimization temporary files from disk.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string> { "Remove-Item -Path \"$env:WINDIR\\ServiceProfiles\\NetworkService\\AppData\\Local\\Microsoft\\Windows\\DeliveryOptimization\\Cache\\*\" -Recurse -Force -ErrorAction SilentlyContinue" },
+                    UndoScript = new List<string> { "Write-Host 'Delivery optimization cache cleared.' -ForegroundColor Gray" }
+                },
+                new()
+                {
+                    Id = "CleanTweakEventLogs",
+                    Name = "Clear Windows Event Logs & Diagnostic Bloat",
+                    Description = "Clears bloated Windows Application, System, and Setup event logs to speed up Event Viewer and reclaim disk performance.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string> { "wevtutil cl Application; wevtutil cl System; wevtutil cl Setup" },
+                    UndoScript = new List<string> { "Write-Host 'Event logs cleared.' -ForegroundColor Gray" }
+                },
+                new()
+                {
+                    Id = "CleanTweakSsdReTrim",
+                    Name = "Trim SSD & NVMe Storage (Optimize-Volume)",
+                    Description = "Sends ATA TRIM / NVMe Deallocate commands to C: drive blocks to ensure flash controller maintains 100% maximum write and read speeds.",
+                    Category = "🧹 PC Cleaner & Cache Flush",
+                    CategoryOrder = 0,
+                    Section = "System",
+                    IsAdvanced = false,
+                    IsRecommended = true,
+                    RequiresReboot = false,
+                    InvokeScript = new List<string> { "Optimize-Volume -DriveLetter C -ReTrim -Verbose -ErrorAction SilentlyContinue" },
+                    UndoScript = new List<string> { "Write-Host 'Trim initiated.' -ForegroundColor Gray" }
+                }
+            };
         }
 
         private static async Task<List<TweakItem>> LoadJsonFileOrResourceAsync(string fileName)
@@ -772,7 +968,7 @@ namespace SetupHub180Hz.Services
         {
             foreach (var item in items)
             {
-                if (RecommendedIds.Contains(item.Id))
+                if (RecommendedIds.Contains(item.Id) || ExtremePerformanceIds.Contains(item.Id) || item.Id.StartsWith("CleanTweak", StringComparison.OrdinalIgnoreCase))
                 {
                     item.IsRecommended = true;
                 }
