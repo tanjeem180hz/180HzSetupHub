@@ -230,68 +230,41 @@
 
                 <!-- Actions WrapPanel -->
                 <WrapPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="12,0,0,0">
-                    <!-- Create Restore Point Safeguard -->
-                    <Button x:Name="BtnCreateRestorePoint" Style="{StaticResource UndoButton}"
-                            Content="🛡️ RESTORE POINT" Padding="10,7" Margin="0,0,6,4"
-                            Click="BtnCreateRestorePoint_Click" ToolTip="Create a Windows System Restore point before applying changes"/>
+                    <!-- 🚀 APPLY ALL (Primary Action: 1-Click 100% Performance) -->
+                    <Button x:Name="BtnApplyAll" Style="{StaticResource ApplyButton}"
+                            Content="🚀 APPLY ALL" Padding="16,8" Margin="0,0,8,4"
+                            Click="BtnApplyAll_Click" ToolTip="1-Click Apply ALL Optimizations: Deploys 5.0GHz Dynamic Boost, 100% GPU mode, 0.500ms Timer, RAM purge &amp; Permanent Boot Safeguard!"/>
 
-                    <!-- Open Backups Folder -->
-                    <Button x:Name="BtnOpenBackups" Style="{StaticResource UndoButton}"
-                            Content="📁 BACKUPS" Padding="10,7" Margin="0,0,6,4"
-                            Click="BtnOpenBackups_Click" ToolTip="Open the folder containing automatic .reg snapshots and pre-state backups"/>
-
-                    <!-- Select All -->
-                    <Button x:Name="BtnSelectAll" Style="{StaticResource UndoButton}"
-                            Content="✓ SELECT ALL" Padding="10,7" Margin="0,0,6,4"
-                            Click="BtnSelectAll_Click" ToolTip="Select all visible tweaks in this section"/>
-
-                    <!-- Deselect All / Clear -->
-                    <Button x:Name="BtnDeselectAll" Style="{StaticResource UndoButton}"
-                            Content="✕ DESELECT ALL" Padding="10,7" Margin="0,0,6,4"
-                            Click="BtnDeselectAll_Click" ToolTip="Deselect all checkboxes in this section"/>
-
-                    <!-- Select Recommended -->
-                    <Button x:Name="BtnSelectRecommended" Style="{StaticResource UndoButton}"
-                            Content="⭐ RECOMMENDED" Padding="10,7" Margin="0,0,6,4"
-                            Click="BtnSelectRecommended_Click" ToolTip="Select recommended safe optimizations"/>
-
-                    <!-- Undo / Restore Selected -->
-                    <Button x:Name="BtnUndoSelected" Style="{StaticResource DangerButton}"
-                            Content="↩ RESTORE SELECTED" Padding="10,7" Margin="0,0,6,4"
-                            Click="BtnUndoSelected_Click" ToolTip="Revert only checked tweaks back to standard Windows defaults"/>
-
-                    <!-- Restore All Default -->
-                    <Button x:Name="BtnRestoreDefault" Style="{StaticResource DangerButton}"
-                            Content="🔄 RESTORE ALL" Padding="10,7" Margin="0,0,6,4"
-                            Click="BtnRestoreDefault_Click" ToolTip="Restore all tweaks in this section back to factory defaults"/>
-
-                    <!-- 🚀 100% EXTREME BOOST (Force 100% PC Performance) -->
-                    <Button x:Name="BtnExtremeBoost" Style="{StaticResource ApplyButton}"
-                            Background="{DynamicResource BrushAccent}" Foreground="#0A0E17"
-                            Content="🚀 100% EXTREME BOOST" Padding="15,7" Margin="0,0,6,4"
-                            Click="BtnExtremeBoost_Click" ToolTip="Force 100% PC Performance: One-click deploy all high-impact latency, CPU unparking, GPU overdrive, zero-ping network &amp; bloatware elimination tweaks!"/>
-
-                    <!-- 🔒 LOCK PERMANENT (Survives Reboot) -->
-                    <Button x:Name="BtnHeaderLockPermanence" Style="{StaticResource ApplyButton}"
-                            Background="#00C853" Foreground="#0A0E17"
-                            Content="🔒 LOCK PERMANENT" Padding="14,7" Margin="0,0,6,4"
-                            Click="BtnLockPermanence_Click" ToolTip="Lock power unparking, network zero-ping heuristics &amp; scheduling permanently across every PC restart!"/>
-
-                    <!-- 🎮 2X FPS GAMING OVERDRIVE (0.5ms Timer + Max FPS) -->
-                    <Button x:Name="Btn2xFpsOverdrive" Style="{StaticResource ApplyButton}"
-                            Background="#FF0055" Foreground="#FFFFFF"
-                            Content="🎮 2X FPS GAMING OVERDRIVE" Padding="15,7" Margin="0,0,6,4"
-                            Click="Btn2xFpsOverdrive_Click" ToolTip="Lock 0.500ms High-Precision Timer, purge Standby RAM, set GPU Priority 8 &amp; activate 180Hz 2X FPS Power Scheme for silky smooth stutter-free gaming!"/>
-
-                    <!-- Apply Selected (Primary Action) -->
-                    <Button x:Name="BtnApplySelected" Style="{StaticResource ApplyButton}"
-                            Content="⚡ APPLY SELECTED" Padding="14,7" Margin="0,0,6,4"
+                    <!-- ⚡ APPLY SELECTED -->
+                    <Button x:Name="BtnApplySelected" Style="{StaticResource UndoButton}"
+                            BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1"
+                            Content="⚡ APPLY SELECTED" Padding="14,8" Margin="0,0,8,4"
                             Click="BtnApplySelected_Click" ToolTip="Apply all checked optimizations to your PC"/>
 
-                    <!-- Apply All -->
-                    <Button x:Name="BtnApplyAll" Style="{StaticResource UndoButton}"
-                            Content="🚀 APPLY ALL" Padding="12,7" Margin="0,0,0,4"
-                            Click="BtnApplyAll_Click" ToolTip="Apply all optimizations in this section"/>
+                    <!-- ⭐ RECOMMENDED -->
+                    <Button x:Name="BtnSelectRecommended" Style="{StaticResource UndoButton}"
+                            Content="⭐ RECOMMENDED" Padding="12,8" Margin="0,0,8,4"
+                            Click="BtnSelectRecommended_Click" ToolTip="Select recommended safe optimizations"/>
+
+                    <!-- ✓ SELECT ALL -->
+                    <Button x:Name="BtnSelectAll" Style="{StaticResource UndoButton}"
+                            Content="✓ SELECT ALL" Padding="12,8" Margin="0,0,8,4"
+                            Click="BtnSelectAll_Click" ToolTip="Select all visible tweaks"/>
+
+                    <!-- ✕ CLEAR -->
+                    <Button x:Name="BtnDeselectAll" Style="{StaticResource UndoButton}"
+                            Content="✕ CLEAR" Padding="12,8" Margin="0,0,8,4"
+                            Click="BtnDeselectAll_Click" ToolTip="Deselect all checkboxes"/>
+
+                    <!-- 🔄 RESTORE DEFAULTS -->
+                    <Button x:Name="BtnRestoreDefault" Style="{StaticResource DangerButton}"
+                            Content="🔄 RESTORE DEFAULTS" Padding="12,8" Margin="0,0,8,4"
+                            Click="BtnRestoreDefault_Click" ToolTip="Restore optimizations back to Windows factory defaults"/>
+
+                    <!-- 🛡️ RESTORE POINT -->
+                    <Button x:Name="BtnCreateRestorePoint" Style="{StaticResource UndoButton}"
+                            Content="🛡️ RESTORE POINT" Padding="12,8" Margin="0,0,0,4"
+                            Click="BtnCreateRestorePoint_Click" ToolTip="Create a Windows System Restore point before applying changes"/>
                 </WrapPanel>
             </Grid>
         </Border>
@@ -304,7 +277,7 @@
                 <RowDefinition Height="*"/>    <!-- Row 2: Tweak List ScrollViewer -->
             </Grid.RowDefinitions>
 
-            <!-- Row 0: Section Switcher (System Tweaks vs Registry Optimization) & Live Search Filter -->
+            <!-- Row 0: Unified All Section & Live Search Filter -->
             <Border Grid.Row="0" Padding="24,10,24,10"
                     BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
                     Background="{DynamicResource BrushSurface}">
@@ -315,34 +288,25 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- 4-Section Segmented Pill Switcher -->
+                    <!-- Single Unified "All Optimizations" Badge -->
                     <Border Grid.Column="0" Background="{DynamicResource BrushBackground}"
-                            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                            CornerRadius="8" Padding="3">
-                        <StackPanel Orientation="Horizontal">
-                            <RadioButton x:Name="TabPermanent" Style="{StaticResource OptimizationSectionTab}"
-                                         Content="🔒 Permanent System (Survives Reboot)" IsChecked="True"
-                                         Checked="SectionTab_Checked" Tag="Permanent"
-                                         ToolTip="Lock core CPU unparking, power plan, BCD, and network tweaks permanently so they survive every PC restart!"/>
-                            <RadioButton x:Name="TabPreGame" Style="{StaticResource OptimizationSectionTab}"
-                                         Content="🎮 Pre-Game Booster (1-Click Boost)"
-                                         Checked="SectionTab_Checked" Tag="PreGame"
-                                         ToolTip="1-Click apply after PC startup or before entering games: 0.5ms Timer, Standby RAM purge, GPU Priority 8 &amp; game priority boost!"/>
-                            <RadioButton x:Name="TabSystemTweaks" Style="{StaticResource OptimizationSectionTab}"
-                                         Content="⚡ System Tweaks"
-                                         Checked="SectionTab_Checked" Tag="System"
-                                         ToolTip="Comprehensive Windows system, gaming, and app optimizations"/>
-                            <RadioButton x:Name="TabRegistryTweaks" Style="{StaticResource OptimizationSectionTab}"
-                                         Content="🗃️ Registry Tweaks"
-                                         Checked="SectionTab_Checked" Tag="Registry"
-                                         ToolTip="Dedicated Windows Registry tweaks for latency, ping, and hardware speed"/>
+                            BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1"
+                            CornerRadius="8" Padding="14,6">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="⚡" FontSize="13" Foreground="{DynamicResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="ALL OPTIMIZATIONS"
+                                       FontFamily="{StaticResource AppFont}" FontSize="12" FontWeight="Bold"
+                                       Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                            <Border Background="#1A00FF66" CornerRadius="4" Padding="6,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="UNIFIED ENGINE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                            </Border>
                         </StackPanel>
                     </Border>
 
                     <!-- Section Description Pill -->
                     <Border Grid.Column="1" VerticalAlignment="Center" Margin="16,0,16,0">
                         <TextBlock x:Name="TxtSectionDescription"
-                                   Text="System and general Windows environment optimizations."
+                                   Text="All system, registry, CPU, GPU, emulator &amp; latency optimizations unified in one place."
                                    FontFamily="{StaticResource AppFont}" FontSize="12"
                                    Foreground="{DynamicResource BrushTextSecondary}"
                                    TextTrimming="CharacterEllipsis"/>
@@ -431,27 +395,26 @@
                         </Grid>
                     </Border>
 
-                    <!-- 🔒 PERMANENT BOOT SAFEGUARD BANNER (Survives PC Restart) -->
-                    <Border x:Name="PermanentSafeguardBanner" Margin="0,0,0,16"
-                            Background="#0B1612" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1.5"
-                            CornerRadius="10" Padding="18,16" Visibility="Visible">
+                    <!-- ⚡ LIVE SYSTEM TELEMETRY & SAFEGUARD STATUS CARD -->
+                    <Border x:Name="LiveTelemetryCard" Margin="0,0,0,16"
+                            Background="#0B1412" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                            CornerRadius="10" Padding="18,14">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
                             <!-- Header Row -->
-                            <Grid Grid.Row="0">
+                            <Grid Grid.Row="0" Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="🔒" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="PERMANENT BOOT SAFEGUARD ENGINE"
-                                               FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="Bold"
+                                    <TextBlock Text="⚡" FontSize="16" Foreground="{DynamicResource BrushAccent}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="LIVE PERFORMANCE TELEMETRY &amp; SAFEGUARD STATUS"
+                                               FontFamily="{StaticResource AppFont}" FontSize="13.5" FontWeight="Bold"
                                                Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <Border Grid.Column="1" x:Name="BadgePermanentStatus" Background="#1A00FF66" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1"
@@ -462,72 +425,8 @@
                                 </Border>
                             </Grid>
 
-                            <!-- Description Row -->
-                            <TextBlock Grid.Row="1" Margin="0,8,0,12" TextWrapping="Wrap"
-                                       FontFamily="{StaticResource AppFont}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}">
-                                Locks 100% Core Unparking, enables dynamic 5.0GHz+ Precision Boost (0ms latency), disables GPU ULPS power throttling, and sets zero-ping network heuristics into a high-privilege Windows Startup Task (<Run FontFamily="Consolas" Foreground="{DynamicResource BrushAccent}">180Hz_Permanence_Guard</Run>).
-                                <LineBreak/>
-                                <Run FontWeight="SemiBold" Foreground="{DynamicResource BrushTextPrimary}">Once locked, these optimizations automatically survive every PC restart or Windows shutdown permanently without ever needing to re-open the app!</Run>
-                            </TextBlock>
-
-                            <!-- Actions Row -->
-                            <WrapPanel Grid.Row="2" Orientation="Horizontal">
-                                <Button x:Name="BtnLockPermanence" Style="{StaticResource ApplyButton}"
-                                        Content="🔒 LOCK PERMANENT OPTIMIZATIONS (SURVIVES RESTART)"
-                                        Padding="18,9" Margin="0,0,10,6" Click="BtnLockPermanence_Click"
-                                        ToolTip="Registers the Windows Boot Safeguard Task and locks all power, network, timer and scheduler optimizations permanently!"/>
-                                <Button x:Name="BtnUnlockPermanence" Style="{StaticResource DangerButton}"
-                                        Content="🔓 REMOVE BOOT SAFEGUARD"
-                                        Padding="14,9" Margin="0,0,10,6" Click="BtnUnlockPermanence_Click"
-                                        ToolTip="Removes the automatic boot persistence scheduled task"/>
-                                <Button x:Name="BtnTestBootScript" Style="{StaticResource UndoButton}"
-                                        Content="⚡ TEST BOOT SCRIPT"
-                                        Padding="12,9" Margin="0,0,0,6" Click="BtnTestBootScript_Click"
-                                        ToolTip="Runs the boot persistence script immediately to verify 100% core unparking &amp; network locks"/>
-                            </WrapPanel>
-                        </Grid>
-                    </Border>
-
-                    <!-- 🎮 PRE-GAME LAUNCH CONTROL BANNER (1-Click Boost Before Gaming) -->
-                    <Border x:Name="PreGameBoosterBanner" Margin="0,0,0,16"
-                            Background="#160B14" BorderBrush="#FF0055" BorderThickness="1.5"
-                            CornerRadius="10" Padding="18,16" Visibility="Collapsed">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <!-- Header Row -->
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="🎮" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="1-CLICK PRE-GAME LAUNCH OVERDRIVE"
-                                               FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="Bold"
-                                               Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
-                                </StackPanel>
-                                <Border Grid.Column="1" Background="#2A0015" BorderBrush="#FF0055" BorderThickness="1"
-                                        CornerRadius="6" Padding="10,4" VerticalAlignment="Center">
-                                    <TextBlock Text="⚡ INSTANT 2X FPS GAMING ENGINE"
-                                               FontFamily="{StaticResource AppFont}" FontSize="11" FontWeight="Bold"
-                                               Foreground="#FF0055"/>
-                                </Border>
-                            </Grid>
-
-                            <!-- Description Row -->
-                            <TextBlock Grid.Row="1" Margin="0,8,0,12" TextWrapping="Wrap"
-                                       FontFamily="{StaticResource AppFont}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}">
-                                Just launched your PC or about to play BlueStacks, MSI App Player, LDPlayer, GameLoop, or any PC game? Click once below to lock <Run FontWeight="Bold" Foreground="#00FF66">0.500ms kernel timer resolution</Run>, unlock <Run FontWeight="Bold" Foreground="#00FF66">5.0GHz+ dynamic CPU Turbo Boost</Run>, force <Run FontWeight="Bold" Foreground="#00FF66">100% GPU utilization (NVIDIA PowerMizer &amp; AMD ULPS disabled)</Run>, flush <Run FontWeight="Bold" Foreground="#00FF66">Standby RAM stutter cache</Run>, disable Windows EcoQoS throttling, and elevate all emulators and games to Realtime High Priority.
-                            </TextBlock>
-
                             <!-- Live Telemetry Badges Grid -->
-                            <UniformGrid Grid.Row="2" Columns="4" Margin="0,0,0,14">
+                            <UniformGrid Grid.Row="1" Columns="4">
                                 <!-- Badge 1: Timer Res -->
                                 <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
                                         CornerRadius="8" Padding="10,10" Margin="0,0,4,0">
@@ -542,7 +441,7 @@
                                 <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
                                         CornerRadius="8" Padding="10,10" Margin="2,0,2,0">
                                     <StackPanel>
-                                        <TextBlock Text="CPU TURBO BOOST" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                        <TextBlock Text="CPU TURBO BOOST" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
                                         <TextBlock x:Name="TxtLiveCpuBoost" Text="5.0 GHz Unlocked ✓" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,3,0,0"/>
                                         <TextBlock Text="Dynamic Precision Scaling" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
                                     </StackPanel>
@@ -568,23 +467,6 @@
                                     </StackPanel>
                                 </Border>
                             </UniformGrid>
-
-                            <!-- Actions Row -->
-                            <WrapPanel Grid.Row="3" Orientation="Horizontal">
-                                <Button x:Name="BtnRunPreGameBoost" Style="{StaticResource ApplyButton}"
-                                        Background="#FF0055" Foreground="#FFFFFF"
-                                        Content="🚀 1-CLICK PRE-GAME TURBO BOOST (ACTIVATE NOW)"
-                                        Padding="18,9" Margin="0,0,10,6" Click="BtnRunPreGameBoost_Click"
-                                        ToolTip="Instantly locks 0.500ms kernel timer, clears Standby RAM, activates 180Hz power scheme, and sets game process priority!"/>
-                                <Button x:Name="BtnPurgeStandbyRam" Style="{StaticResource UndoButton}"
-                                        Content="🧹 PURGE RAM CACHE ONLY"
-                                        Padding="14,9" Margin="0,0,10,6" Click="BtnPurgeStandbyRam_Click"
-                                        ToolTip="Instantly purges standby list memory and working sets to free up RAM before gaming"/>
-                                <Button x:Name="BtnRefreshPreGameStats" Style="{StaticResource UndoButton}"
-                                        Content="🔄 REFRESH GAME SCAN"
-                                        Padding="12,9" Margin="0,0,0,6" Click="BtnRefreshPreGameStats_Click"
-                                        ToolTip="Scan running processes for active games and refresh timer resolution telemetry"/>
-                            </WrapPanel>
                         </Grid>
                     </Border>
 

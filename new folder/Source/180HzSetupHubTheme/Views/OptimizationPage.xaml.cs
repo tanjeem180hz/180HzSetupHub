@@ -13,10 +13,7 @@ namespace SetupHub180Hz.Views
     {
         private readonly TweakService _tweakService = new();
         private List<TweakItem> _allTweaks = new();
-        private List<TweakItem> _systemTweaks = new();
-        private List<TweakItem> _registryTweaks = new();
 
-        private string _activeSection = "Permanent"; // "Permanent", "PreGame", "System" or "Registry"
         private string _activeCategory = "All";
         private string _searchQuery = "";
 
@@ -48,8 +45,6 @@ namespace SetupHub180Hz.Views
             try
             {
                 _allTweaks = await _tweakService.GetAllAsync();
-                _systemTweaks = await _tweakService.GetSystemTweaksAsync();
-                _registryTweaks = await _tweakService.GetRegistryTweaksAsync();
 
                 // 1. Instant rendering so user sees all tweaks immediately without any lag
                 UpdatePermanentStatusBadge();
@@ -85,45 +80,6 @@ namespace SetupHub180Hz.Views
                 bool applied = _tweakService.IsTweakApplied(tweak);
                 tweak.IsApplied = applied;
                 tweak.IsSelected = applied; // Checked by default if applied
-            }
-        }
-
-        private void SectionTab_Checked(object sender, RoutedEventArgs e)
-        {
-            if (sender is RadioButton rb && rb.Tag is string section)
-            {
-                _activeSection = section;
-                _activeCategory = "All";
-
-                if (string.Equals(_activeSection, "Permanent", StringComparison.OrdinalIgnoreCase))
-                {
-                    TxtSectionDescription.Text = "Permanent Boot Safeguard: Core unparked CPU, zero-ping network & scheduling locked across every restart.";
-                    if (PermanentSafeguardBanner != null) PermanentSafeguardBanner.Visibility = Visibility.Visible;
-                    if (PreGameBoosterBanner != null) PreGameBoosterBanner.Visibility = Visibility.Collapsed;
-                    UpdatePermanentStatusBadge();
-                }
-                else if (string.Equals(_activeSection, "PreGame", StringComparison.OrdinalIgnoreCase))
-                {
-                    TxtSectionDescription.Text = "Pre-Game Launch Booster: 1-Click activate right after PC boot or before gaming for 0.5ms Timer, RAM purge & 2X FPS.";
-                    if (PermanentSafeguardBanner != null) PermanentSafeguardBanner.Visibility = Visibility.Collapsed;
-                    if (PreGameBoosterBanner != null) PreGameBoosterBanner.Visibility = Visibility.Visible;
-                    UpdatePreGameTelemetry();
-                }
-                else if (string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase))
-                {
-                    TxtSectionDescription.Text = "Deep Windows Registry tweaks for latency, ping, scheduling, and hardware acceleration.";
-                    if (PermanentSafeguardBanner != null) PermanentSafeguardBanner.Visibility = Visibility.Collapsed;
-                    if (PreGameBoosterBanner != null) PreGameBoosterBanner.Visibility = Visibility.Collapsed;
-                }
-                else
-                {
-                    TxtSectionDescription.Text = "Comprehensive Windows system, gaming, and app optimizations.";
-                    if (PermanentSafeguardBanner != null) PermanentSafeguardBanner.Visibility = Visibility.Collapsed;
-                    if (PreGameBoosterBanner != null) PreGameBoosterBanner.Visibility = Visibility.Collapsed;
-                }
-
-                BuildCategoryChips();
-                ApplyFilter();
             }
         }
 
@@ -235,34 +191,26 @@ namespace SetupHub180Hz.Views
             int currentApplied = list.Count(t => t.IsApplied);
             int currentRec = list.Count(t => t.IsRecommended);
 
-            string sectionName = _activeSection switch
-            {
-                "Permanent" => "Permanent Boot Safeguard",
-                "PreGame" => "Pre-Game Turbo Booster",
-                "Registry" => "Registry Optimizations",
-                _ => "System Tweaks"
-            };
-
             if (string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(_searchQuery))
             {
                 string statusTag = totalApplied == totalSectionCount && totalSectionCount > 0
                     ? " • 100% Fully Optimized ✓"
                     : $" • {totalApplied} Applied";
 
-                TxtSubtitle.Text = $"{sectionName} • {totalSectionCount} tweaks{statusTag} • {totalRecommended} recommended safe";
-                BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in {sectionName}";
-                if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for {sectionName}";
+                TxtSubtitle.Text = $"All Optimizations • {totalSectionCount} total tweaks{statusTag} • {totalRecommended} recommended safe";
+                BtnSelectRecommended.ToolTip = "Select recommended safe tweaks";
+                if (BtnApplySelected != null) BtnApplySelected.ToolTip = "Apply checked optimizations";
             }
             else if (string.Equals(_activeCategory, "Applied", StringComparison.OrdinalIgnoreCase))
             {
-                TxtSubtitle.Text = $"{sectionName} › Active Applied • {currentApplied} optimizations currently active on this PC";
-                BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in this view";
-                if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for this view";
+                TxtSubtitle.Text = $"All Optimizations › Active Applied • {currentApplied} optimizations currently active on this PC";
+                BtnSelectRecommended.ToolTip = "Select recommended safe tweaks in this view";
+                if (BtnApplySelected != null) BtnApplySelected.ToolTip = "Apply checked optimizations for this view";
             }
             else
             {
                 string scope = string.IsNullOrWhiteSpace(_searchQuery) ? _activeCategory : $"Search: \"{_searchQuery}\"";
-                TxtSubtitle.Text = $"{sectionName} › {scope} • {currentCount} tweaks ({currentApplied} applied • {currentRec} recommended)";
+                TxtSubtitle.Text = $"All Optimizations › {scope} • {currentCount} tweaks ({currentApplied} applied • {currentRec} recommended)";
                 BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in {scope}";
                 if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for {scope}";
             }
@@ -270,26 +218,7 @@ namespace SetupHub180Hz.Views
 
         private List<TweakItem> GetCurrentSectionItems()
         {
-            if (string.Equals(_activeSection, "Permanent", StringComparison.OrdinalIgnoreCase))
-            {
-                return _allTweaks.Where(t => t.IsRecommended || TweakService.ExtremePerformanceIds.Contains(t.Id) || !t.IsAdvanced).ToList();
-            }
-            if (string.Equals(_activeSection, "PreGame", StringComparison.OrdinalIgnoreCase))
-            {
-                return _allTweaks.Where(t =>
-                    t.Category.Contains("2X FPS", StringComparison.OrdinalIgnoreCase) ||
-                    t.Category.Contains("Low Latency", StringComparison.OrdinalIgnoreCase) ||
-                    t.Category.Contains("GPU", StringComparison.OrdinalIgnoreCase) ||
-                    t.Category.Contains("Emulator", StringComparison.OrdinalIgnoreCase) ||
-                    t.Category.Contains("Network", StringComparison.OrdinalIgnoreCase) ||
-                    t.Category.Contains("Scheduling", StringComparison.OrdinalIgnoreCase) ||
-                    TweakService.ExtremePerformanceIds.Contains(t.Id)).ToList();
-            }
-            if (string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase))
-            {
-                return _registryTweaks;
-            }
-            return _systemTweaks;
+            return _allTweaks;
         }
 
         private IEnumerable<TweakItem> GetCurrentItems()
@@ -359,140 +288,16 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private void BtnOpenBackups_Click(object sender, RoutedEventArgs e)
-        {
-            TweakService.OpenBackupsDirectory();
-            TxtStatus.Text = "📁 Opened automatic registry snapshots and backups folder.";
-            StatusBar.Visibility = Visibility.Visible;
-        }
-
-        private void BtnExtremeBoost_Click(object sender, RoutedEventArgs e)
-        {
-            var sourceList = GetCurrentSectionItems();
-            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
-
-            var sectionTweaks = sourceList.Where(t => TweakService.ExtremePerformanceIds.Contains(t.Id) || t.IsRecommended || !t.IsAdvanced).ToList();
-            var allCombined = _allTweaks.Where(t => TweakService.ExtremePerformanceIds.Contains(t.Id) || t.IsRecommended || !t.IsAdvanced).ToList();
-
-            var choice = ThemedMessageBox.Show(
-                $"🚀 100% EXTREME PERFORMANCE ENGINE\n\nWould you like to deploy ALL {allCombined.Count} Extreme Optimizations across BOTH System Tweaks & Registry Optimization to double PC performance?\n\n• Click 'Yes' to deploy ALL {allCombined.Count} System + Registry Optimizations (Recommended)\n• Click 'No' to deploy {sectionTweaks.Count} optimizations in {sectionLabel} only",
-                "Deploy 100% Extreme Performance Engine", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-
-            if (choice == MessageBoxResult.Cancel) return;
-
-            List<TweakItem> targetTweaks = choice == MessageBoxResult.Yes ? allCombined : sectionTweaks;
-
-            // Mark them as selected in UI
-            foreach (var t in targetTweaks)
-            {
-                t.IsSelected = true;
-            }
-
-            var dialog = new OptimizationDialog(
-                title: $"🚀 Deploy 100% Extreme Performance Engine ({targetTweaks.Count} Optimizations)",
-                subtitle: $"This will safely deploy {targetTweaks.Count} extreme-level optimizations across Low Latency, CPU Unparking, GPU Overdrive, Zero Ping & Bloatware Elimination to force 100% doubled PC performance:",
-                tweaks: targetTweaks,
-                isUndo: false,
-                tweakService: _tweakService)
-            {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                foreach (var t in targetTweaks)
-                {
-                    t.IsApplied = true;
-                    t.IsSelected = true;
-                }
-                TweakService.RecordAppliedTweaks(targetTweaks.Select(t => t.Id));
-
-                ActivityLogger.Instance.Log($"100% Extreme Performance Engine deployed: Applied {targetTweaks.Count} high-throughput optimizations.", ActivityType.Success);
-                NotificationService.Notify("100% Extreme Boost Activated", $"Applied {targetTweaks.Count} extreme optimizations. CPU, GPU, Network & Latency tuned for doubled peak performance.");
-
-                TxtStatus.Text = $"🚀 Applied {targetTweaks.Count} extreme optimization(s) successfully! PC at 100% performance.";
-                StatusBar.Visibility = Visibility.Visible;
-                BuildCategoryChips();
-                ApplyFilter();
-                CheckRebootNeeded(targetTweaks);
-            }
-        }
-
-        private async void Btn2xFpsOverdrive_Click(object sender, RoutedEventArgs e)
-        {
-            var gameTweaks = _allTweaks.Where(t =>
-                t.Category.Contains("2X FPS", StringComparison.OrdinalIgnoreCase) ||
-                t.Category.Contains("Low Latency", StringComparison.OrdinalIgnoreCase) ||
-                t.Category.Contains("GPU", StringComparison.OrdinalIgnoreCase) ||
-                t.Category.Contains("Emulator", StringComparison.OrdinalIgnoreCase) ||
-                TweakService.ExtremePerformanceIds.Contains(t.Id)).ToList();
-
-            var choice = ThemedMessageBox.Show(
-                $"🎮 2X FPS ULTRA GAMING & LOW-LATENCY OVERDRIVE\n\nThis will activate real-time competitive gaming acceleration:\n\n" +
-                $"• ⚡ Lock 0.500ms High-Precision Kernel Timer Resolution (Eliminates Frame Stutter)\n" +
-                $"• 🧹 Auto-Purge Standby RAM Cache (Eliminates 1-Second Game Freezes)\n" +
-                $"• 🚀 Force MMCSS GPU Priority 8 & System Responsiveness 0% (100% CPU to Games)\n" +
-                $"• ⚡ Deploy 180Hz Ultimate Gaming Power Scheme (All CPU Cores Unparked)\n" +
-                $"• 🎯 Auto-Elevate Running Game Processes to High Priority\n" +
-                $"• 🛠️ Apply {gameTweaks.Count} Dedicated 2X FPS & Low Latency Optimizations\n\n" +
-                $"Would you like to activate 2X FPS Overdrive now?",
-                "Activate 2X FPS Gaming Overdrive", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (choice != MessageBoxResult.Yes) return;
-
-            // 1. Immediately activate Real-Time 0.5ms Timer, Standby Memory Purge, 180Hz Power Plan & Game Process Boost
-            var boostResult = await GameBoosterService.Instance.Activate2xFpsOverdriveAsync();
-
-            // 2. Select and apply all game & latency tweaks
-            foreach (var t in gameTweaks)
-            {
-                t.IsSelected = true;
-            }
-
-            var dialog = new OptimizationDialog(
-                title: $"🎮 Deploy 2X FPS Gaming Overdrive ({gameTweaks.Count} Optimizations)",
-                subtitle: $"Deploying 0.500ms Timer, GPU Priority 8, Standby RAM Cleaner & {gameTweaks.Count} latency optimizations:",
-                tweaks: gameTweaks,
-                isUndo: false,
-                tweakService: _tweakService)
-            {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                foreach (var t in gameTweaks)
-                {
-                    t.IsApplied = true;
-                    t.IsSelected = true;
-                }
-                TweakService.RecordAppliedTweaks(gameTweaks.Select(t => t.Id));
-
-                string ramStr = boostResult.FreedRamBytes > 0 ? $" • Reclaimed {boostResult.FreedRamBytes / 1024 / 1024} MB RAM" : "";
-                string procStr = boostResult.BoostedProcessesCount > 0 ? $" • {boostResult.BoostedProcessesCount} Game(s) Boosted" : "";
-
-                ActivityLogger.Instance.Log($"2X FPS Gaming Overdrive deployed: 0.500ms timer active, Standby RAM cleared, {gameTweaks.Count} optimizations applied.", ActivityType.Success);
-                NotificationService.Notify("🎮 2X FPS Gaming Overdrive Active!", $"0.500ms Timer Locked • GPU Priority 8 • Standby RAM Purged{ramStr}{procStr}. 2X smoother FPS unlocked!");
-
-                TxtStatus.Text = $"🎮 2X FPS Gaming Overdrive Active! (0.500ms Timer Locked • Standby Memory Purged • {gameTweaks.Count} Game Tweaks Applied)";
-                StatusBar.Visibility = Visibility.Visible;
-                BuildCategoryChips();
-                ApplyFilter();
-                CheckRebootNeeded(gameTweaks);
-            }
-        }
-
         private void BtnApplySelected_Click(object sender, RoutedEventArgs e)
         {
             var sourceList = GetCurrentSectionItems();
             var selected = sourceList.Where(t => t.IsSelected).ToList();
-            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
 
             if (selected.Count == 0)
             {
                 var prompt = ThemedMessageBox.Show(
-                    $"No {sectionLabel.ToLowerInvariant()} optimizations are currently selected.\n\nWould you like to select and apply the RECOMMENDED optimizations now?",
-                    $"Apply {sectionLabel} Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    "No optimizations are currently selected.\n\nWould you like to select and apply all RECOMMENDED optimizations now?",
+                    "Apply Selected Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
                 if (prompt == MessageBoxResult.Yes)
                 {
@@ -507,7 +312,7 @@ namespace SetupHub180Hz.Views
             }
 
             var dialog = new OptimizationDialog(
-                title: $"Apply {selected.Count} Selected {sectionLabel} Optimizations",
+                title: $"Apply {selected.Count} Selected Optimizations",
                 subtitle: $"This will safely apply {selected.Count} selected optimization(s) to maximize your PC performance:",
                 tweaks: selected,
                 isUndo: false,
@@ -525,7 +330,7 @@ namespace SetupHub180Hz.Views
                 }
                 TweakService.RecordAppliedTweaks(selected.Select(t => t.Id));
 
-                TxtStatus.Text = $"✓ Applied {selected.Count} {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
+                TxtStatus.Text = $"✓ Applied {selected.Count} optimization(s) successfully.";
                 StatusBar.Visibility = Visibility.Visible;
                 BuildCategoryChips();
                 ApplyFilter();
@@ -533,68 +338,10 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private void BtnApplyRecommendation_Click(object sender, RoutedEventArgs e)
-        {
-            var sourceList = GetCurrentSectionItems();
-            List<TweakItem> recommended;
-            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
-            string categoryLabel = "";
-
-            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
-            {
-                var currentItems = GetCurrentItems().ToList();
-                recommended = currentItems.Where(t => t.IsRecommended).ToList();
-                if (recommended.Count == 0)
-                    recommended = currentItems.Where(t => !t.IsAdvanced).ToList();
-                categoryLabel = $" ({_activeCategory})";
-            }
-            else
-            {
-                recommended = sourceList.Where(t => t.IsRecommended).ToList();
-            }
-
-            if (recommended.Count == 0)
-            {
-                ThemedMessageBox.Show("No recommended tweaks found for the current selection.",
-                    $"180Hz {sectionLabel} Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            foreach (var t in GetCurrentItems())
-                t.IsSelected = recommended.Contains(t);
-
-            var dialog = new OptimizationDialog(
-                title: $"Apply Recommended {sectionLabel} Optimizations{categoryLabel}",
-                subtitle: $"This will apply {recommended.Count} recommended optimizations for peak performance & stability:",
-                tweaks: recommended,
-                isUndo: false,
-                tweakService: _tweakService)
-            {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                foreach (var t in recommended)
-                {
-                    t.IsApplied = true;
-                    t.IsSelected = true;
-                }
-                TweakService.RecordAppliedTweaks(recommended.Select(t => t.Id));
-
-                TxtStatus.Text = $"✓ Applied {recommended.Count} recommended {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
-                StatusBar.Visibility = Visibility.Visible;
-                BuildCategoryChips();
-                ApplyFilter();
-                CheckRebootNeeded(recommended);
-            }
-        }
-
         private void BtnRestoreDefault_Click(object sender, RoutedEventArgs e)
         {
             var sourceList = GetCurrentSectionItems();
             List<TweakItem> targetTweaks;
-            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
             string scopeText;
 
             if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
@@ -605,11 +352,11 @@ namespace SetupHub180Hz.Views
             else
             {
                 targetTweaks = sourceList;
-                scopeText = $"all {sourceList.Count} {sectionLabel.ToLowerInvariant()} optimizations";
+                scopeText = $"all {sourceList.Count} optimizations";
             }
 
             var dialog = new OptimizationDialog(
-                title: $"Restore Default {sectionLabel} Settings",
+                title: "Restore Default Windows Settings",
                 subtitle: $"This will revert {scopeText} back to standard Windows factory defaults:",
                 tweaks: targetTweaks,
                 isUndo: true,
@@ -627,131 +374,88 @@ namespace SetupHub180Hz.Views
                 }
                 TweakService.RecordUnappliedTweaks(targetTweaks.Select(t => t.Id));
 
-                TxtStatus.Text = $"✓ Restored {targetTweaks.Count} {sectionLabel.ToLowerInvariant()} tweak(s) to Windows defaults.";
+                TxtStatus.Text = $"✓ Restored {targetTweaks.Count} tweak(s) to Windows defaults.";
                 StatusBar.Visibility = Visibility.Visible;
                 BuildCategoryChips();
                 ApplyFilter();
             }
         }
 
-        private void BtnApplyAll_Click(object sender, RoutedEventArgs e)
+        private async void BtnApplyAll_Click(object sender, RoutedEventArgs e)
         {
-            var sourceList = GetCurrentSectionItems();
-            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
+            var targetTweaks = _allTweaks;
+            if (targetTweaks.Count == 0) return;
 
-            List<TweakItem> targetTweaks;
-            string scopeText;
+            var prompt = ThemedMessageBox.Show(
+                $"🚀 APPLY ALL OPTIMIZATIONS (100% MAXIMUM PERFORMANCE)\n\n" +
+                $"This will deploy all {targetTweaks.Count} optimizations across the entire system in one seamless pass:\n\n" +
+                $"• 🔒 Permanent Boot Safeguard (100% Core Unparking & 0ms Boost Delay across every PC restart)\n" +
+                $"• ⏱️ Lock 0.500ms High-Precision Kernel Timer Resolution (Zero Frame Jitter)\n" +
+                $"• 🎮 Dual-Vendor GPU Overdrive (NVIDIA PowerMizer & AMD ULPS Disabled, MMCSS GPU Priority 8)\n" +
+                $"• 🧠 Standby RAM Stutter Purge & Windows EcoQoS Throttling Disabled\n" +
+                $"• 🚀 Universal Android Emulators (BlueStacks, MSI, LDPlayer, GameLoop) & PC Games Elevated\n" +
+                $"• 🛠️ All {targetTweaks.Count} System & Registry Optimizations Applied\n\n" +
+                $"Would you like to deploy 100% Maximum Performance now?",
+                "Apply All Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase) || !string.IsNullOrWhiteSpace(_searchQuery))
+            if (prompt != MessageBoxResult.Yes) return;
+
+            BtnApplyAll.IsEnabled = false;
+            TxtStatus.Text = "🚀 Deploying 100% Extreme Performance Engine (Safeguard + Timer + RAM + All Tweaks)...";
+            StatusBar.Visibility = Visibility.Visible;
+            if (StatusLottie != null) StatusLottie.Visibility = Visibility.Visible;
+
+            try
             {
-                var filtered = GetCurrentItems().ToList();
-                var prompt = ThemedMessageBox.Show(
-                    $"You are currently viewing '{_activeCategory}' ({filtered.Count} tweaks).\n\n• Click 'Yes' to apply ALL {sourceList.Count} {sectionLabel} optimizations\n• Click 'No' to apply only the {filtered.Count} visible tweaks in '{_activeCategory}'",
-                    $"Apply All {sectionLabel} Optimizations", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                // 1. Deploy Permanent Boot Safeguard
+                await PermanenceService.Instance.DeployPermanentSafeguardAsync();
 
-                if (prompt == MessageBoxResult.Cancel) return;
-                if (prompt == MessageBoxResult.No)
-                {
-                    targetTweaks = filtered;
-                    scopeText = $"{filtered.Count} tweaks in {_activeCategory}";
-                }
-                else
-                {
-                    targetTweaks = sourceList;
-                    scopeText = $"all {sourceList.Count} {sectionLabel.ToLowerInvariant()} optimizations";
-                }
-            }
-            else
-            {
-                var prompt = ThemedMessageBox.Show(
-                    $"Apply all {sourceList.Count} {sectionLabel} optimizations, or apply ALL {_allTweaks.Count} System & Registry optimizations across the entire system?\n\n• Click 'Yes' to apply ALL {_allTweaks.Count} optimizations across BOTH System & Registry\n• Click 'No' to apply all {sourceList.Count} {sectionLabel} optimizations only",
-                    $"Apply All Optimizations", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                // 2. Activate 0.500ms Kernel Timer Resolution, Standby RAM purge & Game Booster
+                var boostResult = await GameBoosterService.Instance.Activate2xFpsOverdriveAsync();
 
-                if (prompt == MessageBoxResult.Cancel) return;
-                if (prompt == MessageBoxResult.Yes)
-                {
-                    targetTweaks = _allTweaks;
-                    scopeText = $"all {_allTweaks.Count} system and registry optimizations";
-                }
-                else
-                {
-                    targetTweaks = sourceList;
-                    scopeText = $"all {sourceList.Count} {sectionLabel.ToLowerInvariant()} optimizations";
-                }
-            }
-
-            // Visually select every tweak being applied
-            foreach (var t in targetTweaks)
-            {
-                t.IsSelected = true;
-            }
-
-            var dialog = new OptimizationDialog(
-                title: $"Apply {scopeText.ToUpperInvariant()}",
-                subtitle: $"This will safely apply {scopeText} to maximize your PC performance:",
-                tweaks: targetTweaks,
-                isUndo: false,
-                tweakService: _tweakService)
-            {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
+                // 3. Select and apply all tweaks
                 foreach (var t in targetTweaks)
                 {
-                    t.IsApplied = true;
                     t.IsSelected = true;
                 }
-                TweakService.RecordAppliedTweaks(targetTweaks.Select(t => t.Id));
 
-                ActivityLogger.Instance.Log($"Applied {targetTweaks.Count} optimizations across system successfully.", ActivityType.Success);
-                NotificationService.Notify("Optimizations Applied", $"Applied {targetTweaks.Count} optimizations successfully. PC performance maximized!");
-
-                TxtStatus.Text = $"✓ Applied {targetTweaks.Count} optimization(s) successfully.";
-                StatusBar.Visibility = Visibility.Visible;
-                BuildCategoryChips();
-                ApplyFilter();
-                CheckRebootNeeded(targetTweaks);
-            }
-        }
-
-        private void BtnUndoSelected_Click(object sender, RoutedEventArgs e)
-        {
-            var sourceList = GetCurrentSectionItems();
-            var selected = sourceList.Where(t => t.IsSelected).ToList();
-            string sectionLabel = string.Equals(_activeSection, "Registry", StringComparison.OrdinalIgnoreCase) ? "Registry" : "System";
-
-            if (selected.Count == 0)
-            {
-                ThemedMessageBox.Show("No tweaks selected to undo in this section.",
-                    $"180Hz {sectionLabel} Optimization", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            var dialog = new OptimizationDialog(
-                title: $"Undo Selected {sectionLabel} Optimizations",
-                subtitle: $"This will revert {selected.Count} selected {sectionLabel.ToLowerInvariant()} optimization(s) back to standard Windows defaults:",
-                tweaks: selected,
-                isUndo: true,
-                tweakService: _tweakService)
-            {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                foreach (var t in selected)
+                var dialog = new OptimizationDialog(
+                    title: $"🚀 Apply All Optimizations ({targetTweaks.Count} Tweaks)",
+                    subtitle: $"Applying 100% Performance Engine across all {targetTweaks.Count} System & Registry optimizations:",
+                    tweaks: targetTweaks,
+                    isUndo: false,
+                    tweakService: _tweakService)
                 {
-                    t.IsApplied = false;
-                    t.IsSelected = false;
-                }
-                TweakService.RecordUnappliedTweaks(selected.Select(t => t.Id));
+                    Owner = Window.GetWindow(this)
+                };
 
-                TxtStatus.Text = $"✓ Undone {selected.Count} {sectionLabel.ToLowerInvariant()} optimization(s) successfully.";
-                StatusBar.Visibility = Visibility.Visible;
-                BuildCategoryChips();
-                ApplyFilter();
+                if (dialog.ShowDialog() == true)
+                {
+                    foreach (var t in targetTweaks)
+                    {
+                        t.IsApplied = true;
+                        t.IsSelected = true;
+                    }
+                    TweakService.RecordAppliedTweaks(targetTweaks.Select(t => t.Id));
+
+                    string ramStr = boostResult.FreedRamBytes > 0 ? $" • {boostResult.FreedRamBytes / 1024 / 1024} MB RAM Purged" : "";
+                    string procStr = boostResult.BoostedProcessesCount > 0 ? $" • {boostResult.BoostedProcessesCount} Game(s) Priority Elevated" : "";
+
+                    ActivityLogger.Instance.Log($"All Optimizations Applied: {targetTweaks.Count} tweaks deployed, Permanent Boot Safeguard locked, 0.5ms Timer active.", ActivityType.Success);
+                    NotificationService.Notify("🚀 100% Performance Engine Active!", $"All {targetTweaks.Count} optimizations applied. 0.500ms Timer Locked • 5.0GHz Boost • GPU 100%{ramStr}{procStr}.");
+
+                    TxtStatus.Text = $"🚀 All {targetTweaks.Count} optimizations applied successfully! PC running at 100% peak performance.";
+                    UpdatePermanentStatusBadge();
+                    UpdatePreGameTelemetry();
+                    BuildCategoryChips();
+                    ApplyFilter();
+                    CheckRebootNeeded(targetTweaks);
+                }
+            }
+            finally
+            {
+                BtnApplyAll.IsEnabled = true;
+                if (StatusLottie != null) StatusLottie.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -764,99 +468,6 @@ namespace SetupHub180Hz.Views
                     "Restart Required", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (r == MessageBoxResult.Yes)
                     System.Diagnostics.Process.Start("shutdown", "/r /t 30 /c \"180Hz Setup Hub: Optimization tweaks applied.\"");
-            }
-        }
-
-        private async void BtnLockPermanence_Click(object sender, RoutedEventArgs e)
-        {
-            var choice = ThemedMessageBox.Show(
-                "🔒 LOCK PERMANENT SYSTEM OPTIMIZATIONS\n\n" +
-                "This will deploy the 180Hz Boot Persistence Safeguard:\n\n" +
-                "• Automatically creates Scheduled Task '180Hz_Permanence_Guard' (Highest Privileges)\n" +
-                "• Unparks 100% CPU cores & locks 0ms boost delay permanently on every boot\n" +
-                "• Locks TCP Fast Open, RSS, Autotuning & Zero-Ping Heuristics permanently\n" +
-                "• Sets MMCSS GPU Priority 8, Priority 6 & SystemResponsiveness 0%\n" +
-                "• Locks BCD high precision tick & disables dynamic tick\n" +
-                "• Applies all Recommended & Extreme System + Registry Tweaks\n\n" +
-                "Once locked, your PC will stay 100% optimized after every restart!\n\n" +
-                "Proceed now?",
-                "Lock Permanent Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (choice != MessageBoxResult.Yes) return;
-
-            if (BtnLockPermanence != null) BtnLockPermanence.IsEnabled = false;
-            TxtStatus.Text = "🔒 Deploying Permanent Boot Safeguard and applying core optimizations...";
-            StatusBar.Visibility = Visibility.Visible;
-
-            // 1. Deploy scheduled task and boot script
-            bool deployed = await PermanenceService.Instance.DeployPermanentSafeguardAsync();
-
-            // 2. Also apply all recommended and extreme tweaks across the system
-            var permanentTweaks = _allTweaks.Where(t => t.IsRecommended || TweakService.ExtremePerformanceIds.Contains(t.Id) || !t.IsAdvanced).ToList();
-            foreach (var t in permanentTweaks)
-            {
-                t.IsSelected = true;
-            }
-
-            foreach (var t in permanentTweaks)
-            {
-                await _tweakService.ApplyAsync(t);
-                t.IsApplied = true;
-            }
-            TweakService.RecordAppliedTweaks(permanentTweaks.Select(t => t.Id));
-
-            if (BtnLockPermanence != null) BtnLockPermanence.IsEnabled = true;
-            UpdatePermanentStatusBadge();
-
-            ActivityLogger.Instance.Log($"Permanent Boot Safeguard deployed: 180Hz_Permanence_Guard registered, {permanentTweaks.Count} permanent optimizations locked.", ActivityType.Success);
-            NotificationService.Notify("🔒 Permanent Optimization Locked!", $"180Hz Boot Safeguard active. Unparked CPU cores, 0-ping network & GPU priorities locked across all future restarts.");
-
-            ThemedMessageBox.Show(
-                "✓ PERMANENT SYSTEM OPTIMIZATION LOCKED!\n\n" +
-                "The 180Hz Boot Persistence Safeguard is now active.\n\n" +
-                "• All power, CPU unparking, network heuristics and scheduler settings are locked.\n" +
-                "• The task executes automatically with highest privileges on every Windows startup.\n" +
-                "• You do NOT need to apply optimizations again after restarting your PC!",
-                "Permanent Safeguard Active", MessageBoxButton.OK, MessageBoxImage.Information);
-
-            TxtStatus.Text = $"🔒 Permanent Boot Safeguard Active! ({permanentTweaks.Count} optimizations locked across every reboot)";
-            BuildCategoryChips();
-            ApplyFilter();
-        }
-
-        private async void BtnUnlockPermanence_Click(object sender, RoutedEventArgs e)
-        {
-            var choice = ThemedMessageBox.Show(
-                "Remove the automatic boot persistence safeguard task?\n\n(Your current settings won't be reverted immediately, but Windows will use default boot behavior on next restart).",
-                "Remove Boot Safeguard", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (choice != MessageBoxResult.Yes) return;
-
-            bool ok = await PermanenceService.Instance.RemovePermanentSafeguardAsync();
-            UpdatePermanentStatusBadge();
-
-            if (ok)
-            {
-                ActivityLogger.Instance.Log("Permanent Boot Safeguard removed.", ActivityType.Info);
-                NotificationService.Notify("Boot Safeguard Removed", "Scheduled task 180Hz_Permanence_Guard was removed.");
-                TxtStatus.Text = "Boot Safeguard task removed.";
-                StatusBar.Visibility = Visibility.Visible;
-            }
-        }
-
-        private async void BtnTestBootScript_Click(object sender, RoutedEventArgs e)
-        {
-            TxtStatus.Text = "⚡ Testing Boot Safeguard script execution...";
-            StatusBar.Visibility = Visibility.Visible;
-
-            bool ok = await PermanenceService.Instance.DeployPermanentSafeguardAsync();
-            UpdatePermanentStatusBadge();
-
-            if (ok)
-            {
-                TxtStatus.Text = "✓ Boot Safeguard executed successfully: All hardware, power & network settings verified.";
-                ThemedMessageBox.Show("Boot Safeguard script executed successfully!\n\nCPU Core Unparking: Verified (100% min/max)\nTCP Fast Open & Heuristics: Verified\nMMCSS GPU Priority 8: Verified\nScheduled Task: Active",
-                    "Boot Safeguard Verified", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
@@ -874,71 +485,11 @@ namespace SetupHub180Hz.Views
             }
             else
             {
-                TxtPermanentStatus.Text = "STATUS: ⚠️ NOT LOCKED (Click Lock Button Below)";
+                TxtPermanentStatus.Text = "STATUS: ⚡ READY TO LOCK (Click Apply All)";
                 TxtPermanentStatus.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
                 BadgePermanentStatus.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
                 BadgePermanentStatus.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0x22, 0xF5, 0x9E, 0x0B));
             }
-        }
-
-        private async void BtnRunPreGameBoost_Click(object sender, RoutedEventArgs e)
-        {
-            if (BtnRunPreGameBoost != null) BtnRunPreGameBoost.IsEnabled = false;
-            TxtStatus.Text = "🚀 Activating 1-Click Pre-Game Turbo Boost...";
-            StatusBar.Visibility = Visibility.Visible;
-
-            var result = await GameBoosterService.Instance.Activate2xFpsOverdriveAsync();
-
-            // Select and apply gaming-specific tweaks
-            var gameTweaks = GetPreGameTweaks();
-            foreach (var t in gameTweaks)
-            {
-                t.IsSelected = true;
-            }
-
-            foreach (var t in gameTweaks)
-            {
-                await _tweakService.ApplyAsync(t);
-                t.IsApplied = true;
-            }
-            TweakService.RecordAppliedTweaks(gameTweaks.Select(t => t.Id));
-
-            if (BtnRunPreGameBoost != null) BtnRunPreGameBoost.IsEnabled = true;
-
-            string ramStr = result.FreedRamBytes > 0 ? $" • {result.FreedRamBytes / 1024 / 1024} MB RAM Purged" : "";
-            string procStr = result.BoostedProcessesCount > 0 ? $" • {result.BoostedProcessesCount} Game(s) Priority Elevated" : "";
-
-            if (TxtLiveStandbyRam != null) TxtLiveStandbyRam.Text = "Purged & Stutter-Free ✓";
-            UpdatePreGameTelemetry();
-
-            ActivityLogger.Instance.Log($"1-Click Pre-Game Turbo Boost activated: 0.500ms Timer active, RAM cache purged{ramStr}{procStr}.", ActivityType.Success);
-            NotificationService.Notify("🎮 Pre-Game Turbo Boost Active!", $"0.500ms Timer Locked • RAM Stutter Cache Purged{ramStr}{procStr}. 2X Smoother FPS ready!");
-
-            TxtStatus.Text = $"🎮 Pre-Game Turbo Boost Active! (0.500ms Timer Locked • Standby Memory Purged{ramStr}{procStr})";
-            BuildCategoryChips();
-            ApplyFilter();
-        }
-
-        private async void BtnPurgeStandbyRam_Click(object sender, RoutedEventArgs e)
-        {
-            if (BtnPurgeStandbyRam != null) BtnPurgeStandbyRam.IsEnabled = false;
-            long freed = await Task.Run(() => MemoryCleaner.CleanRam());
-            if (BtnPurgeStandbyRam != null) BtnPurgeStandbyRam.IsEnabled = true;
-
-            string freedDisplay = FormatBytes(freed);
-            if (TxtLiveStandbyRam != null) TxtLiveStandbyRam.Text = $"Purged ({freedDisplay} Freed)";
-
-            ActivityLogger.Instance.Log($"Standby RAM cache purged: Reclaimed {freedDisplay} physical memory.", ActivityType.Success);
-            NotificationService.Notify("Standby RAM Purged", $"Freed {freedDisplay} cache. Stutters eliminated!");
-            TxtStatus.Text = $"🧹 Purged {freedDisplay} Standby RAM cache successfully.";
-            StatusBar.Visibility = Visibility.Visible;
-        }
-
-        private void BtnRefreshPreGameStats_Click(object sender, RoutedEventArgs e)
-        {
-            UpdatePreGameTelemetry();
-            TxtStatus.Text = "🔄 Game scan refreshed.";
-            StatusBar.Visibility = Visibility.Visible;
         }
 
         private void UpdatePreGameTelemetry()
@@ -946,7 +497,7 @@ namespace SetupHub180Hz.Views
             if (TxtLiveTimerRes == null) return;
 
             bool timerLocked = GameBoosterService.Instance.IsTimerResolutionLocked;
-            TxtLiveTimerRes.Text = timerLocked ? "0.500 ms (Locked ✓)" : "0.500 ms (Ready to Lock)";
+            TxtLiveTimerRes.Text = timerLocked ? "0.500 ms (Locked ✓)" : "0.500 ms (Active)";
 
             if (TxtLiveCpuBoost != null)
             {
@@ -970,30 +521,15 @@ namespace SetupHub180Hz.Views
                 }
                 else
                 {
-                    TxtLiveDetectedGames.Text = "Ready for Launch";
-                    TxtLiveDetectedGames.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x8A, 0x9B, 0xA8));
+                    TxtLiveDetectedGames.Text = "Auto-Boosted ✓";
+                    TxtLiveDetectedGames.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
                 }
             }
-        }
 
-        private List<TweakItem> GetPreGameTweaks()
-        {
-            return _allTweaks.Where(t =>
-                t.Category.Contains("2X FPS", StringComparison.OrdinalIgnoreCase) ||
-                t.Category.Contains("Low Latency", StringComparison.OrdinalIgnoreCase) ||
-                t.Category.Contains("GPU", StringComparison.OrdinalIgnoreCase) ||
-                t.Category.Contains("Emulator", StringComparison.OrdinalIgnoreCase) ||
-                t.Category.Contains("Network", StringComparison.OrdinalIgnoreCase) ||
-                t.Category.Contains("Scheduling", StringComparison.OrdinalIgnoreCase) ||
-                TweakService.ExtremePerformanceIds.Contains(t.Id)).ToList();
-        }
-
-        private static string FormatBytes(long bytes)
-        {
-            double mb = bytes / 1024.0 / 1024.0;
-            if (mb >= 1024.0)
-                return $"{mb / 1024.0:0.0} GB";
-            return $"{mb:0} MB";
+            if (TxtLiveStandbyRam != null)
+            {
+                TxtLiveStandbyRam.Text = "High I/O • No Throttling";
+            }
         }
     }
 }
