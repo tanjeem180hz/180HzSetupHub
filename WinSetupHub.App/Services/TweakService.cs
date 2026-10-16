@@ -328,6 +328,8 @@ namespace SetupHub180Hz.Services
             "GameTweakNetworkPacketPacingZero",
             "GfxTweakDisableUlpsPowerMizer",
             "GfxTweakDirectXHighPerformanceRouting",
+            "MemTweakDisableMemoryCompression",
+            "EmulTweakUniversalAndroidOverdrive",
             "RegTweakMMCSSGpuPriority8",
             "RegTweakMMCSSCpuPriority6",
             "RegTweakSystemResponsivenessZero",
@@ -383,6 +385,7 @@ namespace SetupHub180Hz.Services
             "GfxTweakDisableDRR",
             "GfxTweakDisableUlpsPowerMizer",
             "GfxTweakDirectXHighPerformanceRouting",
+            "MemTweakDisableMemoryCompression",
 
             // Network & Ping
             "NetTweakTcpAckNoDelay",
@@ -424,6 +427,7 @@ namespace SetupHub180Hz.Services
             "EmulTweakPowerThrottling",
             "EmulTweakGameloopMuMu",
             "EmulTweakGameloopAow",
+            "EmulTweakUniversalAndroidOverdrive",
 
             // Registry Optimizations
             "RegTweakDirectFlipIFlip",

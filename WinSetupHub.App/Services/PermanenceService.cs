@@ -71,19 +71,31 @@ powercfg /setacvalueindex scheme_current sub_processor 06cadf0e-64ed-448a-8927-c
 powercfg /setacvalueindex scheme_current sub_processor 984cf492-3bed-4488-a8f9-4286c97bf5aa 1 >nul 2>&1
 powercfg /setactive scheme_current >nul 2>&1
 
-:: 4. Disable GPU Ultra-Low Power State (ULPS) & Power Saving for 100% Full GPU Utilization
-reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000"" /v EnableUlps /t REG_DWORD /d 0 /f >nul 2>&1
-reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0001"" /v EnableUlps /t REG_DWORD /d 0 /f >nul 2>&1
-reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000"" /v DalDisableDisplayGating /t REG_DWORD /d 1 /f >nul 2>&1
-reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000"" /v DisableDrmdmaPowerGating /t REG_DWORD /d 1 /f >nul 2>&1
-reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000"" /v DisableStutterMode /t REG_DWORD /d 1 /f >nul 2>&1
-reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000"" /v PowerMizerEnable /t REG_DWORD /d 0 /f >nul 2>&1
-reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000"" /v PowerMizerLevel /t REG_DWORD /d 1 /f >nul 2>&1
-reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000"" /v PowerMizerLevelAC /t REG_DWORD /d 1 /f >nul 2>&1
+:: 4. Dual-Vendor GPU Overdrive (NVIDIA PowerMizer + AMD ULPS) Across Display Adapters
+for %%i in (0000 0001 0002 0003 0004) do (
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v EnableUlps /t REG_DWORD /d 0 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v EnableUlps_NA /t REG_DWORD /d 0 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DalDisableDisplayGating /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DisableDrmdmaPowerGating /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DisableStutterMode /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v KMD_EnableComputePreemption /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PP_ThermalAutoThrottlingEnable /t REG_DWORD /d 0 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v ShaderCache /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PowerMizerEnable /t REG_DWORD /d 0 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PowerMizerLevel /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PowerMizerLevelAC /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PerfLevelSrc /t REG_DWORD /d 8738 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v RmGpuPreemption /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DisablePowerGovernors /t REG_DWORD /d 1 /f >nul 2>&1
+)
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v PowerSavingPolicy /t REG_DWORD /d 0 /f >nul 2>&1
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v HwSchMode /t REG_DWORD /d 2 /f >nul 2>&1
+reg add ""HKCU\Software\Microsoft\Direct3D"" /v EnableDirectFlip /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKCU\Software\Microsoft\Direct3D"" /v DirectFlipHonor /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Direct3D\Shaders"" /v ShaderCacheSize /t REG_DWORD /d 10240 /f >nul 2>&1
+reg add ""HKCU\Control Panel\Graphics\WindowedVRR"" /v Enabled /t REG_DWORD /d 1 /f >nul 2>&1
 
-:: 2. Network Zero-Ping & Fast Open Locking
+:: 5. Network Zero-Ping & Fast Open Locking
 netsh int tcp set global fastopen=enabled >nul 2>&1
 netsh int tcp set global fastopenfallback=enabled >nul 2>&1
 netsh int tcp set global rss=enabled >nul 2>&1
@@ -92,11 +104,11 @@ netsh int tcp set global timestamps=disabled >nul 2>&1
 netsh int tcp set heuristics disabled >nul 2>&1
 netsh int ip set global taskoffload=enabled >nul 2>&1
 
-:: 3. Fast File System & NTFS Low Overhead
+:: 6. Fast File System & NTFS Low Overhead
 fsutil behavior set disablelastaccess 1 >nul 2>&1
 fsutil 8dot3name set 1 >nul 2>&1
 
-:: 4. Multimedia & GPU Scheduling Registry Enforcement
+:: 7. Multimedia & GPU Scheduling Registry Enforcement
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"" /v NetworkThrottlingIndex /t REG_DWORD /d 4294967295 /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"" /v SystemResponsiveness /t REG_DWORD /d 0 /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"" /v NoLazyMode /t REG_DWORD /d 1 /f >nul 2>&1
@@ -106,17 +118,36 @@ reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemPro
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""Scheduling Category"" /t REG_SZ /d ""High"" /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""SFIO Priority"" /t REG_SZ /d ""High"" /f >nul 2>&1
 
-:: 5. Priority Control - Short Variable Quantum Foreground Boost (0x26 = 38)
+:: 8. Priority Control - Short Variable Quantum Foreground Boost (0x26 = 38)
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl"" /v Win32PrioritySeparation /t REG_DWORD /d 38 /f >nul 2>&1
 
-:: 6. Disable GameDVR Background Recording & Overheads
+:: 9. Disable GameDVR Background Recording & Overheads
 reg add ""HKCU\System\GameConfigStore"" /v GameDVR_Enabled /t REG_DWORD /d 0 /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR"" /v AllowGameDVR /t REG_DWORD /d 0 /f >nul 2>&1
 
-:: 7. BCD High Precision Scheduling Locks
+:: 10. Global CPU Power Throttling & EcoQoS Disable
+reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling"" /v PowerThrottlingOff /t REG_DWORD /d 1 /f >nul 2>&1
+
+:: 11. Memory Management & Paging Executive Locks (Keep Kernel in RAM)
+reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"" /v DisablePagingExecutive /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"" /v LargeSystemCache /t REG_DWORD /d 0 /f >nul 2>&1
+
+:: 12. Emulator & Competitive Game Priority Class & Working Set Locks (IFEO)
+for %%g in (HD-Player.exe HD-Agent.exe BlueStacks.exe dnplayer.exe LdBoxHeadless.exe ldvboxheadless.exe dnmultiplayer.exe AppMarket.exe AndroidProcess.exe aow_exe.exe Nox.exe MEmu.exe MuMuPlayer.exe NemuPlayer.exe SmartGaGa.exe cs2.exe valorant.exe) do (
+    reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%g\PerfOptions"" /v CpuPriorityClass /t REG_DWORD /d 3 /f >nul 2>&1
+    reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%g\PerfOptions"" /v IoPriority /t REG_DWORD /d 3 /f >nul 2>&1
+    reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%g\PerfOptions"" /v PagePriority /t REG_DWORD /d 5 /f >nul 2>&1
+    reg add ""HKCU\Software\Microsoft\DirectX\UserGpuPreferences"" /v %%g /t REG_SZ /d ""GpuPreference=2;"" /f >nul 2>&1
+)
+
+:: 13. BCD High Precision & Invariant TSC Clock Synchronization
 bcdedit /set useplatformclock false >nul 2>&1
 bcdedit /set useplatformtick yes >nul 2>&1
 bcdedit /set disabledynamictick yes >nul 2>&1
+bcdedit /set tscsyncpolicy Enhanced >nul 2>&1
+
+:: 14. Disable RAM Memory Compression & Page Combining Overhead
+powershell -NoProfile -ExecutionPolicy Bypass -Command ""Disable-MMAgent -MemoryCompression -PageCombining"" >nul 2>&1
 ";
                     File.WriteAllText(GuardScriptPath, scriptContent);
 

@@ -60,6 +60,27 @@
         "Type": "DWord"
       },
       {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Player.exe\\PerfOptions",
+        "Name": "PagePriority",
+        "Value": "5",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Agent.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\BlueStacks.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
         "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dnplayer.exe\\PerfOptions",
         "Name": "CpuPriorityClass",
         "Value": "3",
@@ -74,6 +95,13 @@
         "Type": "DWord"
       },
       {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dnplayer.exe\\PerfOptions",
+        "Name": "PagePriority",
+        "Value": "5",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
         "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LdBoxHeadless.exe\\PerfOptions",
         "Name": "CpuPriorityClass",
         "Value": "3",
@@ -82,6 +110,55 @@
       },
       {
         "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\LdBoxHeadless.exe\\PerfOptions",
+        "Name": "IoPriority",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\ldvboxheadless.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\ldvboxheadless.exe\\PerfOptions",
+        "Name": "IoPriority",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\AppMarket.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\AndroidProcess.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\AndroidProcess.exe\\PerfOptions",
+        "Name": "IoPriority",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\aow_exe.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\aow_exe.exe\\PerfOptions",
         "Name": "IoPriority",
         "Value": "3",
         "OriginalValue": "<RemoveEntry>",
@@ -100,6 +177,41 @@
         "Value": "3",
         "OriginalValue": "<RemoveEntry>",
         "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\MuMuPlayer.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\NemuPlayer.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\SmartGaGa.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\cs2.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\valorant.exe\\PerfOptions",
+        "Name": "CpuPriorityClass",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
       }
     ],
     "service": [],
@@ -108,9 +220,9 @@
   },
   {
     "id": "EmulTweakGpuPreference",
-    "name": "Force Discrete High-Performance GPU for All Emulators",
-    "description": "Forces Windows DirectX graphics runtime to route all Android and console emulator graphics rendering directly through your high-power discrete GPU instead of integrated graphics.",
-    "category": "ðŸš€ Emulator 100% Performance",
+    "name": "Force Discrete High-Performance GPU for All Emulators & Games",
+    "description": "Forces Windows DirectX graphics runtime to route all Android emulators (BlueStacks, MSI, LDPlayer, GameLoop, Nox, MEmu, MuMu) and competitive games directly to your high-performance discrete GPU.",
+    "category": "🚀 Emulator 100% Performance",
     "categoryOrder": 0,
     "section": "System",
     "isAdvanced": false,
@@ -120,6 +232,20 @@
       {
         "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
         "Name": "HD-Player.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "HD-Agent.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "BlueStacks.exe",
         "Value": "GpuPreference=2;",
         "OriginalValue": "<RemoveEntry>",
         "Type": "String"
@@ -140,6 +266,41 @@
       },
       {
         "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "ldvboxheadless.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "dnmultiplayer.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "AppMarket.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "AndroidProcess.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "aow_exe.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
         "Name": "Nox.exe",
         "Value": "GpuPreference=2;",
         "OriginalValue": "<RemoveEntry>",
@@ -148,6 +309,41 @@
       {
         "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
         "Name": "MEmu.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "MuMuPlayer.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "NemuPlayer.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "SmartGaGa.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "cs2.exe",
+        "Value": "GpuPreference=2;",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "String"
+      },
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\DirectX\\UserGpuPreferences",
+        "Name": "valorant.exe",
         "Value": "GpuPreference=2;",
         "OriginalValue": "<RemoveEntry>",
         "Type": "String"
@@ -433,8 +629,17 @@
     "service": [],
     "invokeScript": [
       "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61",
-      "powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61",
-      "powercfg -setacvalueindex scheme_current sub_processor CPMIN 100",
+      "powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c",
+      "powercfg -setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 100",
+      "powercfg -setacvalueindex scheme_current sub_processor ea062031-0e34-4ff1-9b6d-eb1059334028 100",
+      "powercfg -setacvalueindex scheme_current sub_processor 5d76a2ca-e8c0-402f-a133-2158492d58ad 0",
+      "powercfg -setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 2",
+      "powercfg -setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0",
+      "powercfg -setacvalueindex scheme_current sub_processor 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0",
+      "powercfg -setacvalueindex scheme_current sub_processor 893dee8e-2bef-41e0-89c6-b55d0929964c 100",
+      "powercfg -setacvalueindex scheme_current sub_processor bc5038f7-23e0-4960-96da-33abaf5935ec 100",
+      "powercfg -setacvalueindex scheme_current sub_processor 06cadf0e-64ed-448a-8927-ce7bf90eb35d 10",
+      "powercfg -setacvalueindex scheme_current sub_processor 984cf492-3bed-4488-a8f9-4286c97bf5aa 1",
       "powercfg -setactive scheme_current"
     ],
     "undoScript": [
@@ -5970,10 +6175,10 @@
     ],
     "service": [],
     "invokeScript": [
-      "reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v EnableUlps /t REG_DWORD /d 0 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0001\" /v EnableUlps /t REG_DWORD /d 0 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v DalDisableDisplayGating /t REG_DWORD /d 1 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v DisableDrmdmaPowerGating /t REG_DWORD /d 1 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v DisableStutterMode /t REG_DWORD /d 1 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v PowerMizerEnable /t REG_DWORD /d 0 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v PowerMizerLevel /t REG_DWORD /d 1 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v PowerMizerLevelAC /t REG_DWORD /d 1 /f"
+      "0..4 | ForEach-Object { $k = 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\' + ('{0:D4}' -f $_); if (Test-Path $k) { Set-ItemProperty $k EnableUlps 0 -Type DWord -Force; Set-ItemProperty $k EnableUlps_NA 0 -Type DWord -Force; Set-ItemProperty $k DalDisableDisplayGating 1 -Type DWord -Force; Set-ItemProperty $k DisableDrmdmaPowerGating 1 -Type DWord -Force; Set-ItemProperty $k DisableStutterMode 1 -Type DWord -Force; Set-ItemProperty $k KMD_EnableComputePreemption 1 -Type DWord -Force; Set-ItemProperty $k PP_ThermalAutoThrottlingEnable 0 -Type DWord -Force; Set-ItemProperty $k ShaderCache 1 -Type DWord -Force; Set-ItemProperty $k PowerMizerEnable 0 -Type DWord -Force; Set-ItemProperty $k PowerMizerLevel 1 -Type DWord -Force; Set-ItemProperty $k PowerMizerLevelAC 1 -Type DWord -Force; Set-ItemProperty $k PerfLevelSrc 8738 -Type DWord -Force; Set-ItemProperty $k RmGpuPreemption 1 -Type DWord -Force; Set-ItemProperty $k DisablePowerGovernors 1 -Type DWord -Force } }"
     ],
     "undoScript": [
-      "reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v EnableUlps /t REG_DWORD /d 1 /f"
+      "0..4 | ForEach-Object { $k = 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\' + ('{0:D4}' -f $_); if (Test-Path $k) { Set-ItemProperty $k EnableUlps 1 -Type DWord -Force } }"
     ]
   },
   {
@@ -6000,6 +6205,62 @@
         "Type": "DWord",
         "Value": 6,
         "DefaultValue": 2
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "MemTweakDisableMemoryCompression",
+    "name": "🚀 Disable RAM Memory Compression & Page Combining (Zero Micro-Stutter Engine)",
+    "description": "Disables Windows background memory compression and periodic page scanning tasks. Prevents CPU usage spikes and stops periodic 1-second stutters during BlueStacks, LDPlayer, and PC gaming.",
+    "category": "🎮 2X FPS Ultra Gaming & Esports Overdrive",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "Disable-MMAgent -MemoryCompression -PageCombining"
+    ],
+    "undoScript": [
+      "Enable-MMAgent -MemoryCompression -PageCombining"
+    ]
+  },
+  {
+    "id": "EmulTweakUniversalAndroidOverdrive",
+    "name": "⚡ Universal Android Emulator & PC Game Hyper-Drive (BlueStacks / MSI / LDPlayer / PC Games)",
+    "description": "Enforces Realtime High CPU & I/O Priority, eliminates Windows 10/11 EcoQoS Power Throttling, forces 100% discrete GPU routing, and locks 3:1 foreground CPU quanta boost for all Android emulators and PC games.",
+    "category": "🚀 Emulator 100% Performance",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+        "Name": "Win32PrioritySeparation",
+        "Type": "DWord",
+        "Value": 38,
+        "DefaultValue": 2
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+        "Name": "PowerThrottlingOff",
+        "Type": "DWord",
+        "Value": 1,
+        "DefaultValue": 0
+      },
+      {
+        "Path": "HKCU:\\Control Panel\\Graphics\\WindowedVRR",
+        "Name": "Enabled",
+        "Type": "DWord",
+        "Value": 1,
+        "DefaultValue": 0
       }
     ],
     "service": [],

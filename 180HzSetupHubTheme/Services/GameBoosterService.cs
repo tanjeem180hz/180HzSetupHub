@@ -26,6 +26,30 @@ namespace SetupHub180Hz.Services
         [DllImport("winmm.dll", EntryPoint = "timeEndPeriod", SetLastError = true)]
         private static extern uint TimeEndPeriod(uint uMilliseconds);
 
+        [DllImport("ntdll.dll", SetLastError = true)]
+        private static extern int NtSetInformationProcess(IntPtr processHandle, int processInformationClass, ref int processInformation, int processInformationLength);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct PROCESS_POWER_THROTTLING_STATE
+        {
+            public uint Version;
+            public uint ControlMask;
+            public uint StateMask;
+        }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetProcessInformation(
+            IntPtr hProcess,
+            int ProcessInformationClass,
+            ref PROCESS_POWER_THROTTLING_STATE ProcessInformation,
+            uint ProcessInformationSize);
+
+        private const int ProcessPowerThrottling = 4;
+        private const uint PROCESS_POWER_THROTTLING_CURRENT_VERSION = 1;
+        private const uint PROCESS_POWER_THROTTLING_EXECUTION_SPEED = 0x1;
+        private const uint PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION = 0x4;
+        private const int ProcessIoPriority = 21;
+
         private bool _isTimerLocked;
         private uint _currentTimerRes = 5000;
 
@@ -63,7 +87,7 @@ namespace SetupHub180Hz.Services
             // 2. Memory Purge (Standby list, Working Sets, Modified list)
             long freedRam = await Task.Run(() => MemoryCleaner.CleanRam());
 
-            // 3. Enforce Ultimate Power Scheme, 100% Core Unparking & Unlock Full Dynamic Turbo Boost GHz
+            // 3. Enforce Ultimate Power Scheme, 100% Core Unparking, Dynamic Turbo Boost GHz & Disable Memory Compression
             await Task.Run(() =>
             {
                 RunCmd("powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61");
@@ -78,12 +102,13 @@ namespace SetupHub180Hz.Services
                 RunCmd("powercfg -setacvalueindex scheme_current sub_processor 06cadf0e-64ed-448a-8927-ce7bf90eb35d 10");
                 RunCmd("powercfg -setacvalueindex scheme_current sub_processor 984cf492-3bed-4488-a8f9-4286c97bf5aa 1");
                 RunCmd("powercfg -setactive scheme_current");
+                RunCmd("powershell -NoProfile -ExecutionPolicy Bypass -Command \"Disable-MMAgent -MemoryCompression -PageCombining\"");
             });
 
-            // 4. Enforce Game Mode, MMCSS 100% CPU Gaming Reservation, GPU Priority 8
+            // 4. Enforce Game Mode, MMCSS 100% CPU Gaming Reservation, GPU Priority 8, Universal NVIDIA/AMD Overdrive
             ApplyInstantGamingRegistry();
 
-            // 5. Scan & boost active game processes (High Priority, High I/O, No Power Throttling)
+            // 5. Scan & boost active emulator and game processes (High Priority, High I/O, No Power Throttling, Full Cores)
             int boostedProcesses = await BoostRunningGameProcessesAsync();
 
             return new GameBoostResult
@@ -118,6 +143,25 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("Affinity", 0, RegistryValueKind.DWord);
                 }
 
+                // Priority Control - Win32 Priority Separation (0x26 = 38: 3:1 Foreground Quanta Boost)
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\PriorityControl", true))
+                {
+                    key?.SetValue("Win32PrioritySeparation", 38, RegistryValueKind.DWord);
+                }
+
+                // Global CPU Power Throttling Off (Prevents EcoQoS throttling on emulator/game background threads)
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\Power\PowerThrottling", true))
+                {
+                    key?.SetValue("PowerThrottlingOff", 1, RegistryValueKind.DWord);
+                }
+
+                // Memory Management - Keep Kernel & Drivers in Physical RAM (0 Page Fault Stutter)
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management", true))
+                {
+                    key?.SetValue("DisablePagingExecutive", 1, RegistryValueKind.DWord);
+                    key?.SetValue("LargeSystemCache", 0, RegistryValueKind.DWord);
+                }
+
                 // GameBar Game Mode
                 using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\GameBar", true))
                 {
@@ -147,7 +191,13 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("ShaderCacheSize", 10240, RegistryValueKind.DWord);
                 }
 
-                // GraphicsDrivers HwSchMode = 2
+                // Windowed VRR (G-Sync & FreeSync in Borderless/Emulator Windows)
+                using (var key = Registry.CurrentUser.CreateSubKey(@"Control Panel\Graphics\WindowedVRR", true))
+                {
+                    key?.SetValue("Enabled", 1, RegistryValueKind.DWord);
+                }
+
+                // GraphicsDrivers HwSchMode = 2 (Hardware-Accelerated GPU Scheduling)
                 using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\GraphicsDrivers", true))
                 {
                     key?.SetValue("HwSchMode", 2, RegistryValueKind.DWord);
@@ -174,8 +224,8 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("MaxQueuedBuffers", 1, RegistryValueKind.DWord);
                 }
 
-                // Disable GPU Ultra-Low Power State (ULPS) & PowerMizer across all display adapters for 100% full GPU utilization
-                for (int i = 0; i <= 3; i++)
+                // Dual-Vendor GPU Overdrive (NVIDIA PowerMizer + AMD ULPS) across all display adapters
+                for (int i = 0; i <= 4; i++)
                 {
                     string subkey = $@"SYSTEM\CurrentControlSet\Control\Class\{{4d36e968-e325-11ce-bfc1-08002be10318}}\{i:D4}";
                     try
@@ -183,26 +233,59 @@ namespace SetupHub180Hz.Services
                         using var key = Registry.LocalMachine.OpenSubKey(subkey, true);
                         if (key != null)
                         {
+                            // AMD Radeon Optimizations
                             key.SetValue("EnableUlps", 0, RegistryValueKind.DWord);
                             key.SetValue("EnableUlps_NA", 0, RegistryValueKind.DWord);
-                            key.SetValue("KMD_EnableComputePreemption", 1, RegistryValueKind.DWord);
                             key.SetValue("DalDisableDisplayGating", 1, RegistryValueKind.DWord);
                             key.SetValue("DisableDrmdmaPowerGating", 1, RegistryValueKind.DWord);
                             key.SetValue("DisableStutterMode", 1, RegistryValueKind.DWord);
+                            key.SetValue("KMD_EnableComputePreemption", 1, RegistryValueKind.DWord);
+                            key.SetValue("PP_ThermalAutoThrottlingEnable", 0, RegistryValueKind.DWord);
+                            key.SetValue("ShaderCache", 1, RegistryValueKind.DWord);
+
+                            // NVIDIA GeForce Optimizations
                             key.SetValue("PowerMizerEnable", 0, RegistryValueKind.DWord);
                             key.SetValue("PowerMizerLevel", 1, RegistryValueKind.DWord);
                             key.SetValue("PowerMizerLevelAC", 1, RegistryValueKind.DWord);
+                            key.SetValue("PerfLevelSrc", 0x2222, RegistryValueKind.DWord);
+                            key.SetValue("RmGpuPreemption", 1, RegistryValueKind.DWord);
+                            key.SetValue("DisablePowerGovernors", 1, RegistryValueKind.DWord);
                         }
                     }
                     catch { }
                 }
 
-                // Route running games directly to High-Performance GPU in DirectX UserGpuPreferences
+                // Pre-configure IFEO PerfOptions for all major Android emulators and competitive games
+                string[] masterEmulatorExes = new[]
+                {
+                    "HD-Player.exe", "HD-Agent.exe", "BlueStacks.exe", "dnplayer.exe", "LdBoxHeadless.exe",
+                    "ldvboxheadless.exe", "dnmultiplayer.exe", "AppMarket.exe", "AndroidProcess.exe", "aow_exe.exe",
+                    "Nox.exe", "MEmu.exe", "MuMuPlayer.exe", "NemuPlayer.exe", "SmartGaGa.exe", "cs2.exe", "valorant.exe"
+                };
+
+                foreach (var exe in masterEmulatorExes)
+                {
+                    try
+                    {
+                        using var ifeo = Registry.LocalMachine.CreateSubKey($@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{exe}\PerfOptions", true);
+                        ifeo?.SetValue("CpuPriorityClass", 3, RegistryValueKind.DWord);
+                        ifeo?.SetValue("IoPriority", 3, RegistryValueKind.DWord);
+                        ifeo?.SetValue("PagePriority", 5, RegistryValueKind.DWord);
+                    }
+                    catch { }
+                }
+
+                // Route all major emulators and running games directly to High-Performance GPU in DirectX UserGpuPreferences
                 try
                 {
                     using var gpuPrefKey = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\DirectX\UserGpuPreferences", true);
                     if (gpuPrefKey != null)
                     {
+                        foreach (var exe in masterEmulatorExes)
+                        {
+                            gpuPrefKey.SetValue(exe, "GpuPreference=2;", RegistryValueKind.String);
+                        }
+
                         foreach (var p in Process.GetProcesses())
                         {
                             try
@@ -232,11 +315,32 @@ namespace SetupHub180Hz.Services
 
         private static readonly string[] KnownGameExes = new[]
         {
-            "cs2", "csgo", "valorant", "valorant-win64-shipping", "fortniteclient-win64-shipping",
-            "tslgame", "r5apex", "gta5", "robloxplayerbeta", "javaw", "minecraft",
-            "hd-player", "androidprocess", "aow_exe", "mumuplayer", "ldvboxheadless",
-            "overwatch", "rainbowsix", "league of legends", "dota2", "pubgmobile",
-            "cod", "modernwarfare", "warzone", "rocketleague", "apex", "genshinimpact"
+            // Android Emulators (BlueStacks, MSI App Player, LDPlayer, GameLoop, Nox, MEmu, MuMu, SmartGaGa)
+            "hd-player", "hd-agent", "hd-apphandler", "hd-plus-service", "hd-adb", "bstksvc", "bluestacks", "hd-multimanager",
+            "msi", "msiappplayer",
+            "dnplayer", "ldboxheadless", "ldvboxheadless", "ldnews", "ldboxsvc", "dnmultiplayer",
+            "appmarket", "androidprocess", "aow_exe", "qqexternal", "tsettingcenter",
+            "nox", "noxvmsvc", "nox_adb", "noxmultiplayer",
+            "memu", "memuconsole", "memuheadless", "memupower",
+            "mumuplayer", "nemuplayer", "nemuheadless", "mumuvmmdl", "nemuvmmdl",
+            "smartgaga", "titanengine",
+
+            // Esports & PC Games
+            "cs2", "csgo", "valorant", "valorant-win64-shipping", "riotclientservices",
+            "fortniteclient-win64-shipping", "fortnite",
+            "tslgame", "pubgmobile", "pubg",
+            "r5apex", "apex",
+            "gta5", "fivem_b", "fivem_gta", "fivem",
+            "robloxplayerbeta", "javaw", "minecraft", "bedrock_server",
+            "overwatch", "rainbowsix", "league of legends", "leagueclient", "dota2",
+            "cod", "modernwarfare", "warzone", "rocketleague",
+            "genshinimpact", "starrail", "wutheringwaves", "honkaistarrail",
+            "fifa", "fc24", "fc25", "ea",
+            "cyberpunk2077", "witcher3", "rdr2",
+            "forzahorizon5", "forzahorizon4",
+            "destiny2", "helldivers2", "rustclient", "rust",
+            "deadbydaylight", "fallguys_client", "naraka", "warframe",
+            "battlefield", "bf2042"
         };
 
         public static Task<int> BoostRunningGameProcessesAsync()
@@ -264,11 +368,59 @@ namespace SetupHub180Hz.Services
 
                             if (isGame)
                             {
+                                // 1. Elevate Process Priority to High
                                 if (p.PriorityClass != ProcessPriorityClass.High && p.PriorityClass != ProcessPriorityClass.RealTime)
                                 {
                                     p.PriorityClass = ProcessPriorityClass.High;
-                                    count++;
                                 }
+
+                                // 2. Disable Windows Power Throttling / EcoQoS on process
+                                try
+                                {
+                                    var state = new PROCESS_POWER_THROTTLING_STATE
+                                    {
+                                        Version = PROCESS_POWER_THROTTLING_CURRENT_VERSION,
+                                        ControlMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED | PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION,
+                                        StateMask = 0
+                                    };
+                                    SetProcessInformation(p.Handle, ProcessPowerThrottling, ref state, (uint)Marshal.SizeOf(state));
+                                }
+                                catch { }
+
+                                // 3. Elevate I/O Priority to High (Level 3)
+                                try
+                                {
+                                    int ioPriority = 3;
+                                    NtSetInformationProcess(p.Handle, ProcessIoPriority, ref ioPriority, sizeof(int));
+                                }
+                                catch { }
+
+                                // 4. Set CPU Core Affinity across all logical processors
+                                try
+                                {
+                                    long mask = (1L << Math.Min(64, Environment.ProcessorCount)) - 1;
+                                    if (mask > 0)
+                                    {
+                                        p.ProcessorAffinity = (IntPtr)mask;
+                                    }
+                                }
+                                catch { }
+
+                                // 5. Register in IFEO for future automatic High Priority execution
+                                try
+                                {
+                                    string exeName = p.ProcessName + ".exe";
+                                    using var ifeoKey = Registry.LocalMachine.CreateSubKey($@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{exeName}\PerfOptions", true);
+                                    if (ifeoKey != null)
+                                    {
+                                        ifeoKey.SetValue("CpuPriorityClass", 3, RegistryValueKind.DWord);
+                                        ifeoKey.SetValue("IoPriority", 3, RegistryValueKind.DWord);
+                                        ifeoKey.SetValue("PagePriority", 5, RegistryValueKind.DWord);
+                                    }
+                                }
+                                catch { }
+
+                                count++;
                             }
                         }
                         catch { }
