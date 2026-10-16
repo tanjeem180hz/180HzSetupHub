@@ -87,23 +87,13 @@ namespace SetupHub180Hz.Services
             // 2. Memory Purge (Standby list, Working Sets, Modified list)
             long freedRam = await Task.Run(() => MemoryCleaner.CleanRam());
 
-            // 3. Enforce Ultimate Power Scheme, 100% Core Unparking, Dynamic Turbo Boost GHz & Disable Memory Compression
+            // 3. Enforce Ultimate Power Scheme, Hardware CPPC/SpeedShift, Dynamic Turbo Boost GHz & Disable Memory Compression
             await Task.Run(() =>
             {
                 RunCmd("powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 100");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor ea062031-0e34-4ff1-9b6d-eb1059334028 100");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 5d76a2ca-e8c0-402f-a133-2158492d58ad 0");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 2");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 893dee8e-2bef-41e0-89c6-b55d0929964c 100");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor bc5038f7-23e0-4960-96da-33abaf5935ec 100");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 06cadf0e-64ed-448a-8927-ce7bf90eb35d 10");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 984cf492-3bed-4488-a8f9-4286c97bf5aa 1");
-                RunCmd("powercfg -setactive scheme_current");
                 RunCmd("powershell -NoProfile -ExecutionPolicy Bypass -Command \"Disable-MMAgent -MemoryCompression -PageCombining\"");
             });
+            await CpuOptimizerService.ApplyProcessorWiseMaxTurboAsync();
 
             // 4. Enforce Game Mode, MMCSS 100% CPU Gaming Reservation, GPU Priority 8, Universal NVIDIA/AMD Overdrive
             ApplyInstantGamingRegistry();

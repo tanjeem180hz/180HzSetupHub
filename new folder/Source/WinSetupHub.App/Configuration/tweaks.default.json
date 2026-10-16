@@ -3508,10 +3508,37 @@
     "undoScript": []
   },
   {
+    "id": "CpuTweakDynamicTurboOverdrive",
+    "name": "Processor-Wise Aggressive Turbo Boost & Autonomous CPPC/HWP (Max GHz)",
+    "description": "Unlocks maximum hardware turbo boost frequency without thermal throttling or EcoQoS limits. Configures AMD CPPC and Intel Speed Shift autonomous hardware P-States for 0ms turbo ramp up.",
+    "category": "🧠 CPU, RAM & Power Tuning",
+    "categoryOrder": 2,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+        "Name": "PowerThrottlingOff",
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "powercfg -setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 2; powercfg -setacvalueindex scheme_current sub_processor 8baa4a8a-14c6-4451-8e8b-14bdbd197537 1; powercfg -setacvalueindex scheme_current sub_processor 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0; powercfg -setacvalueindex scheme_current sub_processor 893dee8e-2bef-41e0-89c6-b55d0929964c 100; powercfg -setacvalueindex scheme_current sub_processor 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2; powercfg -setactive scheme_current"
+    ],
+    "undoScript": [
+      "powercfg -setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 1; powercfg -setactive scheme_current"
+    ]
+  },
+  {
     "id": "CpuTweakEppPerformance",
     "name": "Intel Speed Shift & AMD CPPC Energy Performance Preference (EPP = 0)",
     "description": "Configures CPU Energy Performance Preference (EPP) to 0 (Pure Performance), forcing Intel Speed Shift and AMD CPPC to keep cores at maximum boost clocks with zero downclocking latency.",
-    "category": "ðŸ§  CPU, RAM & Power Tuning",
+    "category": "🧠 CPU, RAM & Power Tuning",
     "categoryOrder": 2,
     "section": "System",
     "isAdvanced": false,
@@ -3520,7 +3547,7 @@
     "registry": [],
     "service": [],
     "invokeScript": [
-      "powercfg -setacvalueindex scheme_current sub_processor PERFEPP 0; powercfg -setacvalueindex scheme_current sub_processor PERFEPP1 0; powercfg -setactive scheme_current"
+      "powercfg -setacvalueindex scheme_current sub_processor PERFEPP 0; powercfg -setacvalueindex scheme_current sub_processor PERFEPP1 0; powercfg -setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0; powercfg -setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6864 0; powercfg -setactive scheme_current"
     ],
     "undoScript": [
       "powercfg -setacvalueindex scheme_current sub_processor PERFEPP 50; powercfg -setacvalueindex scheme_current sub_processor PERFEPP1 50; powercfg -setactive scheme_current"

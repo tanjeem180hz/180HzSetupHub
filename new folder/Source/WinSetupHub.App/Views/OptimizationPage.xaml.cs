@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using SetupHub180Hz.Models;
 using SetupHub180Hz.Services;
 
@@ -13,6 +14,7 @@ namespace SetupHub180Hz.Views
     {
         private readonly TweakService _tweakService = new();
         private List<TweakItem> _allTweaks = new();
+        private DispatcherTimer? _telemetryTimer;
 
         private string _activeCategory = "All";
         private string _searchQuery = "";
@@ -23,6 +25,13 @@ namespace SetupHub180Hz.Views
 
             Loaded += async (_, _) =>
             {
+                if (_telemetryTimer == null)
+                {
+                    _telemetryTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.5) };
+                    _telemetryTimer.Tick += (_, _) => UpdatePreGameTelemetry();
+                    _telemetryTimer.Start();
+                }
+
                 if (_allTweaks.Count == 0)
                 {
                     await InitializeAsync();
@@ -37,6 +46,12 @@ namespace SetupHub180Hz.Views
                     BuildCategoryChips();
                     ApplyFilter();
                 }
+            };
+
+            Unloaded += (_, _) =>
+            {
+                _telemetryTimer?.Stop();
+                _telemetryTimer = null;
             };
         }
 
@@ -470,6 +485,7 @@ namespace SetupHub180Hz.Views
 
                 // 3. Activate 0.500ms Kernel Timer Resolution, Standby RAM purge & Game Booster
                 var boostResult = await GameBoosterService.Instance.Activate2xFpsOverdriveAsync();
+                await CpuOptimizerService.ApplyProcessorWiseMaxTurboAsync();
 
                 // 4. Select and apply all tweaks
                 foreach (var t in targetTweaks)
@@ -500,8 +516,9 @@ namespace SetupHub180Hz.Views
                     string cleanStr = totalPurged > 0 ? $" • {FormatBytes(totalPurged)} Cleaned" : "";
                     string procStr = boostResult.BoostedProcessesCount > 0 ? $" • {boostResult.BoostedProcessesCount} Game(s) Priority Elevated" : "";
 
+                    var cpu = CpuOptimizerService.GetCpuInfo();
                     ActivityLogger.Instance.Log($"All Optimizations Applied: {targetTweaks.Count} tweaks deployed, Permanent Boot Safeguard locked, 0.5ms Timer active, {FormatBytes(totalPurged)} junk/RAM purged.", ActivityType.Success);
-                    NotificationService.Notify("🚀 100% Performance Engine Active!", $"All {targetTweaks.Count} optimizations applied. 0.500ms Timer Locked • 5.0GHz Boost • GPU 100%{cleanStr}{procStr}.");
+                    NotificationService.Notify("🚀 100% Performance Engine Active!", $"All {targetTweaks.Count} optimizations applied. 0.500ms Timer Locked • {cpu.MaxTurboGhz:0.0}GHz Boost • GPU 100%{cleanStr}{procStr}.");
 
                     TxtStatus.Text = $"🚀 All {targetTweaks.Count} optimizations applied & PC cleaned successfully! Running at 100% peak performance.";
                     UpdatePermanentStatusBadge();
@@ -567,10 +584,16 @@ namespace SetupHub180Hz.Views
             bool timerLocked = GameBoosterService.Instance.IsTimerResolutionLocked;
             TxtLiveTimerRes.Text = timerLocked ? "0.500 ms (Locked ✓)" : "0.500 ms (Active)";
 
+            var cpu = CpuOptimizerService.GetCpuInfo();
             if (TxtLiveCpuBoost != null)
             {
-                TxtLiveCpuBoost.Text = "5.0 GHz Unlocked ✓";
+                TxtLiveCpuBoost.Text = $"{cpu.RealtimeGhz:0.00} GHz (Max {cpu.MaxTurboGhz:0.0} GHz ✓)";
                 TxtLiveCpuBoost.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
+            }
+
+            if (TxtLiveCpuName != null)
+            {
+                TxtLiveCpuName.Text = $"{cpu.ShortName} • Max Turbo";
             }
 
             if (TxtLiveGpuMode != null)

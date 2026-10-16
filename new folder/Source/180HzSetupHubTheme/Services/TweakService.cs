@@ -88,6 +88,7 @@ namespace SetupHub180Hz.Services
             "KernelTweakTimerResolution",
 
             // 🧠 CPU, RAM & Power Tuning
+            "CpuTweakDynamicTurboOverdrive",
             "CpuTweakUnparkCores",
             "CpuTweakWin32Priority",
             "CpuTweakDisablePaging",
@@ -362,6 +363,7 @@ namespace SetupHub180Hz.Services
             "KernelTweakTimerResolution",
 
             // CPU & Scheduling
+            "CpuTweakDynamicTurboOverdrive",
             "CpuTweakUnparkCores",
             "CpuTweakWin32Priority",
             "CpuTweakDisablePaging",

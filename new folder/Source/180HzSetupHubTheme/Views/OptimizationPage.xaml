@@ -449,7 +449,7 @@
                                     <StackPanel>
                                         <TextBlock Text="CPU TURBO BOOST" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
                                         <TextBlock x:Name="TxtLiveCpuBoost" Text="5.0 GHz Unlocked ✓" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,3,0,0"/>
-                                        <TextBlock Text="Dynamic Precision Scaling" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
+                                        <TextBlock x:Name="TxtLiveCpuName" Text="Dynamic Precision Scaling" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </Border>
 
