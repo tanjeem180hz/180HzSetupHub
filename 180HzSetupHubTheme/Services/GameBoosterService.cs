@@ -63,15 +63,20 @@ namespace SetupHub180Hz.Services
             // 2. Memory Purge (Standby list, Working Sets, Modified list)
             long freedRam = await Task.Run(() => MemoryCleaner.CleanRam());
 
-            // 3. Enforce Ultimate / High Performance Power Scheme with 100% unparked cores
+            // 3. Enforce Ultimate Power Scheme, 100% Core Unparking & Unlock Full Dynamic Turbo Boost GHz
             await Task.Run(() =>
             {
                 RunCmd("powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor CPMINCORES 100");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor CPMAXCORES 100");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor PERFBOOSTMODE 2");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor PERFEPP 0");
-                RunCmd("powercfg -setacvalueindex scheme_current sub_processor IDLEDIS 1");
+                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 100");
+                RunCmd("powercfg -setacvalueindex scheme_current sub_processor ea062031-0e34-4ff1-9b6d-eb1059334028 100");
+                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 5d76a2ca-e8c0-402f-a133-2158492d58ad 0");
+                RunCmd("powercfg -setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 2");
+                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0");
+                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0");
+                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 893dee8e-2bef-41e0-89c6-b55d0929964c 100");
+                RunCmd("powercfg -setacvalueindex scheme_current sub_processor bc5038f7-23e0-4960-96da-33abaf5935ec 100");
+                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 06cadf0e-64ed-448a-8927-ce7bf90eb35d 10");
+                RunCmd("powercfg -setacvalueindex scheme_current sub_processor 984cf492-3bed-4488-a8f9-4286c97bf5aa 1");
                 RunCmd("powercfg -setactive scheme_current");
             });
 
@@ -168,6 +173,59 @@ namespace SetupHub180Hz.Services
                 {
                     key?.SetValue("MaxQueuedBuffers", 1, RegistryValueKind.DWord);
                 }
+
+                // Disable GPU Ultra-Low Power State (ULPS) & PowerMizer across all display adapters for 100% full GPU utilization
+                for (int i = 0; i <= 3; i++)
+                {
+                    string subkey = $@"SYSTEM\CurrentControlSet\Control\Class\{{4d36e968-e325-11ce-bfc1-08002be10318}}\{i:D4}";
+                    try
+                    {
+                        using var key = Registry.LocalMachine.OpenSubKey(subkey, true);
+                        if (key != null)
+                        {
+                            key.SetValue("EnableUlps", 0, RegistryValueKind.DWord);
+                            key.SetValue("EnableUlps_NA", 0, RegistryValueKind.DWord);
+                            key.SetValue("KMD_EnableComputePreemption", 1, RegistryValueKind.DWord);
+                            key.SetValue("DalDisableDisplayGating", 1, RegistryValueKind.DWord);
+                            key.SetValue("DisableDrmdmaPowerGating", 1, RegistryValueKind.DWord);
+                            key.SetValue("DisableStutterMode", 1, RegistryValueKind.DWord);
+                            key.SetValue("PowerMizerEnable", 0, RegistryValueKind.DWord);
+                            key.SetValue("PowerMizerLevel", 1, RegistryValueKind.DWord);
+                            key.SetValue("PowerMizerLevelAC", 1, RegistryValueKind.DWord);
+                        }
+                    }
+                    catch { }
+                }
+
+                // Route running games directly to High-Performance GPU in DirectX UserGpuPreferences
+                try
+                {
+                    using var gpuPrefKey = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\DirectX\UserGpuPreferences", true);
+                    if (gpuPrefKey != null)
+                    {
+                        foreach (var p in Process.GetProcesses())
+                        {
+                            try
+                            {
+                                string pName = p.ProcessName.ToLowerInvariant();
+                                foreach (var g in KnownGameExes)
+                                {
+                                    if (pName.Contains(g))
+                                    {
+                                        string? mainModulePath = p.MainModule?.FileName;
+                                        if (!string.IsNullOrEmpty(mainModulePath))
+                                        {
+                                            gpuPrefKey.SetValue(mainModulePath, "GpuPreference=2;", RegistryValueKind.String);
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                catch { }
             }
             catch { }
         }

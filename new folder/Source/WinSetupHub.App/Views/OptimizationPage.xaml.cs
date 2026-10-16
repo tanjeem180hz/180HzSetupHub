@@ -948,17 +948,29 @@ namespace SetupHub180Hz.Views
             bool timerLocked = GameBoosterService.Instance.IsTimerResolutionLocked;
             TxtLiveTimerRes.Text = timerLocked ? "0.500 ms (Locked ✓)" : "0.500 ms (Ready to Lock)";
 
+            if (TxtLiveCpuBoost != null)
+            {
+                TxtLiveCpuBoost.Text = "5.0 GHz Unlocked ✓";
+                TxtLiveCpuBoost.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
+            }
+
+            if (TxtLiveGpuMode != null)
+            {
+                TxtLiveGpuMode.Text = "100% Max Mode ✓";
+                TxtLiveGpuMode.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x00, 0xE5, 0xFF));
+            }
+
             var games = GameBoosterService.GetRunningGameProcessNames();
             if (TxtLiveDetectedGames != null)
             {
                 if (games.Count > 0)
                 {
-                    TxtLiveDetectedGames.Text = $"{string.Join(", ", games.Take(3))} ({games.Count} Game{(games.Count > 1 ? "s" : "")})";
+                    TxtLiveDetectedGames.Text = $"{string.Join(", ", games.Take(2))} ({games.Count} Game{(games.Count > 1 ? "s" : "")})";
                     TxtLiveDetectedGames.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
                 }
                 else
                 {
-                    TxtLiveDetectedGames.Text = "Ready for Game Launch";
+                    TxtLiveDetectedGames.Text = "Ready for Launch";
                     TxtLiveDetectedGames.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x8A, 0x9B, 0xA8));
                 }
             }

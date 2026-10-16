@@ -326,6 +326,8 @@ namespace SetupHub180Hz.Services
             "GameTweakDwmRenderBufferSingle",
             "GameTweakStandbyListAutoPurge",
             "GameTweakNetworkPacketPacingZero",
+            "GfxTweakDisableUlpsPowerMizer",
+            "GfxTweakDirectXHighPerformanceRouting",
             "RegTweakMMCSSGpuPriority8",
             "RegTweakMMCSSCpuPriority6",
             "RegTweakSystemResponsivenessZero",
@@ -379,6 +381,8 @@ namespace SetupHub180Hz.Services
             "GfxTweakShaderCache10GB",
             "GfxTweakDwmMaxQueuedFrames",
             "GfxTweakDisableDRR",
+            "GfxTweakDisableUlpsPowerMizer",
+            "GfxTweakDirectXHighPerformanceRouting",
 
             // Network & Ping
             "NetTweakTcpAckNoDelay",

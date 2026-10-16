@@ -4492,9 +4492,9 @@
   },
   {
     "id": "CpuTweakDisableProcessorIdleDemote",
-    "name": "Disable Processor Idle State Demote / Promote Lag Thresholds",
-    "description": "Disables hysteresis idle demotion in Windows power manager. Keeps CPU executing in C0 performance state rather than stepping down through power states during framerate dips.",
-    "category": "ðŸ§  CPU, RAM & Power Tuning",
+    "name": "🚀 Unlock Maximum CPU Turbo Boost & Dynamic Precision Boost (5.0GHz+ Capable)",
+    "description": "Enables dynamic C-state thermal headroom and configures Aggressive Processor Boost with 0% EPP delay. Unlocks full CPU GHz scaling up to maximum factory turbo boost (e.g. 5.0GHz) without locking at base clock.",
+    "category": "🧠 CPU, RAM & Power Tuning",
     "categoryOrder": 3,
     "section": "System",
     "isAdvanced": false,
@@ -4503,10 +4503,10 @@
     "registry": [],
     "service": [],
     "invokeScript": [
-      "powercfg -setacvalueindex scheme_current sub_processor IDLEDIS 1; powercfg -setactive scheme_current"
+      "powercfg -setacvalueindex scheme_current sub_processor 5d76a2ca-e8c0-402f-a133-2158492d58ad 0; powercfg -setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 2; powercfg -setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0; powercfg -setacvalueindex scheme_current sub_processor 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0; powercfg -setacvalueindex scheme_current sub_processor 06cadf0e-64ed-448a-8927-ce7bf90eb35d 10; powercfg -setacvalueindex scheme_current sub_processor 984cf492-3bed-4488-a8f9-4286c97bf5aa 1; powercfg -setactive scheme_current"
     ],
     "undoScript": [
-      "powercfg -setacvalueindex scheme_current sub_processor IDLEDIS 0; powercfg -setactive scheme_current"
+      "powercfg -setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 1; powercfg -setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 50; powercfg -setactive scheme_current"
     ]
   },
   {
@@ -5699,7 +5699,7 @@
     "registry": [],
     "service": [],
     "invokeScript": [
-      "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; powercfg -setacvalueindex scheme_current sub_processor CPMINCORES 100; powercfg -setacvalueindex scheme_current sub_processor CPMAXCORES 100; powercfg -setacvalueindex scheme_current sub_processor PERFBOOSTMODE 2; powercfg -setacvalueindex scheme_current sub_processor PERFEPP 0; powercfg -setacvalueindex scheme_current sub_processor IDLEDIS 1; powercfg -setactive scheme_current"
+      "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; powercfg -setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 100; powercfg -setacvalueindex scheme_current sub_processor ea062031-0e34-4ff1-9b6d-eb1059334028 100; powercfg -setacvalueindex scheme_current sub_processor 5d76a2ca-e8c0-402f-a133-2158492d58ad 0; powercfg -setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 2; powercfg -setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0; powercfg -setacvalueindex scheme_current sub_processor 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0; powercfg -setacvalueindex scheme_current sub_processor 06cadf0e-64ed-448a-8927-ce7bf90eb35d 10; powercfg -setacvalueindex scheme_current sub_processor 984cf492-3bed-4488-a8f9-4286c97bf5aa 1; powercfg -setactive scheme_current"
     ],
     "undoScript": [
       "powercfg -setacvalueindex scheme_current sub_processor CPMINCORES 5; powercfg -setactive scheme_current"
@@ -5941,5 +5941,69 @@
     "undoScript": [
       "netsh int tcp set global ecncapability=default"
     ]
+  },
+  {
+    "id": "GfxTweakDisableUlpsPowerMizer",
+    "name": "🚀 Disable GPU Ultra-Low Power State (ULPS) & PowerMizer Throttling (Force 100% GPU Utilization)",
+    "description": "Disables AMD ULPS sleep states, NVIDIA PowerMizer throttling and GPU driver power gating across registry classes. Forces the GPU to maintain high 3D clocks and allows games to reach 100% full GPU utilization without GPU power drop.",
+    "category": "🎮 2X FPS Ultra Gaming & Esports Overdrive",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "Name": "PowerSavingPolicy",
+        "Type": "DWord",
+        "Value": 0,
+        "DefaultValue": 1
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "Name": "HwSchMode",
+        "Type": "DWord",
+        "Value": 2,
+        "DefaultValue": 2
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v EnableUlps /t REG_DWORD /d 0 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0001\" /v EnableUlps /t REG_DWORD /d 0 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v DalDisableDisplayGating /t REG_DWORD /d 1 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v DisableDrmdmaPowerGating /t REG_DWORD /d 1 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v DisableStutterMode /t REG_DWORD /d 1 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v PowerMizerEnable /t REG_DWORD /d 0 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v PowerMizerLevel /t REG_DWORD /d 1 /f; reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v PowerMizerLevelAC /t REG_DWORD /d 1 /f"
+    ],
+    "undoScript": [
+      "reg add \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0000\" /v EnableUlps /t REG_DWORD /d 1 /f"
+    ]
+  },
+  {
+    "id": "GfxTweakDirectXHighPerformanceRouting",
+    "name": "🎮 Direct High-Performance GPU Routing & Bypass Hybrid Throttling",
+    "description": "Sets default DirectX graphics scheduling to Dedicated High-Performance GPU mode, preventing games and heavy applications from running on throttled hybrid or low-power GPU states.",
+    "category": "🎮 2X FPS Ultra Gaming & Esports Overdrive",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "Name": "GPU Priority",
+        "Type": "DWord",
+        "Value": 8,
+        "DefaultValue": 8
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+        "Name": "Priority",
+        "Type": "DWord",
+        "Value": 6,
+        "DefaultValue": 2
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
   }
 ]

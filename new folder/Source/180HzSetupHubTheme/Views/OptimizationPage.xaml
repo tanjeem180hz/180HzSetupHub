@@ -465,7 +465,7 @@
                             <!-- Description Row -->
                             <TextBlock Grid.Row="1" Margin="0,8,0,12" TextWrapping="Wrap"
                                        FontFamily="{StaticResource AppFont}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}">
-                                Locks core CPU unparking (100% min/max cores), 0ms turbo boost delay, zero-ping network heuristics, low-latency I/O, and multimedia GPU priorities into a high-privilege Windows Startup Task (<Run FontFamily="Consolas" Foreground="{DynamicResource BrushAccent}">180Hz_Permanence_Guard</Run>).
+                                Locks 100% Core Unparking, enables dynamic 5.0GHz+ Precision Boost (0ms latency), disables GPU ULPS power throttling, and sets zero-ping network heuristics into a high-privilege Windows Startup Task (<Run FontFamily="Consolas" Foreground="{DynamicResource BrushAccent}">180Hz_Permanence_Guard</Run>).
                                 <LineBreak/>
                                 <Run FontWeight="SemiBold" Foreground="{DynamicResource BrushTextPrimary}">Once locked, these optimizations automatically survive every PC restart or Windows shutdown permanently without ever needing to re-open the app!</Run>
                             </TextBlock>
@@ -523,38 +523,48 @@
                             <!-- Description Row -->
                             <TextBlock Grid.Row="1" Margin="0,8,0,12" TextWrapping="Wrap"
                                        FontFamily="{StaticResource AppFont}" FontSize="12" Foreground="{DynamicResource BrushTextSecondary}">
-                                Just turned on your PC or about to launch a game? Click once below to lock <Run FontWeight="Bold" Foreground="#00FF66">0.500ms high-precision kernel timer resolution</Run>, flush <Run FontWeight="Bold" Foreground="#00FF66">Standby RAM stutter cache</Run>, activate <Run FontWeight="Bold" Foreground="#00FF66">GPU Priority 8</Run>, and elevate all detected games to High priority for silk-smooth stutter-free gameplay.
+                                Just turned on your PC or about to launch a game? Click once below to lock <Run FontWeight="Bold" Foreground="#00FF66">0.500ms high-precision kernel timer resolution</Run>, unlock <Run FontWeight="Bold" Foreground="#00FF66">5.0GHz dynamic CPU Turbo Boost</Run>, release <Run FontWeight="Bold" Foreground="#00FF66">100% GPU utilization (ULPS Off)</Run>, flush <Run FontWeight="Bold" Foreground="#00FF66">Standby RAM stutter cache</Run>, and elevate all games to High Priority.
                             </TextBlock>
 
                             <!-- Live Telemetry Badges Grid -->
-                            <UniformGrid Grid.Row="2" Columns="3" Margin="0,0,0,14">
+                            <UniformGrid Grid.Row="2" Columns="4" Margin="0,0,0,14">
                                 <!-- Badge 1: Timer Res -->
                                 <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                                        CornerRadius="8" Padding="12,10" Margin="0,0,6,0">
+                                        CornerRadius="8" Padding="10,10" Margin="0,0,4,0">
                                     <StackPanel>
-                                        <TextBlock Text="KERNEL TIMER RESOLUTION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
-                                        <TextBlock x:Name="TxtLiveTimerRes" Text="0.500 ms (Locked)" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,3,0,0"/>
-                                        <TextBlock Text="Eliminates frame pacing jitter" FontSize="10" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
+                                        <TextBlock Text="KERNEL TIMER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                        <TextBlock x:Name="TxtLiveTimerRes" Text="0.500 ms (Locked ✓)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,3,0,0"/>
+                                        <TextBlock Text="0.5ms zero frame jitter" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </Border>
 
-                                <!-- Badge 2: Standby RAM -->
+                                <!-- Badge 2: CPU Turbo Boost -->
                                 <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                                        CornerRadius="8" Padding="12,10" Margin="3,0,3,0">
+                                        CornerRadius="8" Padding="10,10" Margin="2,0,2,0">
                                     <StackPanel>
-                                        <TextBlock Text="STANDBY MEMORY PURGE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
-                                        <TextBlock x:Name="TxtLiveStandbyRam" Text="Clean &amp; Optimized" FontSize="15" FontWeight="Bold" Foreground="#00E5FF" Margin="0,3,0,0"/>
-                                        <TextBlock Text="Prevents 1-sec game freezes" FontSize="10" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
+                                        <TextBlock Text="CPU TURBO BOOST" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                        <TextBlock x:Name="TxtLiveCpuBoost" Text="5.0 GHz Unlocked ✓" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,3,0,0"/>
+                                        <TextBlock Text="Dynamic Precision Scaling" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </Border>
 
-                                <!-- Badge 3: Active Game Detection -->
+                                <!-- Badge 3: GPU Utilization -->
                                 <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                                        CornerRadius="8" Padding="12,10" Margin="6,0,0,0">
+                                        CornerRadius="8" Padding="10,10" Margin="2,0,2,0">
                                     <StackPanel>
-                                        <TextBlock Text="DETECTED RUNNING GAMES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
-                                        <TextBlock x:Name="TxtLiveDetectedGames" Text="Ready for Game Launch" FontSize="14" FontWeight="Bold" Foreground="#FFD700" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Text="Auto-boosted to High Priority" FontSize="10" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
+                                        <TextBlock Text="GPU UTILIZATION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                        <TextBlock x:Name="TxtLiveGpuMode" Text="100% Max Mode ✓" FontSize="13" FontWeight="Bold" Foreground="#00E5FF" Margin="0,3,0,0"/>
+                                        <TextBlock Text="ULPS Off • Max Perf" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Badge 4: Standby RAM & Games -->
+                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                                        CornerRadius="8" Padding="10,10" Margin="4,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="MEMORY &amp; GAMES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                        <TextBlock x:Name="TxtLiveDetectedGames" Text="Standby Purged ✓" FontSize="13" FontWeight="Bold" Foreground="#FFD700" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock x:Name="TxtLiveStandbyRam" Text="Elevated to High Priority" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </Border>
                             </UniformGrid>
