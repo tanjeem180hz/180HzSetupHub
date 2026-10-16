@@ -187,40 +187,62 @@
                     </Grid>
                 </Grid>
 
-                <!-- 2B. Circular Progress View (Round Animation) -->
-                <Grid x:Name="ProgressPanel" Visibility="Collapsed" MinHeight="260">
+                <!-- 2B. Circular Progress View (High-Velocity Glowing Gauge) -->
+                <Grid x:Name="ProgressPanel" Visibility="Collapsed" MinHeight="290">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
 
-                        <!-- Circular Gauge -->
-                        <Grid Width="140" Height="140" HorizontalAlignment="Center" Margin="0,6,0,16">
-                            <!-- Background Track Ring -->
-                            <Ellipse Stroke="{DynamicResource BrushBorder}" StrokeThickness="8" Width="130" Height="130"/>
-                            <!-- Animated Progress Arc -->
-                            <Path x:Name="ProgressArc" Stroke="{DynamicResource BrushAccent}" StrokeThickness="8"
-                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        <!-- Circular Gauge (170x170, concentric with center at 85,85) -->
+                        <Grid Width="170" Height="170" HorizontalAlignment="Center" Margin="0,10,0,18">
+                            <!-- Outer Ambient Ring -->
+                            <Ellipse Stroke="#0E231B" StrokeThickness="1" Width="162" Height="162"
+                                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                            <!-- Background Track Ring (Dark Emerald) -->
+                            <Ellipse Stroke="#162A22" StrokeThickness="9" Width="140" Height="140"
+                                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                            <!-- Animated Glowing Progress Arc -->
+                            <Path x:Name="ProgressArc" Stroke="{DynamicResource BrushAccent}" StrokeThickness="9"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                  HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <Path.Effect>
+                                    <DropShadowEffect Color="#00FF66" BlurRadius="14" ShadowDepth="0" Opacity="0.85"/>
+                                </Path.Effect>
+                            </Path>
 
                             <!-- Center percentage & counts -->
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <TextBlock x:Name="TxtPercent" Text="0%" FontFamily="{StaticResource AppFont}"
-                                           FontSize="26" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"
-                                           HorizontalAlignment="Center"/>
+                                           FontSize="32" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"
+                                           HorizontalAlignment="Center">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect Color="#00FF66" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
+                                    </TextBlock.Effect>
+                                </TextBlock>
                                 <TextBlock x:Name="TxtStepCounter" Text="0 / 12" FontFamily="{StaticResource AppFont}"
-                                           FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"
+                                           FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"
                                            HorizontalAlignment="Center" Margin="0,2,0,0"/>
+                                <Border x:Name="BadgeStepStatus" Background="#1A00FF66" BorderBrush="{DynamicResource BrushAccent}"
+                                        BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,5,0,0" HorizontalAlignment="Center">
+                                    <TextBlock x:Name="TxtBadgeStatus" Text="APPLYING" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                                </Border>
                             </StackPanel>
                         </Grid>
 
                         <!-- Action Status Headline -->
                         <TextBlock x:Name="TxtActionTitle" Text="Applying Optimizations..."
-                                   FontFamily="{StaticResource AppFont}" FontSize="15" FontWeight="SemiBold"
+                                   FontFamily="{StaticResource AppFont}" FontSize="16" FontWeight="Bold"
                                    Foreground="{DynamicResource BrushTextPrimary}" HorizontalAlignment="Center"
-                                   Margin="0,0,0,6"/>
+                                   Margin="0,0,0,8"/>
 
-                        <!-- Current Tweak Subtext -->
-                        <TextBlock x:Name="TxtCurrentTweakName" Text="Starting..."
-                                   FontFamily="{StaticResource AppFont}" FontSize="12"
-                                   Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Center"
-                                   TextTrimming="CharacterEllipsis" MaxWidth="440"/>
+                        <!-- Current Tweak Subtext Box -->
+                        <Border Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                                CornerRadius="6" Padding="14,6" HorizontalAlignment="Center" MaxWidth="440">
+                            <TextBlock x:Name="TxtCurrentTweakName" Text="Initializing system engine..."
+                                       FontFamily="{StaticResource AppFont}" FontSize="12"
+                                       Foreground="{DynamicResource BrushTextSecondary}" HorizontalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Border>
                     </StackPanel>
                 </Grid>
 

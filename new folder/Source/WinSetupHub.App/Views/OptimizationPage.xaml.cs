@@ -396,35 +396,86 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private async void BtnCleanPc_Click(object sender, RoutedEventArgs e)
+        private void BtnCleanPc_Click(object sender, RoutedEventArgs e)
         {
             if (BtnCleanPc != null) BtnCleanPc.IsEnabled = false;
-            TxtStatus.Text = "🧹 Scanning and cleaning system junk, temporary files, caches & purging RAM...";
+            TxtStatus.Text = "🧹 Cleaning system junk, temporary files, caches & purging RAM...";
             StatusBar.Visibility = Visibility.Visible;
             if (StatusLottie != null) StatusLottie.Visibility = Visibility.Visible;
 
             try
             {
-                var scanTargets = await CleanupService.Instance.ScanAsync(force: true);
-                long freedBytes = await CleanupService.Instance.CleanAllAsync(scanTargets);
-                long ramFreed = await Task.Run(() => MemoryCleaner.CleanRam());
-                long totalFreed = freedBytes + ramFreed;
+                long freedBytes = 0;
+                long ramFreed = 0;
 
-                // Also flush DNS resolver cache
-                await Task.Run(() =>
+                var cleanSteps = new List<OptimizationCustomStep>
                 {
-                    try
+                    new OptimizationCustomStep
                     {
-                        using var proc = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("ipconfig", "/flushdns")
+                        Name = "🔍 Scanning Temporary Files & Cache Directories...",
+                        Action = async () =>
                         {
-                            CreateNoWindow = true,
-                            UseShellExecute = false
-                        });
-                        proc?.WaitForExit(3000);
+                            await Task.Delay(100);
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🗑️ Purging Windows Temp, User Temp & Logs...",
+                        Action = async () =>
+                        {
+                            try
+                            {
+                                var scanTargets = await CleanupService.Instance.ScanAsync(force: true);
+                                freedBytes = await CleanupService.Instance.CleanAllAsync(scanTargets);
+                            }
+                            catch { }
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🌐 Flushing DNS Resolver Cache & Network Buffers...",
+                        Action = async () =>
+                        {
+                            await Task.Run(() =>
+                            {
+                                try
+                                {
+                                    using var proc = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("ipconfig", "/flushdns")
+                                    {
+                                        CreateNoWindow = true,
+                                        UseShellExecute = false
+                                    });
+                                    proc?.WaitForExit(3000);
+                                }
+                                catch { }
+                            });
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🧠 Purging Standby Memory & Working Sets...",
+                        Action = async () =>
+                        {
+                            ramFreed = await Task.Run(() => MemoryCleaner.CleanRam());
+                        }
                     }
-                    catch { }
-                });
+                };
 
+                var dialog = new OptimizationDialog(
+                    title: "🧹 Deep PC & RAM Cleanup",
+                    subtitle: "Purging temporary junk files, update cache, and unreleased standby RAM:",
+                    tweaks: new List<TweakItem>(),
+                    isUndo: false,
+                    tweakService: _tweakService,
+                    autoStart: true,
+                    customSteps: cleanSteps)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+
+                dialog.ShowDialog();
+
+                long totalFreed = freedBytes + ramFreed;
                 string freedDisplay = FormatBytes(totalFreed);
                 TxtStatus.Text = $"🧹 Deep PC Clean complete! Reclaimed {freedDisplay} of junk files and RAM cache.";
                 NotificationService.Notify("🧹 PC & RAM Cleaned!", $"Successfully purged {freedDisplay} of temporary files, update caches, and RAM standby memory.");
@@ -444,7 +495,7 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private async void BtnApplyAll_Click(object sender, RoutedEventArgs e)
+        private void BtnApplyAll_Click(object sender, RoutedEventArgs e)
         {
             var targetTweaks = _allTweaks;
             if (targetTweaks.Count == 0) return;
@@ -465,29 +516,88 @@ namespace SetupHub180Hz.Views
             if (prompt != MessageBoxResult.Yes) return;
 
             BtnApplyAll.IsEnabled = false;
-            TxtStatus.Text = "🚀 Deploying 100% Extreme Performance Engine (Safeguard + Timer + RAM + Deep Clean + All Tweaks)...";
+            TxtStatus.Text = "🚀 Deploying 100% Extreme Performance Engine...";
             StatusBar.Visibility = Visibility.Visible;
             if (StatusLottie != null) StatusLottie.Visibility = Visibility.Visible;
 
             try
             {
-                // 1. Run Deep PC Clean & RAM Purge
                 long cleanedBytes = 0;
-                try
+                long ramPurged = 0;
+                int boostedProcesses = 0;
+
+                var customSteps = new List<OptimizationCustomStep>
                 {
-                    var scanTargets = await CleanupService.Instance.ScanAsync(force: true);
-                    cleanedBytes = await CleanupService.Instance.CleanAllAsync(scanTargets);
-                }
-                catch { }
+                    new OptimizationCustomStep
+                    {
+                        Name = "🧹 Deep PC Junk & Cache Cleanup",
+                        Action = async () =>
+                        {
+                            try
+                            {
+                                var scanTargets = await CleanupService.Instance.ScanAsync(force: true);
+                                cleanedBytes = await CleanupService.Instance.CleanAllAsync(scanTargets);
+                            }
+                            catch { }
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🧠 Purging Standby RAM Memory Stutter",
+                        Action = async () =>
+                        {
+                            try
+                            {
+                                ramPurged = await Task.Run(() => MemoryCleaner.CleanRam());
+                            }
+                            catch { }
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🔒 Deploying Permanent Boot Safeguard",
+                        Action = async () =>
+                        {
+                            await PermanenceService.Instance.DeployPermanentSafeguardAsync();
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "⚡ Unlocking Dynamic Maximum Turbo GHz",
+                        Action = async () =>
+                        {
+                            await CpuOptimizerService.ApplyProcessorWiseMaxTurboAsync();
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "⏱️ Locking 0.500ms Kernel Timer Resolution",
+                        Action = () =>
+                        {
+                            GameBoosterService.Instance.Enable05msTimerResolution();
+                            return Task.CompletedTask;
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🎮 Dual-Vendor GPU Overdrive (NVIDIA & AMD)",
+                        Action = () =>
+                        {
+                            GameBoosterService.ApplyInstantGamingRegistry();
+                            return Task.CompletedTask;
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🚀 Elevating Emulator & Game Priorities",
+                        Action = async () =>
+                        {
+                            boostedProcesses = await GameBoosterService.BoostRunningGameProcessesAsync();
+                        }
+                    }
+                };
 
-                // 2. Deploy Permanent Boot Safeguard
-                await PermanenceService.Instance.DeployPermanentSafeguardAsync();
-
-                // 3. Activate 0.500ms Kernel Timer Resolution, Standby RAM purge & Game Booster
-                var boostResult = await GameBoosterService.Instance.Activate2xFpsOverdriveAsync();
-                await CpuOptimizerService.ApplyProcessorWiseMaxTurboAsync();
-
-                // 4. Select and apply all tweaks
+                // Select and apply all tweaks
                 foreach (var t in targetTweaks)
                 {
                     t.IsSelected = true;
@@ -498,7 +608,9 @@ namespace SetupHub180Hz.Views
                     subtitle: $"Applying 100% Performance Engine across all {targetTweaks.Count} System, Registry & Cleaner optimizations:",
                     tweaks: targetTweaks,
                     isUndo: false,
-                    tweakService: _tweakService)
+                    tweakService: _tweakService,
+                    autoStart: true,
+                    customSteps: customSteps)
                 {
                     Owner = Window.GetWindow(this)
                 };
@@ -512,9 +624,9 @@ namespace SetupHub180Hz.Views
                     }
                     TweakService.RecordAppliedTweaks(targetTweaks.Select(t => t.Id));
 
-                    long totalPurged = cleanedBytes + boostResult.FreedRamBytes;
+                    long totalPurged = cleanedBytes + ramPurged;
                     string cleanStr = totalPurged > 0 ? $" • {FormatBytes(totalPurged)} Cleaned" : "";
-                    string procStr = boostResult.BoostedProcessesCount > 0 ? $" • {boostResult.BoostedProcessesCount} Game(s) Priority Elevated" : "";
+                    string procStr = boostedProcesses > 0 ? $" • {boostedProcesses} Game(s) Priority Elevated" : "";
 
                     var cpu = CpuOptimizerService.GetCpuInfo();
                     ActivityLogger.Instance.Log($"All Optimizations Applied: {targetTweaks.Count} tweaks deployed, Permanent Boot Safeguard locked, 0.5ms Timer active, {FormatBytes(totalPurged)} junk/RAM purged.", ActivityType.Success);
