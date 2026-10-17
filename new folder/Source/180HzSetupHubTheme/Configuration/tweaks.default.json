@@ -357,7 +357,7 @@
     "id": "EmulTweakPowerThrottling",
     "name": "Disable CPU Power Throttling & EcoQoS for Emulators",
     "description": "Stops Windows 10/11 from throttling multi-threaded Android emulator processes, preventing emulator CPU threads from getting relegated to slow efficiency states.",
-    "category": "ðŸš€ Emulator 100% Performance",
+    "category": "🚀 Emulator 100% Performance",
     "categoryOrder": 0,
     "section": "System",
     "isAdvanced": false,
@@ -375,6 +375,56 @@
     "service": [],
     "invokeScript": [],
     "undoScript": []
+  },
+  {
+    "id": "EmulTweakMaxGhzBoostLock",
+    "name": "Lock Maximum Turbo GHz & Zen4/P-Core Priority for Emulators & Games",
+    "description": "Forces Windows CPU Power Boost to Mode 5 (Aggressive at Guaranteed Max Turbo) with 100% boost policy, disables EPP latency, forces heterogeneous thread scheduling directly to high-frequency Zen 4 / P-cores for emulators and games, preventing threads from landing on slower Zen 4c compact / E-cores.",
+    "category": "🚀 Emulator 100% Performance",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+        "Name": "PowerThrottlingOff",
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533251-82be-4824-96c1-47b60b740d00\\be337238-0d82-4146-a960-4f3749d470c7",
+        "Name": "Attributes",
+        "Value": "2",
+        "OriginalValue": "1",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "powercfg -setacvalueindex scheme_current sub_processor PERFBOOSTMODE 5",
+      "powercfg -setdcvalueindex scheme_current sub_processor PERFBOOSTMODE 5",
+      "powercfg -setacvalueindex scheme_current sub_processor 45bcc044-d885-43e2-8605-ee0ec6e96b59 100",
+      "powercfg -setdcvalueindex scheme_current sub_processor 45bcc044-d885-43e2-8605-ee0ec6e96b59 100",
+      "powercfg -setacvalueindex scheme_current sub_processor HETEROPOLICY 1",
+      "powercfg -setdcvalueindex scheme_current sub_processor HETEROPOLICY 1",
+      "powercfg -setacvalueindex scheme_current sub_processor SHORTTHREADHETEROPOLICY 1",
+      "powercfg -setdcvalueindex scheme_current sub_processor SHORTTHREADHETEROPOLICY 1",
+      "powercfg -setacvalueindex scheme_current sub_processor PERFEPP 0",
+      "powercfg -setdcvalueindex scheme_current sub_processor PERFEPP 0",
+      "powercfg -setacvalueindex scheme_current sub_processor PROCTHROTTLEMIN 100",
+      "powercfg -setdcvalueindex scheme_current sub_processor PROCTHROTTLEMIN 100",
+      "powercfg -setacvalueindex scheme_current sub_processor CPMINCORES 100",
+      "powercfg -setdcvalueindex scheme_current sub_processor CPMINCORES 100",
+      "powercfg -setactive scheme_current"
+    ],
+    "undoScript": [
+      "powercfg -setacvalueindex scheme_current sub_processor PERFBOOSTMODE 2",
+      "powercfg -setdcvalueindex scheme_current sub_processor PERFBOOSTMODE 2",
+      "powercfg -setactive scheme_current"
+    ]
   },
   {
     "id": "GfxTweakVisualFX",

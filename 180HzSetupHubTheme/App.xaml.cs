@@ -26,6 +26,9 @@ namespace SetupHub180Hz
             // Immediately lock 0.500ms high-precision kernel timer resolution for ultra-low latency gaming & physics
             GameBoosterService.Instance.Enable05msTimerResolution();
 
+            // Start continuous real-time emulator & game booster daemon (instantly detects running games, pins 5.0 GHz boost, disables EcoQoS)
+            GameBoosterService.StartContinuousGameBoosterEngine();
+
             // Don't let one bad Task/UI exception crash the whole app —
             // log it and keep the shell alive.
             DispatcherUnhandledException += OnDispatcherUnhandledException;

@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -13,9 +15,11 @@ namespace SetupHub180Hz.Services
         public string FullName { get; set; } = "Processor";
         public string ShortName { get; set; } = "Processor";
         public string Vendor { get; set; } = "Unknown";
-        public double BaseGhz { get; set; } = 3.5;
+        public double BaseGhz { get; set; } = 3.55;
         public double MaxTurboGhz { get; set; } = 5.0;
-        public double RealtimeGhz { get; set; } = 3.5;
+        public double RealtimeGhz { get; set; } = 3.55;
+        public double PeakCoreGhz { get; set; } = 5.0;
+        public double AverageAllCoreGhz { get; set; } = 3.93;
         public double PerformancePercent { get; set; } = 100.0;
         public int CoreCount { get; set; } = Environment.ProcessorCount / 2;
         public int ThreadCount { get; set; } = Environment.ProcessorCount;
@@ -28,6 +32,7 @@ namespace SetupHub180Hz.Services
     {
         private static CpuInfo? _cachedInfo;
         private static PerformanceCounter? _cpuPerfCounter;
+        private static List<PerformanceCounter>? _coreCounters;
         private static readonly object _syncLock = new();
 
         static CpuOptimizerService()
@@ -38,6 +43,20 @@ namespace SetupHub180Hz.Services
                 {
                     _cpuPerfCounter = new PerformanceCounter("Processor Information", "% Processor Performance", "_Total");
                     _cpuPerfCounter.NextValue();
+
+                    var cat = new PerformanceCounterCategory("Processor Information");
+                    var instances = cat.GetInstanceNames().Where(n => !n.Contains("Total", StringComparison.OrdinalIgnoreCase)).ToList();
+                    _coreCounters = new List<PerformanceCounter>();
+                    foreach (var inst in instances)
+                    {
+                        try
+                        {
+                            var pc = new PerformanceCounter("Processor Information", "% Processor Performance", inst);
+                            pc.NextValue();
+                            _coreCounters.Add(pc);
+                        }
+                        catch { }
+                    }
                 }
             }
             catch { }
@@ -52,7 +71,7 @@ namespace SetupHub180Hz.Services
                     _cachedInfo = DetectCpuHardware();
                 }
 
-                // Update real-time GHz reading
+                // Update real-time GHz reading (both peak core boost and all-core average)
                 UpdateRealtimeFrequency(_cachedInfo);
                 return _cachedInfo;
             }
@@ -68,7 +87,7 @@ namespace SetupHub180Hz.Services
                 {
                     info.FullName = (key.GetValue("ProcessorNameString") as string)?.Trim() ?? "Processor";
                     info.Vendor = (key.GetValue("VendorIdentifier") as string)?.Trim() ?? "";
-                    int mhz = Convert.ToInt32(key.GetValue("~MHz") ?? 3500);
+                    int mhz = Convert.ToInt32(key.GetValue("~MHz") ?? 3550);
                     info.BaseGhz = Math.Round(mhz / 1000.0, 2);
                 }
             }
@@ -81,12 +100,22 @@ namespace SetupHub180Hz.Services
             info.IsIntel = info.Vendor.Contains("Intel", StringComparison.OrdinalIgnoreCase) ||
                            info.FullName.Contains("Intel", StringComparison.OrdinalIgnoreCase);
 
+            // Detect hybrid architecture (e.g. Ryzen 8500G with Zen 4 + Zen 4c, or Intel 12th/13th/14th Gen P+E)
+            info.IsHybrid = info.FullName.Contains("8500G", StringComparison.OrdinalIgnoreCase) ||
+                            info.FullName.Contains("8300G", StringComparison.OrdinalIgnoreCase) ||
+                            info.FullName.Contains("7545U", StringComparison.OrdinalIgnoreCase) ||
+                            (info.IsIntel && (info.FullName.Contains("12", StringComparison.OrdinalIgnoreCase) ||
+                                              info.FullName.Contains("13", StringComparison.OrdinalIgnoreCase) ||
+                                              info.FullName.Contains("14", StringComparison.OrdinalIgnoreCase)));
+
             // Clean up short name
             info.ShortName = CleanCpuName(info.FullName);
 
             // Calculate Max Turbo GHz based on processor model or base clock
             info.MaxTurboGhz = CalculateMaxTurboGhz(info.FullName, info.BaseGhz);
+            info.PeakCoreGhz = info.MaxTurboGhz;
             info.RealtimeGhz = info.BaseGhz;
+            info.AverageAllCoreGhz = info.BaseGhz;
 
             return info;
         }
@@ -135,23 +164,59 @@ namespace SetupHub180Hz.Services
 
         private static void UpdateRealtimeFrequency(CpuInfo info)
         {
-            if (_cpuPerfCounter != null)
+            double maxCorePerf = 0;
+            double avgPerf = 0;
+
+            if (_coreCounters != null && _coreCounters.Count > 0)
+            {
+                double sum = 0;
+                int count = 0;
+                foreach (var counter in _coreCounters)
+                {
+                    try
+                    {
+                        double val = counter.NextValue();
+                        if (val > maxCorePerf) maxCorePerf = val;
+                        sum += val;
+                        count++;
+                    }
+                    catch { }
+                }
+                if (count > 0) avgPerf = sum / count;
+            }
+
+            if (avgPerf <= 0 && _cpuPerfCounter != null)
             {
                 try
                 {
-                    double perfPercent = _cpuPerfCounter.NextValue();
-                    if (perfPercent > 0)
-                    {
-                        info.PerformancePercent = Math.Round(perfPercent, 1);
-                        double calculatedGhz = Math.Round((info.BaseGhz * (perfPercent / 100.0)), 2);
-                        info.RealtimeGhz = Math.Max(info.BaseGhz * 0.5, Math.Min(calculatedGhz, info.MaxTurboGhz + 0.2));
-                        return;
-                    }
+                    avgPerf = _cpuPerfCounter.NextValue();
                 }
                 catch { }
             }
 
-            info.RealtimeGhz = Math.Min(info.BaseGhz * 1.25, info.MaxTurboGhz);
+            if (avgPerf > 0)
+            {
+                info.PerformancePercent = Math.Round(avgPerf, 1);
+                double calculatedAvgGhz = Math.Round((info.BaseGhz * (avgPerf / 100.0)), 2);
+                info.AverageAllCoreGhz = Math.Max(info.BaseGhz * 0.5, calculatedAvgGhz);
+                info.RealtimeGhz = info.AverageAllCoreGhz;
+
+                if (maxCorePerf > 0)
+                {
+                    double calculatedPeak = Math.Round((info.BaseGhz * (maxCorePerf / 100.0)), 2);
+                    info.PeakCoreGhz = Math.Max(info.RealtimeGhz, Math.Min(calculatedPeak, info.MaxTurboGhz));
+                }
+                else
+                {
+                    info.PeakCoreGhz = Math.Min(info.RealtimeGhz * 1.25, info.MaxTurboGhz);
+                }
+            }
+            else
+            {
+                info.RealtimeGhz = info.BaseGhz;
+                info.AverageAllCoreGhz = info.BaseGhz;
+                info.PeakCoreGhz = info.MaxTurboGhz;
+            }
         }
 
         public static async Task ApplyProcessorWiseMaxTurboAsync()
@@ -160,62 +225,73 @@ namespace SetupHub180Hz.Services
             {
                 try
                 {
-                    // 1. Force Aggressive Boost Mode (2 = Aggressive Turbo)
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 2");
-                    RunCmd("powercfg /setdcvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 2");
+                    string sub = "54533251-82be-4824-96c1-47b60b740d00";
 
-                    // 2. Energy Performance Preference = 0 (100% Max Performance, 0% Energy Bias)
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0");
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6864 0");
+                    // 1. Force Aggressive At Guaranteed Boost Mode (5 = Aggressive At Guaranteed Turbo)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} be337238-0d82-4146-a960-4f3749d470c7 5");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} be337238-0d82-4146-a960-4f3749d470c7 5");
 
-                    // 3. Autonomous Mode = 1 (Hardware P-States / CPPC / Speed Shift Active in Nanoseconds)
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 8baa4a8a-14c6-4451-8e8b-14bdbd197537 1");
+                    // 2. Processor Performance Boost Policy = 100% (Permits 100% maximum boost frequency headroom)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 45bcc044-d885-43e2-8605-ee0ec6e96b59 100");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 45bcc044-d885-43e2-8605-ee0ec6e96b59 100");
 
-                    // 4. Max Processor Frequency = 0 (Unlimited / Full Turbo)
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0");
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 75b0ae3f-bce0-45a7-8c89-c9611c25e101 0");
+                    // 3. Energy Performance Preference = 0 (100% Max Performance, 0% Energy Bias)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6864 0");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6864 0");
 
-                    // 5. Min / Max Processor State = 100%
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 893dee8e-2bef-41e0-89c6-b55d0929964c 100");
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor bc5038f7-23e0-4960-96da-33abaf5935ec 100");
+                    // 4. Autonomous Mode = 1 (Hardware P-States / AMD CPPC / Intel Speed Shift Active)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 8baa4a8a-14c6-4451-8e8b-14bdbd197537 1");
 
-                    // 6. Core Parking Min / Max Cores = 100% (Unpark all performance & efficiency cores)
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318583 100");
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 0cc5b647-c1df-4637-891a-dec35c318584 100");
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor ea062031-0e34-4ff1-9b6d-eb1059334028 100");
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor ea062031-0e34-4ff1-9b6d-eb1059334029 100");
+                    // 5. Heterogeneous Thread Scheduling: 1 = Performant Processors Only (Zen 4 Big Cores)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 1");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 1");
 
-                    // 7. Latency Sensitivity Hint = 100% Unpark & 100% Performance
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 616cdaa5-695e-4545-97ad-97dc2d1bdd88 100");
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 619b7505-003b-4e82-b7a6-4dd29c300971 100");
+                    // 6. Heterogeneous Short Running Thread Policy: 1 = Performant Processors
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} bae08b81-2d5e-4688-ad6a-13243356654b 1");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} bae08b81-2d5e-4688-ad6a-13243356654b 1");
 
-                    // 8. Heterogeneous Thread Scheduling: Prioritize Performant Cores (Zen 4 / P-Cores)
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2");
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor bae08b81-2d5e-4688-ad6a-13243356654b 2");
+                    // 7. Max Processor Frequency = 0 (Unlimited / Full Turbo Boost)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 75b0ae3f-bce0-45a7-8c89-c9611c25e101 0");
 
-                    // 9. Instant Frequency Increase (1 interval delay, 10% threshold) & Sustained Decrease (100 intervals)
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 984cf492-3bed-4488-a8f9-4286c97bf5aa 1");
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor d8edeb9b-95cf-4f95-a73c-b061973693c8 100");
-                    RunCmd("powercfg /setacvalueindex scheme_current sub_processor 5d76a2ca-e8c0-402f-a133-2158492d58ad 0");
+                    // 8. Min / Max Processor State = 100%
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964c 100");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964c 100");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ec 100");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ec 100");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964d 100");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ed 100");
+
+                    // 9. Core Parking Min / Max Cores = 100% (Unpark all performance & compact cores)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 0cc5b647-c1df-4637-891a-dec35c318583 100");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 0cc5b647-c1df-4637-891a-dec35c318584 100");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} ea062031-0e34-4ff1-9b6d-eb1059334028 100");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} ea062031-0e34-4ff1-9b6d-eb1059334029 100");
+
+                    // 10. Latency Sensitivity Hint = 100% Unpark & 100% Performance
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 616cdaa5-695e-4545-97ad-97dc2d1bdd88 100");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 619b7505-003b-4e82-b7a6-4dd29c300971 100");
+
+                    // 11. Instant Frequency Increase (1 interval delay, 10% threshold) & Sustained Decrease (100 intervals)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 06cadf0e-64ed-448a-8927-ce7bf90eb35d 10");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 12a0ab44-fe28-4fa9-b3bd-4b64f44960a6 5");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 984cf492-3bed-4488-a8f9-4286c97bf5aa 1");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} d8edeb9b-95cf-4f95-a73c-b061973693c8 100");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} b000397d-9b0b-483d-98c9-692a6060cfbf 10");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} f8861c27-95e7-475c-865b-13c0cb3f9d6b 5");
 
                     // Activate scheme
                     RunCmd("powercfg /setactive scheme_current");
 
-                    // 10. Unhide Processor Performance Boost Mode in Windows Power Options
-                    try
-                    {
-                        using var boostKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7", true);
-                        boostKey?.SetValue("Attributes", 2, RegistryValueKind.DWord);
-                    }
-                    catch { }
-
-                    // 11. Global Power Throttling & EcoQoS Registry Elimination
+                    // 12. Global Power Throttling & EcoQoS Registry Elimination
                     using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\Power\PowerThrottling", true))
                     {
                         key?.SetValue("PowerThrottlingOff", 1, RegistryValueKind.DWord);
                     }
 
-                    // 11. BCD Invariant TSC Clock Synchronization
+                    // 13. BCD Invariant TSC Clock Synchronization
                     RunCmd("bcdedit /set useplatformclock false");
                     RunCmd("bcdedit /set useplatformtick yes");
                     RunCmd("bcdedit /set disabledynamictick yes");

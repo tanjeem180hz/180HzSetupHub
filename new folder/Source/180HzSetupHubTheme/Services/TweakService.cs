@@ -63,6 +63,7 @@ namespace SetupHub180Hz.Services
             "EmulTweakCpuPriority",
             "EmulTweakGpuPreference",
             "EmulTweakPowerThrottling",
+            "EmulTweakMaxGhzBoostLock",
             "EmulTweakGameloopMuMu",
 
             // 🖥️ Graphical & Visual Responsiveness
@@ -150,6 +151,7 @@ namespace SetupHub180Hz.Services
             "EmulTweakCpuPriority",
             "EmulTweakGpuPreference",
             "EmulTweakPowerThrottling",
+            "EmulTweakMaxGhzBoostLock",
             "EmulTweakGameloopMuMu",
             "EmulTweakGameloopAow",
 
@@ -333,6 +335,7 @@ namespace SetupHub180Hz.Services
             "GfxTweakDirectXHighPerformanceRouting",
             "MemTweakDisableMemoryCompression",
             "EmulTweakUniversalAndroidOverdrive",
+            "EmulTweakMaxGhzBoostLock",
             "RegTweakMMCSSGpuPriority8",
             "RegTweakMMCSSCpuPriority6",
             "RegTweakSystemResponsivenessZero",

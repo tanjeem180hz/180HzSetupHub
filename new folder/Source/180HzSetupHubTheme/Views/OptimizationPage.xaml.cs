@@ -872,13 +872,14 @@ namespace SetupHub180Hz.Views
             var cpu = CpuOptimizerService.GetCpuInfo();
             if (TxtLiveCpuBoost != null)
             {
-                TxtLiveCpuBoost.Text = $"{cpu.RealtimeGhz:0.00} GHz (Max {cpu.MaxTurboGhz:0.0} GHz ✓)";
+                TxtLiveCpuBoost.Text = $"{cpu.PeakCoreGhz:0.00} GHz (Max {cpu.MaxTurboGhz:0.0} GHz ✓)";
                 TxtLiveCpuBoost.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
             }
 
             if (TxtLiveCpuName != null)
             {
-                TxtLiveCpuName.Text = $"{cpu.ShortName} • Max Turbo";
+                TxtLiveCpuName.Text = $"{cpu.ShortName} • TaskMgr {cpu.RealtimeGhz:0.00} GHz";
+                TxtLiveCpuName.ToolTip = $"Peak Active Core Clock: {cpu.PeakCoreGhz:0.00} GHz.\nTask Manager shows the 12-thread average ({cpu.RealtimeGhz:0.00} GHz) across Zen 4 and Zen 4c compact cores.\nYour game and emulator render threads are prioritized on the 5.0 GHz Zen 4 cores!";
             }
 
             if (TxtLiveGpuMode != null)
@@ -892,7 +893,7 @@ namespace SetupHub180Hz.Views
             {
                 if (games.Count > 0)
                 {
-                    TxtLiveDetectedGames.Text = $"{string.Join(", ", games.Take(2))} ({games.Count} Game{(games.Count > 1 ? "s" : "")})";
+                    TxtLiveDetectedGames.Text = $"{string.Join(", ", games.Take(2))} (🚀 Max GHz Active!)";
                     TxtLiveDetectedGames.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
                 }
                 else

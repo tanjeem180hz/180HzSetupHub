@@ -62,7 +62,8 @@ powercfg /setacvalueindex scheme_current sub_processor ea062031-0e34-4ff1-9b6d-e
 
 :: 2. UNLOCK FULL DYNAMIC TURBO BOOST GHz (Never lock at base clock; auto-boost to peak 5.0GHz+)
 powercfg /setacvalueindex scheme_current sub_processor 5d76a2ca-e8c0-402f-a133-2158492d58ad 0 >nul 2>&1
-powercfg /setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 2 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 5 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor 45bcc044-d885-43e2-8605-ee0ec6e96b59 100 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6864 0 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 8baa4a8a-14c6-4451-8e8b-14bdbd197537 1 >nul 2>&1
@@ -72,14 +73,25 @@ powercfg /setacvalueindex scheme_current sub_processor 893dee8e-2bef-41e0-89c6-b
 powercfg /setacvalueindex scheme_current sub_processor bc5038f7-23e0-4960-96da-33abaf5935ec 100 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 616cdaa5-695e-4545-97ad-97dc2d1bdd88 100 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 619b7505-003b-4e82-b7a6-4dd29c300971 100 >nul 2>&1
-powercfg /setacvalueindex scheme_current sub_processor 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2 >nul 2>&1
-powercfg /setacvalueindex scheme_current sub_processor bae08b81-2d5e-4688-ad6a-13243356654b 2 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 1 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor bae08b81-2d5e-4688-ad6a-13243356654b 1 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor b000397d-9b0b-483d-98c9-692a6060cfbf 10 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor f8861c27-95e7-475c-865b-13c0cb3f9d6b 5 >nul 2>&1
 
 :: 3. Instant 0ms Frequency Ramp Up on Software/Game demand (Removes CPU throttle lag)
 powercfg /setacvalueindex scheme_current sub_processor 06cadf0e-64ed-448a-8927-ce7bf90eb35d 10 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor 12a0ab44-fe28-4fa9-b3bd-4b64f44960a6 5 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 984cf492-3bed-4488-a8f9-4286c97bf5aa 1 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor d8edeb9b-95cf-4f95-a73c-b061973693c8 100 >nul 2>&1
 powercfg /setactive scheme_current >nul 2>&1
+
+:: 3b. Android Emulators & Games Realtime High Priority (No EcoQoS Power Throttling)
+for %%e in (HD-Player.exe HD-Agent.exe BlueStacks.exe dnplayer.exe LdBoxHeadless.exe ldvboxheadless.exe dnmultiplayer.exe AppMarket.exe AndroidProcess.exe aow_exe.exe TXPlatform.exe TBSWebRenderer.exe Nox.exe MEmu.exe MuMuPlayer.exe MuMuNxPlayer.exe NemuPlayer.exe crosvm.exe vboxheadless.exe cs2.exe valorant.exe) do (
+    reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%e\PerfOptions"" /v CpuPriorityClass /t REG_DWORD /d 3 /f >nul 2>&1
+    reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%e\PerfOptions"" /v IoPriority /t REG_DWORD /d 3 /f >nul 2>&1
+    reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%e\PerfOptions"" /v PagePriority /t REG_DWORD /d 5 /f >nul 2>&1
+)
+reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling"" /v PowerThrottlingOff /t REG_DWORD /d 1 /f >nul 2>&1
 
 :: 4. Dual-Vendor GPU Overdrive (NVIDIA PowerMizer + AMD ULPS) Across Display Adapters
 for %%i in (0000 0001 0002 0003 0004) do (

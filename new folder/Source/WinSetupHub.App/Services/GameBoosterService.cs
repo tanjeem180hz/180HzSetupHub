@@ -56,6 +56,32 @@ namespace SetupHub180Hz.Services
         public bool IsTimerResolutionLocked => _isTimerLocked;
         public double CurrentTimerResolutionMs => _currentTimerRes > 0 ? _currentTimerRes / 10000.0 : 0.5;
 
+        private static Timer? _daemonTimer;
+        private static readonly object _daemonLock = new();
+        public static bool IsContinuousEngineRunning { get; private set; }
+
+        public static void StartContinuousGameBoosterEngine()
+        {
+            lock (_daemonLock)
+            {
+                if (_daemonTimer != null) return;
+                IsContinuousEngineRunning = true;
+                _daemonTimer = new Timer(async _ =>
+                {
+                    try
+                    {
+                        var running = GetRunningGameProcessNames();
+                        if (running.Count > 0)
+                        {
+                            Instance.Enable05msTimerResolution();
+                            await BoostRunningGameProcessesAsync();
+                        }
+                    }
+                    catch { }
+                }, null, 1000, 2500);
+            }
+        }
+
         public void Enable05msTimerResolution()
         {
             try
@@ -250,7 +276,9 @@ namespace SetupHub180Hz.Services
                 {
                     "HD-Player.exe", "HD-Agent.exe", "BlueStacks.exe", "dnplayer.exe", "LdBoxHeadless.exe",
                     "ldvboxheadless.exe", "dnmultiplayer.exe", "AppMarket.exe", "AndroidProcess.exe", "aow_exe.exe",
-                    "Nox.exe", "MEmu.exe", "MuMuPlayer.exe", "NemuPlayer.exe", "SmartGaGa.exe", "cs2.exe", "valorant.exe"
+                    "TXPlatform.exe", "TBSWebRenderer.exe", "Nox.exe", "MEmu.exe", "MEmuHeadless.exe", "MuMuPlayer.exe",
+                    "MuMuNxPlayer.exe", "NemuPlayer.exe", "NemuHeadless.exe", "SmartGaGa.exe", "TitanEngine.exe",
+                    "crosvm.exe", "vboxheadless.exe", "qemu-system-x86_64.exe", "cs2.exe", "valorant.exe"
                 };
 
                 foreach (var exe in masterEmulatorExes)
@@ -305,15 +333,15 @@ namespace SetupHub180Hz.Services
 
         private static readonly string[] KnownGameExes = new[]
         {
-            // Android Emulators (BlueStacks, MSI App Player, LDPlayer, GameLoop, Nox, MEmu, MuMu, SmartGaGa)
+            // Android Emulators (BlueStacks, MSI App Player, LDPlayer, GameLoop, Nox, MEmu, MuMu, SmartGaGa, Google Play Games)
             "hd-player", "hd-agent", "hd-apphandler", "hd-plus-service", "hd-adb", "bstksvc", "bluestacks", "hd-multimanager",
             "msi", "msiappplayer",
             "dnplayer", "ldboxheadless", "ldvboxheadless", "ldnews", "ldboxsvc", "dnmultiplayer",
-            "appmarket", "androidprocess", "aow_exe", "qqexternal", "tsettingcenter",
+            "appmarket", "androidprocess", "aow_exe", "txplatform", "tbswebrenderer", "qqexternal", "tsettingcenter",
             "nox", "noxvmsvc", "nox_adb", "noxmultiplayer",
             "memu", "memuconsole", "memuheadless", "memupower",
-            "mumuplayer", "nemuplayer", "nemuheadless", "mumuvmmdl", "nemuvmmdl",
-            "smartgaga", "titanengine",
+            "mumuplayer", "mumunxplayer", "nemuplayer", "nemuheadless", "mumuvmmdl", "nemuvmmdl",
+            "smartgaga", "titanengine", "crosvm", "vboxheadless", "qemu-system-x86_64",
 
             // Esports & PC Games
             "cs2", "csgo", "valorant", "valorant-win64-shipping", "riotclientservices",
