@@ -123,6 +123,7 @@ namespace SetupHub180Hz.Services
             "NetTweakMaxUserPort",
 
             // 💾 Storage & NVMe Throughput
+            "DiskTweakDeepCDriveCleanup",
             "DiskTweakNtfsFast",
             "DiskTweakEnableTrim",
             "DiskTweakNvmeWriteCache",
@@ -402,6 +403,7 @@ namespace SetupHub180Hz.Services
             "NetTweakMaxUserPort",
 
             // Storage
+            "DiskTweakDeepCDriveCleanup",
             "DiskTweakNtfsFast",
             "DiskTweakEnableTrim",
             "DiskTweakNvmeWriteCache",

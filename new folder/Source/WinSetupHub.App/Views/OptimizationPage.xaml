@@ -233,7 +233,13 @@
                     <!-- 🚀 APPLY ALL (Primary Action: 1-Click 100% Performance + PC Clean) -->
                     <Button x:Name="BtnApplyAll" Style="{StaticResource ApplyButton}"
                             Content="🚀 APPLY ALL" Padding="16,8" Margin="0,0,8,4"
-                            Click="BtnApplyAll_Click" ToolTip="1-Click Apply ALL Optimizations + Deep PC Clean: Deploys 5.0GHz Dynamic Boost, 100% GPU mode, 0.500ms Timer, Standby RAM purge, disk cleanup &amp; Permanent Boot Safeguard!"/>
+                            Click="BtnApplyAll_Click" ToolTip="1-Click Apply ALL Optimizations + Deep C: Drive Clean: Deploys 5.0GHz Dynamic Boost, 100% GPU mode, 0.500ms Timer, Standby RAM purge, disk cleanup &amp; Permanent Boot Safeguard!"/>
+
+                    <!-- 💽 DEEP C: CLEAN (1-Click Reclaim GBs on Drive C: via DISM, Delivery Optimization, Shader Caches & Temp) -->
+                    <Button x:Name="BtnDeepCleanC" Style="{StaticResource UndoButton}"
+                            BorderBrush="#10B981" BorderThickness="1" Foreground="#10B981"
+                            Content="💽 DEEP C: CLEAN" Padding="14,8" Margin="0,0,8,4"
+                            Click="BtnDeepCleanC_Click" ToolTip="1-Click Deep C: Drive Storage &amp; Component Cleanup: Purges WinSxS superseded updates (DISM), Delivery Optimization, DirectX/GPU shader caches, crash dumps, Recycle Bin &amp; temp files to reclaim maximum gigabytes on C:!"/>
 
                     <!-- 🧹 CLEAN PC & RAM (1-Click Instant Junk, Cache & RAM Cleaner) -->
                     <Button x:Name="BtnCleanPc" Style="{StaticResource UndoButton}"

@@ -8,6 +8,7 @@ namespace SetupHub180Hz.Models
         public string Path { get; set; } = "";
         public List<string>? AdditionalPaths { get; set; }
         public bool IsRamTarget { get; set; }
+        public bool IsRecycleBinTarget { get; set; }
         public long SizeBytes { get; set; }
         public bool IsSelected { get; set; } = true;
 
@@ -16,7 +17,7 @@ namespace SetupHub180Hz.Models
             get
             {
                 double mb = SizeBytes / 1024.0 / 1024.0;
-                return mb >= 1024 ? $"{mb / 1024:0.0} GB" : $"{mb:0.0} MB";
+                return mb >= 1024 ? $"{mb / 1024.0:0.0} GB" : $"{mb:0.0} MB";
             }
         }
     }

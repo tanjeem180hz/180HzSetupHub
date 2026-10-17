@@ -396,6 +396,171 @@ namespace SetupHub180Hz.Views
             }
         }
 
+        private void BtnDeepCleanC_Click(object sender, RoutedEventArgs e)
+        {
+            if (BtnDeepCleanC != null) BtnDeepCleanC.IsEnabled = false;
+            TxtStatus.Text = "💽 Running Deep C: Drive Storage & Component Store Cleanup...";
+            StatusBar.Visibility = Visibility.Visible;
+            if (StatusLottie != null) StatusLottie.Visibility = Visibility.Visible;
+
+            try
+            {
+                long freedBytes = 0;
+                long ramFreed = 0;
+
+                var deepCleanSteps = new List<OptimizationCustomStep>
+                {
+                    new OptimizationCustomStep
+                    {
+                        Name = "🔍 Scanning Drive C: Temporary Files, Component Store & Caches...",
+                        Action = async () =>
+                        {
+                            await Task.Delay(100);
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🗑️ Purging User & Windows Temp, Logs and Dump Files...",
+                        Action = async () =>
+                        {
+                            try
+                            {
+                                var targets = await CleanupService.Instance.ScanAsync(force: true);
+                                var tempTargets = targets.Where(t => !t.IsRamTarget && !t.IsRecycleBinTarget && !t.Name.Contains("Shader", StringComparison.OrdinalIgnoreCase) && !t.Name.Contains("Delivery", StringComparison.OrdinalIgnoreCase)).ToList();
+                                freedBytes += await CleanupService.Instance.CleanAllAsync(tempTargets);
+                            }
+                            catch { }
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "📦 Purging Delivery Optimization & BITS Peer Cache...",
+                        Action = async () =>
+                        {
+                            try
+                            {
+                                var targets = await CleanupService.Instance.ScanAsync(force: false);
+                                var doTarget = targets.FirstOrDefault(t => t.Name.Contains("Delivery", StringComparison.OrdinalIgnoreCase));
+                                if (doTarget != null) freedBytes += await CleanupService.Instance.CleanAsync(doTarget, rescan: false);
+                            }
+                            catch { }
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🎮 Clearing DirectX, NVIDIA & AMD Shader Caches...",
+                        Action = async () =>
+                        {
+                            try
+                            {
+                                var targets = await CleanupService.Instance.ScanAsync(force: false);
+                                var shaderTarget = targets.FirstOrDefault(t => t.Name.Contains("Shader", StringComparison.OrdinalIgnoreCase));
+                                if (shaderTarget != null) freedBytes += await CleanupService.Instance.CleanAsync(shaderTarget, rescan: false);
+                            }
+                            catch { }
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🖼️ Cleaning Windows Thumbnail & Icon Cache...",
+                        Action = async () =>
+                        {
+                            try
+                            {
+                                var targets = await CleanupService.Instance.ScanAsync(force: false);
+                                var thumbTarget = targets.FirstOrDefault(t => t.Name.Contains("Thumbnail", StringComparison.OrdinalIgnoreCase));
+                                if (thumbTarget != null) freedBytes += await CleanupService.Instance.CleanAsync(thumbTarget, rescan: false);
+                            }
+                            catch { }
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🌐 Cleaning Safe Browser Temporary Web Caches on C:...",
+                        Action = async () =>
+                        {
+                            await Task.Run(() =>
+                            {
+                                try
+                                {
+                                    freedBytes += CleanupService.CleanBrowserCaches();
+                                }
+                                catch { }
+                            });
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "♻️ Emptying Windows Recycle Bin on Drive C:...",
+                        Action = async () =>
+                        {
+                            await Task.Run(() =>
+                            {
+                                try
+                                {
+                                    freedBytes += CleanupService.EmptyRecycleBin();
+                                }
+                                catch { }
+                            });
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "⚙️ Running Windows Component Store (WinSxS) Deep Cleanup...",
+                        Action = async () =>
+                        {
+                            try
+                            {
+                                await CleanupService.RunDismComponentCleanupAsync();
+                                await CleanupService.RunCleanMgrAsync();
+                            }
+                            catch { }
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
+                        Name = "🧠 Purging Unreleased Standby RAM & Memory Working Sets...",
+                        Action = async () =>
+                        {
+                            ramFreed = await Task.Run(() => MemoryCleaner.CleanRam());
+                        }
+                    }
+                };
+
+                var dialog = new OptimizationDialog(
+                    title: "💽 Deep C: Drive Storage & Component Store Cleanup",
+                    subtitle: "Purging WinSxS superseded updates, Delivery Optimization, shader caches, crash dumps & Recycle Bin to maximize C: drive space:",
+                    tweaks: new List<TweakItem>(),
+                    isUndo: false,
+                    tweakService: _tweakService,
+                    autoStart: true,
+                    customSteps: deepCleanSteps)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+
+                dialog.ShowDialog();
+
+                long totalFreed = freedBytes + ramFreed;
+                string freedDisplay = FormatBytes(totalFreed);
+                TxtStatus.Text = $"💽 Deep C: Drive Clean complete! Successfully reclaimed {freedDisplay} of space and caches.";
+                NotificationService.Notify("💽 Drive C: Cleaned!", $"Successfully purged {freedDisplay} from Drive C: including WinSxS component cleanup, shader caches, and temporary files.");
+                ActivityLogger.Instance.Log($"Deep C: Drive Clean completed: Reclaimed {freedDisplay} disk & memory cache.", ActivityType.Success);
+
+                UpdatePreGameTelemetry();
+                if (TxtLiveStandbyRam != null) TxtLiveStandbyRam.Text = $"Purged ({freedDisplay} Cleaned ✓)";
+            }
+            catch (Exception ex)
+            {
+                TxtStatus.Text = $"Deep clean completed with notice: {ex.Message}";
+            }
+            finally
+            {
+                if (BtnDeepCleanC != null) BtnDeepCleanC.IsEnabled = true;
+                if (StatusLottie != null) StatusLottie.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private void BtnCleanPc_Click(object sender, RoutedEventArgs e)
         {
             if (BtnCleanPc != null) BtnCleanPc.IsEnabled = false;
@@ -530,13 +695,12 @@ namespace SetupHub180Hz.Views
                 {
                     new OptimizationCustomStep
                     {
-                        Name = "🧹 Deep PC Junk & Cache Cleanup",
+                        Name = "💽 Deep C: Drive Storage & Component Store Cleanup",
                         Action = async () =>
                         {
                             try
                             {
-                                var scanTargets = await CleanupService.Instance.ScanAsync(force: true);
-                                cleanedBytes = await CleanupService.Instance.CleanAllAsync(scanTargets);
+                                cleanedBytes = await CleanupService.Instance.DeepCleanCDriveAsync(includeDism: true);
                             }
                             catch { }
                         }

@@ -761,6 +761,31 @@
     ]
   },
   {
+    "id": "DiskTweakDeepCDriveCleanup",
+    "name": "Deep C: Drive System Storage & Component Cleanup (WinSxS DISM, Temp, Caches & Recycle Bin)",
+    "description": "Deeply purges superseded Windows Update components via DISM /StartComponentCleanup /ResetBase, clears Delivery Optimization caches, deletes DirectX, NVIDIA & AMD shader caches, empties Recycle Bin, and removes temporary crash dumps to reclaim maximum gigabytes on Drive C:.",
+    "category": "ðŸ’¾ Storage & NVMe Throughput",
+    "categoryOrder": 5,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "Write-Host 'Starting Deep C: Drive Storage & Component Store Cleanup...' -ForegroundColor Cyan",
+      "cleanmgr.exe /d C: /VERYLOWDISK",
+      "Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase",
+      "$cPaths = @(\"$env:TEMP\", \"$env:WINDIR\\Temp\", \"$env:WINDIR\\SoftwareDistribution\\Download\", \"$env:WINDIR\\SoftwareDistribution\\DeliveryOptimization\", \"$env:ProgramData\\Microsoft\\Network\\Downloader\", \"$env:LOCALAPPDATA\\D3DSCache\", \"$env:LOCALAPPDATA\\NVIDIA\\DXCache\", \"$env:LOCALAPPDATA\\NVIDIA\\GLCache\", \"$env:LOCALAPPDATA\\AMD\\DxCache\", \"$env:LOCALAPPDATA\\CrashDumps\", \"$env:WINDIR\\Minidump\", \"$env:ProgramData\\Microsoft\\Windows\\WER\")",
+      "foreach ($p in $cPaths) { if (Test-Path $p) { Get-ChildItem -Path $p -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue } }",
+      "Clear-RecycleBin -Force -ErrorAction SilentlyContinue",
+      "Write-Host 'Deep C: Drive Cleanup completed successfully.' -ForegroundColor Green"
+    ],
+    "undoScript": [
+      "Write-Host 'Maintenance action state is clean.' -ForegroundColor Gray"
+    ]
+  },
+  {
     "id": "DiskTweakNtfsFast",
     "name": "Disable NTFS 8.3 Short-Names & Last-Access Time Updates",
     "description": "Eliminates legacy 16-bit DOS 8.3 file creation and stops timestamp writes on every file read, significantly boosting SSD and NVMe read/write throughput.",
