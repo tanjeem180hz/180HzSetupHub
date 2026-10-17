@@ -227,9 +227,9 @@ namespace SetupHub180Hz.Services
                 {
                     string sub = "54533251-82be-4824-96c1-47b60b740d00";
 
-                    // 1. Force Aggressive At Guaranteed Boost Mode (5 = Aggressive At Guaranteed Turbo)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} be337238-0d82-4146-a960-4f3749d470c7 5");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} be337238-0d82-4146-a960-4f3749d470c7 5");
+                    // 1. Dynamic Aggressive Boost Mode (2 = Aggressive - boosts up to 5.0GHz Max Turbo on demand)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} be337238-0d82-4146-a960-4f3749d470c7 2");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} be337238-0d82-4146-a960-4f3749d470c7 2");
 
                     // 2. Processor Performance Boost Policy = 100% (Permits 100% maximum boost frequency headroom)
                     RunCmd($"powercfg /setacvalueindex scheme_current {sub} 45bcc044-d885-43e2-8605-ee0ec6e96b59 100");
@@ -244,25 +244,33 @@ namespace SetupHub180Hz.Services
                     // 4. Autonomous Mode = 1 (Hardware P-States / AMD CPPC / Intel Speed Shift Active)
                     RunCmd($"powercfg /setacvalueindex scheme_current {sub} 8baa4a8a-14c6-4451-8e8b-14bdbd197537 1");
 
-                    // 5. Heterogeneous Thread Scheduling: 1 = Performant Processors Only (Zen 4 Big Cores)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 1");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 1");
+                    // 5. Heterogeneous Thread Scheduling: 2 = Prefer Performant Processors (Zen 4 Big Cores for games/apps, compact cores for background - ZERO thread congestion!)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2");
 
-                    // 6. Heterogeneous Short Running Thread Policy: 1 = Performant Processors
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} bae08b81-2d5e-4688-ad6a-13243356654b 1");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} bae08b81-2d5e-4688-ad6a-13243356654b 1");
+                    // 6. Heterogeneous Short Running Thread Policy: 2 = Prefer Performant Processors
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} bae08b81-2d5e-4688-ad6a-13243356654b 2");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} bae08b81-2d5e-4688-ad6a-13243356654b 2");
 
-                    // 7. Max Processor Frequency = 0 (Unlimited / Full Turbo Boost)
+                    // 7. Heterogeneous Policy in Effect: 0 = Dynamic CPPC balance across all 12 threads
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5 0");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5 0");
+
+                    // 8. Max Processor Frequency = 0 (Unlimited / Full Turbo Boost)
                     RunCmd($"powercfg /setacvalueindex scheme_current {sub} 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0");
                     RunCmd($"powercfg /setacvalueindex scheme_current {sub} 75b0ae3f-bce0-45a7-8c89-c9611c25e101 0");
 
-                    // 8. Min / Max Processor State = 100%
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964c 100");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964c 100");
+                    // 9. Min Processor State = 5% (Gives APU / discrete GPU 100% thermal and TDP power headroom; never throttles GPU)
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964c 5");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964c 5");
+                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964d 5");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964d 5");
+
+                    // Max Processor State = 100%
                     RunCmd($"powercfg /setacvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ec 100");
                     RunCmd($"powercfg /setdcvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ec 100");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964d 100");
                     RunCmd($"powercfg /setacvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ed 100");
+                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ed 100");
 
                     // 9. Core Parking Min / Max Cores = 100% (Unpark all performance & compact cores)
                     RunCmd($"powercfg /setacvalueindex scheme_current {sub} 0cc5b647-c1df-4637-891a-dec35c318583 100");

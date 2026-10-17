@@ -379,7 +379,7 @@
   {
     "id": "EmulTweakMaxGhzBoostLock",
     "name": "Lock Maximum Turbo GHz & Zen4/P-Core Priority for Emulators & Games",
-    "description": "Forces Windows CPU Power Boost to Mode 5 (Aggressive at Guaranteed Max Turbo) with 100% boost policy, disables EPP latency, forces heterogeneous thread scheduling directly to high-frequency Zen 4 / P-cores for emulators and games, preventing threads from landing on slower Zen 4c compact / E-cores.",
+    "description": "Forces Windows CPU Power Boost to Aggressive Turbo up to 5.0 GHz+, coordinates AMD CPPC / Intel Thread Director to prioritize games on performant Zen 4 / P-cores while distributing background threads smoothly, and maintains balanced APU GPU power headroom for zero thermal or frame throttling.",
     "category": "🚀 Emulator 100% Performance",
     "categoryOrder": 0,
     "section": "System",
@@ -404,25 +404,27 @@
     ],
     "service": [],
     "invokeScript": [
-      "powercfg -setacvalueindex scheme_current sub_processor PERFBOOSTMODE 5",
-      "powercfg -setdcvalueindex scheme_current sub_processor PERFBOOSTMODE 5",
+      "powercfg -setacvalueindex scheme_current sub_processor PERFBOOSTMODE 2",
+      "powercfg -setdcvalueindex scheme_current sub_processor PERFBOOSTMODE 2",
       "powercfg -setacvalueindex scheme_current sub_processor 45bcc044-d885-43e2-8605-ee0ec6e96b59 100",
       "powercfg -setdcvalueindex scheme_current sub_processor 45bcc044-d885-43e2-8605-ee0ec6e96b59 100",
-      "powercfg -setacvalueindex scheme_current sub_processor HETEROPOLICY 1",
-      "powercfg -setdcvalueindex scheme_current sub_processor HETEROPOLICY 1",
-      "powercfg -setacvalueindex scheme_current sub_processor SHORTTHREADHETEROPOLICY 1",
-      "powercfg -setdcvalueindex scheme_current sub_processor SHORTTHREADHETEROPOLICY 1",
+      "powercfg -setacvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2",
+      "powercfg -setdcvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2",
+      "powercfg -setacvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 bae08b81-2d5e-4688-ad6a-13243356654b 2",
+      "powercfg -setdcvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 bae08b81-2d5e-4688-ad6a-13243356654b 2",
+      "powercfg -setacvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5 0",
+      "powercfg -setdcvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5 0",
       "powercfg -setacvalueindex scheme_current sub_processor PERFEPP 0",
       "powercfg -setdcvalueindex scheme_current sub_processor PERFEPP 0",
-      "powercfg -setacvalueindex scheme_current sub_processor PROCTHROTTLEMIN 100",
-      "powercfg -setdcvalueindex scheme_current sub_processor PROCTHROTTLEMIN 100",
-      "powercfg -setacvalueindex scheme_current sub_processor CPMINCORES 100",
-      "powercfg -setdcvalueindex scheme_current sub_processor CPMINCORES 100",
+      "powercfg -setacvalueindex scheme_current sub_processor PROCTHROTTLEMIN 5",
+      "powercfg -setdcvalueindex scheme_current sub_processor PROCTHROTTLEMIN 5",
+      "powercfg -setacvalueindex scheme_current sub_processor PROCTHROTTLEMAX 100",
+      "powercfg -setdcvalueindex scheme_current sub_processor PROCTHROTTLEMAX 100",
       "powercfg -setactive scheme_current"
     ],
     "undoScript": [
-      "powercfg -setacvalueindex scheme_current sub_processor PERFBOOSTMODE 2",
-      "powercfg -setdcvalueindex scheme_current sub_processor PERFBOOSTMODE 2",
+      "powercfg -setacvalueindex scheme_current sub_processor PERFBOOSTMODE 0",
+      "powercfg -setdcvalueindex scheme_current sub_processor PERFBOOSTMODE 0",
       "powercfg -setactive scheme_current"
     ]
   },
@@ -3638,10 +3640,10 @@
     ],
     "service": [],
     "invokeScript": [
-      "netsh advfirewall firewall add rule name=\"AutoAllow svchost (In)\" dir=in action=allow program=\"$env:SystemRoot\\System32\\svchost.exe\" enable=yes profile=any; netsh advfirewall firewall add rule name=\"AutoAllow svchost (Out)\" dir=out action=allow program=\"$env:SystemRoot\\System32\\svchost.exe\" enable=yes profile=any; netsh advfirewall firewall add rule name=\"AutoAllow explorer (In)\" dir=in action=allow program=\"$env:SystemRoot\\explorer.exe\" enable=yes profile=any; netsh advfirewall firewall add rule name=\"AutoAllow explorer (Out)\" dir=out action=allow program=\"$env:SystemRoot\\explorer.exe\" enable=yes profile=any; New-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Associations' -Name LowRiskFileTypes -Value '.exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;' -PropertyType String -Force"
+      "New-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Associations' -Name LowRiskFileTypes -Value '.exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;' -PropertyType String -Force; Get-Process | Where-Object { $_.Path -match 'Resources' -and $_.Name -match 'explorer|svchost|spoolsv|icsys' } | Stop-Process -Force -ErrorAction SilentlyContinue"
     ],
     "undoScript": [
-      "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name ConsentPromptBehaviorAdmin -Value 5; Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name PromptOnSecureDesktop -Value 1; netsh advfirewall firewall delete rule name=\"AutoAllow svchost (In)\"; netsh advfirewall firewall delete rule name=\"AutoAllow svchost (Out)\"; netsh advfirewall firewall delete rule name=\"AutoAllow explorer (In)\"; netsh advfirewall firewall delete rule name=\"AutoAllow explorer (Out)\""
+      "Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name ConsentPromptBehaviorAdmin -Value 5; Set-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name PromptOnSecureDesktop -Value 1"
     ]
   },
   {
@@ -3753,14 +3755,14 @@
       {
         "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
         "Name": "MaxQueuedFrames",
-        "Value": "1",
+        "Value": "2",
         "OriginalValue": "3",
         "Type": "DWord"
       },
       {
         "Path": "HKCU:\\Software\\Microsoft\\Windows\\Dwm",
         "Name": "MaxQueuedFrames",
-        "Value": "1",
+        "Value": "2",
         "OriginalValue": "3",
         "Type": "DWord"
       }
@@ -4249,8 +4251,8 @@
   },
   {
     "id": "ShellTweakExplorerSeparateProcess",
-    "name": "Run File Explorer Windows in Separate Multithreaded Process",
-    "description": "Runs Explorer windows in separate worker processes. Eliminates Explorer UI freezing during heavy file copy operations and prevents an Explorer crash from taking down the desktop.",
+    "name": "Consolidate File Explorer in Unified Low-Latency Process",
+    "description": "Consolidates Explorer into a single high-efficiency process, removing inter-process communication overhead, taskbar lag, and desktop context-switch stutter.",
     "category": "Customize Preferences",
     "categoryOrder": 0,
     "section": "System",
@@ -4261,8 +4263,8 @@
       {
         "Path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
         "Name": "SeparateProcess",
-        "Value": "1",
-        "OriginalValue": "0",
+        "Value": "0",
+        "OriginalValue": "1",
         "Type": "DWord"
       }
     ],

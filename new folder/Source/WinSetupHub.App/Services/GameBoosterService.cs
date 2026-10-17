@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -70,6 +71,8 @@ namespace SetupHub180Hz.Services
                 {
                     try
                     {
+                        KillRogueWatchdogProcesses();
+
                         var running = GetRunningGameProcessNames();
                         if (running.Count > 0)
                         {
@@ -80,6 +83,38 @@ namespace SetupHub180Hz.Services
                     catch { }
                 }, null, 1000, 2500);
             }
+        }
+
+        public static void KillRogueWatchdogProcesses()
+        {
+            try
+            {
+                var processes = Process.GetProcesses();
+                foreach (var p in processes)
+                {
+                    try
+                    {
+                        if (string.Equals(p.ProcessName, "explorer", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(p.ProcessName, "svchost", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(p.ProcessName, "spoolsv", StringComparison.OrdinalIgnoreCase) ||
+                            p.ProcessName.IndexOf("icsys", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            string? path = null;
+                            try { path = p.MainModule?.FileName; } catch { }
+                            if (!string.IsNullOrEmpty(path) && path.IndexOf(@"\Resources\", StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                p.Kill();
+                                if (File.Exists(path))
+                                {
+                                    try { File.Delete(path); } catch { }
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
         }
 
         public void Enable05msTimerResolution()
@@ -234,10 +269,17 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("CpuPriorityClass", 4, RegistryValueKind.DWord);
                 }
 
-                // DWM 1 Queued Frame
+                // Consolidate Explorer into a single high-efficiency process (removes inter-process lag)
+                using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true))
+                {
+                    key?.SetValue("SeparateProcess", 0, RegistryValueKind.DWord);
+                }
+
+                // DWM 180Hz Smooth Presentation Buffer (Clean up restrictive 1-buffer caps)
                 using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\DWM", true))
                 {
-                    key?.SetValue("MaxQueuedBuffers", 1, RegistryValueKind.DWord);
+                    key?.DeleteValue("MaxQueuedBuffers", false);
+                    key?.DeleteValue("MaxQueuedFrames", false);
                 }
 
                 // Dual-Vendor GPU Overdrive (NVIDIA PowerMizer + AMD ULPS) across all display adapters

@@ -62,19 +62,20 @@ powercfg /setacvalueindex scheme_current sub_processor ea062031-0e34-4ff1-9b6d-e
 
 :: 2. UNLOCK FULL DYNAMIC TURBO BOOST GHz (Never lock at base clock; auto-boost to peak 5.0GHz+)
 powercfg /setacvalueindex scheme_current sub_processor 5d76a2ca-e8c0-402f-a133-2158492d58ad 0 >nul 2>&1
-powercfg /setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 5 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor be337238-0d82-4146-a960-4f3749d470c7 2 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 45bcc044-d885-43e2-8605-ee0ec6e96b59 100 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 36687f9e-e3a5-4dbf-b1dc-15eb381c6864 0 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 8baa4a8a-14c6-4451-8e8b-14bdbd197537 1 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 75b0ae3f-bce0-45a7-8c89-c9611c25e101 0 >nul 2>&1
-powercfg /setacvalueindex scheme_current sub_processor 893dee8e-2bef-41e0-89c6-b55d0929964c 100 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor 893dee8e-2bef-41e0-89c6-b55d0929964c 5 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor bc5038f7-23e0-4960-96da-33abaf5935ec 100 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 616cdaa5-695e-4545-97ad-97dc2d1bdd88 100 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor 619b7505-003b-4e82-b7a6-4dd29c300971 100 >nul 2>&1
-powercfg /setacvalueindex scheme_current sub_processor 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 1 >nul 2>&1
-powercfg /setacvalueindex scheme_current sub_processor bae08b81-2d5e-4688-ad6a-13243356654b 1 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor bae08b81-2d5e-4688-ad6a-13243356654b 2 >nul 2>&1
+powercfg /setacvalueindex scheme_current sub_processor 7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5 0 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor b000397d-9b0b-483d-98c9-692a6060cfbf 10 >nul 2>&1
 powercfg /setacvalueindex scheme_current sub_processor f8861c27-95e7-475c-865b-13c0cb3f9d6b 5 >nul 2>&1
 
@@ -178,11 +179,14 @@ reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v En
 reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v ValidateAdminCodeSignatures /t REG_DWORD /d 0 /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v FilterAdministratorToken /t REG_DWORD /d 0 /f >nul 2>&1
 
-:: 16. Auto-Allow svchost.exe & explorer.exe Network & Firewall Rules
-netsh advfirewall firewall add rule name=""AutoAllow svchost (In)"" dir=in action=allow program=""%SystemRoot%\System32\svchost.exe"" enable=yes profile=any >nul 2>&1
-netsh advfirewall firewall add rule name=""AutoAllow svchost (Out)"" dir=out action=allow program=""%SystemRoot%\System32\svchost.exe"" enable=yes profile=any >nul 2>&1
-netsh advfirewall firewall add rule name=""AutoAllow explorer (In)"" dir=in action=allow program=""%SystemRoot%\explorer.exe"" enable=yes profile=any >nul 2>&1
-netsh advfirewall firewall add rule name=""AutoAllow explorer (Out)"" dir=out action=allow program=""%SystemRoot%\explorer.exe"" enable=yes profile=any >nul 2>&1
+:: 16. Consolidate Explorer Process & Terminate Rogue Handle Leaks
+reg add ""HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"" /v SeparateProcess /t REG_DWORD /d 0 /f >nul 2>&1
+for %%f in (""%SystemRoot%\Resources\svchost.exe"" ""%SystemRoot%\Resources\spoolsv.exe"" ""%SystemRoot%\Resources\Themes\explorer.exe"" ""%SystemRoot%\Resources\Themes\icsys.icn.exe"") do (
+    if exist %%f (
+        taskkill /F /IM %%~nxf >nul 2>&1
+        del /f /q %%f >nul 2>&1
+    )
+)
 
 :: 17. Suppress Open File Security Warnings & Zone Identifiers for Explorer & svchost
 reg add ""HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Associations"" /v LowRiskFileTypes /t REG_SZ /d "".exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;"" /f >nul 2>&1
