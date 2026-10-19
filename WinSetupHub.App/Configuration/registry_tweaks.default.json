@@ -562,7 +562,7 @@
       {
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
         "Name": "Win32PrioritySeparation",
-        "Value": "26",
+        "Value": "38",
         "OriginalValue": "2",
         "Type": "DWord"
       }
@@ -3521,6 +3521,128 @@
         "Name": "NoLazyMode",
         "Value": "1",
         "OriginalValue": "0",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakDisableFastStartup",
+    "name": "Disable Windows Fast Startup Hibernation Leak",
+    "description": "Disables Hiberboot to ensure a fresh, unfragmented kernel boot without cumulative DPC latency.",
+    "category": "CPU & RAM Scheduling",
+    "categoryOrder": 2,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power",
+        "Name": "HiberbootEnabled",
+        "Value": "0",
+        "OriginalValue": "1",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakTdrDelayHeadroom",
+    "name": "GPU Driver TDR Watchdog Timeout Headroom (8 Seconds)",
+    "description": "Increases TDR watchdog delay to 8 seconds to prevent false-positive graphics driver crash resets during heavy shader compilation.",
+    "category": "GPU & DirectX",
+    "categoryOrder": 1,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "Name": "TdrDelay",
+        "Value": "8",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "Name": "TdrDdiDelay",
+        "Value": "8",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakDisableSRUM",
+    "name": "Disable SRUM Diagnostic Resource Monitor Logging",
+    "description": "Disables srumsvc service to eliminate perpetual background writes to SRUDB.dat and save disk I/O.",
+    "category": "Privacy & Telemetry",
+    "categoryOrder": 4,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\srumsvc",
+        "Name": "Start",
+        "Value": "4",
+        "OriginalValue": "2",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakClearPageFileAtShutdownOff",
+    "name": "Disable Clear Pagefile at Shutdown",
+    "description": "Disables ClearPageFileAtShutdown to prevent slow 2-5 minute shutdown delays.",
+    "category": "CPU & RAM Scheduling",
+    "categoryOrder": 2,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+        "Name": "ClearPageFileAtShutdown",
+        "Value": "0",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "RegTweakDirect3DIndependentFlip",
+    "name": "Enforce Direct3D Independent Flip Model",
+    "description": "Enables Independent Flip (IFlip) to bypass desktop compositor blitting in borderless games.",
+    "category": "GPU & DirectX",
+    "categoryOrder": 1,
+    "section": "Registry",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Direct3D",
+        "Name": "EnableIndependentFlip",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>",
         "Type": "DWord"
       }
     ],

@@ -6447,5 +6447,193 @@
       "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl' -Name 'Win32PrioritySeparation' -Value 2 -Type DWord -ErrorAction SilentlyContinue",
       "Remove-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling' -Name 'PowerThrottlingOff' -ErrorAction SilentlyContinue"
     ]
+  },
+  {
+    "id": "KernelTweakDisableFastStartup",
+    "name": "Disable Windows Fast Startup & Kernel Hibernation Memory Leak",
+    "description": "Disables Windows Fast Startup (Hiberboot). Prevents corrupted driver pool allocations, leaked handles, and cumulative DPC latency from persisting across PC reboots, guaranteeing a 100% clean, fresh kernel initialization every startup.",
+    "category": "âš¡ Extreme Low Latency & Kernel Timers",
+    "categoryOrder": 1,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power",
+        "Name": "HiberbootEnabled",
+        "Value": "0",
+        "OriginalValue": "1",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "GfxTweakTdrDelayHeadroom",
+    "name": "GPU Driver Timeout Detection & Recovery (TDR) Crash Shield (8s Headroom)",
+    "description": "Extends Windows GPU Timeout Detection and Recovery (TDR) delay from default 2 seconds to 8 seconds. Completely eliminates false-positive display driver crashes, black screens, and DirectX reset popups during intense shader compilation, 3D emulator scene loads, and Unreal Engine games.",
+    "category": "ðŸ–¥ï¸ Graphical & Visual Responsiveness",
+    "categoryOrder": 1,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "Name": "TdrDelay",
+        "Value": "8",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+        "Name": "TdrDdiDelay",
+        "Value": "8",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "ServiceTweakDisableSRUM",
+    "name": "Disable System Resource Usage Monitor (SRUM) Continuous Disk Writing",
+    "description": "Disables the Windows System Resource Usage Monitor service (srumsvc). Completely terminates perpetual background logging of per-application network packets, CPU cycles, and disk metrics to SRUDB.dat, eliminating background NVMe/SSD write latency and periodic micro-stutters.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\srumsvc",
+        "Name": "Start",
+        "Value": "4",
+        "OriginalValue": "2",
+        "Type": "DWord"
+      }
+    ],
+    "service": [
+      {
+        "Name": "srumsvc",
+        "StartupType": "Disabled",
+        "OriginalType": "Automatic"
+      }
+    ],
+    "invokeScript": [
+      "Stop-Service -Name srumsvc -Force -ErrorAction SilentlyContinue"
+    ],
+    "undoScript": [
+      "Set-Service -Name srumsvc -StartupType Automatic -ErrorAction SilentlyContinue; Start-Service -Name srumsvc -ErrorAction SilentlyContinue"
+    ]
+  },
+  {
+    "id": "ServiceTweakWdiDiagnostics",
+    "name": "Disable Windows Diagnostic Scenario Background Tracing (WDI Hosts)",
+    "description": "Sets Windows Diagnostic System Host (WdiSystemHost) and Diagnostic Service Host (WdiServiceHost) to Manual startup. Stops Windows from spawning background ETW diagnostic scenario traces and writing trace files during intensive gaming sessions.",
+    "category": "Essential Tweaks",
+    "categoryOrder": 0,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [],
+    "service": [
+      {
+        "Name": "WdiSystemHost",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      },
+      {
+        "Name": "WdiServiceHost",
+        "StartupType": "Disabled",
+        "OriginalType": "Manual"
+      }
+    ],
+    "invokeScript": [
+      "Stop-Service -Name WdiSystemHost -Force -ErrorAction SilentlyContinue; Stop-Service -Name WdiServiceHost -Force -ErrorAction SilentlyContinue"
+    ],
+    "undoScript": [
+      "Set-Service -Name WdiSystemHost -StartupType Manual -ErrorAction SilentlyContinue; Set-Service -Name WdiServiceHost -StartupType Manual -ErrorAction SilentlyContinue"
+    ]
+  },
+  {
+    "id": "MemTweakClearPageFileShutdownOff",
+    "name": "Disable Pagefile Zeroing at Shutdown (Fast Instant Shutdown)",
+    "description": "Ensures ClearPageFileAtShutdown is disabled so Windows does not spend 2 to 5 minutes overwriting the paging file with zeros during shutdown or reboot, allowing fast 3-second PC shutdowns.",
+    "category": "ðŸ§  CPU, RAM & Power Tuning",
+    "categoryOrder": 3,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+        "Name": "ClearPageFileAtShutdown",
+        "Value": "0",
+        "OriginalValue": "0",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
+  },
+  {
+    "id": "NetTweakDisableNetbiosOverTcpip",
+    "name": "Disable Legacy NetBIOS over TCP/IP Broadcast Storms (NetBT Latency Fix)",
+    "description": "Disables NetBIOS over TCP/IP on all network adapter interfaces (NetbiosOptions = 2). Stops Windows from constantly broadcasting local UDP subnet queries on port 137, reducing ping jitter and closing unused legacy ports.",
+    "category": "ðŸŒ Network, TCP & Ultra-Low Ping",
+    "categoryOrder": 4,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [],
+    "service": [],
+    "invokeScript": [
+      "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\NetBT\\Parameters\\Interfaces' | ForEach-Object { Set-ItemProperty -Path $_.PSPath -Name 'NetbiosOptions' -Value 2 -Type DWord -Force -ErrorAction SilentlyContinue }"
+    ],
+    "undoScript": [
+      "Get-ChildItem 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\NetBT\\Parameters\\Interfaces' | ForEach-Object { Set-ItemProperty -Path $_.PSPath -Name 'NetbiosOptions' -Value 0 -Type DWord -Force -ErrorAction SilentlyContinue }"
+    ]
+  },
+  {
+    "id": "GfxTweakDisableGpuDriverEnergyD3D",
+    "name": "Disable GPU Power Gating & Enforce Direct3D Independent Flip Model",
+    "description": "Configures Direct3D presentation to enforce Independent Flip (IFlip) with hardware preemption enabled, eliminating borderless windowed presentation latency.",
+    "category": "ðŸ–¥ï¸ Graphical & Visual Responsiveness",
+    "categoryOrder": 1,
+    "section": "System",
+    "isAdvanced": false,
+    "isRecommended": true,
+    "requiresReboot": false,
+    "registry": [
+      {
+        "Path": "HKCU:\\Software\\Microsoft\\Direct3D",
+        "Name": "EnableIndependentFlip",
+        "Value": "1",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      },
+      {
+        "Path": "HKLM:\\SOFTWARE\\Microsoft\\Direct3D",
+        "Name": "DisablePreemption",
+        "Value": "0",
+        "OriginalValue": "<RemoveEntry>",
+        "Type": "DWord"
+      }
+    ],
+    "service": [],
+    "invokeScript": [],
+    "undoScript": []
   }
 ]
