@@ -7870,5 +7870,120 @@
                              "originalValue":  "0"
                          }
                      ]
+    },
+    {
+        "id":  "GfxTweakGPUCrashShieldMaximum",
+        "name":  "GPU Driver Timeout \u0026 Crash Shield (10-Second Watchdog Headroom)",
+        "category":  "Graphical \u0026 Visual Responsiveness",
+        "categoryOrder":  4,
+        "description":  "Extends the Windows GPU Timeout Detection and Recovery (TDR) delay to 10 seconds. Prevents graphic driver crashes (DXGI_ERROR_DEVICE_REMOVED), black screens, and Unreal Engine 5 shader compilation freezes.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "registry":  [
+                         {
+                             "path":  "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+                             "name":  "TdrDelay",
+                             "type":  "DWord",
+                             "value":  "10",
+                             "originalValue":  "2"
+                         },
+                         {
+                             "path":  "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+                             "name":  "TdrDdiDelay",
+                             "type":  "DWord",
+                             "value":  "10",
+                             "originalValue":  "5"
+                         },
+                         {
+                             "path":  "HKLM\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+                             "name":  "TdrLevel",
+                             "type":  "DWord",
+                             "value":  "3",
+                             "originalValue":  "3"
+                         }
+                     ]
+    },
+    {
+        "id":  "SysTweakInstantFreezeRecovery",
+        "name":  "Continuous System Smoothness \u0026 Zero-Freeze Guardian (Auto-Recovery)",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  8,
+        "description":  "Configures Windows desktop manager to instantly recover from frozen background tasks within 1 second instead of locking up the system for 30+ seconds. Automatically terminates hung orphaned threads.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "registry":  [
+                         {
+                             "path":  "HKCU\\Control Panel\\Desktop",
+                             "name":  "HungAppTimeout",
+                             "type":  "String",
+                             "value":  "1000",
+                             "originalValue":  "5000"
+                         },
+                         {
+                             "path":  "HKCU\\Control Panel\\Desktop",
+                             "name":  "WaitToKillAppTimeout",
+                             "type":  "String",
+                             "value":  "2000",
+                             "originalValue":  "5000"
+                         },
+                         {
+                             "path":  "HKCU\\Control Panel\\Desktop",
+                             "name":  "AutoEndTasks",
+                             "type":  "String",
+                             "value":  "1",
+                             "originalValue":  "0"
+                         }
+                     ]
+    },
+    {
+        "id":  "SysTweakLowLevelHooksNoHang",
+        "name":  "Low-Level Mouse \u0026 Keyboard Input Hook Timeout Shield",
+        "category":  "Extreme Low Latency \u0026 Kernel Timers",
+        "categoryOrder":  2,
+        "description":  "Prevents third-party software, gaming overlays, or background utilities from freezing mouse cursor or keyboard inputs. Drops unresponsive input hooks within 1000ms.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "registry":  [
+                         {
+                             "path":  "HKCU\\Control Panel\\Desktop",
+                             "name":  "LowLevelHooksTimeout",
+                             "type":  "String",
+                             "value":  "1000",
+                             "originalValue":  "5000"
+                         }
+                     ]
+    },
+    {
+        "id":  "GfxTweakSmoothFramePacingDXGI",
+        "name":  "Direct3D DXGI Smooth Frame Pacing (Zero Micro-Stuttering Overdrive)",
+        "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
+        "categoryOrder":  1,
+        "description":  "Enforces Direct3D fast frame presentation and eliminates desktop composition pipeline queuing delays, ensuring stable frametimes and buttery smooth 180Hz pacing in competitive titles.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "registry":  [
+                         {
+                             "path":  "HKCU\\Software\\Microsoft\\Direct3D",
+                             "name":  "Direct3DFastPresentation",
+                             "type":  "DWord",
+                             "value":  "1",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         }
+                     ]
+    },
+    {
+        "id":  "SysTweakAutoHealthRepairEngine",
+        "name":  "Windows System File Integrity \u0026 Health Verification (Fix Broken DLLs \u0026 Freezes)",
+        "category":  "Essential Tweaks",
+        "categoryOrder":  8,
+        "description":  "Performs automated system component store verification and repairs corrupted Windows system files using native DISM and SFC engines, eliminating system instability without reinstalling Windows.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "invokeScript":  [
+                             "DISM.exe /Online /Cleanup-Image /RestoreHealth; sfc /scannow"
+                         ],
+        "undoScript":  [
+                           "Write-Host \u0027System integrity verification is a maintenance diagnostic action; no undo needed.\u0027 -ForegroundColor Gray"
+                       ]
     }
 ]

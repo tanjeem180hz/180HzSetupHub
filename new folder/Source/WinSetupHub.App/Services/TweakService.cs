@@ -347,7 +347,14 @@ namespace SetupHub180Hz.Services
             "RegTweakMouseAccelerationZero",
             "RegTweakHwSchModeHardware",
             "RegTweakDwmSingleBuffer",
-            "RegTweakNoLazyModeMMCSS"
+            "RegTweakNoLazyModeMMCSS",
+
+            // Anti-Crash & Continuous Smoothness Guardians
+            "GfxTweakGPUCrashShieldMaximum",
+            "SysTweakInstantFreezeRecovery",
+            "SysTweakLowLevelHooksNoHang",
+            "GfxTweakSmoothFramePacingDXGI",
+            "SysTweakAutoHealthRepairEngine"
         };
 
         // Extreme Performance Preset - forces 100% PC Performance & Ultra-Low Latency
@@ -655,7 +662,14 @@ namespace SetupHub180Hz.Services
             "RegTweakMouseAccelerationZero",
             "RegTweakHwSchModeHardware",
             "RegTweakDwmSingleBuffer",
-            "RegTweakNoLazyModeMMCSS"
+            "RegTweakNoLazyModeMMCSS",
+
+            // Anti-Crash & Continuous Smoothness Guardians
+            "GfxTweakGPUCrashShieldMaximum",
+            "SysTweakInstantFreezeRecovery",
+            "SysTweakLowLevelHooksNoHang",
+            "GfxTweakSmoothFramePacingDXGI",
+            "SysTweakAutoHealthRepairEngine"
         };
 
         private List<TweakItem>? _cache;
