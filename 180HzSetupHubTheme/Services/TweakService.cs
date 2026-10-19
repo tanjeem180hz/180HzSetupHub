@@ -327,7 +327,6 @@ namespace SetupHub180Hz.Services
             "GameTweakRawLinearMousePrecision",
             "GameTweakDisableWindowedGpuPowerSaving",
             "GameTweakIntelAmdThreadDirector",
-            "GameTweakCsrssRealtimeScheduling",
             "GameTweakDwmRenderBufferSingle",
             "GameTweakStandbyListAutoPurge",
             "GameTweakNetworkPacketPacingZero",
@@ -347,7 +346,6 @@ namespace SetupHub180Hz.Services
             "RegTweakDirectFlipEnabled",
             "RegTweakMouseAccelerationZero",
             "RegTweakHwSchModeHardware",
-            "RegTweakCsrssPriorityRealtime",
             "RegTweakDwmSingleBuffer",
             "RegTweakNoLazyModeMMCSS"
         };
@@ -642,7 +640,6 @@ namespace SetupHub180Hz.Services
             "GameTweakRawLinearMousePrecision",
             "GameTweakDisableWindowedGpuPowerSaving",
             "GameTweakIntelAmdThreadDirector",
-            "GameTweakCsrssRealtimeScheduling",
             "GameTweakDwmRenderBufferSingle",
             "GameTweakStandbyListAutoPurge",
             "GameTweakNetworkPacketPacingZero",
@@ -657,7 +654,6 @@ namespace SetupHub180Hz.Services
             "RegTweakDirectFlipEnabled",
             "RegTweakMouseAccelerationZero",
             "RegTweakHwSchModeHardware",
-            "RegTweakCsrssPriorityRealtime",
             "RegTweakDwmSingleBuffer",
             "RegTweakNoLazyModeMMCSS"
         };

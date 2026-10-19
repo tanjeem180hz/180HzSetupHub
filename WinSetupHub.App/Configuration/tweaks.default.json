@@ -5633,7 +5633,7 @@
     },
     {
         "id":  "CpuTweakDisableProcessorIdleDemote",
-        "name":  "🚀 Unlock Maximum CPU Turbo Boost \u0026 Dynamic Precision Boost (5.0GHz+ Capable)",
+        "name":  "Unlock Maximum CPU Turbo Boost \u0026 Dynamic Precision Boost (5.0GHz+ Capable)",
         "description":  "Enables dynamic C-state thermal headroom and configures Aggressive Processor Boost with 0% EPP delay. Unlocks full CPU GHz scaling up to maximum factory turbo boost (e.g. 5.0GHz) without locking at base clock.",
         "category":  "CPU, RAM \u0026 Power Tuning",
         "categoryOrder":  3,
@@ -6751,7 +6751,7 @@
     },
     {
         "id":  "GameTweakTimerResolution05ms",
-        "name":  "⚡ Real-Time 0.500ms High-Precision Kernel Timer Resolution Lock",
+        "name":  "Real-Time 0.500ms High-Precision Kernel Timer Resolution Lock",
         "description":  "Forces Windows system timer resolution from 15.625ms down to 0.500ms (5000 units). Eliminates frame pacing jitter, synchronizes physics with high-refresh monitors (144Hz/180Hz/240Hz), and makes gameplay feel 2x smoother.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -6780,7 +6780,7 @@
     },
     {
         "id":  "GameTweakMMCSSGpuPriorityMax",
-        "name":  "🎮 MMCSS Dedicated GPU Scheduling Priority 8 (Pure Hardware Direct3D)",
+        "name":  "MMCSS Dedicated GPU Scheduling Priority 8 (Pure Hardware Direct3D)",
         "description":  "Configures Multimedia Class Scheduler Service (MMCSS) to allocate maximum GPU priority (8) to 3D games, preventing Windows desktop compositor from stealing GPU render queues.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -6830,7 +6830,7 @@
     },
     {
         "id":  "GameTweakSystemResponsivenessZero",
-        "name":  "🚀 System Responsiveness 0% Background Reserve (100% CPU Dedicated to Gaming)",
+        "name":  "System Responsiveness 0% Background Reserve (100% CPU Dedicated to Gaming)",
         "description":  "Removes Windows\u0027 default 20% CPU reservation for background services, dedicating 100% of CPU cycles to the active game process.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -6880,7 +6880,7 @@
     },
     {
         "id":  "GameTweakAutoGameModeForce",
-        "name":  "🎯 Force Windows Game Mode Maximum Hardware Allocation",
+        "name":  "Force Windows Game Mode Maximum Hardware Allocation",
         "description":  "Forces Windows Game Mode to prioritize CPU and GPU resources exclusively to the running game, pausing background tasks and Windows Update during gameplay.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -6916,7 +6916,7 @@
     },
     {
         "id":  "GameTweakDisableGameDVRGlobal",
-        "name":  "🚫 Terminate GameDVR Background Video Recording \u0026 Capture Hooks",
+        "name":  "Terminate GameDVR Background Video Recording \u0026 Capture Hooks",
         "description":  "Completely shuts down background GameDVR video encoding buffers. Reclaims 15-20% GPU encoding overhead and frees up VRAM for higher in-game FPS.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -6973,7 +6973,7 @@
     },
     {
         "id":  "GameTweakDirectXShaderCache10GB",
-        "name":  "💾 10GB DirectX Shader Cache Expansion (Zero In-Game Stutter)",
+        "name":  "10GB DirectX Shader Cache Expansion (Zero In-Game Stutter)",
         "description":  "Expands DirectX shader cache buffer to 10GB. Pre-compiled shaders remain permanently cached, eliminating sudden 0 FPS hitching and stutters during firefights and map traversal.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7009,7 +7009,7 @@
     },
     {
         "id":  "GameTweakPowerPlan180HzUltimate",
-        "name":  "⚡ Activate 180Hz 2X FPS Ultimate Gaming Power Scheme (Zero Core Parking)",
+        "name":  "Activate 180Hz 2X FPS Ultimate Gaming Power Scheme (Zero Core Parking)",
         "description":  "Imports and activates the Ultimate Performance power scheme, locks 100% minimum CPU frequency, unparks all cores, and enables aggressive boost clocks.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7032,7 +7032,7 @@
     },
     {
         "id":  "GameTweakDisableFullscreenOptimizationsDXGI",
-        "name":  "🖥️ Direct Hardware Swapchain Presentation (Bypass DWM Blitting)",
+        "name":  "Direct Hardware Swapchain Presentation (Bypass DWM Blitting)",
         "description":  "Bypasses Desktop Window Manager composition blitting for all DirectX 11/12 games, giving borderless windowed mode the exact latency and FPS of true fullscreen exclusive.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7068,7 +7068,7 @@
     },
     {
         "id":  "GameTweakDisableNvidiaPowerMizer",
-        "name":  "🔒 Lock Maximum GPU Boost Clocks on AC Power (Zero Downclocking)",
+        "name":  "Lock Maximum GPU Boost Clocks on AC Power (Zero Downclocking)",
         "description":  "Prevents GPU drivers from dropping core or memory clock states during low-intensity game scenes, guaranteeing consistent framerates and stable frametimes.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7097,7 +7097,7 @@
     },
     {
         "id":  "GameTweakRawLinearMousePrecision",
-        "name":  "🎯 Pixel-Perfect 1:1 Raw Mouse Aim (Disable Mouse Acceleration Curve)",
+        "name":  "Pixel-Perfect 1:1 Raw Mouse Aim (Disable Mouse Acceleration Curve)",
         "description":  "Disables Windows pointer precision acceleration curve in registry. Delivers linear 1:1 mouse movement essential for competitive shooters (CS2, Valorant, Fortnite, Apex).",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7140,7 +7140,7 @@
     },
     {
         "id":  "GameTweakDisableWindowedGpuPowerSaving",
-        "name":  "🛡️ Disable Windows 11 Windowed Game Power Throttling",
+        "name":  "Disable Windows 11 Windowed Game Power Throttling",
         "description":  "Prevents Windows from categorizing windowed games as background power-saving tasks, keeping GPU and CPU running at maximum clocks.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7176,7 +7176,7 @@
     },
     {
         "id":  "GameTweakIntelAmdThreadDirector",
-        "name":  "🧠 Intel P-Core \u0026 AMD 3D V-Cache Scheduling Overdrive for Games",
+        "name":  "Intel P-Core \u0026 AMD 3D V-Cache Scheduling Overdrive for Games",
         "description":  "Instructs the Windows kernel scheduler to pin heavy 3D rendering and physics threads strictly to high-frequency P-cores and V-Cache cores.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7205,7 +7205,7 @@
     },
     {
         "id":  "GameTweakCsrssRealtimeScheduling",
-        "name":  "⚡ Elevate CSRSS Process Priority to Realtime for Instant Display Response",
+        "name":  "Elevate CSRSS Process Priority to Realtime for Instant Display Response",
         "description":  "Elevates Client Server Runtime Subsystem (CSRSS) CPU priority to Realtime, eliminating desktop cursor micro-freezes and window dragging lag.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7234,7 +7234,7 @@
     },
     {
         "id":  "GameTweakDwmRenderBufferSingle",
-        "name":  "🖥️ Cap DWM Maximum Queued Frames to 1 (Zero Compositor Lag)",
+        "name":  "Cap DWM Maximum Queued Frames to 1 (Zero Compositor Lag)",
         "description":  "Forces Desktop Window Manager to buffer only 1 frame instead of 3, reducing display input lag by up to 16ms.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7263,7 +7263,7 @@
     },
     {
         "id":  "GameTweakStandbyListAutoPurge",
-        "name":  "🧹 Auto-Purge Windows Standby RAM List (Fix Sudden 1-Second Freezes)",
+        "name":  "Auto-Purge Windows Standby RAM List (Fix Sudden 1-Second Freezes)",
         "description":  "Flushes cached standby list pages before memory runs low, eliminating the infamous Windows standby list memory stutter in 8GB/16GB gaming rigs.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7286,7 +7286,7 @@
     },
     {
         "id":  "GameTweakNetworkPacketPacingZero",
-        "name":  "🌐 Zero Network Packet Pacing Buffer for Instant Hit Registration",
+        "name":  "Zero Network Packet Pacing Buffer for Instant Hit Registration",
         "description":  "Bypasses network interface packet pacing delays, sending client bullet and movement updates to game servers with zero queue latency.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7309,7 +7309,7 @@
     },
     {
         "id":  "GfxTweakDisableUlpsPowerMizer",
-        "name":  "🚀 Disable GPU Ultra-Low Power State (ULPS) \u0026 PowerMizer Throttling (Force 100% GPU Utilization)",
+        "name":  "Disable GPU Ultra-Low Power State (ULPS) \u0026 PowerMizer Throttling (Force 100% GPU Utilization)",
         "description":  "Disables AMD ULPS sleep states, NVIDIA PowerMizer throttling and GPU driver power gating across registry classes. Forces the GPU to maintain high 3D clocks and allows games to reach 100% full GPU utilization without GPU power drop.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7345,7 +7345,7 @@
     },
     {
         "id":  "GfxTweakDirectXHighPerformanceRouting",
-        "name":  "🎮 Direct High-Performance GPU Routing \u0026 Bypass Hybrid Throttling",
+        "name":  "Direct High-Performance GPU Routing \u0026 Bypass Hybrid Throttling",
         "description":  "Sets default DirectX graphics scheduling to Dedicated High-Performance GPU mode, preventing games and heavy applications from running on throttled hybrid or low-power GPU states.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7381,7 +7381,7 @@
     },
     {
         "id":  "MemTweakDisableMemoryCompression",
-        "name":  "🚀 Disable RAM Memory Compression \u0026 Page Combining (Zero Micro-Stutter Engine)",
+        "name":  "Disable RAM Memory Compression \u0026 Page Combining (Zero Micro-Stutter Engine)",
         "description":  "Disables Windows background memory compression and periodic page scanning tasks. Prevents CPU usage spikes and stops periodic 1-second stutters during BlueStacks, LDPlayer, and PC gaming.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
@@ -7404,7 +7404,7 @@
     },
     {
         "id":  "EmulTweakUniversalAndroidOverdrive",
-        "name":  "⚡ Universal Android Emulator \u0026 PC Game Hyper-Drive (BlueStacks / MSI / LDPlayer / PC Games)",
+        "name":  "Universal Android Emulator \u0026 PC Game Hyper-Drive (BlueStacks / MSI / LDPlayer / PC Games)",
         "description":  "Enforces Realtime High CPU \u0026 I/O Priority, eliminates Windows 10/11 EcoQoS Power Throttling, forces 100% discrete GPU routing, and locks 3:1 foreground CPU quanta boost for all Android emulators and PC games.",
         "category":  "Emulator 100% Performance",
         "categoryOrder":  7,
