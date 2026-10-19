@@ -160,7 +160,6 @@ namespace SetupHub180Hz.Services
             }
             catch
             {
-                // Fallback to default
             }
 
             CurrentVersion = DefaultCurrentVersion;
@@ -238,7 +237,6 @@ namespace SetupHub180Hz.Services
                 }
                 catch
                 {
-                    // Non-critical commit check
                 }
 
                 // 3. Determine if update is available
@@ -446,21 +444,36 @@ namespace SetupHub180Hz.Services
                 progressCallback?.Invoke(100, "Finalizing update and restarting…");
                 DownloadProgress = 100;
 
+                // Test whether install directory is directly writable without elevation
+                bool isInstallDirWritable = false;
+                try
+                {
+                    var testFile = Path.Combine(installDir, $"write_test_{Guid.NewGuid():N}.tmp");
+                    File.WriteAllText(testFile, "test");
+                    File.Delete(testFile);
+                    isInstallDirWritable = true;
+                }
+                catch
+                {
+                    isInstallDirWritable = false;
+                }
+
                 var helperCmd = Path.Combine(tempDir, "apply_update.cmd");
                 var scriptBuilder = new StringBuilder();
                 scriptBuilder.AppendLine("@echo off");
                 scriptBuilder.AppendLine("chcp 65001 >nul");
-                scriptBuilder.AppendLine(":: 180Hz Setup Hub Self-Updater Helper");
-                scriptBuilder.AppendLine("timeout /t 1 /nobreak >nul");
+                scriptBuilder.AppendLine(":: 180Hz Setup Hub Direct EXE In-Place Auto-Updater");
+                // Using ping for sleep avoids 'Input redirection is not supported' error in hidden cmd processes
+                scriptBuilder.AppendLine("ping 127.0.0.1 -n 2 >nul");
                 scriptBuilder.AppendLine($"taskkill /F /PID {currentPid} >nul 2>&1");
-                scriptBuilder.AppendLine("timeout /t 1 /nobreak >nul");
+                scriptBuilder.AppendLine("ping 127.0.0.1 -n 2 >nul");
                 scriptBuilder.AppendLine("set ATTEMPTS=0");
                 scriptBuilder.AppendLine(":RETRY_COPY");
                 scriptBuilder.AppendLine("set /a ATTEMPTS+=1");
                 scriptBuilder.AppendLine($"copy /Y \"{tempExe}\" \"{currentExe}\" >nul 2>&1");
                 scriptBuilder.AppendLine("if errorlevel 1 (");
-                scriptBuilder.AppendLine("    if %ATTEMPTS% LSS 10 (");
-                scriptBuilder.AppendLine("        timeout /t 1 /nobreak >nul");
+                scriptBuilder.AppendLine("    if %ATTEMPTS% LSS 15 (");
+                scriptBuilder.AppendLine("        ping 127.0.0.1 -n 2 >nul");
                 scriptBuilder.AppendLine("        goto RETRY_COPY");
                 scriptBuilder.AppendLine("    )");
                 scriptBuilder.AppendLine(")");
@@ -475,7 +488,7 @@ namespace SetupHub180Hz.Services
 
                 scriptBuilder.AppendLine(":: Launch updated application");
                 scriptBuilder.AppendLine($"start \"\" \"{currentExe}\"");
-                scriptBuilder.AppendLine("timeout /t 2 /nobreak >nul");
+                scriptBuilder.AppendLine("ping 127.0.0.1 -n 3 >nul");
                 scriptBuilder.AppendLine($"rd /S /Q \"{tempDir}\" >nul 2>&1");
                 scriptBuilder.AppendLine("del \"%~f0\" >nul 2>&1");
                 scriptBuilder.AppendLine("exit");
@@ -493,10 +506,16 @@ namespace SetupHub180Hz.Services
                     WorkingDirectory = Path.GetTempPath()
                 };
 
+                // If install directory requires Administrator privileges, elevate to ensure copy succeeds
+                if (!isInstallDirWritable)
+                {
+                    psi.Verb = "runas";
+                }
+
                 Process.Start(psi);
 
                 // 5. Cleanly shut down current application
-                ActivityLogger.Instance.Log("Update ready. Relaunching application…", ActivityType.Info);
+                ActivityLogger.Instance.Log("Update applied. Relaunching 180Hz Setup Hub…", ActivityType.Info);
                 await Task.Delay(300);
 
                 var app = Application.Current;
@@ -541,12 +560,18 @@ namespace SetupHub180Hz.Services
             }
             catch
             {
-                // Non-critical config update
             }
         }
 
         public static string GetCurrentExecutablePath()
         {
+            try
+            {
+                var ep = Environment.ProcessPath;
+                if (!string.IsNullOrWhiteSpace(ep) && File.Exists(ep)) return ep;
+            }
+            catch { }
+
             try
             {
                 var p = Process.GetCurrentProcess().MainModule?.FileName;

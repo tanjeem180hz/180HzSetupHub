@@ -160,12 +160,14 @@ namespace SetupHub180Hz.Services
             }
             catch
             {
-                // Fallback to default
             }
 
             CurrentVersion = DefaultCurrentVersion;
         }
 
+        /// <summary>
+        /// Checks GitHub for updates. Compares version.json, commit history, and remote file metadata.
+        /// </summary>
         public async Task<bool> CheckForUpdatesAsync(bool silent = false)
         {
             if (!await _checkLock.WaitAsync(0))
@@ -178,6 +180,7 @@ namespace SetupHub180Hz.Services
                 IsChecking = true;
                 StatusMessage = "Checking GitHub repository for updates…";
 
+                // 1. Fetch version.json with anti-cache timestamp
                 var cacheBuster = DateTime.UtcNow.Ticks;
                 var manifestUrlWithBuster = $"{ManifestUrl}?_={cacheBuster}";
 
@@ -202,6 +205,7 @@ namespace SetupHub180Hz.Services
                     ActivityLogger.Instance.Log($"GitHub manifest check notice: {ex.Message}", ActivityType.Info);
                 }
 
+                // 2. Check latest commit timestamp on artifacts/publish/win-x64/180HzSetupHub.exe
                 DateTime remoteCommitDate = DateTime.MinValue;
                 string remoteCommitSha = "";
                 try
@@ -235,6 +239,7 @@ namespace SetupHub180Hz.Services
                 {
                 }
 
+                // 3. Determine if update is available
                 bool hasUpdate = false;
                 string candidateVersion = manifest?.version ?? CurrentVersion;
 
@@ -252,6 +257,7 @@ namespace SetupHub180Hz.Services
                     hasUpdate = true;
                 }
 
+                // If remote commit on the exe is newer than local executable's write time
                 if (!hasUpdate && remoteCommitDate > DateTime.MinValue)
                 {
                     try
@@ -308,6 +314,10 @@ namespace SetupHub180Hz.Services
             }
         }
 
+        /// <summary>
+        /// Downloads the latest 180HzSetupHub.exe from GitHub, verifies binary integrity,
+        /// creates a zero-friction detached helper script to replace the locked executable, and relaunches.
+        /// </summary>
         public async Task<bool> DownloadAndApplyUpdateAsync(Action<double, string>? progressCallback = null)
         {
             if (IsDownloading) return false;
@@ -333,6 +343,7 @@ namespace SetupHub180Hz.Services
                 Directory.CreateDirectory(tempDir);
                 var tempExe = Path.Combine(tempDir, "180HzSetupHub_new.exe");
 
+                // Download URL candidate list
                 var downloadUrls = new[]
                 {
                     RawExeUrl,
@@ -357,7 +368,7 @@ namespace SetupHub180Hz.Services
                         var totalBytes = resp.Content.Headers.ContentLength ?? -1L;
                         var sw = Stopwatch.StartNew();
                         long totalRead = 0;
-                        var buffer = new byte[65536];
+                        var buffer = new byte[65536]; // 64 KB buffer
 
                         using (var src = await resp.Content.ReadAsStreamAsync())
                         using (var dst = new FileStream(tempExe, FileMode.Create, FileAccess.Write, FileShare.None, 65536, true))
@@ -391,8 +402,10 @@ namespace SetupHub180Hz.Services
                             }
                         }
 
+                        // Validate downloaded file
                         if (File.Exists(tempExe) && new FileInfo(tempExe).Length > 2 * 1024 * 1024)
                         {
+                            // Validate PE header
                             using (var fs = File.OpenRead(tempExe))
                             {
                                 int b1 = fs.ReadByte();
@@ -418,6 +431,7 @@ namespace SetupHub180Hz.Services
                     return false;
                 }
 
+                // 2. Also download latest config files from GitHub to temp staging so tweaks catalog is updated
                 StatusMessage = "Fetching updated configuration catalogs…";
                 var tempConfigDir = Path.Combine(tempDir, "Configuration");
                 Directory.CreateDirectory(tempConfigDir);
@@ -425,25 +439,41 @@ namespace SetupHub180Hz.Services
                 await TryDownloadConfigAsync("registry_tweaks.default.json", tempConfigDir);
                 await TryDownloadConfigAsync("packages.default.json", tempConfigDir);
 
+                // 3. Build bulletproof detached batch updater script
                 StatusMessage = "Finalizing update and restarting…";
                 progressCallback?.Invoke(100, "Finalizing update and restarting…");
                 DownloadProgress = 100;
+
+                // Test whether install directory is directly writable without elevation
+                bool isInstallDirWritable = false;
+                try
+                {
+                    var testFile = Path.Combine(installDir, $"write_test_{Guid.NewGuid():N}.tmp");
+                    File.WriteAllText(testFile, "test");
+                    File.Delete(testFile);
+                    isInstallDirWritable = true;
+                }
+                catch
+                {
+                    isInstallDirWritable = false;
+                }
 
                 var helperCmd = Path.Combine(tempDir, "apply_update.cmd");
                 var scriptBuilder = new StringBuilder();
                 scriptBuilder.AppendLine("@echo off");
                 scriptBuilder.AppendLine("chcp 65001 >nul");
-                scriptBuilder.AppendLine(":: 180Hz Setup Hub Self-Updater Helper");
-                scriptBuilder.AppendLine("timeout /t 1 /nobreak >nul");
+                scriptBuilder.AppendLine(":: 180Hz Setup Hub Direct EXE In-Place Auto-Updater");
+                // Using ping for sleep avoids 'Input redirection is not supported' error in hidden cmd processes
+                scriptBuilder.AppendLine("ping 127.0.0.1 -n 2 >nul");
                 scriptBuilder.AppendLine($"taskkill /F /PID {currentPid} >nul 2>&1");
-                scriptBuilder.AppendLine("timeout /t 1 /nobreak >nul");
+                scriptBuilder.AppendLine("ping 127.0.0.1 -n 2 >nul");
                 scriptBuilder.AppendLine("set ATTEMPTS=0");
                 scriptBuilder.AppendLine(":RETRY_COPY");
                 scriptBuilder.AppendLine("set /a ATTEMPTS+=1");
                 scriptBuilder.AppendLine($"copy /Y \"{tempExe}\" \"{currentExe}\" >nul 2>&1");
                 scriptBuilder.AppendLine("if errorlevel 1 (");
-                scriptBuilder.AppendLine("    if %ATTEMPTS% LSS 10 (");
-                scriptBuilder.AppendLine("        timeout /t 1 /nobreak >nul");
+                scriptBuilder.AppendLine("    if %ATTEMPTS% LSS 15 (");
+                scriptBuilder.AppendLine("        ping 127.0.0.1 -n 2 >nul");
                 scriptBuilder.AppendLine("        goto RETRY_COPY");
                 scriptBuilder.AppendLine("    )");
                 scriptBuilder.AppendLine(")");
@@ -458,13 +488,14 @@ namespace SetupHub180Hz.Services
 
                 scriptBuilder.AppendLine(":: Launch updated application");
                 scriptBuilder.AppendLine($"start \"\" \"{currentExe}\"");
-                scriptBuilder.AppendLine("timeout /t 2 /nobreak >nul");
+                scriptBuilder.AppendLine("ping 127.0.0.1 -n 3 >nul");
                 scriptBuilder.AppendLine($"rd /S /Q \"{tempDir}\" >nul 2>&1");
                 scriptBuilder.AppendLine("del \"%~f0\" >nul 2>&1");
                 scriptBuilder.AppendLine("exit");
 
                 File.WriteAllText(helperCmd, scriptBuilder.ToString(), Encoding.ASCII);
 
+                // 4. Launch detached updater process
                 var psi = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
@@ -475,9 +506,16 @@ namespace SetupHub180Hz.Services
                     WorkingDirectory = Path.GetTempPath()
                 };
 
+                // If install directory requires Administrator privileges, elevate to ensure copy succeeds
+                if (!isInstallDirWritable)
+                {
+                    psi.Verb = "runas";
+                }
+
                 Process.Start(psi);
 
-                ActivityLogger.Instance.Log("Update ready. Relaunching application…", ActivityType.Info);
+                // 5. Cleanly shut down current application
+                ActivityLogger.Instance.Log("Update applied. Relaunching 180Hz Setup Hub…", ActivityType.Info);
                 await Task.Delay(300);
 
                 var app = Application.Current;
@@ -527,6 +565,13 @@ namespace SetupHub180Hz.Services
 
         public static string GetCurrentExecutablePath()
         {
+            try
+            {
+                var ep = Environment.ProcessPath;
+                if (!string.IsNullOrWhiteSpace(ep) && File.Exists(ep)) return ep;
+            }
+            catch { }
+
             try
             {
                 var p = Process.GetCurrentProcess().MainModule?.FileName;

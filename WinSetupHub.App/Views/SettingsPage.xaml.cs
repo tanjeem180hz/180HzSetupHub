@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
@@ -72,20 +73,41 @@ namespace SetupHub180Hz.Views
 
             if (s.IsDownloading)
             {
+                PnlSettingsDownloadProgress.Visibility = Visibility.Visible;
+                PrgSettingsDownload.Value = s.DownloadProgress;
+                TxtSettingsDownloadBytes.Text = string.IsNullOrWhiteSpace(s.DownloadBytesText) ? "Downloading 180HzSetupHub.exe from GitHub…" : s.DownloadBytesText;
+                TxtSettingsDownloadSpeed.Text = s.DownloadSpeedText;
+
                 BtnSettingsCheckUpdate.IsEnabled = false;
                 BtnSettingsUpdateNow.IsEnabled = false;
+                BtnSettingsForceUpdate.IsEnabled = false;
             }
             else
             {
+                PnlSettingsDownloadProgress.Visibility = Visibility.Collapsed;
                 BtnSettingsCheckUpdate.IsEnabled = !s.IsChecking;
-                BtnSettingsUpdateNow.IsEnabled = s.UpdateAvailable;
+                BtnSettingsForceUpdate.IsEnabled = true;
+
                 if (s.UpdateAvailable)
                 {
+                    BtnSettingsUpdateNow.IsEnabled = true;
                     BtnSettingsUpdateNow.Content = $"🚀 Update to v{s.LatestVersion}";
+
+                    if (!string.IsNullOrWhiteSpace(s.ReleaseNotes))
+                    {
+                        TxtSettingsReleaseNotes.Text = s.ReleaseNotes;
+                        PnlSettingsReleaseNotes.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        PnlSettingsReleaseNotes.Visibility = Visibility.Collapsed;
+                    }
                 }
                 else
                 {
+                    BtnSettingsUpdateNow.IsEnabled = false;
                     BtnSettingsUpdateNow.Content = "✓ Up to Date";
+                    PnlSettingsReleaseNotes.Visibility = Visibility.Collapsed;
                 }
             }
         }
@@ -159,7 +181,6 @@ namespace SetupHub180Hz.Views
                     ActivityLogger.Instance.Log($"Set automated update frequency to {hours} hours.", ActivityType.Info);
                 }
 
-                // Sync background update monitor and task scheduler
                 try
                 {
                     UpdateMonitorService.Instance.UpdateInterval();
@@ -207,23 +228,38 @@ namespace SetupHub180Hz.Views
         private async void BtnSettingsUpdateNow_Click(object sender, RoutedEventArgs e)
         {
             var res = ThemedMessageBox.Show(
-                $"180Hz Setup Hub will download the latest build from GitHub and restart the application.\n\nDo you want to proceed?",
-                "Update 180Hz Setup Hub",
+                $"180Hz Setup Hub will download the latest build (v{AppUpdateService.Instance.LatestVersion}) from GitHub and automatically replace the running executable and restart.\n\nDo you want to proceed?",
+                "Direct EXE Update from GitHub",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
 
             if (res != MessageBoxResult.Yes) return;
 
-            BtnSettingsUpdateNow.IsEnabled = false;
-            BtnSettingsCheckUpdate.IsEnabled = false;
-            TxtSettingsAppUpdateStatus.Text = "Downloading update from GitHub…";
+            await RunExeUpdate();
+        }
 
-            var ok = await AppUpdateService.Instance.DownloadAndApplyUpdateAsync();
-            if (!ok)
+        private async void BtnSettingsForceUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            var res = ThemedMessageBox.Show(
+                "This will force download the latest 180HzSetupHub.exe from GitHub (main branch) and replace the running executable in-place.\n\nThe app will restart automatically once completed.\n\nDo you want to continue?",
+                "Force Re-download Latest EXE",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (res != MessageBoxResult.Yes) return;
+
+            await RunExeUpdate();
+        }
+
+        private async Task RunExeUpdate()
+        {
+            UpdateAppUpdateStatusUi();
+            var success = await AppUpdateService.Instance.DownloadAndApplyUpdateAsync();
+            if (!success)
             {
                 UpdateAppUpdateStatusUi();
                 ThemedMessageBox.Show(
-                    $"Could not update application: {AppUpdateService.Instance.StatusMessage}",
+                    $"Could not complete EXE update: {AppUpdateService.Instance.StatusMessage}",
                     "Update Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
