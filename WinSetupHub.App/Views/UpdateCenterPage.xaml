@@ -181,20 +181,150 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,18">
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <lottie:LottieAnimationView Width="26" Height="26" AutoPlay="True" RepeatCount="-1"
                                             services:LottieHelper.AssetName="update_sync.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
                 <TextBlock Text="Update Center" Style="{StaticResource TextHeader}" FontSize="26" VerticalAlignment="Center"/>
             </StackPanel>
-            <TextBlock Text="Keep your applications up to date with the latest versions and security patches."
+            <TextBlock Text="Keep 180Hz Setup Hub and your installed PC applications up to date with the latest versions and patches."
                        Style="{StaticResource TextBody}" Margin="0,4,0,0"/>
         </StackPanel>
 
-        <Grid Grid.Row="1" Margin="0,0,0,16">
+        <!-- ======================================================== -->
+        <!--  180Hz Setup Hub Native App Self-Updater (GitHub Live)   -->
+        <!-- ======================================================== -->
+        <Border Grid.Row="1" Margin="0,0,0,20" CornerRadius="10"
+                Background="{DynamicResource BrushSurface}"
+                BorderBrush="{DynamicResource BrushAccent}"
+                BorderThickness="1"
+                Padding="18,16"
+                ClipToBounds="True">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="16" ShadowDepth="4" Direction="270" Opacity="0.45"/>
+            </Border.Effect>
+            <Grid>
+                <!-- Top Edge Highlight Glow -->
+                <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                        Background="{DynamicResource BrushAccent}" Opacity="0.4"/>
+
+                <Grid Margin="0,4,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Top Row: Icon, Title, Version Pills & Action Buttons -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- App Icon -->
+                        <Border Grid.Column="0" Width="44" Height="44" CornerRadius="8"
+                                Background="{DynamicResource BrushBackground}"
+                                BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                                Margin="0,0,14,0" VerticalAlignment="Center">
+                            <Image Source="pack://application:,,,/Assets/AppIcon-1024.png"
+                                   Width="30" Height="30" Stretch="Uniform"
+                                   RenderOptions.BitmapScalingMode="HighQuality"/>
+                        </Border>
+
+                        <!-- Title & Version Info -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="180Hz Setup Hub"
+                                           FontFamily="{StaticResource AppFont}"
+                                           FontSize="15" FontWeight="Bold"
+                                           Foreground="{DynamicResource BrushTextPrimary}"
+                                           VerticalAlignment="Center"/>
+
+                                <!-- Installed Version Badge -->
+                                <Border Background="{DynamicResource BrushBackground}"
+                                        BorderBrush="{DynamicResource BrushBorder}"
+                                        BorderThickness="1" CornerRadius="4"
+                                        Padding="7,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock x:Name="TxtAppCurrentVersion" Text="Installed: v2.5.0"
+                                               FontSize="11" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource BrushTextSecondary}"/>
+                                </Border>
+
+                                <!-- GitHub Branch Tag -->
+                                <Border Background="#1400FF66"
+                                        BorderBrush="#4000FF66"
+                                        BorderThickness="1" CornerRadius="4"
+                                        Padding="7,2" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="⚡ GitHub: main" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Status Description -->
+                            <TextBlock x:Name="TxtAppUpdateStatus"
+                                       Text="Check GitHub to verify if a newer application executable or tweak update is available."
+                                       Style="{StaticResource TextBody}"
+                                       FontSize="12" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <!-- Action Buttons -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button x:Name="BtnCheckAppUpdate" Content="Check GitHub"
+                                    Style="{StaticResource ExpandableOutlineButton}"
+                                    Margin="0,0,8,0" Padding="12,6" Height="34"
+                                    Click="BtnCheckAppUpdate_Click" ToolTip="Check GitHub repository for newer version"/>
+
+                            <Button x:Name="BtnApplyAppUpdate" Content="🚀 Update App Now"
+                                    Style="{StaticResource ExpandableAccentButton}"
+                                    Padding="14,6" Height="34"
+                                    Click="BtnApplyAppUpdate_Click" ToolTip="Download and install update from GitHub"/>
+
+                            <Button x:Name="BtnForceAppUpdate" Content="Force Sync"
+                                    Style="{StaticResource ExpandableOutlineButton}"
+                                    Margin="8,0,0,0" Padding="10,6" Height="34"
+                                    Click="BtnForceAppUpdate_Click" ToolTip="Force download and replace with latest GitHub exe"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Progress Bar Row (Shown when downloading) -->
+                    <StackPanel x:Name="PnlAppDownloadProgress" Grid.Row="1" Margin="0,14,0,4" Visibility="Collapsed">
+                        <Grid Margin="0,0,0,6">
+                            <TextBlock x:Name="TxtAppDownloadBytes" Text="Downloading: 0 MB / 0 MB"
+                                       FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                            <TextBlock x:Name="TxtAppDownloadSpeed" Text="0 KB/s" HorizontalAlignment="Right"
+                                       FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                        </Grid>
+                        <ProgressBar x:Name="PrgAppDownload" Height="6" Maximum="100" Value="0"
+                                     Foreground="{DynamicResource BrushAccent}"
+                                     Background="{DynamicResource BrushBackground}"
+                                     BorderThickness="0"/>
+                    </StackPanel>
+
+                    <!-- Release Notes Panel (Collapsible) -->
+                    <Border x:Name="PnlAppReleaseNotes" Grid.Row="2" Margin="0,10,0,0"
+                            Background="{DynamicResource BrushBackground}"
+                            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                            CornerRadius="6" Padding="12,8" Visibility="Collapsed">
+                        <StackPanel>
+                            <TextBlock Text="Release Notes &amp; Changes:" FontSize="11" FontWeight="Bold"
+                                       Foreground="{DynamicResource BrushAccent}" Margin="0,0,0,4"/>
+                            <TextBlock x:Name="TxtAppReleaseNotes" Text=""
+                                       FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- 3rd-Party Applications Section Header -->
+        <Grid Grid.Row="2" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -212,7 +342,8 @@
             </Button>
         </Grid>
 
-        <ListBox Grid.Row="2"
+        <!-- 3rd-Party Applications List -->
+        <ListBox Grid.Row="3"
                  x:Name="UpdatesListBox"
                  VirtualizingPanel.IsVirtualizing="True"
                  VirtualizingPanel.VirtualizationMode="Recycling"

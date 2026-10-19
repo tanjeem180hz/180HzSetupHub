@@ -19,6 +19,11 @@ namespace SetupHub180Hz.Views
         {
             InitializeComponent();
             Loaded += (_, _) => LoadSettings();
+
+            AppUpdateService.Instance.StatusChanged += (_, _) =>
+            {
+                Dispatcher.InvokeAsync(UpdateAppUpdateStatusUi);
+            };
         }
 
         private void LoadSettings()
@@ -29,6 +34,7 @@ namespace SetupHub180Hz.Views
             ChkAutoStart.IsChecked = settings.AutoStartWithWindows;
             ChkNotifications.IsChecked = settings.ShowNotifications;
             ChkRequireAdmin.IsChecked = settings.RequireAdminForActions;
+            ChkAutoCheckAppUpdates.IsChecked = settings.AutoCheckAppUpdates;
 
             // Select ComboBoxItem matching frequency (including 0 for Never)
             bool matched = false;
@@ -54,7 +60,34 @@ namespace SetupHub180Hz.Views
                 }
             }
 
+            UpdateAppUpdateStatusUi();
             _isInitializing = false;
+        }
+
+        private void UpdateAppUpdateStatusUi()
+        {
+            var s = AppUpdateService.Instance;
+            TxtSettingsAppVersion.Text = $"v{s.CurrentVersion}";
+            TxtSettingsAppUpdateStatus.Text = s.StatusMessage;
+
+            if (s.IsDownloading)
+            {
+                BtnSettingsCheckUpdate.IsEnabled = false;
+                BtnSettingsUpdateNow.IsEnabled = false;
+            }
+            else
+            {
+                BtnSettingsCheckUpdate.IsEnabled = !s.IsChecking;
+                BtnSettingsUpdateNow.IsEnabled = s.UpdateAvailable;
+                if (s.UpdateAvailable)
+                {
+                    BtnSettingsUpdateNow.Content = $"🚀 Update to v{s.LatestVersion}";
+                }
+                else
+                {
+                    BtnSettingsUpdateNow.Content = "✓ Up to Date";
+                }
+            }
         }
 
         private void ChkAutoStart_Changed(object sender, RoutedEventArgs e)
@@ -147,6 +180,54 @@ namespace SetupHub180Hz.Views
             ActivityLogger.Instance.Log(
                 enabled ? "Require Administrator privilege enabled." : "Require Administrator privilege disabled.",
                 ActivityType.Info);
+        }
+
+        private void ChkAutoCheckAppUpdates_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isInitializing) return;
+
+            var enabled = ChkAutoCheckAppUpdates.IsChecked == true;
+            SettingsService.Instance.Current.AutoCheckAppUpdates = enabled;
+            SettingsService.Instance.Save();
+
+            ActivityLogger.Instance.Log(
+                enabled ? "Enabled auto-check for 180Hz Setup Hub updates on launch." : "Disabled auto-check for 180Hz Setup Hub updates on launch.",
+                ActivityType.Info);
+        }
+
+        private async void BtnSettingsCheckUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            BtnSettingsCheckUpdate.IsEnabled = false;
+            TxtSettingsAppUpdateStatus.Text = "Checking GitHub repository for updates…";
+
+            await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
+            UpdateAppUpdateStatusUi();
+        }
+
+        private async void BtnSettingsUpdateNow_Click(object sender, RoutedEventArgs e)
+        {
+            var res = ThemedMessageBox.Show(
+                $"180Hz Setup Hub will download the latest build from GitHub and restart the application.\n\nDo you want to proceed?",
+                "Update 180Hz Setup Hub",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (res != MessageBoxResult.Yes) return;
+
+            BtnSettingsUpdateNow.IsEnabled = false;
+            BtnSettingsCheckUpdate.IsEnabled = false;
+            TxtSettingsAppUpdateStatus.Text = "Downloading update from GitHub…";
+
+            var ok = await AppUpdateService.Instance.DownloadAndApplyUpdateAsync();
+            if (!ok)
+            {
+                UpdateAppUpdateStatusUi();
+                ThemedMessageBox.Show(
+                    $"Could not update application: {AppUpdateService.Instance.StatusMessage}",
+                    "Update Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
     }
 }

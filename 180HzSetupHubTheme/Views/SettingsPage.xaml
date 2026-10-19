@@ -230,6 +230,55 @@
                                   Unchecked="ChkRequireAdmin_Changed"/>
                     </StackPanel>
                 </Border>
+
+                <!-- 4. 180Hz Setup Hub App Updates Card -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,4">
+                            <TextBlock Text="180Hz Setup Hub Updates &amp; GitHub Sync" Style="{StaticResource TextSubHeader}" VerticalAlignment="Center"/>
+                            <Border Background="#1400FF66" BorderBrush="#4000FF66" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="10,0,0,0">
+                                <TextBlock Text="Live Auto-Update" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Text="Configure how 180Hz Setup Hub synchronizes and auto-updates with the GitHub repository releases."
+                                   Style="{StaticResource TextBody}" Margin="0,0,0,14"/>
+
+                        <CheckBox x:Name="ChkAutoCheckAppUpdates"
+                                  Style="{StaticResource AppCheckBox}"
+                                  Content="Automatically check for newer 180Hz Setup Hub updates on application launch"
+                                  Margin="0,0,0,14"
+                                  Checked="ChkAutoCheckAppUpdates_Changed"
+                                  Unchecked="ChkAutoCheckAppUpdates_Changed"/>
+
+                        <!-- Current Version & Action row -->
+                        <Grid Margin="0,4,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Current Version: " Style="{StaticResource TextBody}" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextPrimary}"/>
+                                    <TextBlock x:Name="TxtSettingsAppVersion" Text="v2.5.0" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                                    <TextBlock Text="  •  Repository: tanjeem180hz/180HzSetupHub" Style="{StaticResource TextBody}" FontSize="11" Margin="8,0,0,0"/>
+                                </StackPanel>
+                                <TextBlock x:Name="TxtSettingsAppUpdateStatus" Text="Ready to check for updates." Style="{StaticResource TextBody}" FontSize="12" Margin="0,4,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button x:Name="BtnSettingsCheckUpdate" Content="Check for Updates"
+                                        Style="{StaticResource ExpandableOutlineButton}"
+                                        Margin="0,0,8,0" Padding="12,6" Height="34"
+                                        Click="BtnSettingsCheckUpdate_Click"/>
+                                <Button x:Name="BtnSettingsUpdateNow" Content="🚀 Update Now"
+                                        Style="{StaticResource ExpandableAccentButton}"
+                                        Padding="14,6" Height="34"
+                                        Click="BtnSettingsUpdateNow_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
     </Grid>

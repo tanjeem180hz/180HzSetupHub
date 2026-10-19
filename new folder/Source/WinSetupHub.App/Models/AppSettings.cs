@@ -7,5 +7,6 @@ namespace SetupHub180Hz.Models
         public int UpdateCheckFrequencyHours { get; set; } = 6;
         public bool RequireAdminForActions { get; set; } = true;
         public bool DarkTheme { get; set; } = true;
+        public bool AutoCheckAppUpdates { get; set; } = true;
     }
 }

@@ -73,6 +73,16 @@ namespace SetupHub180Hz
             // Automatically start cleanup background scan immediately when app opens
             CleanupService.Instance.StartBackgroundScan();
 
+            // Check for 180Hz Setup Hub App update from GitHub (silent background check)
+            if (SettingsService.Instance.Current.AutoCheckAppUpdates)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(4000);
+                    await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
+                });
+            }
+
             NavigateTo("Dashboard");
         }
 
