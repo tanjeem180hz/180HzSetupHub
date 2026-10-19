@@ -146,15 +146,33 @@ namespace SetupHub180Hz.Services
         {
             try
             {
-                var asm = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
-                var fvi = FileVersionInfo.GetVersionInfo(asm.Location);
-                if (!string.IsNullOrWhiteSpace(fvi.FileVersion))
+                var exePath = GetCurrentExecutablePath();
+                if (!string.IsNullOrWhiteSpace(exePath) && File.Exists(exePath))
                 {
-                    var parts = fvi.FileVersion.Split('.');
-                    if (parts.Length >= 2)
+                    var fvi = FileVersionInfo.GetVersionInfo(exePath);
+                    if (!string.IsNullOrWhiteSpace(fvi.FileVersion))
                     {
-                        CurrentVersion = $"{parts[0]}.{parts[1]}.{(parts.Length > 2 ? parts[2] : "0")}";
-                        return;
+                        var parts = fvi.FileVersion.Split('.');
+                        if (parts.Length >= 2)
+                        {
+                            CurrentVersion = $"{parts[0]}.{parts[1]}.{(parts.Length > 2 ? parts[2] : "0")}";
+                            return;
+                        }
+                    }
+                }
+
+                var asm = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+                if (!string.IsNullOrWhiteSpace(asm?.Location) && File.Exists(asm.Location))
+                {
+                    var fvi = FileVersionInfo.GetVersionInfo(asm.Location);
+                    if (!string.IsNullOrWhiteSpace(fvi.FileVersion))
+                    {
+                        var parts = fvi.FileVersion.Split('.');
+                        if (parts.Length >= 2)
+                        {
+                            CurrentVersion = $"{parts[0]}.{parts[1]}.{(parts.Length > 2 ? parts[2] : "0")}";
+                            return;
+                        }
                     }
                 }
             }

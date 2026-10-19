@@ -162,7 +162,7 @@
                                             services:LottieHelper.AssetName="settings_dial.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
                 <TextBlock Text="Settings" Style="{StaticResource TextHeader}" VerticalAlignment="Center"/>
             </StackPanel>
-            <TextBlock Text="Configure 180Hz Setup Hub executable auto-updates, system startup, notifications, and preferences."
+            <TextBlock Text="Configure system startup, notifications, update frequency, and safety preferences."
                        Style="{StaticResource TextBody}" Margin="0,6,0,0"/>
         </StackPanel>
 
@@ -170,125 +170,7 @@
         <ScrollViewer Grid.Row="1" Style="{StaticResource CleanScrollViewer}">
             <StackPanel MaxWidth="1100" HorizontalAlignment="Stretch">
 
-                <!-- ======================================================== -->
-                <!--  1. 180Hz Setup Hub EXE Auto-Update Card (GitHub Live)   -->
-                <!-- ======================================================== -->
-                <Border Style="{StaticResource Card}" Margin="0,0,0,16" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1.2">
-                    <Grid>
-                        <!-- Top Accent Highlight -->
-                        <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                Background="{DynamicResource BrushAccent}" Opacity="0.5"/>
-
-                        <StackPanel Margin="2,4,2,0">
-                            <!-- Card Header -->
-                            <Grid Margin="0,0,0,10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <Border Grid.Column="0" Width="40" Height="40" CornerRadius="8"
-                                        Background="{DynamicResource BrushBackground}"
-                                        BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                                        Margin="0,0,12,0" VerticalAlignment="Center">
-                                    <Image Source="pack://application:,,,/Assets/AppIcon-1024.png"
-                                           Width="26" Height="26" Stretch="Uniform"
-                                           RenderOptions.BitmapScalingMode="HighQuality"/>
-                                </Border>
-
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock Text="180Hz Setup Hub .EXE Direct Auto-Updater" Style="{StaticResource TextSubHeader}" VerticalAlignment="Center"/>
-                                        <Border Background="#1400FF66" BorderBrush="#4000FF66" BorderThickness="1" CornerRadius="4" Padding="7,2" Margin="10,0,0,0">
-                                            <TextBlock Text="⚡ GitHub Live Sync" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
-                                        </Border>
-                                    </StackPanel>
-                                    <TextBlock Text="Update the application executable directly from GitHub with 1-click in-place binary swap. No manual browser downloads or reinstalling needed."
-                                               Style="{StaticResource TextBody}" Margin="0,2,0,0"/>
-                                </StackPanel>
-                            </Grid>
-
-                            <CheckBox x:Name="ChkAutoCheckAppUpdates"
-                                      Style="{StaticResource AppCheckBox}"
-                                      Content="Automatically check GitHub for newer 180Hz Setup Hub builds when application starts"
-                                      Margin="0,0,0,14"
-                                      Checked="ChkAutoCheckAppUpdates_Changed"
-                                      Unchecked="ChkAutoCheckAppUpdates_Changed"/>
-
-                            <!-- Version Details & Action Buttons -->
-                            <Border Background="{DynamicResource BrushBackground}"
-                                    BorderBrush="{DynamicResource BrushBorder}"
-                                    BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,0,8">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <!-- Version & Status -->
-                                    <StackPanel VerticalAlignment="Center">
-                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                            <TextBlock Text="Installed EXE Version: " Style="{StaticResource TextBody}" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextPrimary}"/>
-                                            <TextBlock x:Name="TxtSettingsAppVersion" Text="v2.5.0" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
-                                            <Border Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="6,1" Margin="8,0,0,0">
-                                                <TextBlock Text="GitHub: main" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
-                                            </Border>
-                                        </StackPanel>
-                                        <TextBlock x:Name="TxtSettingsAppUpdateStatus" Text="Ready to check for updates from GitHub." Style="{StaticResource TextBody}" FontSize="12" Margin="0,6,0,0"/>
-                                    </StackPanel>
-
-                                    <!-- Action Buttons -->
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button x:Name="BtnSettingsCheckUpdate" Content="Check GitHub"
-                                                Style="{StaticResource ExpandableOutlineButton}"
-                                                Margin="0,0,8,0" Padding="12,6" Height="34"
-                                                Click="BtnSettingsCheckUpdate_Click" ToolTip="Check GitHub repository for newer version"/>
-
-                                        <Button x:Name="BtnSettingsUpdateNow" Content="🚀 Update EXE Now"
-                                                Style="{StaticResource ExpandableAccentButton}"
-                                                Padding="14,6" Height="34"
-                                                Click="BtnSettingsUpdateNow_Click" ToolTip="Download and apply update from GitHub immediately"/>
-
-                                        <Button x:Name="BtnSettingsForceUpdate" Content="Force Re-download"
-                                                Style="{StaticResource ExpandableOutlineButton}"
-                                                Margin="8,0,0,0" Padding="10,6" Height="34"
-                                                Click="BtnSettingsForceUpdate_Click" ToolTip="Directly re-download latest executable from GitHub and swap"/>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-
-                            <!-- Live Download Progress Panel -->
-                            <StackPanel x:Name="PnlSettingsDownloadProgress" Margin="0,6,0,4" Visibility="Collapsed">
-                                <Grid Margin="0,0,0,6">
-                                    <TextBlock x:Name="TxtSettingsDownloadBytes" Text="Downloading: 0 MB / 0 MB"
-                                               FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
-                                    <TextBlock x:Name="TxtSettingsDownloadSpeed" Text="0 KB/s" HorizontalAlignment="Right"
-                                               FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
-                                </Grid>
-                                <ProgressBar x:Name="PrgSettingsDownload" Height="6" Maximum="100" Value="0"
-                                             Foreground="{DynamicResource BrushAccent}"
-                                             Background="{DynamicResource BrushBackground}"
-                                             BorderThickness="0"/>
-                            </StackPanel>
-
-                            <!-- Release Notes Panel -->
-                            <Border x:Name="PnlSettingsReleaseNotes" Margin="0,4,0,0"
-                                    Background="{DynamicResource BrushBackground}"
-                                    BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                                    CornerRadius="6" Padding="12,8" Visibility="Collapsed">
-                                <StackPanel>
-                                    <TextBlock Text="What's New in Latest GitHub Release:" FontSize="11" FontWeight="Bold"
-                                               Foreground="{DynamicResource BrushAccent}" Margin="0,0,0,4"/>
-                                    <TextBlock x:Name="TxtSettingsReleaseNotes" Text=""
-                                               FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"
-                                               TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <!-- 2. Startup Card -->
+                <!-- 1. Startup Card -->
                 <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Text="Startup" Style="{StaticResource TextSubHeader}" Margin="0,0,0,4"/>
@@ -303,38 +185,145 @@
                     </StackPanel>
                 </Border>
 
-                <!-- 3. Notifications Card -->
-                <Border Style="{StaticResource Card}" Margin="0,0,0,16">
-                    <StackPanel>
-                        <TextBlock Text="Notifications &amp; Updates" Style="{StaticResource TextSubHeader}" Margin="0,0,0,4"/>
-                        <TextBlock Text="Manage background notifications and automated update check frequency."
-                                   Style="{StaticResource TextBody}" Margin="0,0,0,14"/>
+                <!-- 2. Notifications & Updates Card -->
+                <Border Style="{StaticResource Card}" Margin="0,0,0,16" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1.2">
+                    <Grid>
+                        <!-- Top Accent Highlight -->
+                        <Border Height="1" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                Background="{DynamicResource BrushAccent}" Opacity="0.5"/>
 
-                        <CheckBox x:Name="ChkNotifications"
-                                  Style="{StaticResource AppCheckBox}"
-                                  Content="Show Windows toast notifications for completed actions"
-                                  Margin="0,0,0,16"
-                                  Checked="ChkNotifications_Changed"
-                                  Unchecked="ChkNotifications_Changed"/>
+                        <StackPanel Margin="0,4,0,0">
+                            <!-- Card Header -->
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Notifications &amp; Updates" Style="{StaticResource TextSubHeader}" Margin="0,0,0,4"/>
+                                    <TextBlock Text="Manage 180Hz Setup Hub executable auto-updates directly from GitHub and background notifications."
+                                               Style="{StaticResource TextBody}"/>
+                                </StackPanel>
+                                <Border Grid.Column="1" Background="#1400FF66" BorderBrush="#4000FF66" BorderThickness="1" CornerRadius="4" Padding="7,2" VerticalAlignment="Top">
+                                    <TextBlock Text="⚡ GitHub Live Sync" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                                </Border>
+                            </Grid>
 
-                        <TextBlock Text="Automated Update Check Frequency" Style="{StaticResource TextBody}"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource BrushTextPrimary}" Margin="0,0,0,8"/>
+                            <!-- ======================================================== -->
+                            <!--  180Hz Setup Hub EXE Direct Auto-Updater Row            -->
+                            <!-- ======================================================== -->
+                            <Border Background="{DynamicResource BrushBackground}"
+                                    BorderBrush="{DynamicResource BrushBorder}"
+                                    BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,8,0,14">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
 
-                        <ComboBox x:Name="CmbUpdateFrequency"
-                                  Style="{StaticResource SettingComboBox}"
-                                  Width="240"
-                                  HorizontalAlignment="Left"
-                                  SelectionChanged="CmbUpdateFrequency_SelectionChanged">
-                            <ComboBoxItem Content="Never" Tag="0"/>
-                            <ComboBoxItem Content="Every 6 hours" Tag="6"/>
-                            <ComboBoxItem Content="Every 12 hours" Tag="12"/>
-                            <ComboBoxItem Content="Daily" Tag="24"/>
-                            <ComboBoxItem Content="Weekly" Tag="168"/>
-                        </ComboBox>
-                    </StackPanel>
+                                    <!-- Top Row: Status & Action Buttons -->
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Version & Status -->
+                                        <StackPanel VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="180Hz Setup Hub .EXE: " Style="{StaticResource TextBody}" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}"/>
+                                                <TextBlock x:Name="TxtSettingsAppVersion" Text="v2.5.0" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                                                <Border Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="6,1" Margin="8,0,0,0">
+                                                    <TextBlock Text="GitHub: main" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock x:Name="TxtSettingsAppUpdateStatus" Text="Ready to check for updates from GitHub." Style="{StaticResource TextBody}" FontSize="12" Margin="0,4,0,0"/>
+                                        </StackPanel>
+
+                                        <!-- Buttons -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button x:Name="BtnSettingsCheckUpdate" Content="Check GitHub"
+                                                    Style="{StaticResource ExpandableOutlineButton}"
+                                                    Margin="0,0,8,0" Padding="12,6" Height="34"
+                                                    Click="BtnSettingsCheckUpdate_Click" ToolTip="Check GitHub repository for newer version"/>
+
+                                            <Button x:Name="BtnSettingsUpdateNow" Content="🚀 Update EXE Now"
+                                                    Style="{StaticResource ExpandableAccentButton}"
+                                                    Padding="14,6" Height="34"
+                                                    Click="BtnSettingsUpdateNow_Click" ToolTip="Download and apply update from GitHub immediately"/>
+
+                                            <Button x:Name="BtnSettingsForceUpdate" Content="Force Re-download"
+                                                    Style="{StaticResource ExpandableOutlineButton}"
+                                                    Margin="8,0,0,0" Padding="10,6" Height="34"
+                                                    Click="BtnSettingsForceUpdate_Click" ToolTip="Directly re-download latest executable from GitHub and swap"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Live Download Progress Panel -->
+                                    <StackPanel x:Name="PnlSettingsDownloadProgress" Grid.Row="1" Margin="0,10,0,4" Visibility="Collapsed">
+                                        <Grid Margin="0,0,0,6">
+                                            <TextBlock x:Name="TxtSettingsDownloadBytes" Text="Downloading: 0 MB / 0 MB"
+                                                       FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                                            <TextBlock x:Name="TxtSettingsDownloadSpeed" Text="0 KB/s" HorizontalAlignment="Right"
+                                                       FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
+                                        </Grid>
+                                        <ProgressBar x:Name="PrgSettingsDownload" Height="6" Maximum="100" Value="0"
+                                                     Foreground="{DynamicResource BrushAccent}"
+                                                     Background="{DynamicResource BrushSurface}"
+                                                     BorderThickness="0"/>
+                                    </StackPanel>
+
+                                    <!-- Release Notes Panel -->
+                                    <Border x:Name="PnlSettingsReleaseNotes" Grid.Row="2" Margin="0,8,0,0"
+                                            Background="{DynamicResource BrushSurface}"
+                                            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                                            CornerRadius="6" Padding="10,8" Visibility="Collapsed">
+                                        <StackPanel>
+                                            <TextBlock Text="What's New in Latest GitHub Release:" FontSize="11" FontWeight="Bold"
+                                                       Foreground="{DynamicResource BrushAccent}" Margin="0,0,0,3"/>
+                                            <TextBlock x:Name="TxtSettingsReleaseNotes" Text=""
+                                                       FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"
+                                                       TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <!-- Checkboxes and options -->
+                            <CheckBox x:Name="ChkAutoCheckAppUpdates"
+                                      Style="{StaticResource AppCheckBox}"
+                                      Content="Automatically check for newer 180Hz Setup Hub updates on application launch"
+                                      Margin="0,0,0,12"
+                                      Checked="ChkAutoCheckAppUpdates_Changed"
+                                      Unchecked="ChkAutoCheckAppUpdates_Changed"/>
+
+                            <CheckBox x:Name="ChkNotifications"
+                                      Style="{StaticResource AppCheckBox}"
+                                      Content="Show Windows toast notifications for completed actions"
+                                      Margin="0,0,0,16"
+                                      Checked="ChkNotifications_Changed"
+                                      Unchecked="ChkNotifications_Changed"/>
+
+                            <TextBlock Text="Automated Software Catalog Update Frequency" Style="{StaticResource TextBody}"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource BrushTextPrimary}" Margin="0,0,0,8"/>
+
+                            <ComboBox x:Name="CmbUpdateFrequency"
+                                      Style="{StaticResource SettingComboBox}"
+                                      Width="240"
+                                      HorizontalAlignment="Left"
+                                      SelectionChanged="CmbUpdateFrequency_SelectionChanged">
+                                <ComboBoxItem Content="Never" Tag="0"/>
+                                <ComboBoxItem Content="Every 6 hours" Tag="6"/>
+                                <ComboBoxItem Content="Every 12 hours" Tag="12"/>
+                                <ComboBoxItem Content="Daily" Tag="24"/>
+                                <ComboBoxItem Content="Weekly" Tag="168"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
                 </Border>
 
-                <!-- 4. Safety Card -->
+                <!-- 3. Safety Card -->
                 <Border Style="{StaticResource Card}" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Text="Safety" Style="{StaticResource TextSubHeader}" Margin="0,0,0,4"/>
