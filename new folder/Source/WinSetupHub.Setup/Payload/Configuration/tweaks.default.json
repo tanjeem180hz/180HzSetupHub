@@ -2967,7 +2967,9 @@
     "invokeScript": [
       "Rundll32.exe fthsvc.dll,FthSysprepSpecialize"
     ],
-    "undoScript": []
+    "undoScript": [
+      "Rundll32.exe fthsvc.dll,FthSysprepSpecialize"
+    ]
   },
   {
     "id": "CpuTweakDisableCpuIdle",
@@ -3223,7 +3225,9 @@
     "invokeScript": [
       "Stop-Service -Name DiagTrack -Force -ErrorAction SilentlyContinue"
     ],
-    "undoScript": []
+    "undoScript": [
+      "Set-Service -Name 'DiagTrack' -StartupType Automatic -ErrorAction SilentlyContinue; Start-Service -Name 'DiagTrack' -ErrorAction SilentlyContinue"
+    ]
   },
   {
     "id": "ServiceTweakXboxServices",
@@ -3839,7 +3843,9 @@
     "invokeScript": [
       "Stop-Service -Name RemoteRegistry -Force -ErrorAction SilentlyContinue; Stop-Service -Name SessionEnv -Force -ErrorAction SilentlyContinue"
     ],
-    "undoScript": []
+    "undoScript": [
+      "Set-Service -Name 'RemoteRegistry' -StartupType Manual -ErrorAction SilentlyContinue; Set-Service -Name 'SessionEnv' -StartupType Manual -ErrorAction SilentlyContinue"
+    ]
   },
   {
     "id": "ServiceTweakLocationService",
@@ -3867,7 +3873,9 @@
     "invokeScript": [
       "Stop-Service -Name lfsvc -Force -ErrorAction SilentlyContinue"
     ],
-    "undoScript": []
+    "undoScript": [
+      "Set-Service -Name 'lfsvc' -StartupType Manual -ErrorAction SilentlyContinue; Set-Service -Name 'SensorService' -StartupType Manual -ErrorAction SilentlyContinue"
+    ]
   },
   {
     "id": "RegTweakMouseCurvesRaw",
@@ -4201,7 +4209,9 @@
     "invokeScript": [
       "powercfg -setacvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 7f2f4c9f-3fc4-47e7-ac0b-2da78e75b399 0 -ErrorAction SilentlyContinue; powercfg -setactive scheme_current"
     ],
-    "undoScript": []
+    "undoScript": [
+      "powercfg -setacvalueindex scheme_current 54533251-82be-4824-96c1-47b60b740d00 7f2f4c9f-3fc4-47e7-ac0b-2da78e75b399 1 -ErrorAction SilentlyContinue; powercfg -setactive scheme_current"
+    ]
   },
   {
     "id": "GfxTweakDisableWindowedPowerSaving",
@@ -4551,7 +4561,7 @@
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Dnscache\\Parameters",
         "Name": "MaxNegativeCacheTtl",
         "Value": "0",
-        "OriginalValue": "5",
+        "OriginalValue": "30",
         "Type": "DWord"
       }
     ],
@@ -5112,7 +5122,7 @@
       {
         "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
         "Name": "NetworkThrottlingIndex",
-        "Value": "-1",
+        "Value": "4294967295",
         "OriginalValue": "10",
         "Type": "DWord"
       }
@@ -5526,7 +5536,7 @@
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters",
         "Name": "KeyboardDataQueueSize",
         "Value": "512",
-        "OriginalValue": "100",
+        "OriginalValue": "32",
         "Type": "DWord"
       }
     ],
@@ -5551,7 +5561,7 @@
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
         "Name": "MouseDataQueueSize",
         "Value": "512",
-        "OriginalValue": "100",
+        "OriginalValue": "32",
         "Type": "DWord"
       }
     ],
@@ -6068,15 +6078,15 @@
     "category": "🎮 2X FPS Ultra Gaming & Esports Overdrive",
     "categoryOrder": 0,
     "section": "System",
-    "isAdvanced": false,
-    "isRecommended": true,
+    "isAdvanced": true,
+    "isRecommended": false,
     "requiresReboot": false,
     "registry": [
       {
         "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions",
         "Name": "CpuPriorityClass",
-        "Value": "4",
-        "OriginalValue": "2",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
         "Type": "DWord"
       }
     ],
@@ -6126,7 +6136,9 @@
     "invokeScript": [
       "[GC]::Collect(); [GC]::WaitForPendingFinalizers()"
     ],
-    "undoScript": []
+    "undoScript": [
+      "Write-Host 'Standby list purge is a one-time maintenance action; no undo needed.' -ForegroundColor Gray"
+    ]
   },
   {
     "id": "GameTweakNetworkPacketPacingZero",
@@ -6161,16 +6173,16 @@
       {
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
         "Name": "PowerSavingPolicy",
-        "Type": "DWord",
-        "Value": 0,
-        "DefaultValue": 1
+        "Value": "0",
+        "OriginalValue": "1",
+        "Type": "DWord"
       },
       {
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
         "Name": "HwSchMode",
-        "Type": "DWord",
-        "Value": 2,
-        "DefaultValue": 2
+        "Value": "2",
+        "OriginalValue": "1",
+        "Type": "DWord"
       }
     ],
     "service": [],
@@ -6195,16 +6207,16 @@
       {
         "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
         "Name": "GPU Priority",
-        "Type": "DWord",
-        "Value": 8,
-        "DefaultValue": 8
+        "Value": "8",
+        "OriginalValue": "2",
+        "Type": "DWord"
       },
       {
         "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
         "Name": "Priority",
-        "Type": "DWord",
-        "Value": 6,
-        "DefaultValue": 2
+        "Value": "6",
+        "OriginalValue": "2",
+        "Type": "DWord"
       }
     ],
     "service": [],
@@ -6244,27 +6256,30 @@
       {
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
         "Name": "Win32PrioritySeparation",
-        "Type": "DWord",
-        "Value": 38,
-        "DefaultValue": 2
+        "Value": "38",
+        "OriginalValue": "2",
+        "Type": "DWord"
       },
       {
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
         "Name": "PowerThrottlingOff",
-        "Type": "DWord",
-        "Value": 1,
-        "DefaultValue": 0
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
       },
       {
         "Path": "HKCU:\\Control Panel\\Graphics\\WindowedVRR",
         "Name": "Enabled",
-        "Type": "DWord",
-        "Value": 1,
-        "DefaultValue": 0
+        "Value": "1",
+        "OriginalValue": "0",
+        "Type": "DWord"
       }
     ],
     "service": [],
     "invokeScript": [],
-    "undoScript": []
+    "undoScript": [
+      "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl' -Name 'Win32PrioritySeparation' -Value 2 -Type DWord -ErrorAction SilentlyContinue",
+      "Remove-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling' -Name 'PowerThrottlingOff' -ErrorAction SilentlyContinue"
+    ]
   }
 ]

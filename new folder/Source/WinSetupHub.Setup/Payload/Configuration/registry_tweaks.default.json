@@ -2379,7 +2379,7 @@
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Dnscache\\Parameters",
         "Name": "MaxNegativeCacheTtl",
         "Value": "0",
-        "OriginalValue": "5",
+        "OriginalValue": "30",
         "Type": "DWord"
       }
     ],
@@ -3129,7 +3129,7 @@
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\kbdclass\\Parameters",
         "Name": "KeyboardDataQueueSize",
         "Value": "512",
-        "OriginalValue": "100",
+        "OriginalValue": "32",
         "Type": "DWord"
       }
     ],
@@ -3152,7 +3152,7 @@
         "Path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\mouclass\\Parameters",
         "Name": "MouseDataQueueSize",
         "Value": "512",
-        "OriginalValue": "100",
+        "OriginalValue": "32",
         "Type": "DWord"
       }
     ],
@@ -3466,15 +3466,15 @@
     "category": "🎮 2X FPS Gaming & Low Latency",
     "categoryOrder": 0,
     "section": "Registry",
-    "isAdvanced": false,
-    "isRecommended": true,
+    "isAdvanced": true,
+    "isRecommended": false,
     "requiresReboot": false,
     "registry": [
       {
         "Path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions",
         "Name": "CpuPriorityClass",
-        "Value": "4",
-        "OriginalValue": "2",
+        "Value": "3",
+        "OriginalValue": "<RemoveEntry>",
         "Type": "DWord"
       }
     ],
