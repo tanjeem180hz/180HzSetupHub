@@ -1527,7 +1527,7 @@
 
                     ],
         "invokeScript":  [
-                             "\n      # A temp folder always holds files something has open, including this run\u0027s own, and\n      # the job layer counts a logged error as a failed step\n      Remove-Item -Path \"$Env:Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      Remove-Item -Path \"$Env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue\n      "
+                             "Remove-Item -Path \"$Env:Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path \"$Env:SystemRoot\\Temp\\*\" -Recurse -Force -ErrorAction SilentlyContinue"
                          ],
         "undoScript":  [
                            "Write-Host \u0027Maintenance action state is clean.\u0027 -ForegroundColor Gray"

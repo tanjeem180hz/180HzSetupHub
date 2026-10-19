@@ -262,7 +262,7 @@ namespace SetupHub180Hz.Services
                     hasUpdate = true;
                 }
 
-                // If remote commit on the exe is newer than local executable's write time
+                // If remote commit on the exe is newer and version differs from local
                 if (!hasUpdate && remoteCommitDate > DateTime.MinValue)
                 {
                     try
@@ -271,12 +271,12 @@ namespace SetupHub180Hz.Services
                         if (File.Exists(currentExe))
                         {
                             var localWriteTime = File.GetLastWriteTimeUtc(currentExe);
-                            if (remoteCommitDate > localWriteTime.AddMinutes(5))
+                            if (remoteCommitDate > localWriteTime.AddMinutes(5) &&
+                                !string.IsNullOrWhiteSpace(manifest?.version) &&
+                                !string.Equals(manifest.version.Trim(), CurrentVersion.Trim(), StringComparison.OrdinalIgnoreCase))
                             {
                                 hasUpdate = true;
-                                candidateVersion = string.IsNullOrWhiteSpace(manifest?.version)
-                                    ? $"{CurrentVersion}+git"
-                                    : manifest.version;
+                                candidateVersion = manifest.version;
                             }
                         }
                     }
