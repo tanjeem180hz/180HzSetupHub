@@ -265,7 +265,7 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("AlwaysOn", 1, RegistryValueKind.DWord);
                 }
 
-                // Tasks\Games: GPU Priority = 8, Priority = 6
+                // Tasks\Games: GPU Priority = 8, Priority = 6, Clock Rate = 10000 (1ms), SFIO = High
                 using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games", true))
                 {
                     key?.SetValue("GPU Priority", 8, RegistryValueKind.DWord);
@@ -273,7 +273,56 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("Scheduling Category", "High", RegistryValueKind.String);
                     key?.SetValue("SFIO Priority", "High", RegistryValueKind.String);
                     key?.SetValue("Affinity", 0, RegistryValueKind.DWord);
+                    key?.SetValue("Clock Rate", 10000, RegistryValueKind.DWord);
+                    key?.SetValue("Background Only", "False", RegistryValueKind.String);
                 }
+
+                // Network Zero-Ping & Low Latency: Enforce TcpAckFrequency=1 & TCPNoDelay=1 across all network adapters
+                try
+                {
+                    using (var tcpParams = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters", true))
+                    {
+                        tcpParams?.SetValue("DefaultTTL", 64, RegistryValueKind.DWord);
+                        tcpParams?.SetValue("EnableTCPA", 1, RegistryValueKind.DWord);
+                        tcpParams?.SetValue("EnableDCA", 1, RegistryValueKind.DWord);
+                        tcpParams?.SetValue("MaxUserPort", 65534, RegistryValueKind.DWord);
+                        tcpParams?.SetValue("TcpTimedWaitDelay", 30, RegistryValueKind.DWord);
+                    }
+
+                    using (var interfacesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces", true))
+                    {
+                        if (interfacesKey != null)
+                        {
+                            foreach (var subName in interfacesKey.GetSubKeyNames())
+                            {
+                                try
+                                {
+                                    using var sub = interfacesKey.OpenSubKey(subName, true);
+                                    if (sub != null)
+                                    {
+                                        sub.SetValue("TcpAckFrequency", 1, RegistryValueKind.DWord);
+                                        sub.SetValue("TCPNoDelay", 1, RegistryValueKind.DWord);
+                                        sub.SetValue("TcpDelAckTicks", 0, RegistryValueKind.DWord);
+                                    }
+                                }
+                                catch { }
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                // Filesystem Low Overhead: Zero 8.3 Legacy Generation & Zero Last Access Timestamps
+                try
+                {
+                    using (var fsKey = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\FileSystem", true))
+                    {
+                        fsKey?.SetValue("NtfsDisable8dot3NameCreation", 1, RegistryValueKind.DWord);
+                        fsKey?.SetValue("NtfsDisableLastAccessUpdate", 1, RegistryValueKind.DWord);
+                        fsKey?.SetValue("LongPathsEnabled", 1, RegistryValueKind.DWord);
+                    }
+                }
+                catch { }
 
                 // Priority Control - Win32 Priority Separation (0x26 = 38: 3:1 Foreground Quanta Boost)
                 using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\PriorityControl", true))

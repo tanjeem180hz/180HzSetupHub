@@ -225,6 +225,11 @@ namespace SetupHub180Hz.Services
             {
                 try
                 {
+                    // Ensure Ultimate or High-Performance scheme is unlocked and active
+                    RunCmd("powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61");
+                    RunCmd("powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61");
+                    RunCmd("powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
+
                     string sub = "54533251-82be-4824-96c1-47b60b740d00";
 
                     // 1. Dynamic Aggressive Boost Mode (2 = Aggressive - boosts up to 5.0GHz Max Turbo on demand)

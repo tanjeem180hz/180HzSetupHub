@@ -734,11 +734,12 @@ namespace SetupHub180Hz.Services
             var registryTask = Task.Run(() => ScanRegistry(app, sig, mode));
             var filesystemTask = Task.Run(() => ScanFilesystem(app, sig, mode));
 
-            await Task.WhenAll(registryTask, filesystemTask);
+            var regItems = await registryTask;
+            var fsItems = await filesystemTask;
 
             var combined = new List<LeftoverItem>();
-            combined.AddRange(registryTask.Result);
-            combined.AddRange(filesystemTask.Result);
+            combined.AddRange(regItems);
+            combined.AddRange(fsItems);
 
             var unique = combined
                 .GroupBy(i => (i.Type, i.Path, i.ValueName ?? string.Empty))

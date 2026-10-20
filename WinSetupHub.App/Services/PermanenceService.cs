@@ -126,10 +126,23 @@ netsh int tcp set global autotuninglevel=normal >nul 2>&1
 netsh int tcp set global timestamps=disabled >nul 2>&1
 netsh int tcp set heuristics disabled >nul 2>&1
 netsh int ip set global taskoffload=enabled >nul 2>&1
+for /f %%a in ('reg query ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces""') do (
+    reg add ""%%a"" /v TcpAckFrequency /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""%%a"" /v TCPNoDelay /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""%%a"" /v TcpDelAckTicks /t REG_DWORD /d 0 /f >nul 2>&1
+)
+reg add ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"" /v DefaultTTL /t REG_DWORD /d 64 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"" /v EnableTCPA /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"" /v EnableDCA /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"" /v MaxUserPort /t REG_DWORD /d 65534 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"" /v TcpTimedWaitDelay /t REG_DWORD /d 30 /f >nul 2>&1
 
 :: 6. Fast File System & NTFS Low Overhead
 fsutil behavior set disablelastaccess 1 >nul 2>&1
 fsutil 8dot3name set 1 >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Control\FileSystem"" /v NtfsDisable8dot3NameCreation /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Control\FileSystem"" /v NtfsDisableLastAccessUpdate /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Control\FileSystem"" /v LongPathsEnabled /t REG_DWORD /d 1 /f >nul 2>&1
 
 :: 7. Multimedia & GPU Scheduling Registry Enforcement
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"" /v NetworkThrottlingIndex /t REG_DWORD /d 4294967295 /f >nul 2>&1
@@ -140,6 +153,8 @@ reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemPro
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""Priority"" /t REG_DWORD /d 6 /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""Scheduling Category"" /t REG_SZ /d ""High"" /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""SFIO Priority"" /t REG_SZ /d ""High"" /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""Clock Rate"" /t REG_DWORD /d 10000 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""Background Only"" /t REG_SZ /d ""False"" /f >nul 2>&1
 
 :: 8. Priority Control - Short Variable Quantum Foreground Boost (0x26 = 38)
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl"" /v Win32PrioritySeparation /t REG_DWORD /d 38 /f >nul 2>&1
