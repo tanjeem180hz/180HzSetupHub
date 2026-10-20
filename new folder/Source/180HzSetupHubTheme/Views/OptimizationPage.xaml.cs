@@ -209,23 +209,23 @@ namespace SetupHub180Hz.Views
             if (string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase) && string.IsNullOrWhiteSpace(_searchQuery))
             {
                 string statusTag = totalApplied == totalSectionCount && totalSectionCount > 0
-                    ? " • 100% Fully Optimized ✓"
+                    ? " • Fully Optimized ✓"
                     : $" • {totalApplied} Applied";
 
-                TxtSubtitle.Text = $"All Optimizations • {totalSectionCount} total tweaks{statusTag} • {totalRecommended} recommended safe";
+                TxtSubtitle.Text = $"{totalSectionCount} optimizations available{statusTag} • {totalRecommended} recommended safe";
                 BtnSelectRecommended.ToolTip = "Select recommended safe tweaks";
                 if (BtnApplySelected != null) BtnApplySelected.ToolTip = "Apply checked optimizations";
             }
             else if (string.Equals(_activeCategory, "Applied", StringComparison.OrdinalIgnoreCase))
             {
-                TxtSubtitle.Text = $"All Optimizations › Active Applied • {currentApplied} optimizations currently active on this PC";
+                TxtSubtitle.Text = $"{currentApplied} optimizations currently active on this PC";
                 BtnSelectRecommended.ToolTip = "Select recommended safe tweaks in this view";
                 if (BtnApplySelected != null) BtnApplySelected.ToolTip = "Apply checked optimizations for this view";
             }
             else
             {
                 string scope = string.IsNullOrWhiteSpace(_searchQuery) ? _activeCategory : $"Search: \"{_searchQuery}\"";
-                TxtSubtitle.Text = $"All Optimizations › {scope} • {currentCount} tweaks ({currentApplied} applied • {currentRec} recommended)";
+                TxtSubtitle.Text = $"{scope} • {currentCount} tweaks ({currentApplied} applied • {currentRec} recommended)";
                 BtnSelectRecommended.ToolTip = $"Select recommended safe tweaks in {scope}";
                 if (BtnApplySelected != null) BtnApplySelected.ToolTip = $"Apply checked optimizations for {scope}";
             }
@@ -326,6 +326,15 @@ namespace SetupHub180Hz.Views
                 }
             }
 
+            var caution = ThemedMessageBox.Show(
+                $"Apply {selected.Count} selected optimization(s)?\n\n" +
+                "• Speeds up games and system response\n" +
+                "• Safe and easily reversible anytime\n\n" +
+                "Do you want to continue?",
+                "Apply Selected", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (caution != MessageBoxResult.Yes) return;
+
             var dialog = new OptimizationDialog(
                 title: $"Apply {selected.Count} Selected Optimizations",
                 subtitle: $"This will safely apply {selected.Count} selected optimization(s) to maximize your PC performance:",
@@ -370,6 +379,14 @@ namespace SetupHub180Hz.Views
                 scopeText = $"all {sourceList.Count} optimizations";
             }
 
+            var caution = ThemedMessageBox.Show(
+                "Reset settings back to normal defaults?\n\n" +
+                "This will restore original Windows settings.\n\n" +
+                "Do you want to continue?",
+                "Reset to Defaults", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (caution != MessageBoxResult.Yes) return;
+
             var dialog = new OptimizationDialog(
                 title: "Restore Default Windows Settings",
                 subtitle: $"This will revert {scopeText} back to standard Windows factory defaults:",
@@ -398,6 +415,15 @@ namespace SetupHub180Hz.Views
 
         private void BtnDeepCleanC_Click(object sender, RoutedEventArgs e)
         {
+            var caution = ThemedMessageBox.Show(
+                "Clean temporary system files on Drive C:?\n\n" +
+                "• Clears update cache, shader cache & temp files\n" +
+                "• Reclaims free disk space safely\n\n" +
+                "Do you want to continue?",
+                "Clean Drive C:", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (caution != MessageBoxResult.Yes) return;
+
             if (BtnDeepCleanC != null) BtnDeepCleanC.IsEnabled = false;
             TxtStatus.Text = "💽 Running Deep C: Drive Storage & Component Store Cleanup...";
             StatusBar.Visibility = Visibility.Visible;
@@ -563,6 +589,15 @@ namespace SetupHub180Hz.Views
 
         private void BtnCleanPc_Click(object sender, RoutedEventArgs e)
         {
+            var caution = ThemedMessageBox.Show(
+                "Clean PC junk files and free memory?\n\n" +
+                "• Clears temporary files and logs\n" +
+                "• Frees up RAM for smoother performance\n\n" +
+                "Do you want to continue?",
+                "Clean PC & RAM", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (caution != MessageBoxResult.Yes) return;
+
             if (BtnCleanPc != null) BtnCleanPc.IsEnabled = false;
             TxtStatus.Text = "🧹 Cleaning system junk, temporary files, caches & purging RAM...";
             StatusBar.Visibility = Visibility.Visible;
@@ -666,17 +701,13 @@ namespace SetupHub180Hz.Views
             if (targetTweaks.Count == 0) return;
 
             var prompt = ThemedMessageBox.Show(
-                $"🚀 APPLY ALL OPTIMIZATIONS (100% MAXIMUM PERFORMANCE + DEEP PC CLEAN)\n\n" +
-                $"This will deploy all {targetTweaks.Count} optimizations across the entire system in one seamless pass:\n\n" +
-                $"• 🧹 Deep PC Clean & Cache Purge (User/Win Temp, Update Cache, Prefetch, WER & Shader Caches)\n" +
-                $"• 🔒 Permanent Boot Safeguard (100% Core Unparking & 0ms Boost Delay across every PC restart)\n" +
-                $"• ⏱️ Lock 0.500ms High-Precision Kernel Timer Resolution (Zero Frame Jitter)\n" +
-                $"• 🎮 Dual-Vendor GPU Overdrive (NVIDIA PowerMizer & AMD ULPS Disabled, MMCSS GPU Priority 8)\n" +
-                $"• 🧠 Standby RAM Stutter Purge & Windows EcoQoS Throttling Disabled\n" +
-                $"• 🚀 Universal Android Emulators (BlueStacks, MSI, LDPlayer, GameLoop) & PC Games Elevated\n" +
-                $"• 🛠️ All {targetTweaks.Count} System, Registry & Hygiene Optimizations Applied\n\n" +
-                $"Would you like to deploy 100% Maximum Performance + Clean now?",
-                "Apply All Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                "Boost PC & Gaming Performance?\n\n" +
+                "• Speeds up games, reduces ping and input lag\n" +
+                "• Cleans junk files and frees up memory\n" +
+                "• Safe and easily reversible anytime\n\n" +
+                "A backup restore point will be created automatically.\n" +
+                "Do you want to continue?",
+                "Boost PC Performance", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (prompt != MessageBoxResult.Yes) return;
 
@@ -848,14 +879,14 @@ namespace SetupHub180Hz.Views
             bool locked = PermanenceService.Instance.IsPermanenceLocked();
             if (locked)
             {
-                TxtPermanentStatus.Text = "STATUS: 🔒 ACTIVE & PERMANENTLY LOCKED (Survives Reboot)";
+                TxtPermanentStatus.Text = "🔒 Active & Protected";
                 TxtPermanentStatus.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
                 BadgePermanentStatus.BorderBrush = (System.Windows.Media.Brush)FindResource("BrushAccent");
                 BadgePermanentStatus.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0x22, 0x00, 0xFF, 0x66));
             }
             else
             {
-                TxtPermanentStatus.Text = "STATUS: ⚡ READY TO LOCK (Click Apply All)";
+                TxtPermanentStatus.Text = "⚡ Ready to Boost";
                 TxtPermanentStatus.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
                 BadgePermanentStatus.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0x9E, 0x0B));
                 BadgePermanentStatus.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(0x22, 0xF5, 0x9E, 0x0B));
@@ -867,24 +898,23 @@ namespace SetupHub180Hz.Views
             if (TxtLiveTimerRes == null) return;
 
             bool timerLocked = GameBoosterService.Instance.IsTimerResolutionLocked;
-            TxtLiveTimerRes.Text = timerLocked ? "0.500 ms (Locked ✓)" : "0.500 ms (Active)";
+            TxtLiveTimerRes.Text = timerLocked ? "0.500 ms (Locked)" : "0.500 ms";
 
             var cpu = CpuOptimizerService.GetCpuInfo();
             if (TxtLiveCpuBoost != null)
             {
-                TxtLiveCpuBoost.Text = $"{cpu.PeakCoreGhz:0.00} GHz (Max {cpu.MaxTurboGhz:0.0} GHz ✓)";
+                TxtLiveCpuBoost.Text = $"Boost {cpu.MaxTurboGhz:0.0} GHz ✓";
                 TxtLiveCpuBoost.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
             }
 
             if (TxtLiveCpuName != null)
             {
-                TxtLiveCpuName.Text = $"{cpu.ShortName} • TaskMgr {cpu.RealtimeGhz:0.00} GHz";
-                TxtLiveCpuName.ToolTip = $"Peak Active Core Clock: {cpu.PeakCoreGhz:0.00} GHz.\nTask Manager shows the 12-thread average ({cpu.RealtimeGhz:0.00} GHz) across Zen 4 and Zen 4c compact cores.\nYour game and emulator render threads are prioritized on the 5.0 GHz Zen 4 cores!";
+                TxtLiveCpuName.Text = $"{cpu.ShortName}";
             }
 
             if (TxtLiveGpuMode != null)
             {
-                TxtLiveGpuMode.Text = "100% Max Mode ✓";
+                TxtLiveGpuMode.Text = "100% Mode ✓";
                 TxtLiveGpuMode.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x00, 0xE5, 0xFF));
             }
 
@@ -893,7 +923,7 @@ namespace SetupHub180Hz.Views
             {
                 if (games.Count > 0)
                 {
-                    TxtLiveDetectedGames.Text = $"{string.Join(", ", games.Take(2))} (🚀 Max GHz Active!)";
+                    TxtLiveDetectedGames.Text = $"{string.Join(", ", games.Take(2))} (Boosted)";
                     TxtLiveDetectedGames.Foreground = (System.Windows.Media.Brush)FindResource("BrushAccent");
                 }
                 else
@@ -905,7 +935,7 @@ namespace SetupHub180Hz.Views
 
             if (TxtLiveStandbyRam != null)
             {
-                TxtLiveStandbyRam.Text = "High I/O • No Throttling";
+                TxtLiveStandbyRam.Text = "Clean & Smooth";
             }
         }
     }

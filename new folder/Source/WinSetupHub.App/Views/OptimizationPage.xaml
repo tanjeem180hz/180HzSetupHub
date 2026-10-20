@@ -7,35 +7,81 @@
 
     <UserControl.Resources>
 
-        <!-- Top Section Tab Switcher (System Tweaks vs Registry Optimization) -->
-        <Style x:Key="OptimizationSectionTab" TargetType="{x:Type RadioButton}">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Foreground" Value="{DynamicResource BrushTextSecondary}"/>
+        <!-- ================= ANIMATED BUTTON STYLES ================= -->
+
+        <!-- 🚀 Primary Action Button (Accent, Smooth Scale & Opacity Animation) -->
+        <Style x:Key="AnimatedPrimaryButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{DynamicResource BrushAccent}"/>
+            <Setter Property="Foreground" Value="#0A0E17"/>
             <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="18,7"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="22,10"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="GroupName" Value="OptimizationSectionGroup"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type RadioButton}">
-                        <Border x:Name="Bd"
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="6"
-                                Padding="{TemplateBinding Padding}">
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                CornerRadius="8" Padding="{TemplateBinding Padding}"
+                                RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="BdScale" ScaleX="1.0" ScaleY="1.0"/>
+                            </Border.RenderTransform>
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="1.03" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="1.03" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="Opacity"
+                                                             To="0.92" Duration="0:0:0.12"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="1.0" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="1.0" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="Bd" Storyboard.TargetProperty="Opacity"
+                                                             To="1.0" Duration="0:0:0.12"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushAccent}"/>
-                                <Setter Property="Foreground" Value="#0A0E17"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="0.97" Duration="0:0:0.06"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="0.97" Duration="0:0:0.06"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="1.03" Duration="0:0:0.06"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="1.03" Duration="0:0:0.06"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -43,12 +89,167 @@
             </Setter>
         </Style>
 
-        <!-- Category chip radio buttons -->
+        <!-- Secondary Action Button (Surface Hover, Smooth Scale) -->
+        <Style x:Key="AnimatedSecondaryButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="{DynamicResource BrushSurface}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="7" Padding="{TemplateBinding Padding}"
+                                RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="BdScale" ScaleX="1.0" ScaleY="1.0"/>
+                            </Border.RenderTransform>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="1.025" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="1.025" Duration="0:0:0.12"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="1.0" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="1.0" Duration="0:0:0.12"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="0.97" Duration="0:0:0.06"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="0.97" Duration="0:0:0.06"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="1.025" Duration="0:0:0.06"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="1.025" Duration="0:0:0.06"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Danger / Restore Action Button (Soft Dark Red, Smooth Scale) -->
+        <Style x:Key="AnimatedDangerButton" TargetType="{x:Type Button}" BasedOn="{StaticResource AnimatedSecondaryButton}">
+            <Setter Property="Background" Value="#1A1212"/>
+            <Setter Property="BorderBrush" Value="#442222"/>
+            <Setter Property="Foreground" Value="#FF6B6B"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="7" Padding="{TemplateBinding Padding}"
+                                RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="BdScale" ScaleX="1.0" ScaleY="1.0"/>
+                            </Border.RenderTransform>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#2D1515"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#FF6B6B"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="1.025" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="1.025" Duration="0:0:0.12"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="1.0" Duration="0:0:0.12"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="1.0" Duration="0:0:0.12"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="0.97" Duration="0:0:0.06"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="0.97" Duration="0:0:0.06"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleX"
+                                                             To="1.025" Duration="0:0:0.06"/>
+                                            <DoubleAnimation Storyboard.TargetName="BdScale" Storyboard.TargetProperty="ScaleY"
+                                                             To="1.025" Duration="0:0:0.06"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Category Chip Radio Buttons -->
         <Style x:Key="TweakCategoryChip" TargetType="{x:Type RadioButton}">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}"/>
+            <Setter Property="Foreground" Value="{DynamicResource BrushTextSecondary}"/>
             <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
@@ -63,7 +264,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6"
+                                CornerRadius="7"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
@@ -73,9 +274,10 @@
                                 <Setter Property="Foreground" Value="{DynamicResource BrushTextPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource BrushSurface}"/>
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BrushAccent}"/>
-                                <Setter Property="Foreground" Value="{StaticResource BrushAccent}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource BrushSurface}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BrushAccent}"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -83,7 +285,7 @@
             </Setter>
         </Style>
 
-        <!-- Tweak row toggle switch style -->
+        <!-- Tweak Row Toggle Switch -->
         <Style x:Key="TweakToggle" TargetType="{x:Type CheckBox}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -93,14 +295,14 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type CheckBox}">
                         <Border x:Name="Track" Width="38" Height="20" CornerRadius="10"
-                                Background="{StaticResource BrushBorder}" Cursor="Hand">
+                                Background="{DynamicResource BrushBorder}" Cursor="Hand">
                             <Ellipse x:Name="Thumb" Width="14" Height="14" Fill="#6B7280"
                                      HorizontalAlignment="Left" Margin="3,0,0,0" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Track" Property="Background" Value="{StaticResource BrushAccent}"/>
-                                <Setter TargetName="Thumb" Property="Fill" Value="White"/>
+                                <Setter TargetName="Track" Property="Background" Value="{DynamicResource BrushAccent}"/>
+                                <Setter TargetName="Thumb" Property="Fill" Value="#0A0E17"/>
                                 <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right"/>
                                 <Setter TargetName="Thumb" Property="Margin" Value="0,0,3,0"/>
                             </Trigger>
@@ -113,75 +315,26 @@
             </Setter>
         </Style>
 
-        <!-- Tweak card container -->
+        <!-- Tweak Card Container -->
         <Style x:Key="TweakCard" TargetType="{x:Type Border}">
-            <Setter Property="Background" Value="{StaticResource BrushSurface}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BrushBorder}"/>
+            <Setter Property="Background" Value="{DynamicResource BrushSurface}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BrushBorder}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="14,11"/>
+            <Setter Property="Padding" Value="16,12"/>
             <Setter Property="Margin" Value="0,0,0,6"/>
         </Style>
 
-        <!-- Apply button (Primary Accent) -->
-        <Style x:Key="ApplyButton" TargetType="{x:Type Button}">
-            <Setter Property="Background" Value="{StaticResource BrushAccent}"/>
-            <Setter Property="Foreground" Value="#0A0E17"/>
-            <Setter Property="FontFamily" Value="{StaticResource AppFont}"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="16,8"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="7"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.88"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.75"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Secondary action button -->
-        <Style x:Key="UndoButton" TargetType="{x:Type Button}" BasedOn="{StaticResource ApplyButton}">
-            <Setter Property="Background" Value="{StaticResource BrushSurfaceHover}"/>
-            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-        </Style>
-
-        <!-- Danger / Restore button -->
-        <Style x:Key="DangerButton" TargetType="{x:Type Button}" BasedOn="{StaticResource ApplyButton}">
-            <Setter Property="Background" Value="#2D1515"/>
-            <Setter Property="Foreground" Value="#FF6B6B"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-        </Style>
-
-        <!-- Advanced warning badge -->
-        <Style x:Key="AdvancedBadge" TargetType="{x:Type Border}">
-            <Setter Property="Background" Value="#1F1500"/>
-            <Setter Property="BorderBrush" Value="#F59E0B"/>
+        <!-- Badges -->
+        <Style x:Key="AppliedBadge" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#1A00FF66"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="4"/>
             <Setter Property="Padding" Value="6,2"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
-        <!-- Recommended badge -->
         <Style x:Key="RecommendedBadge" TargetType="{x:Type Border}">
             <Setter Property="Background" Value="{DynamicResource BrushSurfaceHover}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
@@ -191,13 +344,12 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
-        <!-- Applied badge style -->
-        <Style x:Key="AppliedBadge" TargetType="{x:Type Border}">
-            <Setter Property="Background" Value="#1A00FF66"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BrushAccent}"/>
+        <Style x:Key="AdvancedBadge" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#1F1500"/>
+            <Setter Property="BorderBrush" Value="#F59E0B"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Padding" Value="7,2"/>
+            <Setter Property="Padding" Value="6,2"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
@@ -205,390 +357,319 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/> <!-- Row 0: Clean Header with 1-Click Hero Button -->
+            <RowDefinition Height="Auto"/> <!-- Row 1: Simple Action Tools + Sleek Status Bar -->
+            <RowDefinition Height="Auto"/> <!-- Row 2: Category Filter Bar & Search -->
+            <RowDefinition Height="*"/>    <!-- Row 3: Tweaks List -->
         </Grid.RowDefinitions>
 
-        <!-- ===== PAGE HEADER ===== -->
+        <!-- ================= ROW 0: CLEAN HEADER & 1-CLICK BOOST HERO ================= -->
         <Border Grid.Row="0" Background="{DynamicResource BrushSurface}"
                 BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
-                Padding="24,14,24,12">
+                Padding="24,14,24,14">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- Left: Title & Simple Subtext -->
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock x:Name="TxtHeaderTitle" Text="Optimization" FontFamily="{StaticResource AppFont}"
-                               FontSize="22" FontWeight="Bold"
-                               Foreground="{DynamicResource BrushTextPrimary}"/>
-                    <TextBlock x:Name="TxtSubtitle" Margin="0,2,0,0"
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="⚡" FontSize="20" Foreground="{DynamicResource BrushAccent}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtHeaderTitle" Text="PC &amp; Gaming Optimizer"
+                                   FontFamily="{StaticResource AppFont}" FontSize="20" FontWeight="Bold"
+                                   Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock x:Name="TxtSubtitle" Margin="28,3,0,0"
+                               Text="1-click to speed up games, reduce ping &amp; boost smoothness"
                                FontFamily="{StaticResource AppFont}" FontSize="12"
                                Foreground="{DynamicResource BrushTextSecondary}"/>
                 </StackPanel>
 
-                <!-- Actions WrapPanel -->
-                <WrapPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="12,0,0,0">
-                    <!-- 🚀 APPLY ALL (Primary Action: 1-Click 100% Performance + PC Clean) -->
-                    <Button x:Name="BtnApplyAll" Style="{StaticResource ApplyButton}"
-                            Content="🚀 APPLY ALL" Padding="16,8" Margin="0,0,8,4"
-                            Click="BtnApplyAll_Click" ToolTip="1-Click Apply ALL Optimizations + Deep C: Drive Clean: Deploys 5.0GHz Dynamic Boost, 100% GPU mode, 0.500ms Timer, Standby RAM purge, disk cleanup &amp; Permanent Boot Safeguard!"/>
+                <!-- Right: Status Badge & Big 1-Click Hero Action -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Status Badge -->
+                    <Border x:Name="BadgePermanentStatus" Background="#1A00FF66" BorderBrush="{DynamicResource BrushAccent}"
+                            BorderThickness="1" CornerRadius="8" Padding="12,7" Margin="0,0,12,0" VerticalAlignment="Center">
+                        <TextBlock x:Name="TxtPermanentStatus" Text="🔒 Active &amp; Protected"
+                                   FontFamily="{StaticResource AppFont}" FontSize="11.5" FontWeight="Bold"
+                                   Foreground="{DynamicResource BrushAccent}"/>
+                    </Border>
 
-                    <!-- 💽 DEEP C: CLEAN (1-Click Reclaim GBs on Drive C: via DISM, Delivery Optimization, Shader Caches & Temp) -->
-                    <Button x:Name="BtnDeepCleanC" Style="{StaticResource UndoButton}"
-                            BorderBrush="#10B981" BorderThickness="1" Foreground="#10B981"
-                            Content="💽 DEEP C: CLEAN" Padding="14,8" Margin="0,0,8,4"
-                            Click="BtnDeepCleanC_Click" ToolTip="1-Click Deep C: Drive Storage &amp; Component Cleanup: Purges WinSxS superseded updates (DISM), Delivery Optimization, DirectX/GPU shader caches, crash dumps, Recycle Bin &amp; temp files to reclaim maximum gigabytes on C:!"/>
-
-                    <!-- 🧹 CLEAN PC & RAM (1-Click Instant Junk, Cache & RAM Cleaner) -->
-                    <Button x:Name="BtnCleanPc" Style="{StaticResource UndoButton}"
-                            BorderBrush="#00E5FF" BorderThickness="1" Foreground="#00E5FF"
-                            Content="🧹 CLEAN PC &amp; RAM" Padding="14,8" Margin="0,0,8,4"
-                            Click="BtnCleanPc_Click" ToolTip="1-Click Deep Clean: Clears user/windows temp files, update cache, prefetch, shader cache &amp; purges Standby RAM!"/>
-
-                    <!-- ⚡ APPLY SELECTED -->
-                    <Button x:Name="BtnApplySelected" Style="{StaticResource UndoButton}"
-                            BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1"
-                            Content="⚡ APPLY SELECTED" Padding="14,8" Margin="0,0,8,4"
-                            Click="BtnApplySelected_Click" ToolTip="Apply all checked optimizations to your PC"/>
-
-                    <!-- ⭐ RECOMMENDED -->
-                    <Button x:Name="BtnSelectRecommended" Style="{StaticResource UndoButton}"
-                            Content="⭐ RECOMMENDED" Padding="12,8" Margin="0,0,8,4"
-                            Click="BtnSelectRecommended_Click" ToolTip="Select recommended safe optimizations"/>
-
-                    <!-- ✓ SELECT ALL -->
-                    <Button x:Name="BtnSelectAll" Style="{StaticResource UndoButton}"
-                            Content="✓ SELECT ALL" Padding="12,8" Margin="0,0,8,4"
-                            Click="BtnSelectAll_Click" ToolTip="Select all visible tweaks"/>
-
-                    <!-- ✕ CLEAR -->
-                    <Button x:Name="BtnDeselectAll" Style="{StaticResource UndoButton}"
-                            Content="✕ CLEAR" Padding="12,8" Margin="0,0,8,4"
-                            Click="BtnDeselectAll_Click" ToolTip="Deselect all checkboxes"/>
-
-                    <!-- 🔄 RESTORE DEFAULTS -->
-                    <Button x:Name="BtnRestoreDefault" Style="{StaticResource DangerButton}"
-                            Content="🔄 RESTORE DEFAULTS" Padding="12,8" Margin="0,0,8,4"
-                            Click="BtnRestoreDefault_Click" ToolTip="Restore optimizations back to Windows factory defaults"/>
-
-                    <!-- 🛡️ RESTORE POINT -->
-                    <Button x:Name="BtnCreateRestorePoint" Style="{StaticResource UndoButton}"
-                            Content="🛡️ RESTORE POINT" Padding="12,8" Margin="0,0,0,4"
-                            Click="BtnCreateRestorePoint_Click" ToolTip="Create a Windows System Restore point before applying changes"/>
-                </WrapPanel>
+                    <!-- 🚀 Big 1-Click Boost Button (Easy for any beginner!) -->
+                    <Button x:Name="BtnApplyAll" Style="{StaticResource AnimatedPrimaryButton}"
+                            Content="🚀 BOOST PC (1-CLICK)"
+                            Click="BtnApplyAll_Click"
+                            ToolTip="1-Click: Speeds up your PC, optimizes games &amp; cleans junk safely"/>
+                </StackPanel>
             </Grid>
         </Border>
 
-        <!-- ===== BODY ===== -->
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/> <!-- Row 0: Section Switcher & Search Bar -->
-                <RowDefinition Height="Auto"/> <!-- Row 1: Category Filter Bar -->
-                <RowDefinition Height="*"/>    <!-- Row 2: Tweak List ScrollViewer -->
-            </Grid.RowDefinitions>
+        <!-- ================= ROW 1: SIMPLE ACTION TOOLS & SLEEK STATUS STRIP ================= -->
+        <Border Grid.Row="1" Padding="24,10,24,10"
+                BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
+                Background="{DynamicResource BrushBackground}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Row 0: Unified All Section & Live Search Filter -->
-            <Border Grid.Row="0" Padding="24,10,24,10"
-                    BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
-                    Background="{DynamicResource BrushSurface}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <!-- Left: Simplified Action Buttons -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- ⭐ Select Recommended -->
+                    <Button x:Name="BtnSelectRecommended" Style="{StaticResource AnimatedSecondaryButton}"
+                            Content="⭐ Recommended" Margin="0,0,8,0"
+                            Click="BtnSelectRecommended_Click" ToolTip="Select recommended safe optimizations"/>
 
-                    <!-- Single Unified "All Optimizations" Badge -->
-                    <Border Grid.Column="0" Background="{DynamicResource BrushBackground}"
-                            BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1"
-                            CornerRadius="8" Padding="14,6">
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="⚡" FontSize="13" Foreground="{DynamicResource BrushAccent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="ALL OPTIMIZATIONS"
-                                       FontFamily="{StaticResource AppFont}" FontSize="12" FontWeight="Bold"
-                                       Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
-                            <Border Background="#1A00FF66" CornerRadius="4" Padding="6,2" Margin="8,0,0,0" VerticalAlignment="Center">
-                                <TextBlock Text="UNIFIED ENGINE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
-                            </Border>
+                    <!-- ⚡ Apply Selected -->
+                    <Button x:Name="BtnApplySelected" Style="{StaticResource AnimatedSecondaryButton}"
+                            BorderBrush="{DynamicResource BrushAccent}"
+                            Content="⚡ Apply Selected" Margin="0,0,8,0"
+                            Click="BtnApplySelected_Click" ToolTip="Apply checked optimizations to your PC"/>
+
+                    <!-- 🧹 Clean PC & RAM -->
+                    <Button x:Name="BtnCleanPc" Style="{StaticResource AnimatedSecondaryButton}"
+                            Content="🧹 Clean PC" Margin="0,0,8,0"
+                            Click="BtnCleanPc_Click" ToolTip="Clean temporary junk files and free memory"/>
+
+                    <!-- 💽 Deep Clean C: (Hidden helper or accessible) -->
+                    <Button x:Name="BtnDeepCleanC" Style="{StaticResource AnimatedSecondaryButton}"
+                            Content="💽 Clean Drive C:" Margin="0,0,8,0" Visibility="Collapsed"
+                            Click="BtnDeepCleanC_Click" ToolTip="Deep clean Windows update cache and component store on Drive C:"/>
+
+                    <!-- 🔄 Reset Defaults -->
+                    <Button x:Name="BtnRestoreDefault" Style="{StaticResource AnimatedDangerButton}"
+                            Content="↩️ Reset Defaults" Margin="0,0,8,0"
+                            Click="BtnRestoreDefault_Click" ToolTip="Restore Windows original default settings"/>
+
+                    <!-- 🛡️ Create Restore Point -->
+                    <Button x:Name="BtnCreateRestorePoint" Style="{StaticResource AnimatedSecondaryButton}"
+                            Content="🛡️ Backup" Margin="0,0,0,0"
+                            Click="BtnCreateRestorePoint_Click" ToolTip="Create a Windows System Restore point checkpoint"/>
+                </StackPanel>
+
+                <!-- Right: Sleek Minimal 1-Line Status Indicators -->
+                <Border Grid.Column="2" Background="{DynamicResource BrushSurface}"
+                        BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                        CornerRadius="8" Padding="12,5" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- 1. Kernel Timer -->
+                        <TextBlock Text="⏱️" FontSize="11" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtLiveTimerRes" Text="0.500 ms" FontSize="11" FontWeight="Bold"
+                                   Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
+
+                        <TextBlock Text="  •  " Foreground="{DynamicResource BrushBorder}" VerticalAlignment="Center"/>
+
+                        <!-- 2. CPU Boost -->
+                        <TextBlock Text="⚡" FontSize="11" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtLiveCpuBoost" Text="Dynamic Boost" FontSize="11" FontWeight="Bold"
+                                   Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
+
+                        <TextBlock Text="  •  " Foreground="{DynamicResource BrushBorder}" VerticalAlignment="Center"/>
+
+                        <!-- 3. GPU Mode -->
+                        <TextBlock Text="🎮" FontSize="11" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtLiveGpuMode" Text="100% Mode" FontSize="11" FontWeight="Bold"
+                                   Foreground="#00E5FF" VerticalAlignment="Center"/>
+
+                        <TextBlock Text="  •  " Foreground="{DynamicResource BrushBorder}" VerticalAlignment="Center"/>
+
+                        <!-- 4. RAM / Game State -->
+                        <TextBlock Text="🧠" FontSize="11" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtLiveStandbyRam" Text="Smooth &amp; Clean" FontSize="11" FontWeight="Bold"
+                                   Foreground="#FFD700" VerticalAlignment="Center"/>
+
+                        <!-- Hidden bindings to satisfy code-behind telemetry references -->
+                        <TextBlock x:Name="TxtLiveCpuName" Visibility="Collapsed"/>
+                        <TextBlock x:Name="TxtLiveDetectedGames" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ================= ROW 2: CATEGORY FILTER BAR & SEARCH ================= -->
+        <Border Grid.Row="2" Padding="24,8,24,8"
+                BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
+                Background="{DynamicResource BrushSurface}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Category Chips ScrollViewer -->
+                <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="CategoryChipsPanel" Orientation="Horizontal"/>
+                </ScrollViewer>
+
+                <!-- Select All / Clear Quick Helpers -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,12,0">
+                    <Button x:Name="BtnSelectAll" Style="{StaticResource AnimatedSecondaryButton}"
+                            Content="✓ All" Padding="8,4" Margin="0,0,6,0"
+                            Click="BtnSelectAll_Click" ToolTip="Check all visible optimizations"/>
+                    <Button x:Name="BtnDeselectAll" Style="{StaticResource AnimatedSecondaryButton}"
+                            Content="✕ Clear" Padding="8,4"
+                            Click="BtnDeselectAll_Click" ToolTip="Uncheck all"/>
+                </StackPanel>
+
+                <!-- Search Box -->
+                <Border Grid.Column="2" Background="{DynamicResource BrushBackground}"
+                        BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
+                        CornerRadius="7" Width="200" Height="30" Padding="8,0" VerticalAlignment="Center">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="🔍" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"
+                                   VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBox x:Name="FilterBox" Grid.Column="1"
+                                 Background="Transparent" BorderThickness="0"
+                                 Foreground="{DynamicResource BrushTextPrimary}"
+                                 CaretBrush="{DynamicResource BrushAccent}"
+                                 FontFamily="{StaticResource AppFont}" FontSize="12"
+                                 VerticalAlignment="Center"
+                                 TextChanged="FilterBox_TextChanged"/>
+                        <TextBlock Grid.Column="1" Text="Search..."
+                                   FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"
+                                   Opacity="0.5" VerticalAlignment="Center" IsHitTestVisible="False"
+                                   Visibility="{Binding Text.IsEmpty, ElementName=FilterBox, Converter={StaticResource BoolToVis}}"/>
+                        <Button x:Name="ClearFilterButton" Grid.Column="2" Content="✕"
+                                Background="Transparent" BorderThickness="0"
+                                Foreground="{DynamicResource BrushTextSecondary}"
+                                Cursor="Hand" FontSize="10" Padding="4,0"
+                                VerticalAlignment="Center" Visibility="Collapsed"
+                                Click="ClearFilter_Click"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- ================= ROW 3: TWEAKS LIST ================= -->
+        <ScrollViewer x:Name="TweaksScrollViewer" Grid.Row="3" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="24,14,24,24">
+            <StackPanel>
+
+                <!-- Status / Progress notification banner -->
+                <Border x:Name="StatusBar" Margin="0,0,0,12"
+                        Background="{DynamicResource BrushSurface}"
+                        BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1"
+                        CornerRadius="8" Padding="14,10" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="TxtStatus"
+                                   FontFamily="{StaticResource AppFont}" FontSize="12.5" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <lottie:LottieAnimationView x:Name="StatusLottie" Width="22" Height="22"
+                                                        AutoPlay="True" RepeatCount="-1"
+                                                        services:LottieHelper.AssetName="rocket.json"
+                                                        VerticalAlignment="Center" Visibility="Collapsed"/>
                         </StackPanel>
-                    </Border>
+                    </Grid>
+                </Border>
 
-                    <!-- Section Description Pill -->
-                    <Border Grid.Column="1" VerticalAlignment="Center" Margin="16,0,16,0">
-                        <TextBlock x:Name="TxtSectionDescription"
-                                   Text="All system, registry, CPU, GPU, emulator &amp; latency optimizations unified in one place."
+                <!-- Advanced Warning Banner (Shown only when viewing advanced tweaks) -->
+                <Border x:Name="AdvancedWarningBanner" Margin="0,0,0,12"
+                        Background="#1A0F00" BorderBrush="#92400E" BorderThickness="1"
+                        CornerRadius="8" Padding="14,10" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⚠" FontSize="15" Margin="0,0,10,0"
+                                   Foreground="#F59E0B" VerticalAlignment="Center"/>
+                        <TextBlock TextWrapping="Wrap" VerticalAlignment="Center"
                                    FontFamily="{StaticResource AppFont}" FontSize="12"
-                                   Foreground="{DynamicResource BrushTextSecondary}"
-                                   TextTrimming="CharacterEllipsis"/>
-                    </Border>
+                                   Foreground="#F59E0B">
+                            <Run FontWeight="Bold">Notice:</Run>
+                            <Run> These advanced tweaks fine-tune system-level scheduling. Recommended tweaks are safe for daily gaming.</Run>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
 
-                    <!-- Search Filter Box -->
-                    <Border Grid.Column="2" Background="{DynamicResource BrushBackground}"
-                            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                            CornerRadius="6" Width="260" Height="32" Padding="8,0">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="🔍" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"
-                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
-                            <TextBox x:Name="FilterBox" Grid.Column="1"
-                                     Background="Transparent" BorderThickness="0"
-                                     Foreground="{DynamicResource BrushTextPrimary}"
-                                     CaretBrush="{DynamicResource BrushAccent}"
-                                     FontFamily="{StaticResource AppFont}" FontSize="12"
-                                     VerticalAlignment="Center"
-                                     TextChanged="FilterBox_TextChanged"/>
-                            <TextBlock Grid.Column="1" Text="Search tweaks or registry keys…"
-                                       FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"
-                                       Opacity="0.5" VerticalAlignment="Center" IsHitTestVisible="False"
-                                       Visibility="{Binding Text.IsEmpty, ElementName=FilterBox, Converter={StaticResource BoolToVis}}"/>
-                            <Button x:Name="ClearFilterButton" Grid.Column="2" Content="✕"
-                                    Background="Transparent" BorderThickness="0"
-                                    Foreground="{DynamicResource BrushTextSecondary}"
-                                    Cursor="Hand" FontSize="10" Padding="4,0"
-                                    VerticalAlignment="Center" Visibility="Collapsed"
-                                    Click="ClearFilter_Click"/>
-                        </Grid>
-                    </Border>
-                </Grid>
-            </Border>
+                <!-- Tweaks ItemsControl -->
+                <ItemsControl x:Name="TweaksItemsControl">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:TweakItem}">
+                            <Border Style="{StaticResource TweakCard}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-            <!-- Row 1: Category Filter Bar + Quick Select Helpers -->
-            <Border Grid.Row="1" Padding="24,10,24,10"
-                    BorderBrush="{DynamicResource BrushBorder}" BorderThickness="0,0,0,1"
-                    Background="{DynamicResource BrushBackground}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                        <StackPanel x:Name="CategoryChipsPanel" Orientation="Horizontal"/>
-                    </ScrollViewer>
-
-                    <!-- Quick Select Recommended Helper -->
-                    <Button Grid.Column="1" x:Name="BtnCategoryRecommended" Style="{StaticResource UndoButton}"
-                            Content="SELECT RECOMMENDED" Padding="10,5" Margin="8,0,0,0"
-                            Click="BtnSelectRecommended_Click" ToolTip="Select recommended safe tweaks in this view"/>
-                </Grid>
-            </Border>
-
-            <!-- Row 2: Tweak List -->
-            <ScrollViewer x:Name="TweaksScrollViewer" Grid.Row="2" VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled"
-                          Padding="24,16,24,24">
-                <StackPanel>
-
-                    <!-- Progress / Status bar -->
-                    <Border x:Name="StatusBar" Margin="0,0,0,14"
-                            Background="{DynamicResource BrushSurface}"
-                            BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                            CornerRadius="8" Padding="14,10" Visibility="Collapsed">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="TxtStatus"
-                                       FontFamily="{StaticResource AppFont}" FontSize="13"
-                                       Foreground="{DynamicResource BrushAccent}" VerticalAlignment="Center"/>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                <lottie:LottieAnimationView x:Name="StatusLottie" Width="22" Height="22"
-                                                            AutoPlay="True" RepeatCount="-1"
-                                                            services:LottieHelper.AssetName="rocket.json"
-                                                            VerticalAlignment="Center" Visibility="Collapsed"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <!-- ⚡ LIVE SYSTEM TELEMETRY & SAFEGUARD STATUS CARD -->
-                    <Border x:Name="LiveTelemetryCard" Margin="0,0,0,16"
-                            Background="#0B1412" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                            CornerRadius="10" Padding="18,14">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <!-- Header Row -->
-                            <Grid Grid.Row="0" Margin="0,0,0,10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="⚡" FontSize="16" Foreground="{DynamicResource BrushAccent}" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="LIVE PERFORMANCE TELEMETRY &amp; SAFEGUARD STATUS"
-                                               FontFamily="{StaticResource AppFont}" FontSize="13.5" FontWeight="Bold"
-                                               Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
-                                </StackPanel>
-                                <Border Grid.Column="1" x:Name="BadgePermanentStatus" Background="#1A00FF66" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1"
-                                        CornerRadius="6" Padding="10,4" VerticalAlignment="Center">
-                                    <TextBlock x:Name="TxtPermanentStatus" Text="STATUS: 🔒 ACTIVE &amp; LOCKED"
-                                               FontFamily="{StaticResource AppFont}" FontSize="11" FontWeight="Bold"
-                                               Foreground="{DynamicResource BrushAccent}"/>
-                                </Border>
-                            </Grid>
-
-                            <!-- Live Telemetry Badges Grid -->
-                            <UniformGrid Grid.Row="1" Columns="4">
-                                <!-- Badge 1: Timer Res -->
-                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                                        CornerRadius="8" Padding="10,10" Margin="0,0,4,0">
-                                    <StackPanel>
-                                        <TextBlock Text="KERNEL TIMER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
-                                        <TextBlock x:Name="TxtLiveTimerRes" Text="0.500 ms (Locked ✓)" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,3,0,0"/>
-                                        <TextBlock Text="0.5ms zero frame jitter" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Badge 2: CPU Turbo Boost -->
-                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                                        CornerRadius="8" Padding="10,10" Margin="2,0,2,0">
-                                    <StackPanel>
-                                        <TextBlock Text="CPU TURBO BOOST" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
-                                        <TextBlock x:Name="TxtLiveCpuBoost" Text="5.0 GHz Unlocked ✓" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,3,0,0"/>
-                                        <TextBlock x:Name="TxtLiveCpuName" Text="Dynamic Precision Scaling" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Badge 3: GPU Utilization -->
-                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                                        CornerRadius="8" Padding="10,10" Margin="2,0,2,0">
-                                    <StackPanel>
-                                        <TextBlock Text="NVIDIA &amp; AMD GPU" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
-                                        <TextBlock x:Name="TxtLiveGpuMode" Text="100% Max Mode ✓" FontSize="13" FontWeight="Bold" Foreground="#00E5FF" Margin="0,3,0,0"/>
-                                        <TextBlock Text="PowerMizer &amp; ULPS Off" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
-                                    </StackPanel>
-                                </Border>
-
-                                <!-- Badge 4: Standby RAM & Games -->
-                                <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1"
-                                        CornerRadius="8" Padding="10,10" Margin="4,0,0,0">
-                                    <StackPanel>
-                                        <TextBlock Text="PC CLEAN &amp; RAM" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
-                                        <TextBlock x:Name="TxtLiveDetectedGames" Text="Purged &amp; Boosted ✓" FontSize="13" FontWeight="Bold" Foreground="#FFD700" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock x:Name="TxtLiveStandbyRam" Text="High I/O • No Throttling" FontSize="9.5" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,2,0,0"/>
-                                    </StackPanel>
-                                </Border>
-                            </UniformGrid>
-                        </Grid>
-                    </Border>
-
-                    <!-- Advanced Tweaks Warning -->
-                    <Border x:Name="AdvancedWarningBanner" Margin="0,0,0,14"
-                            Background="#1A0F00" BorderBrush="#92400E" BorderThickness="1"
-                            CornerRadius="8" Padding="14,10" Visibility="Collapsed">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="⚠" FontSize="16" Margin="0,0,10,0"
-                                       Foreground="#F59E0B" VerticalAlignment="Center"/>
-                            <TextBlock TextWrapping="Wrap" VerticalAlignment="Center"
-                                       FontFamily="{StaticResource AppFont}" FontSize="12"
-                                       Foreground="#F59E0B">
-                                <Run FontWeight="Bold">Advanced Optimization (Caution):</Run>
-                                <Run> These tweaks tune deep Windows scheduling, drivers, or kernel configurations. Use recommended tweaks for safe daily operation.</Run>
-                            </TextBlock>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Tweaks ItemsControl -->
-                    <ItemsControl x:Name="TweaksItemsControl">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="{x:Type models:TweakItem}">
-                                <Border Style="{StaticResource TweakCard}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding Name}"
-                                                           FontFamily="{StaticResource AppFont}"
-                                                           FontSize="13" FontWeight="SemiBold"
-                                                           Foreground="{DynamicResource BrushTextPrimary}"
-                                                           VerticalAlignment="Center"/>
-                                                <!-- Applied status badge -->
-                                                <Border Style="{StaticResource AppliedBadge}"
-                                                        Margin="8,0,0,0"
-                                                        Visibility="{Binding IsApplied, Converter={StaticResource BoolToVis}}">
-                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                        <TextBlock Text="✓" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,0,3,0"/>
-                                                        <TextBlock Text="APPLIED" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
-                                                    </StackPanel>
-                                                </Border>
-                                                <!-- Recommended badge -->
-                                                <Border Style="{StaticResource RecommendedBadge}"
-                                                        Margin="8,0,0,0"
-                                                        Visibility="{Binding IsRecommended, Converter={StaticResource BoolToVis}}">
-                                                    <TextBlock Text="RECOMMENDED" FontSize="9" FontWeight="Bold"
-                                                               Foreground="{DynamicResource BrushAccent}"/>
-                                                </Border>
-                                                <!-- Advanced badge -->
-                                                <Border Style="{StaticResource AdvancedBadge}"
-                                                        Margin="8,0,0,0"
-                                                        Visibility="{Binding IsAdvanced, Converter={StaticResource BoolToVis}}">
-                                                    <TextBlock Text="CAUTION" FontSize="9" FontWeight="Bold"
-                                                               Foreground="#F59E0B"/>
-                                                </Border>
-                                            </StackPanel>
-
-                                            <!-- Description -->
-                                            <TextBlock Text="{Binding Description}"
+                                    <!-- Left: Name, Badges & 1-Line Description -->
+                                    <StackPanel Grid.Column="0" Margin="0,0,16,0" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}"
                                                        FontFamily="{StaticResource AppFont}"
-                                                       FontSize="11" TextWrapping="Wrap"
-                                                       Foreground="{DynamicResource BrushTextSecondary}"
-                                                       Margin="0,3,0,0" MaxWidth="720"/>
+                                                       FontSize="13.5" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource BrushTextPrimary}"
+                                                       VerticalAlignment="Center"/>
 
-                                            <!-- Registry target badge (visible when tweak has registry key definitions) -->
-                                            <Border Background="{DynamicResource BrushBackground}"
-                                                    BorderBrush="{DynamicResource BrushBorder}"
-                                                    BorderThickness="1"
-                                                    CornerRadius="4"
-                                                    Padding="6,2"
-                                                    Margin="0,5,0,0"
-                                                    HorizontalAlignment="Left"
-                                                    Visibility="{Binding HasRegistryTarget, Converter={StaticResource BoolToVis}}">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="🔑" FontSize="10" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                                                    <TextBlock Text="{Binding FormattedRegistryTarget}"
-                                                               FontFamily="Consolas"
-                                                               FontSize="10"
-                                                               Foreground="{DynamicResource BrushAccent}"
-                                                               VerticalAlignment="Center"/>
+                                            <!-- Applied status badge -->
+                                            <Border Style="{StaticResource AppliedBadge}"
+                                                    Margin="8,0,0,0"
+                                                    Visibility="{Binding IsApplied, Converter={StaticResource BoolToVis}}">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="✓" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}" Margin="0,0,3,0"/>
+                                                    <TextBlock Text="APPLIED" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrushAccent}"/>
                                                 </StackPanel>
+                                            </Border>
+
+                                            <!-- Recommended badge -->
+                                            <Border Style="{StaticResource RecommendedBadge}"
+                                                    Margin="8,0,0,0"
+                                                    Visibility="{Binding IsRecommended, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="RECOMMENDED" FontSize="9" FontWeight="Bold"
+                                                           Foreground="{DynamicResource BrushAccent}"/>
+                                            </Border>
+
+                                            <!-- Caution badge -->
+                                            <Border Style="{StaticResource AdvancedBadge}"
+                                                    Margin="8,0,0,0"
+                                                    Visibility="{Binding IsAdvanced, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="CAUTION" FontSize="9" FontWeight="Bold"
+                                                           Foreground="#F59E0B"/>
                                             </Border>
                                         </StackPanel>
 
-                                        <!-- Toggle switch -->
-                                        <CheckBox Grid.Column="1" Style="{StaticResource TweakToggle}"
-                                                  IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                  VerticalAlignment="Center"/>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                        <!-- Plain, simple 1-line description -->
+                                        <TextBlock Text="{Binding Description}"
+                                                   FontFamily="{StaticResource AppFont}"
+                                                   FontSize="11.5" TextWrapping="Wrap"
+                                                   Foreground="{DynamicResource BrushTextSecondary}"
+                                                   Margin="0,4,0,0" MaxWidth="760"/>
+                                    </StackPanel>
 
-                    <!-- Empty state -->
-                    <StackPanel x:Name="EmptyState" Visibility="Collapsed"
-                                HorizontalAlignment="Center" Margin="0,60,0,0">
-                        <TextBlock Text="No tweaks match your filter" FontSize="15"
-                                   FontFamily="{StaticResource AppFont}"
-                                   Foreground="{DynamicResource BrushTextSecondary}"
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
+                                    <!-- Right: Smooth Toggle Switch -->
+                                    <CheckBox Grid.Column="1" Style="{StaticResource TweakToggle}"
+                                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
+                <!-- Empty State -->
+                <StackPanel x:Name="EmptyState" Visibility="Collapsed"
+                            HorizontalAlignment="Center" Margin="0,60,0,0">
+                    <TextBlock Text="🔍" FontSize="28" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+                    <TextBlock Text="No optimizations found" FontSize="14" FontWeight="SemiBold"
+                               FontFamily="{StaticResource AppFont}"
+                               Foreground="{DynamicResource BrushTextSecondary}"
+                               HorizontalAlignment="Center"/>
                 </StackPanel>
-            </ScrollViewer>
-        </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>
