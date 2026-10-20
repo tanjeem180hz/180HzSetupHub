@@ -277,8 +277,9 @@ namespace SetupHub180Hz.Views
                 string diskStr = FormatBytes(freedBytes);
                 string procStr = gameBoost.BoostedProcessesCount > 0 ? $" • {gameBoost.BoostedProcessesCount} Game(s) Priority Elevated" : "";
 
-                ActivityLogger.Instance.Log($"2X FPS Extreme Turbo Boost completed: 0.500ms Timer Locked, Flushed {ramStr} RAM cache and wiped {diskStr} junk.{procStr}", ActivityType.Success);
-                NotificationService.Notify("🎮 2X FPS Turbo Boost Activated!", $"Locked 0.500ms Timer Resolution • Purged {ramStr} Standby Cache • Wiped {diskStr} trash{procStr}. Ultra-smooth gameplay active!");
+                string timerStr = $"{gameBoost.TimerResolutionMs:0.000} ms";
+                ActivityLogger.Instance.Log($"2X FPS Extreme Turbo Boost completed: {timerStr} Lowest Input Delay Timer Locked, Flushed {ramStr} RAM cache and wiped {diskStr} junk.{procStr}", ActivityType.Success);
+                NotificationService.Notify("🎮 2X FPS Turbo Boost Activated!", $"Locked {timerStr} Timer Resolution (Lowest Input Delay) • Purged {ramStr} Standby Cache • Wiped {diskStr} trash{procStr}. Ultra-smooth gameplay active!");
 
                 TxtQuickBoostBtn.Text = "✓ 2X BOOSTED!";
 

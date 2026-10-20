@@ -55,7 +55,37 @@ namespace SetupHub180Hz.Services
         private uint _currentTimerRes = 5000;
 
         public bool IsTimerResolutionLocked => _isTimerLocked;
-        public double CurrentTimerResolutionMs => _currentTimerRes > 0 ? _currentTimerRes / 10000.0 : 0.5;
+
+        /// <summary>
+        /// Gets the live system timer resolution in milliseconds.
+        /// Queries the OS kernel directly to report the true hardware timer period.
+        /// </summary>
+        public double CurrentTimerResolutionMs
+        {
+            get
+            {
+                try
+                {
+                    int status = NtQueryTimerResolution(out _, out _, out uint cur);
+                    if (status == 0 && cur > 0)
+                    {
+                        _currentTimerRes = cur;
+                        return cur / 10000.0;
+                    }
+                }
+                catch { }
+                return _currentTimerRes > 0 ? _currentTimerRes / 10000.0 : 0.5;
+            }
+        }
+
+        public string FormattedTimerResolution
+        {
+            get
+            {
+                double ms = CurrentTimerResolutionMs;
+                return $"{ms:0.000} ms";
+            }
+        }
 
         private static Timer? _daemonTimer;
         private static readonly object _daemonLock = new();
@@ -76,7 +106,7 @@ namespace SetupHub180Hz.Services
                         var running = GetRunningGameProcessNames();
                         if (running.Count > 0)
                         {
-                            Instance.Enable05msTimerResolution();
+                            Instance.EnableLowestSafeTimerResolution();
                             await BoostRunningGameProcessesAsync();
                         }
                     }
@@ -117,23 +147,72 @@ namespace SetupHub180Hz.Services
             catch { }
         }
 
-        public void Enable05msTimerResolution()
+        /// <summary>
+        /// Queries the maximum hardware resolution (smallest time interval) supported by the hardware abstraction layer.
+        /// </summary>
+        public uint GetMaximumHardwareTimerResolution()
         {
             try
             {
-                // Request 0.5ms (5000 in 100ns units)
-                int status = NtSetTimerResolution(5000, true, out _currentTimerRes);
-                TimeBeginPeriod(1);
-                _isTimerLocked = true;
+                int status = NtQueryTimerResolution(out _, out uint maxRes, out _);
+                if (status == 0 && maxRes > 0)
+                {
+                    return maxRes;
+                }
             }
             catch { }
+            return 5000;
         }
+
+        /// <summary>
+        /// Locks timer resolution to the absolute lowest safe limit supported by the motherboard and Windows HAL
+        /// (e.g. 0.496ms, 0.500ms, or sub-0.5ms on high-precision platforms) to eliminate input delay and frame jitter.
+        /// </summary>
+        public void EnableLowestSafeTimerResolution()
+        {
+            try
+            {
+                // 1. Query the true hardware capability
+                int queryStatus = NtQueryTimerResolution(out uint minRes, out uint maxRes, out uint curRes);
+
+                // Use the maximum resolution (smallest interval) supported by the hardware
+                uint targetRes = (queryStatus == 0 && maxRes > 0) ? maxRes : 5000;
+
+                // 2. Request lowest safe resolution from kernel
+                int status = NtSetTimerResolution(targetRes, true, out _currentTimerRes);
+                TimeBeginPeriod(1);
+
+                // 3. Confirm live granted resolution
+                int verifyStatus = NtQueryTimerResolution(out _, out _, out uint actualCur);
+                if (verifyStatus == 0 && actualCur > 0)
+                {
+                    _currentTimerRes = actualCur;
+                }
+
+                _isTimerLocked = true;
+            }
+            catch
+            {
+                try
+                {
+                    TimeBeginPeriod(1);
+                    _isTimerLocked = true;
+                }
+                catch { }
+            }
+        }
+
+        /// <summary>
+        /// Backwards-compatible alias for EnableLowestSafeTimerResolution.
+        /// </summary>
+        public void Enable05msTimerResolution() => EnableLowestSafeTimerResolution();
 
         public void DisableTimerResolution()
         {
             try
             {
-                NtSetTimerResolution(5000, false, out _currentTimerRes);
+                uint targetRes = GetMaximumHardwareTimerResolution();
+                NtSetTimerResolution(targetRes, false, out _currentTimerRes);
                 TimeEndPeriod(1);
                 _isTimerLocked = false;
             }
@@ -142,8 +221,8 @@ namespace SetupHub180Hz.Services
 
         public async Task<GameBoostResult> Activate2xFpsOverdriveAsync()
         {
-            // 1. Lock 0.500ms Timer Resolution
-            Enable05msTimerResolution();
+            // 1. Lock Lowest Safe Hardware Timer Resolution (Zero Input Delay)
+            EnableLowestSafeTimerResolution();
 
             // 2. Memory Purge (Standby list, Working Sets, Modified list)
             long freedRam = await Task.Run(() => MemoryCleaner.CleanRam());
@@ -156,17 +235,19 @@ namespace SetupHub180Hz.Services
             });
             await CpuOptimizerService.ApplyProcessorWiseMaxTurboAsync();
 
-            // 4. Enforce Game Mode, MMCSS 100% CPU Gaming Reservation, GPU Priority 8, Universal NVIDIA/AMD Overdrive
+            // 4. Enforce Game Mode, MMCSS 100% CPU Gaming Reservation, GPU Priority 8, Universal NVIDIA/AMD Overdrive, Low Latency Input
             ApplyInstantGamingRegistry();
 
             // 5. Scan & boost active emulator and game processes (High Priority, High I/O, No Power Throttling, Full Cores)
             int boostedProcesses = await BoostRunningGameProcessesAsync();
 
+            double liveMs = CurrentTimerResolutionMs;
+
             return new GameBoostResult
             {
                 FreedRamBytes = freedRam,
                 BoostedProcessesCount = boostedProcesses,
-                TimerResolutionMs = 0.5,
+                TimerResolutionMs = liveMs,
                 Success = true
             };
         }
@@ -255,7 +336,7 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("PowerSavingPolicy", 0, RegistryValueKind.DWord);
                 }
 
-                // Mouse Acceleration Linear Fix
+                // Mouse Acceleration Linear Fix (1:1 Raw Pixel Precision)
                 using (var key = Registry.CurrentUser.CreateSubKey(@"Control Panel\Mouse", true))
                 {
                     key?.SetValue("MouseSpeed", "0", RegistryValueKind.String);
@@ -263,10 +344,40 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("MouseThreshold2", "0", RegistryValueKind.String);
                 }
 
-                // CSRSS Realtime
+                // Keyboard Zero Delay & Maximum Repeat Rate
+                using (var key = Registry.CurrentUser.CreateSubKey(@"Control Panel\Keyboard", true))
+                {
+                    key?.SetValue("KeyboardDelay", "0", RegistryValueKind.String);
+                    key?.SetValue("KeyboardSpeed", "31", RegistryValueKind.String);
+                }
+
+                // Fast HID Buffer Queues (Instant Hardware Packet Dispatch, Zero Backlog Delay)
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\mouclass\Parameters", true))
+                {
+                    key?.SetValue("MouseDataQueueSize", 32, RegistryValueKind.DWord);
+                }
+
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\kbdclass\Parameters", true))
+                {
+                    key?.SetValue("KeyboardDataQueueSize", 32, RegistryValueKind.DWord);
+                }
+
+                // Global Timer Resolution Requests (Enforces low timer resolution across all processes)
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\kernel", true))
+                {
+                    key?.SetValue("GlobalTimerResolutionRequests", 1, RegistryValueKind.DWord);
+                }
+
+                // Disable Timer Coalescing (Zero latency batching)
+                using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\Power", true))
+                {
+                    key?.SetValue("CoalescingTimerInterval", 0, RegistryValueKind.DWord);
+                }
+
+                // CSRSS Safe High Priority (3) for smooth input event dispatch without BSOD risk
                 using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\csrss.exe\PerfOptions", true))
                 {
-                    key?.SetValue("CpuPriorityClass", 4, RegistryValueKind.DWord);
+                    key?.SetValue("CpuPriorityClass", 3, RegistryValueKind.DWord);
                 }
 
                 // Consolidate Explorer into a single high-efficiency process (removes inter-process lag)

@@ -739,7 +739,7 @@
                                     <!-- Button 1: 1-Click Pre-Game Boost -->
                                     <Button Grid.Row="0" x:Name="BtnQuickBoost" Style="{StaticResource AccentButton}" Click="BtnQuickBoost_Click"
                                             Height="34" Padding="10,0" Margin="0,0,0,7"
-                                            ToolTip="1-Click apply after PC boot or before gaming: 0.5ms Timer, Standby RAM purge &amp; 2X FPS!">
+                                            ToolTip="1-Click apply after PC boot or before gaming: Lowest safe input delay timer lock, Standby RAM purge &amp; 2X FPS!">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <TextBlock x:Name="BoostIcon" Text="🎮" FontSize="12" FontWeight="Bold" Margin="0,0,6,0"
                                                        Foreground="{DynamicResource BrushAccentForeground}"/>

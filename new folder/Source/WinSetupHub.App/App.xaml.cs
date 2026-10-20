@@ -23,8 +23,8 @@ namespace SetupHub180Hz
                 }
             }
 
-            // Immediately lock 0.500ms high-precision kernel timer resolution for ultra-low latency gaming & physics
-            GameBoosterService.Instance.Enable05msTimerResolution();
+            // Immediately lock hardware-maximum low-latency kernel timer resolution for zero input delay
+            GameBoosterService.Instance.EnableLowestSafeTimerResolution();
 
             // Start continuous real-time emulator & game booster daemon (instantly detects running games, pins 5.0 GHz boost, disables EcoQoS)
             GameBoosterService.StartContinuousGameBoosterEngine();

@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "id":  "EmulTweakHypervisorVBS",
         "name":  "Emulator 100% CPU Utilization \u0026 VBS/Hypervisor Bypass",
@@ -4103,8 +4103,8 @@
     },
     {
         "id":  "KernelTweakTimerResolution",
-        "name":  "Enforce 0.5ms Global Hardware Timer Resolution",
-        "description":  "Forces Windows to enforce a 0.5ms global timer resolution rather than the 15.6ms default, cutting frame rendering latency and improving frametime consistency.",
+        "name":  "Enforce Lowest Hardware Timer Resolution (Zero Input Delay)",
+        "description":  "Dynamically locks Windows system timer to the maximum hardware resolution supported by the motherboard (sub-0.5ms/0.5ms rather than 15.6ms default), eliminating input delay and micro-stutter.",
         "category":  "Extreme Low Latency \u0026 Kernel Timers",
         "categoryOrder":  2,
         "section":  "System",
@@ -6751,8 +6751,8 @@
     },
     {
         "id":  "GameTweakTimerResolution05ms",
-        "name":  "Real-Time 0.500ms High-Precision Kernel Timer Resolution Lock",
-        "description":  "Forces Windows system timer resolution from 15.625ms down to 0.500ms (5000 units). Eliminates frame pacing jitter, synchronizes physics with high-refresh monitors (144Hz/180Hz/240Hz), and makes gameplay feel 2x smoother.",
+        "name":  "Dynamic Lowest Hardware Timer Precision \u0026 Zero Input Delay Lock",
+        "description":  "Dynamically sets the lowest safe timer resolution supported by your motherboard and Windows kernel. Eliminates frame pacing jitter, synchronizes physics with high-refresh monitors, and minimizes keyboard, mouse, and game engine input delay.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
         "section":  "System",

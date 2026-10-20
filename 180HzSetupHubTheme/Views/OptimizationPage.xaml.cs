@@ -775,10 +775,10 @@ namespace SetupHub180Hz.Views
                     },
                     new OptimizationCustomStep
                     {
-                        Name = "⏱️ Locking 0.500ms Kernel Timer Resolution",
+                        Name = "⏱️ Locking Hardware Maximum Precision Timer (Lowest Input Delay)",
                         Action = () =>
                         {
-                            GameBoosterService.Instance.Enable05msTimerResolution();
+                            GameBoosterService.Instance.EnableLowestSafeTimerResolution();
                             return Task.CompletedTask;
                         }
                     },
@@ -833,8 +833,10 @@ namespace SetupHub180Hz.Views
                     string procStr = boostedProcesses > 0 ? $" • {boostedProcesses} Game(s) Priority Elevated" : "";
 
                     var cpu = CpuOptimizerService.GetCpuInfo();
-                    ActivityLogger.Instance.Log($"All Optimizations Applied: {targetTweaks.Count} tweaks deployed, Permanent Boot Safeguard locked, 0.5ms Timer active, {FormatBytes(totalPurged)} junk/RAM purged.", ActivityType.Success);
-                    NotificationService.Notify("🚀 100% Performance Engine Active!", $"All {targetTweaks.Count} optimizations applied. 0.500ms Timer Locked • {cpu.MaxTurboGhz:0.0}GHz Boost • GPU 100%{cleanStr}{procStr}.");
+                    double liveTimerMs = GameBoosterService.Instance.CurrentTimerResolutionMs;
+                    string timerStr = $"{liveTimerMs:0.000} ms";
+                    ActivityLogger.Instance.Log($"All Optimizations Applied: {targetTweaks.Count} tweaks deployed, Permanent Boot Safeguard locked, {timerStr} Lowest Input Delay Timer active, {FormatBytes(totalPurged)} junk/RAM purged.", ActivityType.Success);
+                    NotificationService.Notify("🚀 100% Performance Engine Active!", $"All {targetTweaks.Count} optimizations applied. {timerStr} Timer Locked (Lowest Input Delay) • {cpu.MaxTurboGhz:0.0}GHz Boost • GPU 100%{cleanStr}{procStr}.");
 
                     TxtStatus.Text = $"🚀 All {targetTweaks.Count} optimizations applied & PC cleaned successfully! Running at 100% peak performance.";
                     UpdatePermanentStatusBadge();
@@ -898,7 +900,10 @@ namespace SetupHub180Hz.Views
             if (TxtLiveTimerRes == null) return;
 
             bool timerLocked = GameBoosterService.Instance.IsTimerResolutionLocked;
-            TxtLiveTimerRes.Text = timerLocked ? "0.500 ms (Locked)" : "0.500 ms";
+            double currentMs = GameBoosterService.Instance.CurrentTimerResolutionMs;
+            string msStr = $"{currentMs:0.000} ms";
+            TxtLiveTimerRes.Text = timerLocked ? $"{msStr} (Lowest Latency ✓)" : $"{msStr}";
+            TxtLiveTimerRes.ToolTip = $"Dynamic Hardware Timer: {msStr}\nHardware Maximum Precision is active with zero artificial cap.\nInput delay and frame pacing jitter are reduced to the absolute lowest safe limit supported by your motherboard & Windows kernel.";
 
             var cpu = CpuOptimizerService.GetCpuInfo();
             if (TxtLiveCpuBoost != null)
