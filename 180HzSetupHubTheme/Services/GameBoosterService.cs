@@ -569,8 +569,8 @@ namespace SetupHub180Hz.Services
                                 // 4. Set CPU Core Affinity across all logical processors
                                 try
                                 {
-                                    long mask = (1L << Math.Min(64, Environment.ProcessorCount)) - 1;
-                                    if (mask > 0)
+                                    long mask = Environment.ProcessorCount >= 64 ? -1L : (1L << Math.Max(1, Environment.ProcessorCount)) - 1L;
+                                    if (mask != 0)
                                     {
                                         p.ProcessorAffinity = (IntPtr)mask;
                                     }

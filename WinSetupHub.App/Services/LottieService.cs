@@ -24,9 +24,10 @@ namespace SetupHub180Hz.Services
                 var asm = typeof(LottieService).Assembly;
                 foreach (var r in asm.GetManifestResourceNames())
                 {
-                    if (r.Contains("Assets.Lottie.", StringComparison.OrdinalIgnoreCase) && r.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                    int lottieIdx = r.IndexOf("Assets.Lottie.", StringComparison.OrdinalIgnoreCase);
+                    if (lottieIdx >= 0 && r.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
                     {
-                        var fileName = r.Substring(r.IndexOf("Assets.Lottie.", StringComparison.OrdinalIgnoreCase) + "Assets.Lottie.".Length);
+                        var fileName = r.Substring(lottieIdx + "Assets.Lottie.".Length);
                         var target = Path.Combine(LottieFolder, fileName);
                         using var src = asm.GetManifestResourceStream(r);
                         if (src != null)

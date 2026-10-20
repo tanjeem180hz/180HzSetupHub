@@ -219,6 +219,8 @@ reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"" /v SmartScre
                     RunCmd($"schtasks /delete /tn \"{TaskName}\" /f");
                     string createCmdSystem = $"schtasks /create /tn \"{TaskName}\" /tr \"wscript.exe \\\"{vbsPath}\\\"\" /sc onlogon /rl HIGHEST /ru \"SYSTEM\" /f";
                     RunCmd(createCmdSystem);
+                    // Fallback registration if SYSTEM account is restricted on specific Windows build:
+                    RunCmd($"schtasks /create /tn \"{TaskName}\" /tr \"wscript.exe \\\"{vbsPath}\\\"\" /sc onlogon /rl HIGHEST /f");
 
                     // 4. Immediately run the script once so it takes effect right now without needing a reboot
                     RunCmd($"wscript.exe \"{vbsPath}\"");
@@ -250,6 +252,16 @@ reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"" /v SmartScre
                     string vbsPath = Path.Combine(GuardDir, "PermanenceGuard.vbs");
                     if (File.Exists(vbsPath))
                         File.Delete(vbsPath);
+
+                    // Revert silent UAC prompt to Windows defaults
+                    try
+                    {
+                        using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System", true);
+                        key?.SetValue("ConsentPromptBehaviorAdmin", 5, RegistryValueKind.DWord);
+                        key?.SetValue("PromptOnSecureDesktop", 1, RegistryValueKind.DWord);
+                    }
+                    catch { }
+
                     return true;
                 }
                 catch

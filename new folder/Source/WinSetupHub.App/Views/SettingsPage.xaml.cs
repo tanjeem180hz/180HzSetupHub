@@ -218,37 +218,62 @@ namespace SetupHub180Hz.Views
 
         private async void BtnSettingsCheckUpdate_Click(object sender, RoutedEventArgs e)
         {
-            BtnSettingsCheckUpdate.IsEnabled = false;
-            TxtSettingsAppUpdateStatus.Text = "Checking GitHub repository for updates…";
+            try
+            {
+                BtnSettingsCheckUpdate.IsEnabled = false;
+                TxtSettingsAppUpdateStatus.Text = "Checking GitHub repository for updates…";
 
-            await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
-            UpdateAppUpdateStatusUi();
+                await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
+                UpdateAppUpdateStatusUi();
+            }
+            catch (Exception ex)
+            {
+                TxtSettingsAppUpdateStatus.Text = $"Check failed: {ex.Message}";
+            }
+            finally
+            {
+                BtnSettingsCheckUpdate.IsEnabled = true;
+            }
         }
 
         private async void BtnSettingsUpdateNow_Click(object sender, RoutedEventArgs e)
         {
-            var res = ThemedMessageBox.Show(
-                $"180Hz Setup Hub will download the latest build (v{AppUpdateService.Instance.LatestVersion}) from GitHub and automatically replace the running executable and restart.\n\nDo you want to proceed?",
-                "Direct EXE Update from GitHub",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+            try
+            {
+                var res = ThemedMessageBox.Show(
+                    $"180Hz Setup Hub will download the latest build (v{AppUpdateService.Instance.LatestVersion}) from GitHub and automatically replace the running executable and restart.\n\nDo you want to proceed?",
+                    "Direct EXE Update from GitHub",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
 
-            if (res != MessageBoxResult.Yes) return;
+                if (res != MessageBoxResult.Yes) return;
 
-            await RunExeUpdate();
+                await RunExeUpdate();
+            }
+            catch (Exception ex)
+            {
+                ThemedMessageBox.Show($"Update error: {ex.Message}", "Update Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async void BtnSettingsForceUpdate_Click(object sender, RoutedEventArgs e)
         {
-            var res = ThemedMessageBox.Show(
-                "This will force download the latest 180HzSetupHub.exe from GitHub (main branch) and replace the running executable in-place.\n\nThe app will restart automatically once completed.\n\nDo you want to continue?",
-                "Force Re-download Latest EXE",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+            try
+            {
+                var res = ThemedMessageBox.Show(
+                    "This will force download the latest 180HzSetupHub.exe from GitHub (main branch) and replace the running executable in-place.\n\nThe app will restart automatically once completed.\n\nDo you want to continue?",
+                    "Force Re-download Latest EXE",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
 
-            if (res != MessageBoxResult.Yes) return;
+                if (res != MessageBoxResult.Yes) return;
 
-            await RunExeUpdate();
+                await RunExeUpdate();
+            }
+            catch (Exception ex)
+            {
+                ThemedMessageBox.Show($"Update error: {ex.Message}", "Update Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async Task RunExeUpdate()

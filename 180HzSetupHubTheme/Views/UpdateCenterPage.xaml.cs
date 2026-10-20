@@ -102,37 +102,62 @@ namespace SetupHub180Hz.Views
 
         private async void BtnCheckAppUpdate_Click(object sender, RoutedEventArgs e)
         {
-            BtnCheckAppUpdate.IsEnabled = false;
-            TxtAppUpdateStatus.Text = "Checking GitHub for updates…";
+            try
+            {
+                BtnCheckAppUpdate.IsEnabled = false;
+                TxtAppUpdateStatus.Text = "Checking GitHub for updates…";
 
-            await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
-            UpdateAppSelfUpdateUi();
+                await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
+                UpdateAppSelfUpdateUi();
+            }
+            catch (Exception ex)
+            {
+                TxtAppUpdateStatus.Text = $"Check failed: {ex.Message}";
+            }
+            finally
+            {
+                BtnCheckAppUpdate.IsEnabled = true;
+            }
         }
 
         private async void BtnApplyAppUpdate_Click(object sender, RoutedEventArgs e)
         {
-            var res = ThemedMessageBox.Show(
-                $"180Hz Setup Hub will now download and install v{AppUpdateService.Instance.LatestVersion} from GitHub.\n\nThe application will automatically restart once the update is applied.\n\nDo you want to proceed?",
-                "Install 180Hz Setup Hub Update",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+            try
+            {
+                var res = ThemedMessageBox.Show(
+                    $"180Hz Setup Hub will now download and install v{AppUpdateService.Instance.LatestVersion} from GitHub.\n\nThe application will automatically restart once the update is applied.\n\nDo you want to proceed?",
+                    "Install 180Hz Setup Hub Update",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
 
-            if (res != MessageBoxResult.Yes) return;
+                if (res != MessageBoxResult.Yes) return;
 
-            await StartSelfUpdate();
+                await StartSelfUpdate();
+            }
+            catch (Exception ex)
+            {
+                ThemedMessageBox.Show($"Update error: {ex.Message}", "Update Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async void BtnForceAppUpdate_Click(object sender, RoutedEventArgs e)
         {
-            var res = ThemedMessageBox.Show(
-                "This will force download the latest executable from GitHub (main branch) and reinstall it, even if versions appear identical.\n\nThe application will restart automatically.\n\nDo you want to continue?",
-                "Force Sync from GitHub",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+            try
+            {
+                var res = ThemedMessageBox.Show(
+                    "This will force download the latest executable from GitHub (main branch) and reinstall it, even if versions appear identical.\n\nThe application will restart automatically.\n\nDo you want to continue?",
+                    "Force Sync from GitHub",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
 
-            if (res != MessageBoxResult.Yes) return;
+                if (res != MessageBoxResult.Yes) return;
 
-            await StartSelfUpdate();
+                await StartSelfUpdate();
+            }
+            catch (Exception ex)
+            {
+                ThemedMessageBox.Show($"Update error: {ex.Message}", "Update Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async Task StartSelfUpdate()
@@ -167,10 +192,21 @@ namespace SetupHub180Hz.Views
 
         private async void Refresh_Click(object sender, RoutedEventArgs e)
         {
-            SummaryText.Text = "Checking for updates via Winget…";
-            UpgradeAllButton.IsEnabled = false;
-            await UpdateMonitorService.Instance.RefreshAsync(force: true);
-            UpdateSummary();
+            try
+            {
+                SummaryText.Text = "Checking for updates via Winget…";
+                UpgradeAllButton.IsEnabled = false;
+                await UpdateMonitorService.Instance.RefreshAsync(force: true);
+                UpdateSummary();
+            }
+            catch (Exception ex)
+            {
+                SummaryText.Text = $"Update check notice: {ex.Message}";
+            }
+            finally
+            {
+                UpgradeAllButton.IsEnabled = UpdateMonitorService.Instance.UpgradableApps.Count > 0;
+            }
         }
 
         private void UpgradeAll_Click(object sender, RoutedEventArgs e)

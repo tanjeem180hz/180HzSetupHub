@@ -144,35 +144,57 @@ namespace SetupHub180Hz.Views
 
         private async void Rescan_Click(object sender, RoutedEventArgs e)
         {
-            SummaryText.Text = "Scanning…";
-            CleanSelectedButton.IsEnabled = false;
-            UpdateRamStats();
-            var targets = await _cleanup.ScanAsync(force: true);
-            UpdateDisplay(targets);
+            try
+            {
+                SummaryText.Text = "Scanning…";
+                CleanSelectedButton.IsEnabled = false;
+                UpdateRamStats();
+                var targets = await _cleanup.ScanAsync(force: true);
+                UpdateDisplay(targets);
+            }
+            catch (Exception ex)
+            {
+                SummaryText.Text = $"Scan notice: {ex.Message}";
+                ActivityLogger.Instance.Log($"Cleanup scan error: {ex.Message}", ActivityType.Warning);
+            }
+            finally
+            {
+                CleanSelectedButton.IsEnabled = true;
+            }
         }
 
         private async void QuickCleanRam_Click(object sender, RoutedEventArgs e)
         {
             if (QuickCleanRamButton == null) return;
 
-            QuickCleanRamButton.IsEnabled = false;
-            QuickCleanRamButton.Tag = "Clearing RAM…";
+            try
+            {
+                QuickCleanRamButton.IsEnabled = false;
+                QuickCleanRamButton.Tag = "Clearing RAM…";
 
-            long freed = await Task.Run(() => MemoryCleaner.CleanRam());
-            UpdateRamStats();
+                long freed = await Task.Run(() => MemoryCleaner.CleanRam());
+                UpdateRamStats();
 
-            string freedDisplay = FormatSize(freed);
-            QuickCleanRamButton.Tag = $"✓ {freedDisplay} Freed";
+                string freedDisplay = FormatSize(freed);
+                QuickCleanRamButton.Tag = $"✓ {freedDisplay} Freed";
 
-            ActivityLogger.Instance.Log($"RAM Cleaner: Purged cache & reclaimed {freedDisplay} physical memory.", ActivityType.Success);
-            NotificationService.Notify("RAM Cleaned", $"Successfully reclaimed {freedDisplay} physical memory & purged cache.");
+                ActivityLogger.Instance.Log($"RAM Cleaner: Purged cache & reclaimed {freedDisplay} physical memory.", ActivityType.Success);
+                NotificationService.Notify("RAM Cleaned", $"Successfully reclaimed {freedDisplay} physical memory & purged cache.");
 
-            // Refresh targets list so RAM Cache size reflects the clean state
-            _ = _cleanup.ScanAsync(force: true);
+                // Refresh targets list so RAM Cache size reflects the clean state
+                _ = _cleanup.ScanAsync(force: true);
 
-            await Task.Delay(2500);
-            QuickCleanRamButton.Tag = "Clean RAM";
-            QuickCleanRamButton.IsEnabled = true;
+                await Task.Delay(2500);
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"RAM Clean notice: {ex.Message}", ActivityType.Warning);
+            }
+            finally
+            {
+                QuickCleanRamButton.Tag = "Clean RAM";
+                QuickCleanRamButton.IsEnabled = true;
+            }
         }
 
         private async void CleanSelected_Click(object sender, RoutedEventArgs e)
@@ -180,21 +202,33 @@ namespace SetupHub180Hz.Views
             var selected = _rowMap.Where(kv => kv.Key.IsChecked == true).Select(kv => kv.Value).ToList();
             if (selected.Count == 0) return;
 
-            CleanSelectedButton.IsEnabled = false;
-            CleanSelectedButton.Tag = "Cleaning…";
+            try
+            {
+                CleanSelectedButton.IsEnabled = false;
+                CleanSelectedButton.Tag = "Cleaning…";
 
-            long freed = await _cleanup.CleanAllAsync(selected);
-            UpdateRamStats();
+                long freed = await _cleanup.CleanAllAsync(selected);
+                UpdateRamStats();
 
-            ActivityLogger.Instance.Log($"Cleanup freed {FormatSize(freed)} of storage & memory.", ActivityType.Success);
-            NotificationService.Notify("Cleanup Complete", $"Cleanup freed {FormatSize(freed)} of storage & memory.");
+                ActivityLogger.Instance.Log($"Cleanup freed {FormatSize(freed)} of storage & memory.", ActivityType.Success);
+                NotificationService.Notify("Cleanup Complete", $"Cleanup freed {FormatSize(freed)} of storage & memory.");
 
-            CleanSelectedButton.Tag = "Clean Selected";
-            CleanSelectedButton.IsEnabled = true;
+                CleanSelectedButton.Tag = "Clean Selected";
+                CleanSelectedButton.IsEnabled = true;
 
-            SummaryText.Text = "Updating sizes…";
-            var targets = await _cleanup.ScanAsync(force: true);
-            UpdateDisplay(targets);
+                SummaryText.Text = "Updating sizes…";
+                var targets = await _cleanup.ScanAsync(force: true);
+                UpdateDisplay(targets);
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Cleanup error: {ex.Message}", ActivityType.Warning);
+            }
+            finally
+            {
+                CleanSelectedButton.Tag = "Clean Selected";
+                CleanSelectedButton.IsEnabled = true;
+            }
         }
 
         private Border BuildRow(CleanupTarget target, bool isChecked = true)

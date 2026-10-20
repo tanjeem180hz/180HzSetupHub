@@ -82,7 +82,17 @@ namespace SetupHub180Hz.Views
 
         private async void BtnProceed_Click(object sender, RoutedEventArgs e)
         {
-            await StartExecutionAsync();
+            try
+            {
+                await StartExecutionAsync();
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Optimization execution notice: {ex.Message}", ActivityType.Warning);
+                BtnDialogClose.IsEnabled = true;
+                DialogResult = false;
+                Close();
+            }
         }
 
         private async Task StartExecutionAsync()

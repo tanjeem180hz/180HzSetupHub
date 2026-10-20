@@ -224,14 +224,26 @@ namespace SetupHub180Hz.Views
 
         private async void BtnProceedToUninstaller_Click(object sender, RoutedEventArgs e)
         {
-            BtnProceedToUninstaller.IsEnabled = false;
-            PrepProgressBar.Visibility = Visibility.Visible;
-            PrepProgressBar.IsIndeterminate = true;
+            try
+            {
+                BtnProceedToUninstaller.IsEnabled = false;
+                PrepProgressBar.Visibility = Visibility.Visible;
+                PrepProgressBar.IsIndeterminate = true;
 
-            await RunPhase1PreparationAsync();
+                await RunPhase1PreparationAsync();
 
-            SetStep(2);
-            await RunPhase2BuiltInUninstallerAsync();
+                SetStep(2);
+                await RunPhase2BuiltInUninstallerAsync();
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Phase 1 error: {ex.Message}", ActivityType.Warning);
+                SetStep(2);
+            }
+            finally
+            {
+                BtnProceedToUninstaller.IsEnabled = true;
+            }
         }
 
         #endregion
@@ -521,7 +533,14 @@ namespace SetupHub180Hz.Views
 
         private async void BtnRerunUninstaller_Click(object sender, RoutedEventArgs e)
         {
-            await RunPhase2BuiltInUninstallerAsync();
+            try
+            {
+                await RunPhase2BuiltInUninstallerAsync();
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Rerun uninstaller error: {ex.Message}", ActivityType.Warning);
+            }
         }
 
         private void BtnProceedToScanMode_Click(object sender, RoutedEventArgs e)
@@ -577,59 +596,68 @@ namespace SetupHub180Hz.Views
 
         private async void BtnStartScan_Click(object sender, RoutedEventArgs e)
         {
-            UpdateModeCardStyles();
-
-            BtnStartScan.IsEnabled = false;
-            ScanProgressPanel.Visibility = Visibility.Visible;
-            ScanStatusText.Text = $"Deep scanning with {_currentScanMode} mode across Windows registry and disk…";
-
-            ActivityLogger.Instance.Log($"Phase 3: Starting leftover scan ({_currentScanMode} mode) for {_app.Name}…", ActivityType.Info);
-
-            var leftovers = await _deepUninstall.ScanAsync(_app, _currentScanMode);
-
-            _registryViewModels.Clear();
-            _filesViewModels.Clear();
-
-            foreach (var item in leftovers)
+            try
             {
-                var vm = new LeftoverViewModel(item, _app.Name);
-                if (item.Type == LeftoverType.RegistryKey || item.Type == LeftoverType.RegistryValue)
+                UpdateModeCardStyles();
+
+                BtnStartScan.IsEnabled = false;
+                ScanProgressPanel.Visibility = Visibility.Visible;
+                ScanStatusText.Text = $"Deep scanning with {_currentScanMode} mode across Windows registry and disk…";
+
+                ActivityLogger.Instance.Log($"Phase 3: Starting leftover scan ({_currentScanMode} mode) for {_app.Name}…", ActivityType.Info);
+
+                var leftovers = await _deepUninstall.ScanAsync(_app, _currentScanMode);
+
+                _registryViewModels.Clear();
+                _filesViewModels.Clear();
+
+                foreach (var item in leftovers)
                 {
-                    vm.PropertyChanged += (_, _) => UpdateRegistryCounts();
-                    _registryViewModels.Add(vm);
+                    var vm = new LeftoverViewModel(item, _app.Name);
+                    if (item.Type == LeftoverType.RegistryKey || item.Type == LeftoverType.RegistryValue)
+                    {
+                        vm.PropertyChanged += (_, _) => UpdateRegistryCounts();
+                        _registryViewModels.Add(vm);
+                    }
+                    else
+                    {
+                        vm.PropertyChanged += (_, _) => UpdateFilesCounts();
+                        _filesViewModels.Add(vm);
+                    }
+                }
+
+                ScanProgressPanel.Visibility = Visibility.Collapsed;
+                BtnStartScan.IsEnabled = true;
+
+                // Transition to Phase 4 (Registry) or Phase 5 (Files) or Complete
+                if (_registryViewModels.Count > 0)
+                {
+                    RegistryCountText.Text = $"{_registryViewModels.Count} residual registry trace(s) detected.";
+                    RegistryEmptyText.Visibility = Visibility.Collapsed;
+                    SetStep(4);
+                    UpdateRegistryCounts();
+                }
+                else if (_filesViewModels.Count > 0)
+                {
+                    FilesCountText.Text = $"{_filesViewModels.Count} residual file(s) and folder(s) detected.";
+                    FilesEmptyText.Visibility = Visibility.Collapsed;
+                    SetStep(5);
+                    UpdateFilesCounts();
                 }
                 else
                 {
-                    vm.PropertyChanged += (_, _) => UpdateFilesCounts();
-                    _filesViewModels.Add(vm);
+                    // No leftovers detected! Finish cleanly!
+                    IsUninstalled = true;
+                    DeepUninstallService.RemoveRegistryUninstallKeys(_app);
+                    DeepUninstallService.RemoveShortcutsForApp(_app);
+                    ShowCompleteSummary();
                 }
             }
-
-            ScanProgressPanel.Visibility = Visibility.Collapsed;
-            BtnStartScan.IsEnabled = true;
-
-            // Transition to Phase 4 (Registry) or Phase 5 (Files) or Complete
-            if (_registryViewModels.Count > 0)
+            catch (Exception ex)
             {
-                RegistryCountText.Text = $"{_registryViewModels.Count} residual registry trace(s) detected.";
-                RegistryEmptyText.Visibility = Visibility.Collapsed;
-                SetStep(4);
-                UpdateRegistryCounts();
-            }
-            else if (_filesViewModels.Count > 0)
-            {
-                FilesCountText.Text = $"{_filesViewModels.Count} residual file(s) and folder(s) detected.";
-                FilesEmptyText.Visibility = Visibility.Collapsed;
-                SetStep(5);
-                UpdateFilesCounts();
-            }
-            else
-            {
-                // No leftovers detected! Finish cleanly!
-                IsUninstalled = true;
-                DeepUninstallService.RemoveRegistryUninstallKeys(_app);
-                DeepUninstallService.RemoveShortcutsForApp(_app);
-                ShowCompleteSummary();
+                ActivityLogger.Instance.Log($"Leftover scan notice: {ex.Message}", ActivityType.Warning);
+                ScanProgressPanel.Visibility = Visibility.Collapsed;
+                BtnStartScan.IsEnabled = true;
             }
         }
 
@@ -683,55 +711,64 @@ namespace SetupHub180Hz.Views
             var selected = _registryViewModels.Where(v => v.IsSelected && !v.IsDeleted).ToList();
             if (selected.Count == 0 || _isDeleting) return;
 
-            var confirm = MessageBox.Show(
-                $"Are you sure you want to permanently delete the {selected.Count} selected leftover registry key(s)?",
-                "Confirm Registry Removal — 180Hz Setup Hub",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-            if (confirm != MessageBoxResult.Yes) return;
-
-            _isDeleting = true;
-            WindowCloseBtn.IsEnabled = false;
-            RegistryActionsPanel.Visibility = Visibility.Collapsed;
-            RegistryProgressPanel.Visibility = Visibility.Visible;
-
-            int total = selected.Count;
-            RegistryProgressBar.Minimum = 0;
-            RegistryProgressBar.Maximum = 100;
-            RegistryProgressBar.Value = 0;
-
-            var progress = new Progress<LeftoverDeleteProgress>(p =>
+            try
             {
-                var vm = selected.FirstOrDefault(v => string.Equals(v.Path, p.Item.Path, StringComparison.OrdinalIgnoreCase));
-                if (vm != null)
+                var confirm = MessageBox.Show(
+                    $"Are you sure you want to permanently delete the {selected.Count} selected leftover registry key(s)?",
+                    "Confirm Registry Removal — 180Hz Setup Hub",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+                if (confirm != MessageBoxResult.Yes) return;
+
+                _isDeleting = true;
+                WindowCloseBtn.IsEnabled = false;
+                RegistryActionsPanel.Visibility = Visibility.Collapsed;
+                RegistryProgressPanel.Visibility = Visibility.Visible;
+
+                int total = selected.Count;
+                RegistryProgressBar.Minimum = 0;
+                RegistryProgressBar.Maximum = 100;
+                RegistryProgressBar.Value = 0;
+
+                var progress = new Progress<LeftoverDeleteProgress>(p =>
                 {
-                    vm.IsProcessing = false;
-                    vm.IsDeleted = p.Success;
-                    vm.IsFailed = !p.Success;
+                    var vm = selected.FirstOrDefault(v => string.Equals(v.Path, p.Item.Path, StringComparison.OrdinalIgnoreCase));
+                    if (vm != null)
+                    {
+                        vm.IsProcessing = false;
+                        vm.IsDeleted = p.Success;
+                        vm.IsFailed = !p.Success;
+                    }
+
+                    double pct = ((double)p.Current / p.Total) * 100.0;
+                    RegistryProgressBar.Value = pct;
+                    RegistryProgressStatusText.Text = $"Purging residual registry key {p.Current} of {p.Total}…";
+                });
+
+                var (deleted, failed) = await _deepUninstall.DeleteAsync(selected.Select(v => v.Item), progress);
+                _purgedRegistryCount += deleted;
+                IsUninstalled = true;
+
+                foreach (var vm in selected)
+                {
+                    if (vm.IsDeleted) vm.IsSelected = false;
                 }
 
-                double pct = ((double)p.Current / p.Total) * 100.0;
-                RegistryProgressBar.Value = pct;
-                RegistryProgressStatusText.Text = $"Purging residual registry key {p.Current} of {p.Total}…";
-            });
-
-            var (deleted, failed) = await _deepUninstall.DeleteAsync(selected.Select(v => v.Item), progress);
-            _purgedRegistryCount += deleted;
-            IsUninstalled = true;
-
-            foreach (var vm in selected)
-            {
-                if (vm.IsDeleted) vm.IsSelected = false;
+                RegistryProgressStatusText.Text = $"Eradicated {deleted} registry trace(s).";
+                await Task.Delay(400);
             }
-
-            RegistryProgressStatusText.Text = $"Eradicated {deleted} registry trace(s).";
-            await Task.Delay(400);
-
-            _isDeleting = false;
-            WindowCloseBtn.IsEnabled = true;
-            RegistryProgressPanel.Visibility = Visibility.Collapsed;
-            RegistryActionsPanel.Visibility = Visibility.Visible;
-            UpdateRegistryCounts();
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Registry delete notice: {ex.Message}", ActivityType.Warning);
+            }
+            finally
+            {
+                _isDeleting = false;
+                WindowCloseBtn.IsEnabled = true;
+                RegistryProgressPanel.Visibility = Visibility.Collapsed;
+                RegistryActionsPanel.Visibility = Visibility.Visible;
+                UpdateRegistryCounts();
+            }
         }
 
         private void BtnNextToFiles_Click(object sender, RoutedEventArgs e)
@@ -802,57 +839,66 @@ namespace SetupHub180Hz.Views
             var selected = _filesViewModels.Where(v => v.IsSelected && !v.IsDeleted).ToList();
             if (selected.Count == 0 || _isDeleting) return;
 
-            long totalBytes = selected.Sum(v => v.SizeBytes ?? 0);
-            var confirm = MessageBox.Show(
-                $"Are you sure you want to permanently delete the {selected.Count} selected leftover file(s) and folder(s)?\nTotal size: {FormatBytes(totalBytes)}",
-                "Confirm Leftovers Deletion — 180Hz Setup Hub",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-            if (confirm != MessageBoxResult.Yes) return;
-
-            _isDeleting = true;
-            WindowCloseBtn.IsEnabled = false;
-            FilesActionsPanel.Visibility = Visibility.Collapsed;
-            FilesProgressPanel.Visibility = Visibility.Visible;
-
-            int total = selected.Count;
-            FilesProgressBar.Minimum = 0;
-            FilesProgressBar.Maximum = 100;
-            FilesProgressBar.Value = 0;
-
-            var progress = new Progress<LeftoverDeleteProgress>(p =>
+            try
             {
-                var vm = selected.FirstOrDefault(v => string.Equals(v.Path, p.Item.Path, StringComparison.OrdinalIgnoreCase));
-                if (vm != null)
+                long totalBytes = selected.Sum(v => v.SizeBytes ?? 0);
+                var confirm = MessageBox.Show(
+                    $"Are you sure you want to permanently delete the {selected.Count} selected leftover file(s) and folder(s)?\nTotal size: {FormatBytes(totalBytes)}",
+                    "Confirm Leftovers Deletion — 180Hz Setup Hub",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+                if (confirm != MessageBoxResult.Yes) return;
+
+                _isDeleting = true;
+                WindowCloseBtn.IsEnabled = false;
+                FilesActionsPanel.Visibility = Visibility.Collapsed;
+                FilesProgressPanel.Visibility = Visibility.Visible;
+
+                int total = selected.Count;
+                FilesProgressBar.Minimum = 0;
+                FilesProgressBar.Maximum = 100;
+                FilesProgressBar.Value = 0;
+
+                var progress = new Progress<LeftoverDeleteProgress>(p =>
                 {
-                    vm.IsProcessing = false;
-                    vm.IsDeleted = p.Success;
-                    vm.IsFailed = !p.Success;
+                    var vm = selected.FirstOrDefault(v => string.Equals(v.Path, p.Item.Path, StringComparison.OrdinalIgnoreCase));
+                    if (vm != null)
+                    {
+                        vm.IsProcessing = false;
+                        vm.IsDeleted = p.Success;
+                        vm.IsFailed = !p.Success;
+                    }
+
+                    double pct = ((double)p.Current / p.Total) * 100.0;
+                    FilesProgressBar.Value = pct;
+                    FilesProgressStatusText.Text = $"Purging residual directory/file {p.Current} of {p.Total}…";
+                });
+
+                var (deleted, failed) = await _deepUninstall.DeleteAsync(selected.Select(v => v.Item), progress);
+                _purgedFilesCount += deleted;
+                _purgedBytes += selected.Where(v => v.IsDeleted).Sum(v => v.SizeBytes ?? 0);
+                IsUninstalled = true;
+
+                foreach (var vm in selected)
+                {
+                    if (vm.IsDeleted) vm.IsSelected = false;
                 }
 
-                double pct = ((double)p.Current / p.Total) * 100.0;
-                FilesProgressBar.Value = pct;
-                FilesProgressStatusText.Text = $"Purging residual directory/file {p.Current} of {p.Total}…";
-            });
-
-            var (deleted, failed) = await _deepUninstall.DeleteAsync(selected.Select(v => v.Item), progress);
-            _purgedFilesCount += deleted;
-            _purgedBytes += selected.Where(v => v.IsDeleted).Sum(v => v.SizeBytes ?? 0);
-            IsUninstalled = true;
-
-            foreach (var vm in selected)
-            {
-                if (vm.IsDeleted) vm.IsSelected = false;
+                FilesProgressStatusText.Text = $"Purged {deleted} residual directory/file trace(s).";
+                await Task.Delay(400);
             }
-
-            FilesProgressStatusText.Text = $"Purged {deleted} residual directory/file trace(s).";
-            await Task.Delay(400);
-
-            _isDeleting = false;
-            WindowCloseBtn.IsEnabled = true;
-            FilesProgressPanel.Visibility = Visibility.Collapsed;
-            FilesActionsPanel.Visibility = Visibility.Visible;
-            UpdateFilesCounts();
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Files delete notice: {ex.Message}", ActivityType.Warning);
+            }
+            finally
+            {
+                _isDeleting = false;
+                WindowCloseBtn.IsEnabled = true;
+                FilesProgressPanel.Visibility = Visibility.Collapsed;
+                FilesActionsPanel.Visibility = Visibility.Visible;
+                UpdateFilesCounts();
+            }
         }
 
         private void BtnFinishFiles_Click(object sender, RoutedEventArgs e)

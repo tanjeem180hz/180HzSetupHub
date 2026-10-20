@@ -301,65 +301,76 @@ namespace SetupHub180Hz.Views
         {
             if (BtnPermanentSafeguard == null || TxtPermanentSafeguardBtn == null) return;
 
-            bool isLocked = PermanenceService.Instance.IsPermanenceLocked();
-            if (isLocked)
+            try
             {
-                var viewChoice = ThemedMessageBox.Show(
-                    "🔒 PERMANENT BOOT SAFEGUARD IS ACTIVE!\n\n" +
-                    "Your system already has the 180Hz Boot Persistence Safeguard installed and running.\n\n" +
-                    "• CPU Core Unparking (100% min/max): Active\n" +
-                    "• Zero-Ping Network Heuristics: Active\n" +
-                    "• MMCSS GPU Priority 8: Active\n" +
-                    "• Survives Every Restart: Active\n\n" +
-                    "Would you like to open the Permanent Optimization Hub to review or customize tweaks?",
-                    "Boot Safeguard Active", MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-                if (viewChoice == MessageBoxResult.Yes)
+                bool isLocked = PermanenceService.Instance.IsPermanenceLocked();
+                if (isLocked)
                 {
-                    _mainWindow.GoToPage("Optimization");
+                    var viewChoice = ThemedMessageBox.Show(
+                        "🔒 PERMANENT BOOT SAFEGUARD IS ACTIVE!\n\n" +
+                        "Your system already has the 180Hz Boot Persistence Safeguard installed and running.\n\n" +
+                        "• CPU Core Unparking (100% min/max): Active\n" +
+                        "• Zero-Ping Network Heuristics: Active\n" +
+                        "• MMCSS GPU Priority 8: Active\n" +
+                        "• Survives Every Restart: Active\n\n" +
+                        "Would you like to open the Permanent Optimization Hub to review or customize tweaks?",
+                        "Boot Safeguard Active", MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+                    if (viewChoice == MessageBoxResult.Yes)
+                    {
+                        _mainWindow.GoToPage("Optimization");
+                    }
+                    return;
                 }
-                return;
+
+                var choice = ThemedMessageBox.Show(
+                    "🔒 LOCK PERMANENT SYSTEM OPTIMIZATIONS\n\n" +
+                    "This will deploy the 180Hz Boot Persistence Safeguard:\n\n" +
+                    "• Creates Windows Startup Scheduled Task '180Hz_Permanence_Guard' (Highest Privileges)\n" +
+                    "• Unparks 100% CPU cores & locks 0ms boost delay permanently on every boot\n" +
+                    "• Locks TCP Fast Open, RSS, Autotuning & Zero-Ping Heuristics permanently\n" +
+                    "• Sets MMCSS GPU Priority 8, Priority 6 & SystemResponsiveness 0%\n" +
+                    "• Locks BCD high precision tick & disables dynamic tick\n\n" +
+                    "Once locked, your PC will stay 100% optimized after every restart!\n\n" +
+                    "Lock permanent optimizations now?",
+                    "Lock Permanent Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (choice != MessageBoxResult.Yes) return;
+
+                BtnPermanentSafeguard.IsEnabled = false;
+                TxtPermanentSafeguardBtn.Text = "LOCKING PERMANENT...";
+
+                bool ok = await PermanenceService.Instance.DeployPermanentSafeguardAsync();
+
+                if (ok)
+                {
+                    ActivityLogger.Instance.Log("Permanent Boot Safeguard deployed from Dashboard.", ActivityType.Success);
+                    NotificationService.Notify("🔒 Permanent Optimization Locked!", "180Hz Boot Safeguard active. Unparked CPU cores, 0-ping network & GPU priorities locked across all future restarts.");
+
+                    TxtPermanentSafeguardBtn.Text = "✓ PERMANENTLY LOCKED";
+                    ThemedMessageBox.Show(
+                        "✓ PERMANENT SYSTEM OPTIMIZATION LOCKED!\n\n" +
+                        "The 180Hz Boot Persistence Safeguard is now active.\n\n" +
+                        "• All power, CPU unparking, network heuristics and scheduler settings are locked.\n" +
+                        "• The task executes automatically with highest privileges on every Windows startup.\n" +
+                        "• You do NOT need to apply optimizations again after restarting your PC!",
+                        "Permanent Safeguard Active", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    TxtPermanentSafeguardBtn.Text = "LOCK PERMANENT (SURVIVES REBOOT)";
+                }
             }
-
-            var choice = ThemedMessageBox.Show(
-                "🔒 LOCK PERMANENT SYSTEM OPTIMIZATIONS\n\n" +
-                "This will deploy the 180Hz Boot Persistence Safeguard:\n\n" +
-                "• Creates Windows Startup Scheduled Task '180Hz_Permanence_Guard' (Highest Privileges)\n" +
-                "• Unparks 100% CPU cores & locks 0ms boost delay permanently on every boot\n" +
-                "• Locks TCP Fast Open, RSS, Autotuning & Zero-Ping Heuristics permanently\n" +
-                "• Sets MMCSS GPU Priority 8, Priority 6 & SystemResponsiveness 0%\n" +
-                "• Locks BCD high precision tick & disables dynamic tick\n\n" +
-                "Once locked, your PC will stay 100% optimized after every restart!\n\n" +
-                "Lock permanent optimizations now?",
-                "Lock Permanent Optimizations", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (choice != MessageBoxResult.Yes) return;
-
-            BtnPermanentSafeguard.IsEnabled = false;
-            TxtPermanentSafeguardBtn.Text = "LOCKING PERMANENT...";
-
-            bool ok = await PermanenceService.Instance.DeployPermanentSafeguardAsync();
-
-            if (ok)
+            catch (Exception ex)
             {
-                ActivityLogger.Instance.Log("Permanent Boot Safeguard deployed from Dashboard.", ActivityType.Success);
-                NotificationService.Notify("🔒 Permanent Optimization Locked!", "180Hz Boot Safeguard active. Unparked CPU cores, 0-ping network & GPU priorities locked across all future restarts.");
-
-                TxtPermanentSafeguardBtn.Text = "✓ PERMANENTLY LOCKED";
-                ThemedMessageBox.Show(
-                    "✓ PERMANENT SYSTEM OPTIMIZATION LOCKED!\n\n" +
-                    "The 180Hz Boot Persistence Safeguard is now active.\n\n" +
-                    "• All power, CPU unparking, network heuristics and scheduler settings are locked.\n" +
-                    "• The task executes automatically with highest privileges on every Windows startup.\n" +
-                    "• You do NOT need to apply optimizations again after restarting your PC!",
-                    "Permanent Safeguard Active", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
+                ActivityLogger.Instance.Log($"Error locking permanent safeguard: {ex.Message}", ActivityType.Warning);
+                ThemedMessageBox.Show($"Could not lock permanent optimizations: {ex.Message}", "Safeguard Notice", MessageBoxButton.OK, MessageBoxImage.Warning);
                 TxtPermanentSafeguardBtn.Text = "LOCK PERMANENT (SURVIVES REBOOT)";
             }
-
-            BtnPermanentSafeguard.IsEnabled = true;
+            finally
+            {
+                BtnPermanentSafeguard.IsEnabled = true;
+            }
         }
 
         private void TileSetupApps_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("SetupApps");
@@ -380,30 +391,40 @@ namespace SetupHub180Hz.Views
                 SmoothScrollHelper.HandleMouseWheel(DashboardScrollViewer, e);
             }
         }
-            private async void BtnCleanRam_Click(object sender, RoutedEventArgs e)
+        private async void BtnCleanRam_Click(object sender, RoutedEventArgs e)
         {
             if (BtnCleanRam == null || TxtCleanRamBtn == null) return;
 
-            BtnCleanRam.IsEnabled = false;
-            TxtCleanRamBtn.Text = "CLEARING…";
+            try
+            {
+                BtnCleanRam.IsEnabled = false;
+                TxtCleanRamBtn.Text = "CLEARING…";
 
-            long freed = await Task.Run(() => MemoryCleaner.CleanRam());
+                long freed = await Task.Run(() => MemoryCleaner.CleanRam());
 
-            // Immediately refresh live stats gauge
-            _ = UpdateStatsAsync();
+                // Immediately refresh live stats gauge
+                _ = UpdateStatsAsync();
 
-            // Refresh CleanupService RAM target in background
-            CleanupService.Instance.StartBackgroundScan();
+                // Refresh CleanupService RAM target in background
+                CleanupService.Instance.StartBackgroundScan();
 
-            string freedDisplay = FormatBytes(freed);
-            TxtCleanRamBtn.Text = $"✓ {freedDisplay}";
+                string freedDisplay = FormatBytes(freed);
+                TxtCleanRamBtn.Text = $"✓ {freedDisplay}";
 
-            ActivityLogger.Instance.Log($"Maximum RAM Clear & Cache Purged: Reclaimed {freedDisplay} physical memory with peak performance tuning.", ActivityType.Success);
-            NotificationService.Notify("Maximum RAM & Cache Purged", $"Successfully freed {freedDisplay} RAM. System cache cleared & memory performance maximized.");
+                ActivityLogger.Instance.Log($"Maximum RAM Clear & Cache Purged: Reclaimed {freedDisplay} physical memory with peak performance tuning.", ActivityType.Success);
+                NotificationService.Notify("Maximum RAM & Cache Purged", $"Successfully freed {freedDisplay} RAM. System cache cleared & memory performance maximized.");
 
-            await Task.Delay(2500);
-            TxtCleanRamBtn.Text = "CLEAR";
-            BtnCleanRam.IsEnabled = true;
+                await Task.Delay(2500);
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"RAM Clear notice: {ex.Message}", ActivityType.Warning);
+            }
+            finally
+            {
+                TxtCleanRamBtn.Text = "CLEAR";
+                BtnCleanRam.IsEnabled = true;
+            }
         }
 
         private void BtnGoToCleanup_Click(object sender, RoutedEventArgs e) => _mainWindow.GoToPage("Cleanup");

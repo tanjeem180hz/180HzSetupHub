@@ -44,60 +44,68 @@ namespace SetupHub180Hz.Views
 
         private async Task LoadAsync()
         {
-            StatusText.Text = "Scanning installed applications…";
-            StatusText.Visibility = Visibility.Visible;
-            InstalledCountText.Text = "Scanning…";
-
-            _allApps = await _winget.GetInstalledAppsAsync();
-            var presetCatalog = await _catalog.GetAllAsync();
-
-            // Enrich all installed apps with exact registry details & session download history
-            var completedHistory = DownloadManagerService.Instance.CompletedHistory;
-            foreach (var app in _allApps)
+            try
             {
-                AppMetadataHelper.EnrichAppItem(app, presetCatalog);
+                StatusText.Text = "Scanning installed applications…";
+                StatusText.Visibility = Visibility.Visible;
+                InstalledCountText.Text = "Scanning…";
 
-                var completedInSession = completedHistory.FirstOrDefault(h =>
-                    string.Equals(h.App.Id, app.Id, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(h.App.Name, app.Name, StringComparison.OrdinalIgnoreCase));
-                if (completedInSession != null)
+                _allApps = await _winget.GetInstalledAppsAsync();
+                var presetCatalog = await _catalog.GetAllAsync();
+
+                // Enrich all installed apps with exact registry details & session download history
+                var completedHistory = DownloadManagerService.Instance.CompletedHistory;
+                foreach (var app in _allApps)
                 {
-                    app.InstallDate = completedInSession.CompletedAt;
-                }
-            }
+                    AppMetadataHelper.EnrichAppItem(app, presetCatalog);
 
-            InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
-            ApplyFilter();
-
-            // Background async icon extraction & website discovery in parallel
-            _ = Task.Run(async () =>
-            {
-                await Parallel.ForEachAsync(_allApps, new ParallelOptions { MaxDegreeOfParallelism = 2 }, async (app, ct) =>
-                {
-                    // If WebUrl is still missing, query winget metadata manifest in background
-                    if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id) && !app.Id.StartsWith("ARP\\", StringComparison.OrdinalIgnoreCase))
+                    var completedInSession = completedHistory.FirstOrDefault(h =>
+                        string.Equals(h.App.Id, app.Id, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(h.App.Name, app.Name, StringComparison.OrdinalIgnoreCase));
+                    if (completedInSession != null)
                     {
-                        var meta = await _winget.GetMetadataAsync(app.Id);
-                        if (meta?.BestLink != null)
+                        app.InstallDate = completedInSession.CompletedAt;
+                    }
+                }
+
+                InstalledCountText.Text = $"{_allApps.Count} Applications Installed";
+                ApplyFilter();
+
+                // Background async icon extraction & website discovery in parallel
+                _ = Task.Run(async () =>
+                {
+                    await Parallel.ForEachAsync(_allApps, new ParallelOptions { MaxDegreeOfParallelism = 2 }, async (app, ct) =>
+                    {
+                        // If WebUrl is still missing, query winget metadata manifest in background
+                        if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id) && !app.Id.StartsWith("ARP\\", StringComparison.OrdinalIgnoreCase))
                         {
-                            app.WebUrl = meta.BestLink;
-                            if (string.IsNullOrWhiteSpace(app.IconUrl))
+                            var meta = await _winget.GetMetadataAsync(app.Id);
+                            if (meta?.BestLink != null)
                             {
-                                app.IconUrl = IconCacheService.DeriveFaviconUrl(app.WebUrl) ?? "";
+                                app.WebUrl = meta.BestLink;
+                                if (string.IsNullOrWhiteSpace(app.IconUrl))
+                                {
+                                    app.IconUrl = IconCacheService.DeriveFaviconUrl(app.WebUrl) ?? "";
+                                }
                             }
                         }
-                    }
 
-                    if (app.IconImageSource == null && (!string.IsNullOrWhiteSpace(app.IconUrl) || !string.IsNullOrWhiteSpace(app.LocalIconPath)))
-                    {
-                        var img = await IconCacheService.GetImageAsync(app.IconUrl, app.LocalIconPath);
-                        if (img != null)
+                        if (app.IconImageSource == null && (!string.IsNullOrWhiteSpace(app.IconUrl) || !string.IsNullOrWhiteSpace(app.LocalIconPath)))
                         {
-                            await Dispatcher.InvokeAsync(() => app.IconImageSource = img);
+                            var img = await IconCacheService.GetImageAsync(app.IconUrl, app.LocalIconPath);
+                            if (img != null)
+                            {
+                                await Dispatcher.InvokeAsync(() => app.IconImageSource = img);
+                            }
                         }
-                    }
+                    });
                 });
-            });
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = $"Notice: {ex.Message}";
+                ActivityLogger.Instance.Log($"Uninstaller scan notice: {ex.Message}", ActivityType.Warning);
+            }
         }
 
         private async void Refresh_Click(object sender, RoutedEventArgs e) => await LoadAsync();

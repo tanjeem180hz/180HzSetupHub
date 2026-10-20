@@ -88,17 +88,19 @@ namespace SetupHub180Hz.Services
             }
             catch { }
 
-            // 3. Disk Space (C:)
+            // 3. Disk Space (System Drive)
             double diskFreeGb = 0.0;
             double diskTotalGb = 0.0;
             double diskPercent = 0.0;
             try
             {
-                var cDrive = DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady && d.Name.StartsWith("C", StringComparison.OrdinalIgnoreCase));
-                if (cDrive != null)
+                string sysRoot = Path.GetPathRoot(Environment.SystemDirectory) ?? "C:\\";
+                var sysDrive = DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady && string.Equals(d.Name, sysRoot, StringComparison.OrdinalIgnoreCase))
+                               ?? DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady && d.DriveType == DriveType.Fixed);
+                if (sysDrive != null)
                 {
-                    diskTotalGb = Math.Round((double)cDrive.TotalSize / (1024 * 1024 * 1024), 1);
-                    diskFreeGb = Math.Round((double)cDrive.AvailableFreeSpace / (1024 * 1024 * 1024), 1);
+                    diskTotalGb = Math.Round((double)sysDrive.TotalSize / (1024 * 1024 * 1024), 1);
+                    diskFreeGb = Math.Round((double)sysDrive.AvailableFreeSpace / (1024 * 1024 * 1024), 1);
                     double diskUsedGb = diskTotalGb - diskFreeGb;
                     diskPercent = diskTotalGb > 0 ? Math.Round((diskUsedGb / diskTotalGb) * 100.0, 1) : 0.0;
                 }

@@ -837,7 +837,7 @@ namespace SetupHub180Hz.Views
                     else
                     {
                         // It's an online Winget package! Display it directly in the main list ready to install!
-                        DisplaySingleOrOnlinePackage(selected);
+                        _ = DisplaySingleOrOnlinePackageAsync(selected);
                     }
                 }
                 finally
@@ -847,25 +847,32 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private async void DisplaySingleOrOnlinePackage(AppItem app)
+        private async Task DisplaySingleOrOnlinePackageAsync(AppItem app)
         {
-            AppMetadataHelper.EnrichAppItem(app, _allPackages);
-            var list = new List<AppItem> { app };
-            await _catalog.CheckInstalledStatusAsync(_winget, list);
-
-            CatalogCountText.Text = $"1 Online Package Ready for '{app.Name}'";
-            StatusText.Visibility = Visibility.Collapsed;
-            AppsListBox.ItemsSource = list;
-            ResetAppsListScrollToTop();
-
-            // Load icon
-            if (app.IconImageSource == null && (!string.IsNullOrWhiteSpace(app.IconUrl) || !string.IsNullOrWhiteSpace(app.LocalIconPath)))
+            try
             {
-                var img = await IconCacheService.GetImageAsync(app.IconUrl, app.LocalIconPath);
-                if (img != null)
+                AppMetadataHelper.EnrichAppItem(app, _allPackages);
+                var list = new List<AppItem> { app };
+                await _catalog.CheckInstalledStatusAsync(_winget, list);
+
+                CatalogCountText.Text = $"1 Online Package Ready for '{app.Name}'";
+                StatusText.Visibility = Visibility.Collapsed;
+                AppsListBox.ItemsSource = list;
+                ResetAppsListScrollToTop();
+
+                // Load icon
+                if (app.IconImageSource == null && (!string.IsNullOrWhiteSpace(app.IconUrl) || !string.IsNullOrWhiteSpace(app.LocalIconPath)))
                 {
-                    app.IconImageSource = img;
+                    var img = await IconCacheService.GetImageAsync(app.IconUrl, app.LocalIconPath);
+                    if (img != null)
+                    {
+                        app.IconImageSource = img;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error displaying online package: {ex.Message}");
             }
         }
 

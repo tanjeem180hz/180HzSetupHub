@@ -1992,33 +1992,37 @@ namespace SetupHub180Hz.Services
                     }
                     catch
                     {
-                        // In-process failed due to UAC permissions: fallback to elevated reg.exe delete!
-                        var regPsi = new System.Diagnostics.ProcessStartInfo
+                        try
                         {
-                            FileName = "reg.exe",
-                            Arguments = $"delete \"{fullPath}\" /f",
-                            UseShellExecute = true,
-                            Verb = "runas",
-                            WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-                        };
-                        using var p = System.Diagnostics.Process.Start(regPsi);
-                        p?.WaitForExit(3000);
-                        deleted = p != null && p.ExitCode == 0;
-
-                        if (!deleted && (fullPath.Contains("WOW6432Node", StringComparison.OrdinalIgnoreCase) || Environment.Is64BitOperatingSystem))
-                        {
-                            var regPsi32 = new System.Diagnostics.ProcessStartInfo
+                            // In-process failed due to UAC permissions: fallback to elevated reg.exe delete!
+                            var regPsi = new System.Diagnostics.ProcessStartInfo
                             {
                                 FileName = "reg.exe",
-                                Arguments = $"delete \"{fullPath}\" /f /reg:32",
+                                Arguments = $"delete \"{fullPath}\" /f",
                                 UseShellExecute = true,
                                 Verb = "runas",
                                 WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
                             };
-                            using var p32 = System.Diagnostics.Process.Start(regPsi32);
-                            p32?.WaitForExit(3000);
-                            deleted = p32 != null && p32.ExitCode == 0;
+                            using var p = System.Diagnostics.Process.Start(regPsi);
+                            p?.WaitForExit(3000);
+                            deleted = p != null && p.ExitCode == 0;
+
+                            if (!deleted && (fullPath.Contains("WOW6432Node", StringComparison.OrdinalIgnoreCase) || Environment.Is64BitOperatingSystem))
+                            {
+                                var regPsi32 = new System.Diagnostics.ProcessStartInfo
+                                {
+                                    FileName = "reg.exe",
+                                    Arguments = $"delete \"{fullPath}\" /f /reg:32",
+                                    UseShellExecute = true,
+                                    Verb = "runas",
+                                    WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                                };
+                                using var p32 = System.Diagnostics.Process.Start(regPsi32);
+                                p32?.WaitForExit(3000);
+                                deleted = p32 != null && p32.ExitCode == 0;
+                            }
                         }
+                        catch { }
                     }
 
                     return deleted;
@@ -2091,32 +2095,36 @@ namespace SetupHub180Hz.Services
                     }
                     catch
                     {
-                        var regPsi = new System.Diagnostics.ProcessStartInfo
+                        try
                         {
-                            FileName = "reg.exe",
-                            Arguments = $"delete \"{fullKeyPath}\" /v \"{valueName}\" /f",
-                            UseShellExecute = true,
-                            Verb = "runas",
-                            WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-                        };
-                        using var p = System.Diagnostics.Process.Start(regPsi);
-                        p?.WaitForExit(3000);
-                        deleted = p != null && p.ExitCode == 0;
-
-                        if (!deleted && (fullKeyPath.Contains("WOW6432Node", StringComparison.OrdinalIgnoreCase) || Environment.Is64BitOperatingSystem))
-                        {
-                            var regPsi32 = new System.Diagnostics.ProcessStartInfo
+                            var regPsi = new System.Diagnostics.ProcessStartInfo
                             {
                                 FileName = "reg.exe",
-                                Arguments = $"delete \"{fullKeyPath}\" /v \"{valueName}\" /f /reg:32",
+                                Arguments = $"delete \"{fullKeyPath}\" /v \"{valueName}\" /f",
                                 UseShellExecute = true,
                                 Verb = "runas",
                                 WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
                             };
-                            using var p32 = System.Diagnostics.Process.Start(regPsi32);
-                            p32?.WaitForExit(3000);
-                            deleted = p32 != null && p32.ExitCode == 0;
+                            using var p = System.Diagnostics.Process.Start(regPsi);
+                            p?.WaitForExit(3000);
+                            deleted = p != null && p.ExitCode == 0;
+
+                            if (!deleted && (fullKeyPath.Contains("WOW6432Node", StringComparison.OrdinalIgnoreCase) || Environment.Is64BitOperatingSystem))
+                            {
+                                var regPsi32 = new System.Diagnostics.ProcessStartInfo
+                                {
+                                    FileName = "reg.exe",
+                                    Arguments = $"delete \"{fullKeyPath}\" /v \"{valueName}\" /f /reg:32",
+                                    UseShellExecute = true,
+                                    Verb = "runas",
+                                    WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                                };
+                                using var p32 = System.Diagnostics.Process.Start(regPsi32);
+                                p32?.WaitForExit(3000);
+                                deleted = p32 != null && p32.ExitCode == 0;
+                            }
                         }
+                        catch { }
                     }
 
                     return deleted;

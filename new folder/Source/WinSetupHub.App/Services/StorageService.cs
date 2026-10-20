@@ -23,11 +23,15 @@ namespace SetupHub180Hz.Services
 
         public void OpenInExplorer()
         {
-            Process.Start(new ProcessStartInfo
+            try
             {
-                FileName = AppDataFolder,
-                UseShellExecute = true
-            });
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = AppDataFolder,
+                    UseShellExecute = true
+                });
+            }
+            catch { }
         }
 
         public long GetFolderSizeBytes()

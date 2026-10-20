@@ -102,108 +102,121 @@ namespace SetupHub180Hz.Views
             var selectedVms = _viewModels.Where(v => v.IsSelected).ToList();
             if (selectedVms.Count == 0 || _isDeleting) return;
 
-            _isDeleting = true;
-
-            // Lock header and toolbar buttons
-            DialogCloseButton.IsEnabled = false;
-            SelectAllBtn.IsEnabled = false;
-            DeselectAllBtn.IsEnabled = false;
-
-            // Transition from action buttons to inline progress panel (No popups!)
-            FooterActionsPanel.Visibility = Visibility.Collapsed;
-            FooterProgressPanel.Visibility = Visibility.Visible;
-
-            int total = selectedVms.Count;
-            PurgeProgressBar.Minimum = 0;
-            PurgeProgressBar.Maximum = 100;
-            PurgeProgressBar.Value = 0;
-            ProgressPercentText.Text = "0%";
-            ProgressStatusText.Text = $"Purging residual traces (0 of {total})…";
-            CurrentTracePathText.Text = "Initializing deep clean engine…";
-
-            var progress = new Progress<LeftoverDeleteProgress>(p =>
+            try
             {
-                // Find matching viewmodel and mark state
-                var vm = selectedVms.FirstOrDefault(v => string.Equals(v.Path, p.Item.Path, StringComparison.OrdinalIgnoreCase));
-                if (vm != null)
+                _isDeleting = true;
+
+                // Lock header and toolbar buttons
+                DialogCloseButton.IsEnabled = false;
+                SelectAllBtn.IsEnabled = false;
+                DeselectAllBtn.IsEnabled = false;
+
+                // Transition from action buttons to inline progress panel (No popups!)
+                FooterActionsPanel.Visibility = Visibility.Collapsed;
+                FooterProgressPanel.Visibility = Visibility.Visible;
+
+                int total = selectedVms.Count;
+                PurgeProgressBar.Minimum = 0;
+                PurgeProgressBar.Maximum = 100;
+                PurgeProgressBar.Value = 0;
+                ProgressPercentText.Text = "0%";
+                ProgressStatusText.Text = $"Purging residual traces (0 of {total})…";
+                CurrentTracePathText.Text = "Initializing deep clean engine…";
+
+                var progress = new Progress<LeftoverDeleteProgress>(p =>
                 {
-                    vm.IsProcessing = false;
-                    vm.IsDeleted = p.Success;
-                    vm.IsFailed = !p.Success;
-                    try
+                    // Find matching viewmodel and mark state
+                    var vm = selectedVms.FirstOrDefault(v => string.Equals(v.Path, p.Item.Path, StringComparison.OrdinalIgnoreCase));
+                    if (vm != null)
                     {
-                        LeftoversListBox.ScrollIntoView(vm);
+                        vm.IsProcessing = false;
+                        vm.IsDeleted = p.Success;
+                        vm.IsFailed = !p.Success;
+                        try
+                        {
+                            LeftoversListBox.ScrollIntoView(vm);
+                        }
+                        catch { }
                     }
-                    catch { }
+
+                    // Smoothly animate progress bar to target percentage (0% -> 100%)
+                    double targetPercent = ((double)p.Current / p.Total) * 100.0;
+                    var anim = new DoubleAnimation
+                    {
+                        To = targetPercent,
+                        Duration = TimeSpan.FromMilliseconds(160),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    PurgeProgressBar.BeginAnimation(RangeBase.ValueProperty, anim);
+
+                    ProgressPercentText.Text = $"{(int)targetPercent}%";
+                    ProgressStatusText.Text = $"Purging residual trace {p.Current} of {p.Total}…";
+                    CurrentTracePathText.Text = p.Item.Path;
+                });
+
+                // Mark first item as processing
+                if (selectedVms.Count > 0)
+                {
+                    selectedVms[0].IsProcessing = true;
                 }
 
-                // Smoothly animate progress bar to target percentage (0% -> 100%)
-                double targetPercent = ((double)p.Current / p.Total) * 100.0;
-                var anim = new DoubleAnimation
+                var (deleted, failed) = await _deepUninstall.DeleteAsync(selectedVms.Select(v => v.Item), progress);
+
+                // Final 100% animation and success state
+                var finalAnim = new DoubleAnimation
                 {
-                    To = targetPercent,
-                    Duration = TimeSpan.FromMilliseconds(160),
+                    To = 100,
+                    Duration = TimeSpan.FromMilliseconds(200),
                     EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
                 };
-                PurgeProgressBar.BeginAnimation(RangeBase.ValueProperty, anim);
+                PurgeProgressBar.BeginAnimation(RangeBase.ValueProperty, finalAnim);
 
-                ProgressPercentText.Text = $"{(int)targetPercent}%";
-                ProgressStatusText.Text = $"Purging residual trace {p.Current} of {p.Total}…";
-                CurrentTracePathText.Text = p.Item.Path;
-            });
+                ProgressPercentText.Text = "100%";
+                ProgressIconText.Text = "✓";
 
-            // Mark first item as processing
-            if (selectedVms.Count > 0)
-            {
-                selectedVms[0].IsProcessing = true;
+                var successBrush = (Brush)FindResource("BrushSuccess");
+                ProgressIconText.Foreground = successBrush;
+                ProgressPercentText.Foreground = successBrush;
+                PurgeProgressBar.Foreground = successBrush;
+
+                ProgressStatusText.Text = failed == 0
+                    ? $"Deep Clean Completed! {deleted} residual trace(s) eradicated."
+                    : $"Deep Clean Finished! Removed {deleted} item(s), skipped {failed}.";
+
+                CurrentTracePathText.Text = "Residual traces successfully purged from Windows. Auto-closing…";
+
+                // Non-intrusive notification (No MessageBox popup!)
+                NotificationService.Notify(
+                    "Leftovers Cleaned",
+                    $"Permanently eradicated {deleted} residual trace(s) for {_app.Name}.");
+
+                // Smooth fade-out and auto-close
+                await Task.Delay(900);
+
+                var fadeOut = new DoubleAnimation
+                {
+                    From = 1.0,
+                    To = 0.0,
+                    Duration = TimeSpan.FromMilliseconds(250),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                fadeOut.Completed += (_, _) =>
+                {
+                    _isDeleting = false;
+                    Close();
+                };
+                BeginAnimation(OpacityProperty, fadeOut);
             }
-
-            var (deleted, failed) = await _deepUninstall.DeleteAsync(selectedVms.Select(v => v.Item), progress);
-
-            // Final 100% animation and success state
-            var finalAnim = new DoubleAnimation
+            catch (Exception ex)
             {
-                To = 100,
-                Duration = TimeSpan.FromMilliseconds(200),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-            };
-            PurgeProgressBar.BeginAnimation(RangeBase.ValueProperty, finalAnim);
-
-            ProgressPercentText.Text = "100%";
-            ProgressIconText.Text = "✓";
-
-            var successBrush = (Brush)FindResource("BrushSuccess");
-            ProgressIconText.Foreground = successBrush;
-            ProgressPercentText.Foreground = successBrush;
-            PurgeProgressBar.Foreground = successBrush;
-
-            ProgressStatusText.Text = failed == 0
-                ? $"Deep Clean Completed! {deleted} residual trace(s) eradicated."
-                : $"Deep Clean Finished! Removed {deleted} item(s), skipped {failed}.";
-
-            CurrentTracePathText.Text = "Residual traces successfully purged from Windows. Auto-closing…";
-
-            // Non-intrusive notification (No MessageBox popup!)
-            NotificationService.Notify(
-                "Leftovers Cleaned",
-                $"Permanently eradicated {deleted} residual trace(s) for {_app.Name}.");
-
-            // Smooth fade-out and auto-close
-            await Task.Delay(900);
-
-            var fadeOut = new DoubleAnimation
-            {
-                From = 1.0,
-                To = 0.0,
-                Duration = TimeSpan.FromMilliseconds(250),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-            };
-            fadeOut.Completed += (_, _) =>
-            {
+                ActivityLogger.Instance.Log($"Leftover cleanup error: {ex.Message}", ActivityType.Warning);
                 _isDeleting = false;
-                Close();
-            };
-            BeginAnimation(OpacityProperty, fadeOut);
+                DialogCloseButton.IsEnabled = true;
+                SelectAllBtn.IsEnabled = true;
+                DeselectAllBtn.IsEnabled = true;
+                FooterActionsPanel.Visibility = Visibility.Visible;
+                FooterProgressPanel.Visibility = Visibility.Collapsed;
+            }
         }
     }
 }

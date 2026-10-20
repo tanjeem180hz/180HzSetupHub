@@ -1783,9 +1783,10 @@ namespace SetupHub180Hz.Services
             if (string.IsNullOrWhiteSpace(path)) return (null, "");
 
             // Strip PowerShell provider prefix if present: "Registry::" or "Microsoft.PowerShell.Core\Registry::"
-            if (path.Contains("::"))
+            int doubleColonIdx = path.IndexOf("::", StringComparison.Ordinal);
+            if (doubleColonIdx >= 0)
             {
-                path = path.Substring(path.IndexOf("::") + 2);
+                path = path.Substring(doubleColonIdx + 2);
             }
 
             path = path.Replace("/", "\\").Trim('\\');
