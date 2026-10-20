@@ -7985,5 +7985,222 @@
         "undoScript":  [
                            "Write-Host \u0027System integrity verification is a maintenance diagnostic action; no undo needed.\u0027 -ForegroundColor Gray"
                        ]
+    },
+    {
+        "id":  "EmulTweakBlueStacksMsiPlayerOverdrive",
+        "name":  "BlueStacks 5 \u0026 MSI App Player Ultra-Performance Priority Engine",
+        "category":  "Emulator 100% Performance",
+        "categoryOrder":  7,
+        "description":  "Configures BlueStacks 5 and MSI App Player core engines (HD-Player.exe, HD-Agent.exe, BstkSVC.exe) with High CPU priority class, High I/O throughput, and forces discrete GPU rendering for stable 120/180/240 FPS in Free Fire, PUBG Mobile, and COD Mobile.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "registry":  [
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Player.exe\\PerfOptions",
+                             "name":  "CpuPriorityClass",
+                             "type":  "DWord",
+                             "value":  "3",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         },
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Player.exe\\PerfOptions",
+                             "name":  "IoPriority",
+                             "type":  "DWord",
+                             "value":  "3",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         },
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Agent.exe\\PerfOptions",
+                             "name":  "CpuPriorityClass",
+                             "type":  "DWord",
+                             "value":  "3",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         },
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\HD-Agent.exe\\PerfOptions",
+                             "name":  "IoPriority",
+                             "type":  "DWord",
+                             "value":  "3",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         },
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\BstkSVC.exe\\PerfOptions",
+                             "name":  "CpuPriorityClass",
+                             "type":  "DWord",
+                             "value":  "3",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         },
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\BstkSVC.exe\\PerfOptions",
+                             "name":  "IoPriority",
+                             "type":  "DWord",
+                             "value":  "3",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         }
+                     ]
+    },
+    {
+        "id":  "EmulTweakDirectXAngleTexturePacing",
+        "name":  "Android Emulator DirectX ANGLE \u0026 ASTC Hardware Acceleration",
+        "category":  "Emulator 100% Performance",
+        "categoryOrder":  7,
+        "description":  "Enforces direct hardware swapchain presentation for ANGLE DirectX/Vulkan translation layers in BlueStacks, MSI App Player, and LDPlayer, eliminating texture stutter and screen tearing.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "registry":  [
+                         {
+                             "path":  "HKCU\\Software\\Microsoft\\Direct3D",
+                             "name":  "Direct3D11FastPresentation",
+                             "type":  "DWord",
+                             "value":  "1",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         },
+                         {
+                             "path":  "HKCU\\Software\\Microsoft\\Direct3D",
+                             "name":  "Direct3D12FastPresentation",
+                             "type":  "DWord",
+                             "value":  "1",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         }
+                     ]
+    },
+    {
+        "id":  "NetTweakEsportsPingStabilizerECN",
+        "name":  "Esports Ping Stabilizer \u0026 Zero Packet Loss Buffer (ECN + CTCP)",
+        "category":  "Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  5,
+        "description":  "Enables Explicit Congestion Notification (ECN) to prevent router packet bufferbloat, and tunes TCP packet pacing for rock-solid low ping in Valorant, CS2, Fortnite, Apex, and mobile online games.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "invokeScript":  [
+                             "netsh int tcp set global ecncapability=enabled; netsh int tcp set global autotuninglevel=normal; netsh int tcp set global rss=enabled; netsh int ip set global taskoffload=enabled"
+                         ],
+        "undoScript":  [
+                           "netsh int tcp set global ecncapability=default; netsh int tcp set global autotuninglevel=normal"
+                       ]
+    },
+    {
+        "id":  "NetTweakAfdFastSocketPacing",
+        "name":  "AFD High-Speed Network Socket Buffer Expansion (Zero Jitter)",
+        "category":  "Network, TCP \u0026 Ultra-Low Ping",
+        "categoryOrder":  5,
+        "description":  "Expands Windows Ancillary Function Driver (AFD) socket buffers for gaming network adapters, preventing micro packet drops and buffer overflows during intense multiplayer firefights.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "registry":  [
+                         {
+                             "path":  "HKLM\\SYSTEM\\CurrentControlSet\\Services\\Afd\\Parameters",
+                             "name":  "DefaultReceiveWindow",
+                             "type":  "DWord",
+                             "value":  "65536",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         },
+                         {
+                             "path":  "HKLM\\SYSTEM\\CurrentControlSet\\Services\\Afd\\Parameters",
+                             "name":  "DefaultSendWindow",
+                             "type":  "DWord",
+                             "value":  "65536",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         },
+                         {
+                             "path":  "HKLM\\SYSTEM\\CurrentControlSet\\Services\\Afd\\Parameters",
+                             "name":  "FastSendDatagramThreshold",
+                             "type":  "DWord",
+                             "value":  "1024",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         },
+                         {
+                             "path":  "HKLM\\SYSTEM\\CurrentControlSet\\Services\\Afd\\Parameters",
+                             "name":  "FastCopyReceiveThreshold",
+                             "type":  "DWord",
+                             "value":  "1024",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         }
+                     ]
+    },
+    {
+        "id":  "GameTweakContinuousSmoothnessEngine",
+        "name":  "Continuous System Smoothness \u0026 Zero Desktop Stutter (0ms Menu Delay)",
+        "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
+        "categoryOrder":  1,
+        "description":  "Eliminates Windows Explorer animation lag, reduces menu display delay to 0ms, and bypasses desktop compositing friction so that the PC feels super smooth, fluid, and responsive during daily tasks and gaming.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "registry":  [
+                         {
+                             "path":  "HKCU\\Control Panel\\Desktop",
+                             "name":  "MenuShowDelay",
+                             "type":  "String",
+                             "value":  "0",
+                             "originalValue":  "400"
+                         },
+                         {
+                             "path":  "HKCU\\Control Panel\\Desktop",
+                             "name":  "MinAnimate",
+                             "type":  "String",
+                             "value":  "0",
+                             "originalValue":  "1"
+                         },
+                         {
+                             "path":  "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                             "name":  "TaskbarAnimations",
+                             "type":  "DWord",
+                             "value":  "0",
+                             "originalValue":  "1"
+                         },
+                         {
+                             "path":  "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+                             "name":  "ExtendedUIHoverTime",
+                             "type":  "DWord",
+                             "value":  "1",
+                             "originalValue":  "\u003cRemoveEntry\u003e"
+                         }
+                     ]
+    },
+    {
+        "id":  "GameTweakPeakGamingThreadDirector",
+        "name":  "All-Time Peak Gaming Thread Scheduling (Zero Background Interruption)",
+        "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
+        "categoryOrder":  1,
+        "description":  "Locks Windows Multimedia Class Scheduler (MMCSS) games task profile to maximum priority (GPU Priority 8, CPU Priority 6, Scheduling High, SFIO High), guaranteeing uninterrupted peak hardware performance for any PC or mobile game.",
+        "isRecommended":  true,
+        "isAdvanced":  false,
+        "registry":  [
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "name":  "GPU Priority",
+                             "type":  "DWord",
+                             "value":  "8",
+                             "originalValue":  "8"
+                         },
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "name":  "Priority",
+                             "type":  "DWord",
+                             "value":  "6",
+                             "originalValue":  "2"
+                         },
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "name":  "Scheduling Category",
+                             "type":  "String",
+                             "value":  "High",
+                             "originalValue":  "Medium"
+                         },
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "name":  "SFIO Priority",
+                             "type":  "String",
+                             "value":  "High",
+                             "originalValue":  "Normal"
+                         },
+                         {
+                             "path":  "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+                             "name":  "Background Only",
+                             "type":  "String",
+                             "value":  "False",
+                             "originalValue":  "False"
+                         }
+                     ]
     }
 ]

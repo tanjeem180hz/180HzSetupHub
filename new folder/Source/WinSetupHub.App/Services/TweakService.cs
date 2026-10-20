@@ -354,7 +354,15 @@ namespace SetupHub180Hz.Services
             "SysTweakInstantFreezeRecovery",
             "SysTweakLowLevelHooksNoHang",
             "GfxTweakSmoothFramePacingDXGI",
-            "SysTweakAutoHealthRepairEngine"
+            "SysTweakAutoHealthRepairEngine",
+
+            // 🚀 BlueStacks/MSI Player & Super Smoothness & Ping Stabilizers
+            "EmulTweakBlueStacksMsiPlayerOverdrive",
+            "EmulTweakDirectXAngleTexturePacing",
+            "NetTweakEsportsPingStabilizerECN",
+            "NetTweakAfdFastSocketPacing",
+            "GameTweakContinuousSmoothnessEngine",
+            "GameTweakPeakGamingThreadDirector"
         };
 
         // Extreme Performance Preset - forces 100% PC Performance & Ultra-Low Latency
@@ -669,7 +677,15 @@ namespace SetupHub180Hz.Services
             "SysTweakInstantFreezeRecovery",
             "SysTweakLowLevelHooksNoHang",
             "GfxTweakSmoothFramePacingDXGI",
-            "SysTweakAutoHealthRepairEngine"
+            "SysTweakAutoHealthRepairEngine",
+
+            // 🚀 BlueStacks/MSI Player & Super Smoothness & Ping Stabilizers
+            "EmulTweakBlueStacksMsiPlayerOverdrive",
+            "EmulTweakDirectXAngleTexturePacing",
+            "NetTweakEsportsPingStabilizerECN",
+            "NetTweakAfdFastSocketPacing",
+            "GameTweakContinuousSmoothnessEngine",
+            "GameTweakPeakGamingThreadDirector"
         };
 
         private List<TweakItem>? _cache;
