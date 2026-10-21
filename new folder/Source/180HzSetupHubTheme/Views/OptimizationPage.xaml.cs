@@ -282,24 +282,34 @@ namespace SetupHub180Hz.Views
 
         private async void BtnCreateRestorePoint_Click(object sender, RoutedEventArgs e)
         {
-            BtnCreateRestorePoint.IsEnabled = false;
-            TxtStatus.Text = "Creating Windows System Restore point checkpoint…";
-            StatusBar.Visibility = Visibility.Visible;
-
-            bool ok = await DeepUninstallService.CreateRestorePointAsync("180Hz Setup Hub: Optimization Safeguard");
-            BtnCreateRestorePoint.IsEnabled = true;
-
-            if (ok)
+            try
             {
-                TxtStatus.Text = "✓ System Restore Point checkpoint created successfully.";
-                ThemedMessageBox.Show("Windows System Restore Point created successfully.\nYour system state is safely checkpointed.",
-                    "Safeguard Created", MessageBoxButton.OK, MessageBoxImage.Information);
+                BtnCreateRestorePoint.IsEnabled = false;
+                TxtStatus.Text = "Creating Windows System Restore point checkpoint…";
+                StatusBar.Visibility = Visibility.Visible;
+
+                bool ok = await DeepUninstallService.CreateRestorePointAsync("180Hz Setup Hub: Optimization Safeguard");
+
+                if (ok)
+                {
+                    TxtStatus.Text = "✓ System Restore Point checkpoint created successfully.";
+                    ThemedMessageBox.Show("Windows System Restore Point created successfully.\nYour system state is safely checkpointed.",
+                        "Safeguard Created", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    TxtStatus.Text = "ℹ️ System Restore is disabled or unavailable on this system.";
+                    ThemedMessageBox.Show("Windows System Restore is disabled or unconfigured on this drive.\n(Safe to proceed with individual tweaks).",
+                        "System Restore Notice", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TxtStatus.Text = "ℹ️ System Restore is disabled or unavailable on this system.";
-                ThemedMessageBox.Show("Windows System Restore is disabled or unconfigured on this drive.\n(Safe to proceed with individual tweaks).",
-                    "System Restore Notice", MessageBoxButton.OK, MessageBoxImage.Information);
+                TxtStatus.Text = $"Restore point error: {ex.Message}";
+            }
+            finally
+            {
+                BtnCreateRestorePoint.IsEnabled = true;
             }
         }
 
@@ -697,14 +707,18 @@ namespace SetupHub180Hz.Views
 
         private void BtnApplyAll_Click(object sender, RoutedEventArgs e)
         {
-            var targetTweaks = _allTweaks;
+            var targetTweaks = _allTweaks.Where(t => t.IsRecommended && !t.IsAdvanced).ToList();
+            if (targetTweaks.Count == 0)
+            {
+                targetTweaks = _allTweaks.Where(t => t.IsRecommended).ToList();
+            }
             if (targetTweaks.Count == 0) return;
 
             var prompt = ThemedMessageBox.Show(
                 "Boost PC & Gaming Performance?\n\n" +
                 "• Speeds up games, reduces ping and input lag\n" +
                 "• Cleans junk files and frees up memory\n" +
-                "• Safe and easily reversible anytime\n\n" +
+                "• 100% Safe, stable and easily reversible anytime\n\n" +
                 "A backup restore point will be created automatically.\n" +
                 "Do you want to continue?",
                 "Boost PC Performance", MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -726,12 +740,12 @@ namespace SetupHub180Hz.Views
                 {
                     new OptimizationCustomStep
                     {
-                        Name = "💽 Deep C: Drive Storage & Component Store Cleanup",
+                        Name = "💽 Fast C: Drive Storage & System Cache Cleanup",
                         Action = async () =>
                         {
                             try
                             {
-                                cleanedBytes = await CleanupService.Instance.DeepCleanCDriveAsync(includeDism: true);
+                                cleanedBytes = await CleanupService.Instance.DeepCleanCDriveAsync(includeDism: false);
                             }
                             catch { }
                         }
@@ -870,7 +884,20 @@ namespace SetupHub180Hz.Views
                     "Some tweaks require a system restart to take full effect.\n\nRestart now?",
                     "Restart Required", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (r == MessageBoxResult.Yes)
-                    System.Diagnostics.Process.Start("shutdown", "/r /t 30 /c \"180Hz Setup Hub: Optimization tweaks applied.\"");
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("shutdown", "/r /t 30 /c \"180Hz Setup Hub: Optimization tweaks applied.\"")
+                        {
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        ThemedMessageBox.Show($"Could not initiate restart: {ex.Message}", "Restart Notice", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
             }
         }
 

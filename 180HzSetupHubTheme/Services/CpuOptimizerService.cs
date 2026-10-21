@@ -304,11 +304,11 @@ namespace SetupHub180Hz.Services
                         key?.SetValue("PowerThrottlingOff", 1, RegistryValueKind.DWord);
                     }
 
-                    // 13. BCD Invariant TSC Clock Synchronization
-                    RunCmd("bcdedit /set useplatformclock false");
-                    RunCmd("bcdedit /set useplatformtick yes");
-                    RunCmd("bcdedit /set disabledynamictick yes");
-                    RunCmd("bcdedit /set tscsyncpolicy Enhanced");
+                    // 13. Ensure Windows Default Kernel Clock Stability (Delete any desynchronized overrides to prevent CLOCK_WATCHDOG_TIMEOUT BSOD)
+                    RunCmd("bcdedit /deletevalue disabledynamictick");
+                    RunCmd("bcdedit /deletevalue useplatformtick");
+                    RunCmd("bcdedit /deletevalue tscsyncpolicy");
+                    RunCmd("bcdedit /deletevalue useplatformclock");
                 }
                 catch { }
             });

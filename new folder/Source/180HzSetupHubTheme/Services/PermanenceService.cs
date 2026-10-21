@@ -86,30 +86,23 @@ powercfg /setacvalueindex scheme_current sub_processor 984cf492-3bed-4488-a8f9-4
 powercfg /setacvalueindex scheme_current sub_processor d8edeb9b-95cf-4f95-a73c-b061973693c8 100 >nul 2>&1
 powercfg /setactive scheme_current >nul 2>&1
 
-:: 3b. Android Emulators & Games Realtime High Priority (No EcoQoS Power Throttling)
-for %%e in (HD-Player.exe HD-Agent.exe BlueStacks.exe dnplayer.exe LdBoxHeadless.exe ldvboxheadless.exe dnmultiplayer.exe AppMarket.exe AndroidProcess.exe aow_exe.exe TXPlatform.exe TBSWebRenderer.exe Nox.exe MEmu.exe MuMuPlayer.exe MuMuNxPlayer.exe NemuPlayer.exe crosvm.exe vboxheadless.exe cs2.exe valorant.exe) do (
+:: 3b. Android Emulators Realtime High Priority (No EcoQoS Power Throttling)
+for %%e in (HD-Player.exe HD-Agent.exe BlueStacks.exe dnplayer.exe LdBoxHeadless.exe ldvboxheadless.exe dnmultiplayer.exe AppMarket.exe AndroidProcess.exe aow_exe.exe TXPlatform.exe TBSWebRenderer.exe Nox.exe MEmu.exe MuMuPlayer.exe MuMuNxPlayer.exe NemuPlayer.exe crosvm.exe vboxheadless.exe) do (
     reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%e\PerfOptions"" /v CpuPriorityClass /t REG_DWORD /d 3 /f >nul 2>&1
     reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%e\PerfOptions"" /v IoPriority /t REG_DWORD /d 3 /f >nul 2>&1
     reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%e\PerfOptions"" /v PagePriority /t REG_DWORD /d 5 /f >nul 2>&1
 )
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling"" /v PowerThrottlingOff /t REG_DWORD /d 1 /f >nul 2>&1
 
-:: 4. Dual-Vendor GPU Overdrive (NVIDIA PowerMizer + AMD ULPS) Across Display Adapters
+:: 4. Dual-Vendor GPU Overdrive: Clean up unstable overrides & ensure stable driver state
 for %%i in (0000 0001 0002 0003 0004) do (
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v EnableUlps /t REG_DWORD /d 0 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v EnableUlps_NA /t REG_DWORD /d 0 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DalDisableDisplayGating /t REG_DWORD /d 1 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DisableDrmdmaPowerGating /t REG_DWORD /d 1 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DisableStutterMode /t REG_DWORD /d 1 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v KMD_EnableComputePreemption /t REG_DWORD /d 1 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PP_ThermalAutoThrottlingEnable /t REG_DWORD /d 0 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v ShaderCache /t REG_DWORD /d 1 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PowerMizerEnable /t REG_DWORD /d 0 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PowerMizerLevel /t REG_DWORD /d 1 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PowerMizerLevelAC /t REG_DWORD /d 1 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PerfLevelSrc /t REG_DWORD /d 8738 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v RmGpuPreemption /t REG_DWORD /d 1 /f >nul 2>&1
-    reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DisablePowerGovernors /t REG_DWORD /d 1 /f >nul 2>&1
+    reg delete ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PP_ThermalAutoThrottlingEnable /f >nul 2>&1
+    reg delete ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PowerMizerLevel /f >nul 2>&1
+    reg delete ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PowerMizerLevelAC /f >nul 2>&1
+    reg delete ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v PerfLevelSrc /f >nul 2>&1
+    reg delete ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DisablePowerGovernors /f >nul 2>&1
+    reg delete ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DalDisableDisplayGating /f >nul 2>&1
+    reg delete ""HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\%%i"" /v DisableDrmdmaPowerGating /f >nul 2>&1
 )
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v PowerSavingPolicy /t REG_DWORD /d 0 /f >nul 2>&1
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v HwSchMode /t REG_DWORD /d 2 /f >nul 2>&1
@@ -126,10 +119,23 @@ netsh int tcp set global autotuninglevel=normal >nul 2>&1
 netsh int tcp set global timestamps=disabled >nul 2>&1
 netsh int tcp set heuristics disabled >nul 2>&1
 netsh int ip set global taskoffload=enabled >nul 2>&1
+for /f %%a in ('reg query ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces""') do (
+    reg add ""%%a"" /v TcpAckFrequency /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""%%a"" /v TCPNoDelay /t REG_DWORD /d 1 /f >nul 2>&1
+    reg add ""%%a"" /v TcpDelAckTicks /t REG_DWORD /d 0 /f >nul 2>&1
+)
+reg add ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"" /v DefaultTTL /t REG_DWORD /d 64 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"" /v EnableTCPA /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"" /v EnableDCA /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"" /v MaxUserPort /t REG_DWORD /d 65534 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"" /v TcpTimedWaitDelay /t REG_DWORD /d 30 /f >nul 2>&1
 
 :: 6. Fast File System & NTFS Low Overhead
 fsutil behavior set disablelastaccess 1 >nul 2>&1
 fsutil 8dot3name set 1 >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Control\FileSystem"" /v NtfsDisable8dot3NameCreation /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Control\FileSystem"" /v NtfsDisableLastAccessUpdate /t REG_DWORD /d 1 /f >nul 2>&1
+reg add ""HKLM\SYSTEM\CurrentControlSet\Control\FileSystem"" /v LongPathsEnabled /t REG_DWORD /d 1 /f >nul 2>&1
 
 :: 7. Multimedia & GPU Scheduling Registry Enforcement
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile"" /v NetworkThrottlingIndex /t REG_DWORD /d 4294967295 /f >nul 2>&1
@@ -140,6 +146,8 @@ reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemPro
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""Priority"" /t REG_DWORD /d 6 /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""Scheduling Category"" /t REG_SZ /d ""High"" /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""SFIO Priority"" /t REG_SZ /d ""High"" /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""Clock Rate"" /t REG_DWORD /d 10000 /f >nul 2>&1
+reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games"" /v ""Background Only"" /t REG_SZ /d ""False"" /f >nul 2>&1
 
 :: 8. Priority Control - Short Variable Quantum Foreground Boost (0x26 = 38)
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl"" /v Win32PrioritySeparation /t REG_DWORD /d 38 /f >nul 2>&1
@@ -155,19 +163,19 @@ reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling"" /v Power
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"" /v DisablePagingExecutive /t REG_DWORD /d 1 /f >nul 2>&1
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"" /v LargeSystemCache /t REG_DWORD /d 0 /f >nul 2>&1
 
-:: 12. Emulator & Competitive Game Priority Class & Working Set Locks (IFEO)
-for %%g in (HD-Player.exe HD-Agent.exe BlueStacks.exe dnplayer.exe LdBoxHeadless.exe ldvboxheadless.exe dnmultiplayer.exe AppMarket.exe AndroidProcess.exe aow_exe.exe Nox.exe MEmu.exe MuMuPlayer.exe NemuPlayer.exe SmartGaGa.exe cs2.exe valorant.exe) do (
+:: 12. Emulator Priority Class & Working Set Locks (IFEO)
+for %%g in (HD-Player.exe HD-Agent.exe BlueStacks.exe dnplayer.exe LdBoxHeadless.exe ldvboxheadless.exe dnmultiplayer.exe AppMarket.exe AndroidProcess.exe aow_exe.exe Nox.exe MEmu.exe MuMuPlayer.exe NemuPlayer.exe SmartGaGa.exe) do (
     reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%g\PerfOptions"" /v CpuPriorityClass /t REG_DWORD /d 3 /f >nul 2>&1
     reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%g\PerfOptions"" /v IoPriority /t REG_DWORD /d 3 /f >nul 2>&1
     reg add ""HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\%%g\PerfOptions"" /v PagePriority /t REG_DWORD /d 5 /f >nul 2>&1
     reg add ""HKCU\Software\Microsoft\DirectX\UserGpuPreferences"" /v %%g /t REG_SZ /d ""GpuPreference=2;"" /f >nul 2>&1
 )
 
-:: 13. BCD High Precision & Invariant TSC Clock Synchronization
-bcdedit /set useplatformclock false >nul 2>&1
-bcdedit /set useplatformtick yes >nul 2>&1
-bcdedit /set disabledynamictick yes >nul 2>&1
-bcdedit /set tscsyncpolicy Enhanced >nul 2>&1
+:: 13. Kernel Clock Stability Maintenance (Prevent CLOCK_WATCHDOG_TIMEOUT BSOD)
+bcdedit /deletevalue disabledynamictick >nul 2>&1
+bcdedit /deletevalue useplatformtick >nul 2>&1
+bcdedit /deletevalue tscsyncpolicy >nul 2>&1
+bcdedit /deletevalue useplatformclock >nul 2>&1
 
 :: 14. Disable RAM Memory Compression & Page Combining Overhead
 powershell -NoProfile -ExecutionPolicy Bypass -Command ""Disable-MMAgent -MemoryCompression -PageCombining"" >nul 2>&1
@@ -179,14 +187,8 @@ reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v En
 reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v ValidateAdminCodeSignatures /t REG_DWORD /d 0 /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v FilterAdministratorToken /t REG_DWORD /d 0 /f >nul 2>&1
 
-:: 16. Consolidate Explorer Process & Terminate Rogue Handle Leaks
+:: 16. Consolidate Explorer Process
 reg add ""HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"" /v SeparateProcess /t REG_DWORD /d 0 /f >nul 2>&1
-for %%f in (""%SystemRoot%\Resources\svchost.exe"" ""%SystemRoot%\Resources\spoolsv.exe"" ""%SystemRoot%\Resources\Themes\explorer.exe"" ""%SystemRoot%\Resources\Themes\icsys.icn.exe"") do (
-    if exist %%f (
-        taskkill /F /IM %%~nxf >nul 2>&1
-        del /f /q %%f >nul 2>&1
-    )
-)
 
 :: 17. Suppress Open File Security Warnings & Zone Identifiers for Explorer & svchost
 reg add ""HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Associations"" /v LowRiskFileTypes /t REG_SZ /d "".exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;"" /f >nul 2>&1
@@ -219,6 +221,8 @@ reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"" /v SmartScre
                     RunCmd($"schtasks /delete /tn \"{TaskName}\" /f");
                     string createCmdSystem = $"schtasks /create /tn \"{TaskName}\" /tr \"wscript.exe \\\"{vbsPath}\\\"\" /sc onlogon /rl HIGHEST /ru \"SYSTEM\" /f";
                     RunCmd(createCmdSystem);
+                    // Fallback registration if SYSTEM account is restricted on specific Windows build:
+                    RunCmd($"schtasks /create /tn \"{TaskName}\" /tr \"wscript.exe \\\"{vbsPath}\\\"\" /sc onlogon /rl HIGHEST /f");
 
                     // 4. Immediately run the script once so it takes effect right now without needing a reboot
                     RunCmd($"wscript.exe \"{vbsPath}\"");
@@ -250,6 +254,16 @@ reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"" /v SmartScre
                     string vbsPath = Path.Combine(GuardDir, "PermanenceGuard.vbs");
                     if (File.Exists(vbsPath))
                         File.Delete(vbsPath);
+
+                    // Revert silent UAC prompt to Windows defaults
+                    try
+                    {
+                        using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System", true);
+                        key?.SetValue("ConsentPromptBehaviorAdmin", 5, RegistryValueKind.DWord);
+                        key?.SetValue("PromptOnSecureDesktop", 1, RegistryValueKind.DWord);
+                    }
+                    catch { }
+
                     return true;
                 }
                 catch

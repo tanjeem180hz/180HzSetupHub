@@ -6,8 +6,8 @@
         "category":  "Emulator 100% Performance",
         "categoryOrder":  7,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  true,
         "registry":  [
                          {
@@ -615,7 +615,6 @@
                          {
                              "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
                              "Name":  "OverlayTestMode",
-                              "Value":  "5",
                              "Value":  "5",
                              "OriginalValue":  "\u003cRemoveEntry\u003e",
                              "Type":  "DWord"
@@ -638,8 +637,8 @@
         "category":  "Extreme Low Latency \u0026 Kernel Timers",
         "categoryOrder":  2,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  true,
         "registry":  [
 
@@ -648,10 +647,10 @@
 
                     ],
         "invokeScript":  [
-                             "bcdedit /set disabledynamictick yes"
+                             "bcdedit /deletevalue disabledynamictick"
                          ],
         "undoScript":  [
-                           "bcdedit /set disabledynamictick no"
+                           "bcdedit /deletevalue disabledynamictick"
                        ]
     },
     {
@@ -661,8 +660,8 @@
         "category":  "Extreme Low Latency \u0026 Kernel Timers",
         "categoryOrder":  2,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  true,
         "registry":  [
 
@@ -671,8 +670,8 @@
 
                     ],
         "invokeScript":  [
-                             "bcdedit /set useplatformclock no",
-                             "bcdedit /set useplatformtick yes"
+                             "bcdedit /deletevalue useplatformclock",
+                             "bcdedit /deletevalue useplatformtick"
                          ],
         "undoScript":  [
                            "bcdedit /deletevalue useplatformclock",
@@ -686,8 +685,8 @@
         "category":  "Extreme Low Latency \u0026 Kernel Timers",
         "categoryOrder":  2,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  true,
         "registry":  [
 
@@ -696,10 +695,10 @@
 
                     ],
         "invokeScript":  [
-                             "bcdedit /set tscsyncpolicy Enhanced"
+                             "bcdedit /deletevalue tscsyncpolicy"
                          ],
         "undoScript":  [
-                           "bcdedit /set tscsyncpolicy Default"
+                           "bcdedit /deletevalue tscsyncpolicy"
                        ]
     },
     {
@@ -918,8 +917,8 @@
         "category":  "Storage \u0026 NVMe Throughput",
         "categoryOrder":  6,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
 
@@ -1965,7 +1964,7 @@
                          {
                              "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
                              "Name":  "OverlayTestMode",
-                              "Value":  "5",
+                             "Value":  "5",
                              "Type":  "DWord",
                              "DefaultValue":  "0",
                              "Values":  {
@@ -1978,7 +1977,7 @@
                          {
                              "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
                              "Name":  "DisableOverlays",
-                              "Value":  "1",
+                             "Value":  "1",
                              "Type":  "DWord",
                              "DefaultValue":  "0",
                              "Values":  {
@@ -3328,24 +3327,10 @@
         "category":  "Extreme Low Latency \u0026 Kernel Timers",
         "categoryOrder":  2,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
-                         {
-                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions",
-                             "Name":  "CpuPriorityClass",
-                             "Value":  "3",
-                             "OriginalValue":  "\u003cRemoveEntry\u003e",
-                             "Type":  "DWord"
-                         },
-                         {
-                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions",
-                             "Name":  "IoPriority",
-                             "Value":  "3",
-                             "OriginalValue":  "\u003cRemoveEntry\u003e",
-                             "Type":  "DWord"
-                         },
                          {
                              "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\dwm.exe\\PerfOptions",
                              "Name":  "CpuPriorityClass",
@@ -3365,10 +3350,10 @@
 
                     ],
         "invokeScript":  [
-
+                             "Remove-Item -Path \u0027HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\u0027 -Recurse -ErrorAction SilentlyContinue"
                          ],
         "undoScript":  [
-
+                           "Remove-Item -Path \u0027HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\u0027 -Recurse -ErrorAction SilentlyContinue"
                        ]
     },
     {
@@ -4191,7 +4176,7 @@
 
                     ],
         "invokeScript":  [
-                             "New-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Associations\u0027 -Name LowRiskFileTypes -Value \u0027.exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;\u0027 -PropertyType String -Force; Get-Process | Where-Object { $_.Path -match \u0027Resources\u0027 -and $_.Name -match \u0027explorer|svchost|spoolsv|icsys\u0027 } | Stop-Process -Force -ErrorAction SilentlyContinue"
+                             "New-ItemProperty -Path \u0027HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Associations\u0027 -Name LowRiskFileTypes -Value \u0027.exe;.bat;.cmd;.ps1;.vbs;.reg;.msi;.dll;.com;.cpl;\u0027 -PropertyType String -Force -ErrorAction SilentlyContinue"
                          ],
         "undoScript":  [
                            "Set-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\u0027 -Name ConsentPromptBehaviorAdmin -Value 5; Set-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\u0027 -Name PromptOnSecureDesktop -Value 1"
@@ -7340,10 +7325,10 @@
 
                     ],
         "invokeScript":  [
-                             "0..4 | ForEach-Object { $k = \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\\u0027 + (\u0027{0:D4}\u0027 -f $_); if (Test-Path $k) { Set-ItemProperty $k EnableUlps 0 -Type DWord -Force; Set-ItemProperty $k EnableUlps_NA 0 -Type DWord -Force; Set-ItemProperty $k DalDisableDisplayGating 1 -Type DWord -Force; Set-ItemProperty $k DisableDrmdmaPowerGating 1 -Type DWord -Force; Set-ItemProperty $k DisableStutterMode 1 -Type DWord -Force; Set-ItemProperty $k KMD_EnableComputePreemption 1 -Type DWord -Force; Set-ItemProperty $k PP_ThermalAutoThrottlingEnable 0 -Type DWord -Force; Set-ItemProperty $k ShaderCache 1 -Type DWord -Force; Set-ItemProperty $k PowerMizerEnable 0 -Type DWord -Force; Set-ItemProperty $k PowerMizerLevel 1 -Type DWord -Force; Set-ItemProperty $k PowerMizerLevelAC 1 -Type DWord -Force; Set-ItemProperty $k PerfLevelSrc 8738 -Type DWord -Force; Set-ItemProperty $k RmGpuPreemption 1 -Type DWord -Force; Set-ItemProperty $k DisablePowerGovernors 1 -Type DWord -Force } }"
+                             "0..4 | ForEach-Object { $k = \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\\u0027 + (\u0027{0:D4}\u0027 -f $_); if (Test-Path $k) { Remove-ItemProperty $k PP_ThermalAutoThrottlingEnable, PowerMizerLevel, PowerMizerLevelAC, PerfLevelSrc, DisablePowerGovernors, DalDisableDisplayGating, DisableDrmdmaPowerGating -ErrorAction SilentlyContinue } }"
                          ],
         "undoScript":  [
-                           "0..4 | ForEach-Object { $k = \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\\u0027 + (\u0027{0:D4}\u0027 -f $_); if (Test-Path $k) { Set-ItemProperty $k EnableUlps 1 -Type DWord -Force } }"
+                           "0..4 | ForEach-Object { $k = \u0027HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\\u0027 + (\u0027{0:D4}\u0027 -f $_); if (Test-Path $k) { Remove-ItemProperty $k PP_ThermalAutoThrottlingEnable, PowerMizerLevel, PowerMizerLevelAC, PerfLevelSrc, DisablePowerGovernors, DalDisableDisplayGating, DisableDrmdmaPowerGating -ErrorAction SilentlyContinue } }"
                        ]
     },
     {
@@ -7980,8 +7965,8 @@
         "category":  "Essential Tweaks",
         "categoryOrder":  8,
         "description":  "Performs automated system component store verification and repairs corrupted Windows system files using native DISM and SFC engines, eliminating system instability without reinstalling Windows.",
-        "isRecommended":  true,
-        "isAdvanced":  false,
+        "isRecommended":  false,
+        "isAdvanced":  true,
         "invokeScript":  [
                              "DISM.exe /Online /Cleanup-Image /RestoreHealth; sfc /scannow"
                          ],

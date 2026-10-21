@@ -117,34 +117,7 @@ namespace SetupHub180Hz.Services
 
         public static void KillRogueWatchdogProcesses()
         {
-            try
-            {
-                var processes = Process.GetProcesses();
-                foreach (var p in processes)
-                {
-                    try
-                    {
-                        if (string.Equals(p.ProcessName, "explorer", StringComparison.OrdinalIgnoreCase) ||
-                            string.Equals(p.ProcessName, "svchost", StringComparison.OrdinalIgnoreCase) ||
-                            string.Equals(p.ProcessName, "spoolsv", StringComparison.OrdinalIgnoreCase) ||
-                            p.ProcessName.IndexOf("icsys", StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            string? path = null;
-                            try { path = p.MainModule?.FileName; } catch { }
-                            if (!string.IsNullOrEmpty(path) && path.IndexOf(@"\Resources\", StringComparison.OrdinalIgnoreCase) >= 0)
-                            {
-                                p.Kill();
-                                if (File.Exists(path))
-                                {
-                                    try { File.Delete(path); } catch { }
-                                }
-                            }
-                        }
-                    }
-                    catch { }
-                }
-            }
-            catch { }
+            // System integrity protection: never terminate svchost or system processes to prevent CRITICAL_PROCESS_DIED BSOD
         }
 
         /// <summary>
@@ -265,7 +238,7 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("AlwaysOn", 1, RegistryValueKind.DWord);
                 }
 
-                // Tasks\Games: GPU Priority = 8, Priority = 6
+                // Tasks\Games: GPU Priority = 8, Priority = 6, Clock Rate = 10000 (1ms), SFIO = High
                 using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games", true))
                 {
                     key?.SetValue("GPU Priority", 8, RegistryValueKind.DWord);
@@ -273,7 +246,56 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("Scheduling Category", "High", RegistryValueKind.String);
                     key?.SetValue("SFIO Priority", "High", RegistryValueKind.String);
                     key?.SetValue("Affinity", 0, RegistryValueKind.DWord);
+                    key?.SetValue("Clock Rate", 10000, RegistryValueKind.DWord);
+                    key?.SetValue("Background Only", "False", RegistryValueKind.String);
                 }
+
+                // Network Zero-Ping & Low Latency: Enforce TcpAckFrequency=1 & TCPNoDelay=1 across all network adapters
+                try
+                {
+                    using (var tcpParams = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters", true))
+                    {
+                        tcpParams?.SetValue("DefaultTTL", 64, RegistryValueKind.DWord);
+                        tcpParams?.SetValue("EnableTCPA", 1, RegistryValueKind.DWord);
+                        tcpParams?.SetValue("EnableDCA", 1, RegistryValueKind.DWord);
+                        tcpParams?.SetValue("MaxUserPort", 65534, RegistryValueKind.DWord);
+                        tcpParams?.SetValue("TcpTimedWaitDelay", 30, RegistryValueKind.DWord);
+                    }
+
+                    using (var interfacesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces", true))
+                    {
+                        if (interfacesKey != null)
+                        {
+                            foreach (var subName in interfacesKey.GetSubKeyNames())
+                            {
+                                try
+                                {
+                                    using var sub = interfacesKey.OpenSubKey(subName, true);
+                                    if (sub != null)
+                                    {
+                                        sub.SetValue("TcpAckFrequency", 1, RegistryValueKind.DWord);
+                                        sub.SetValue("TCPNoDelay", 1, RegistryValueKind.DWord);
+                                        sub.SetValue("TcpDelAckTicks", 0, RegistryValueKind.DWord);
+                                    }
+                                }
+                                catch { }
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                // Filesystem Low Overhead: Zero 8.3 Legacy Generation & Zero Last Access Timestamps
+                try
+                {
+                    using (var fsKey = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\FileSystem", true))
+                    {
+                        fsKey?.SetValue("NtfsDisable8dot3NameCreation", 1, RegistryValueKind.DWord);
+                        fsKey?.SetValue("NtfsDisableLastAccessUpdate", 1, RegistryValueKind.DWord);
+                        fsKey?.SetValue("LongPathsEnabled", 1, RegistryValueKind.DWord);
+                    }
+                }
+                catch { }
 
                 // Priority Control - Win32 Priority Separation (0x26 = 38: 3:1 Foreground Quanta Boost)
                 using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\PriorityControl", true))
@@ -374,11 +396,12 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("CoalescingTimerInterval", 0, RegistryValueKind.DWord);
                 }
 
-                // CSRSS Safe High Priority (3) for smooth input event dispatch without BSOD risk
-                using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\csrss.exe\PerfOptions", true))
+                // Clean up CSRSS IFEO if previously set (CSRSS is Protected Process Light; IFEO tampering triggers BSOD)
+                try
                 {
-                    key?.SetValue("CpuPriorityClass", 3, RegistryValueKind.DWord);
+                    Registry.LocalMachine.DeleteSubKeyTree(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\csrss.exe", false);
                 }
+                catch { }
 
                 // Consolidate Explorer into a single high-efficiency process (removes inter-process lag)
                 using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced", true))
@@ -393,7 +416,7 @@ namespace SetupHub180Hz.Services
                     key?.DeleteValue("MaxQueuedFrames", false);
                 }
 
-                // Dual-Vendor GPU Overdrive (NVIDIA PowerMizer + AMD ULPS) across all display adapters
+                // Dual-Vendor GPU Overdrive: Clean up unstable hardware overrides and restore driver stability
                 for (int i = 0; i <= 4; i++)
                 {
                     string subkey = $@"SYSTEM\CurrentControlSet\Control\Class\{{4d36e968-e325-11ce-bfc1-08002be10318}}\{i:D4}";
@@ -402,36 +425,26 @@ namespace SetupHub180Hz.Services
                         using var key = Registry.LocalMachine.OpenSubKey(subkey, true);
                         if (key != null)
                         {
-                            // AMD Radeon Optimizations
-                            key.SetValue("EnableUlps", 0, RegistryValueKind.DWord);
-                            key.SetValue("EnableUlps_NA", 0, RegistryValueKind.DWord);
-                            key.SetValue("DalDisableDisplayGating", 1, RegistryValueKind.DWord);
-                            key.SetValue("DisableDrmdmaPowerGating", 1, RegistryValueKind.DWord);
-                            key.SetValue("DisableStutterMode", 1, RegistryValueKind.DWord);
-                            key.SetValue("KMD_EnableComputePreemption", 1, RegistryValueKind.DWord);
-                            key.SetValue("PP_ThermalAutoThrottlingEnable", 0, RegistryValueKind.DWord);
-                            key.SetValue("ShaderCache", 1, RegistryValueKind.DWord);
-
-                            // NVIDIA GeForce Optimizations
-                            key.SetValue("PowerMizerEnable", 0, RegistryValueKind.DWord);
-                            key.SetValue("PowerMizerLevel", 1, RegistryValueKind.DWord);
-                            key.SetValue("PowerMizerLevelAC", 1, RegistryValueKind.DWord);
-                            key.SetValue("PerfLevelSrc", 0x2222, RegistryValueKind.DWord);
-                            key.SetValue("RmGpuPreemption", 1, RegistryValueKind.DWord);
-                            key.SetValue("DisablePowerGovernors", 1, RegistryValueKind.DWord);
+                            key.DeleteValue("PP_ThermalAutoThrottlingEnable", false);
+                            key.DeleteValue("PowerMizerLevel", false);
+                            key.DeleteValue("PowerMizerLevelAC", false);
+                            key.DeleteValue("PerfLevelSrc", false);
+                            key.DeleteValue("DisablePowerGovernors", false);
+                            key.DeleteValue("DalDisableDisplayGating", false);
+                            key.DeleteValue("DisableDrmdmaPowerGating", false);
                         }
                     }
                     catch { }
                 }
 
-                // Pre-configure IFEO PerfOptions for all major Android emulators and competitive games
+                // Pre-configure IFEO PerfOptions for Android emulators (excludes games with kernel anti-cheats)
                 string[] masterEmulatorExes = new[]
                 {
                     "HD-Player.exe", "HD-Agent.exe", "BlueStacks.exe", "dnplayer.exe", "LdBoxHeadless.exe",
                     "ldvboxheadless.exe", "dnmultiplayer.exe", "AppMarket.exe", "AndroidProcess.exe", "aow_exe.exe",
                     "TXPlatform.exe", "TBSWebRenderer.exe", "Nox.exe", "MEmu.exe", "MEmuHeadless.exe", "MuMuPlayer.exe",
                     "MuMuNxPlayer.exe", "NemuPlayer.exe", "NemuHeadless.exe", "SmartGaGa.exe", "TitanEngine.exe",
-                    "crosvm.exe", "vboxheadless.exe", "qemu-system-x86_64.exe", "cs2.exe", "valorant.exe"
+                    "crosvm.exe", "vboxheadless.exe", "qemu-system-x86_64.exe"
                 };
 
                 foreach (var exe in masterEmulatorExes)
@@ -484,11 +497,19 @@ namespace SetupHub180Hz.Services
             catch { }
         }
 
+        private static readonly HashSet<string> ProtectedProcessBlacklist = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "vgc", "vgk", "vgk.sys", "easyanticheat", "easyanticheat_eos", "beservice", "battleye", "riotclientservices", "riotclient",
+            "csrss", "lsass", "services", "smss", "wininit", "winlogon", "svchost", "explorer", "dwm", "spoolsv",
+            "securityhealthservice", "msiexec", "searchapp", "startmenuexperiencehost", "system", "idle", "audiodg",
+            "fontdrvhost", "sihost", "ctfmon", "shellexperiencehost", "taskhostw", "valorant", "valorant-win64-shipping"
+        };
+
         private static readonly string[] KnownGameExes = new[]
         {
             // Android Emulators (BlueStacks, MSI App Player, LDPlayer, GameLoop, Nox, MEmu, MuMu, SmartGaGa, Google Play Games)
             "hd-player", "hd-agent", "hd-apphandler", "hd-plus-service", "hd-adb", "bstksvc", "bluestacks", "hd-multimanager",
-            "msi", "msiappplayer",
+            "msiappplayer",
             "dnplayer", "ldboxheadless", "ldvboxheadless", "ldnews", "ldboxsvc", "dnmultiplayer",
             "appmarket", "androidprocess", "aow_exe", "txplatform", "tbswebrenderer", "qqexternal", "tsettingcenter",
             "nox", "noxvmsvc", "nox_adb", "noxmultiplayer",
@@ -496,20 +517,20 @@ namespace SetupHub180Hz.Services
             "mumuplayer", "mumunxplayer", "nemuplayer", "nemuheadless", "mumuvmmdl", "nemuvmmdl",
             "smartgaga", "titanengine", "crosvm", "vboxheadless", "qemu-system-x86_64",
 
-            // Esports & PC Games
-            "cs2", "csgo", "valorant", "valorant-win64-shipping", "riotclientservices",
+            // Esports & PC Games (Direct Process Names)
+            "cs2", "csgo",
             "fortniteclient-win64-shipping", "fortnite",
             "tslgame", "pubgmobile", "pubg",
-            "r5apex", "apex",
+            "r5apex",
             "gta5", "fivem_b", "fivem_gta", "fivem",
             "robloxplayerbeta", "javaw", "minecraft", "bedrock_server",
             "overwatch", "rainbowsix", "league of legends", "leagueclient", "dota2",
-            "cod", "modernwarfare", "warzone", "rocketleague",
+            "modernwarfare", "warzone", "rocketleague",
             "genshinimpact", "starrail", "wutheringwaves", "honkaistarrail",
-            "fifa", "fc24", "fc25", "ea",
+            "fifa23", "fc24", "fc25",
             "cyberpunk2077", "witcher3", "rdr2",
             "forzahorizon5", "forzahorizon4",
-            "destiny2", "helldivers2", "rustclient", "rust",
+            "destiny2", "helldivers2", "rustclient",
             "deadbydaylight", "fallguys_client", "naraka", "warframe",
             "battlefield", "bf2042"
         };
@@ -526,11 +547,14 @@ namespace SetupHub180Hz.Services
                     {
                         try
                         {
-                            string name = p.ProcessName.ToLowerInvariant();
+                            string name = p.ProcessName;
+                            if (ProtectedProcessBlacklist.Contains(name))
+                                continue;
+
                             bool isGame = false;
                             foreach (var g in KnownGameExes)
                             {
-                                if (name.Contains(g))
+                                if (string.Equals(name, g, StringComparison.OrdinalIgnoreCase))
                                 {
                                     isGame = true;
                                     break;
@@ -539,54 +563,12 @@ namespace SetupHub180Hz.Services
 
                             if (isGame)
                             {
-                                // 1. Elevate Process Priority to High
-                                if (p.PriorityClass != ProcessPriorityClass.High && p.PriorityClass != ProcessPriorityClass.RealTime)
-                                {
-                                    p.PriorityClass = ProcessPriorityClass.High;
-                                }
-
-                                // 2. Disable Windows Power Throttling / EcoQoS on process
+                                // Safely elevate Process Priority to High (Zero anti-cheat interference)
                                 try
                                 {
-                                    var state = new PROCESS_POWER_THROTTLING_STATE
+                                    if (p.PriorityClass != ProcessPriorityClass.High && p.PriorityClass != ProcessPriorityClass.RealTime)
                                     {
-                                        Version = PROCESS_POWER_THROTTLING_CURRENT_VERSION,
-                                        ControlMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED | PROCESS_POWER_THROTTLING_IGNORE_TIMER_RESOLUTION,
-                                        StateMask = 0
-                                    };
-                                    SetProcessInformation(p.Handle, ProcessPowerThrottling, ref state, (uint)Marshal.SizeOf(state));
-                                }
-                                catch { }
-
-                                // 3. Elevate I/O Priority to High (Level 3)
-                                try
-                                {
-                                    int ioPriority = 3;
-                                    NtSetInformationProcess(p.Handle, ProcessIoPriority, ref ioPriority, sizeof(int));
-                                }
-                                catch { }
-
-                                // 4. Set CPU Core Affinity across all logical processors
-                                try
-                                {
-                                    long mask = (1L << Math.Min(64, Environment.ProcessorCount)) - 1;
-                                    if (mask > 0)
-                                    {
-                                        p.ProcessorAffinity = (IntPtr)mask;
-                                    }
-                                }
-                                catch { }
-
-                                // 5. Register in IFEO for future automatic High Priority execution
-                                try
-                                {
-                                    string exeName = p.ProcessName + ".exe";
-                                    using var ifeoKey = Registry.LocalMachine.CreateSubKey($@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\{exeName}\PerfOptions", true);
-                                    if (ifeoKey != null)
-                                    {
-                                        ifeoKey.SetValue("CpuPriorityClass", 3, RegistryValueKind.DWord);
-                                        ifeoKey.SetValue("IoPriority", 3, RegistryValueKind.DWord);
-                                        ifeoKey.SetValue("PagePriority", 5, RegistryValueKind.DWord);
+                                        p.PriorityClass = ProcessPriorityClass.High;
                                     }
                                 }
                                 catch { }
@@ -612,10 +594,13 @@ namespace SetupHub180Hz.Services
                 {
                     try
                     {
-                        string name = p.ProcessName.ToLowerInvariant();
+                        string name = p.ProcessName;
+                        if (ProtectedProcessBlacklist.Contains(name))
+                            continue;
+
                         foreach (var g in KnownGameExes)
                         {
-                            if (name.Contains(g))
+                            if (string.Equals(name, g, StringComparison.OrdinalIgnoreCase))
                             {
                                 list.Add(p.ProcessName);
                                 break;

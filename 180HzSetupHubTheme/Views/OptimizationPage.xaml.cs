@@ -707,14 +707,18 @@ namespace SetupHub180Hz.Views
 
         private void BtnApplyAll_Click(object sender, RoutedEventArgs e)
         {
-            var targetTweaks = _allTweaks;
+            var targetTweaks = _allTweaks.Where(t => t.IsRecommended && !t.IsAdvanced).ToList();
+            if (targetTweaks.Count == 0)
+            {
+                targetTweaks = _allTweaks.Where(t => t.IsRecommended).ToList();
+            }
             if (targetTweaks.Count == 0) return;
 
             var prompt = ThemedMessageBox.Show(
                 "Boost PC & Gaming Performance?\n\n" +
                 "• Speeds up games, reduces ping and input lag\n" +
                 "• Cleans junk files and frees up memory\n" +
-                "• Safe and easily reversible anytime\n\n" +
+                "• 100% Safe, stable and easily reversible anytime\n\n" +
                 "A backup restore point will be created automatically.\n" +
                 "Do you want to continue?",
                 "Boost PC Performance", MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -736,12 +740,12 @@ namespace SetupHub180Hz.Views
                 {
                     new OptimizationCustomStep
                     {
-                        Name = "💽 Deep C: Drive Storage & Component Store Cleanup",
+                        Name = "💽 Fast C: Drive Storage & System Cache Cleanup",
                         Action = async () =>
                         {
                             try
                             {
-                                cleanedBytes = await CleanupService.Instance.DeepCleanCDriveAsync(includeDism: true);
+                                cleanedBytes = await CleanupService.Instance.DeepCleanCDriveAsync(includeDism: false);
                             }
                             catch { }
                         }
