@@ -82,7 +82,17 @@ namespace SetupHub180Hz.Views
 
         private async void BtnProceed_Click(object sender, RoutedEventArgs e)
         {
-            await StartExecutionAsync();
+            try
+            {
+                await StartExecutionAsync();
+            }
+            catch (Exception ex)
+            {
+                ActivityLogger.Instance.Log($"Optimization execution notice: {ex.Message}", ActivityType.Warning);
+                BtnDialogClose.IsEnabled = true;
+                DialogResult = false;
+                Close();
+            }
         }
 
         private async Task StartExecutionAsync()
@@ -115,53 +125,63 @@ namespace SetupHub180Hz.Views
                 await Task.Delay(100);
             }
 
-            // 2. Custom Pre-Steps (Cleaner, RAM flush, Turbo CPU boost, Timer resolution, etc.)
-            if (_customSteps != null)
+            TweakService.BeginBatchOperation();
+            try
             {
-                foreach (var step in _customSteps)
+                // 2. Custom Pre-Steps (Cleaner, RAM flush, Turbo CPU boost, Timer resolution, etc.)
+                if (_customSteps != null)
                 {
-                    double targetPercent = ((double)done / total) * 100.0;
-                    await UpdateProgressSmoothAsync(targetPercent, done + 1, total, step.Name);
+                    foreach (var step in _customSteps)
+                    {
+                        double targetPercent = ((double)done / total) * 100.0;
+                        await UpdateProgressSmoothAsync(targetPercent, done + 1, total, step.Name);
+
+                        try
+                        {
+                            await step.Action();
+                        }
+                        catch (Exception ex)
+                        {
+                            await UpdateProgressSmoothAsync(targetPercent, done + 1, total, $"{step.Name}: Notice ({ex.Message})");
+                            await Task.Delay(150);
+                        }
+
+                        done++;
+                        double newPercent = ((double)done / total) * 100.0;
+                        await UpdateProgressSmoothAsync(newPercent, done, total, step.Name);
+                    }
+                }
+
+                // 3. Tweak List Execution
+                foreach (var tweak in _tweaks)
+                {
+                    double currentPercent = ((double)done / total) * 100.0;
+                    await UpdateProgressSmoothAsync(currentPercent, done + 1, total, tweak.Name);
 
                     try
                     {
-                        await step.Action();
+                        if (_isUndo)
+                            await _tweakService.UndoAsync(tweak);
+                        else
+                            await _tweakService.ApplyAsync(tweak);
                     }
                     catch (Exception ex)
                     {
-                        await UpdateProgressSmoothAsync(targetPercent, done + 1, total, $"{step.Name}: Notice ({ex.Message})");
-                        await Task.Delay(250);
+                        await UpdateProgressSmoothAsync(currentPercent, done + 1, total, $"Notice: {ex.Message}");
                     }
 
                     done++;
                     double newPercent = ((double)done / total) * 100.0;
-                    await UpdateProgressSmoothAsync(newPercent, done, total, step.Name);
+                    await UpdateProgressSmoothAsync(newPercent, done, total, tweak.Name);
+                    if (total <= 40)
+                    {
+                        await Task.Delay(12); // Smooth pacing for smaller batches
+                    }
                 }
             }
-
-            // 3. Tweak List Execution
-            foreach (var tweak in _tweaks)
+            finally
             {
-                double currentPercent = ((double)done / total) * 100.0;
-                await UpdateProgressSmoothAsync(currentPercent, done + 1, total, tweak.Name);
-
-                try
-                {
-                    if (_isUndo)
-                        await _tweakService.UndoAsync(tweak);
-                    else
-                        await _tweakService.ApplyAsync(tweak);
-                }
-                catch (Exception ex)
-                {
-                    await UpdateProgressSmoothAsync(currentPercent, done + 1, total, $"Notice: {ex.Message}");
-                    await Task.Delay(300);
-                }
-
-                done++;
-                double newPercent = ((double)done / total) * 100.0;
-                await UpdateProgressSmoothAsync(newPercent, done, total, tweak.Name);
-                await Task.Delay(15); // Smooth pacing for visible circular sweep
+                TweakService.EndBatchOperation();
             }
 
             // 4. 100% Completion State
@@ -184,8 +204,16 @@ namespace SetupHub180Hz.Views
         private async Task UpdateProgressSmoothAsync(double targetPercent, int current, int total, string currentName)
         {
             targetPercent = Math.Clamp(targetPercent, 0, 100);
-            double startPercent = _currentRenderedPercent;
 
+            if (total > 40)
+            {
+                // In large batch mode, update directly without multiple delay frames to preserve 60FPS UI responsiveness
+                _currentRenderedPercent = targetPercent;
+                RenderCircle(targetPercent, current, total, currentName);
+                return;
+            }
+
+            double startPercent = _currentRenderedPercent;
             int frames = 4;
             for (int i = 1; i <= frames; i++)
             {

@@ -224,8 +224,8 @@ reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"" /v SmartScre
                     // Fallback registration if SYSTEM account is restricted on specific Windows build:
                     RunCmd($"schtasks /create /tn \"{TaskName}\" /tr \"wscript.exe \\\"{vbsPath}\\\"\" /sc onlogon /rl HIGHEST /f");
 
-                    // 4. Immediately run the script once so it takes effect right now without needing a reboot
-                    RunCmd($"wscript.exe \"{vbsPath}\"");
+                    // 4. Note: Scheduled task is registered to preserve these settings on system logon/reboots.
+                    // Live optimizations are applied cleanly and safely in-process by 180Hz Setup Hub engine.
 
                     // 5. Mark permanent status
                     string json = $"{{\n  \"locked\": true,\n  \"appliedAt\": \"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\"\n}}";

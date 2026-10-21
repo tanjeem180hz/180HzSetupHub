@@ -1000,6 +1000,28 @@ namespace SetupHub180Hz.Services
         private static readonly string SnapshotFile = Path.Combine(BackupDir, "prestate_snapshots.json");
         private static readonly object CacheLock = new();
         private static Dictionary<string, TweakPreStateSnapshot>? _preStateCache;
+        private static bool _isBatchActive = false;
+        private static readonly object BatchLock = new();
+
+        public static void BeginBatchOperation()
+        {
+            lock (BatchLock)
+            {
+                _isBatchActive = true;
+                EnsureCacheLoaded();
+                EnsureAppliedCacheLoaded();
+            }
+        }
+
+        public static void EndBatchOperation()
+        {
+            lock (BatchLock)
+            {
+                _isBatchActive = false;
+                SaveCache();
+                SaveAppliedCache();
+            }
+        }
 
         private static void EnsureCacheLoaded()
         {
@@ -1100,7 +1122,7 @@ namespace SetupHub180Hz.Services
                     if (!string.IsNullOrWhiteSpace(id) && _appliedCache!.Add(id))
                         changed = true;
                 }
-                if (changed) SaveAppliedCache();
+                if (changed && !_isBatchActive) SaveAppliedCache();
             }
         }
 
@@ -1121,7 +1143,7 @@ namespace SetupHub180Hz.Services
                     if (!string.IsNullOrWhiteSpace(id) && _appliedCache!.Remove(id))
                         changed = true;
                 }
-                if (changed) SaveAppliedCache();
+                if (changed && !_isBatchActive) SaveAppliedCache();
             }
         }
 
@@ -1175,7 +1197,10 @@ namespace SetupHub180Hz.Services
                 sb.AppendLine("; ================================================================");
                 sb.AppendLine();
 
-                var regEntries = tweaks.SelectMany(t => t.Registry)
+                var regEntries = (tweaks ?? Enumerable.Empty<TweakItem>())
+                    .Where(t => t != null && t.Registry != null)
+                    .SelectMany(t => t.Registry)
+                    .Where(r => r != null && !string.IsNullOrWhiteSpace(r.Path))
                     .GroupBy(r => r.Path, StringComparer.OrdinalIgnoreCase);
 
                 foreach (var group in regEntries)
@@ -1308,7 +1333,10 @@ namespace SetupHub180Hz.Services
             catch { }
 
             _preStateCache[keyId] = snap;
-            SaveCache();
+            if (!_isBatchActive)
+            {
+                SaveCache();
+            }
         }
 
         public async Task ApplyAsync(TweakItem tweak)
@@ -1337,13 +1365,9 @@ namespace SetupHub180Hz.Services
                     }
                 }
 
-                if (tweak.InvokeScript != null)
+                if (tweak.InvokeScript != null && tweak.InvokeScript.Count > 0)
                 {
-                    foreach (var script in tweak.InvokeScript)
-                    {
-                        if (!string.IsNullOrWhiteSpace(script))
-                            await RunPowerShellAsync(script);
-                    }
+                    await RunScriptsAsync(tweak.InvokeScript);
                 }
 
                 tweak.IsApplied = true;
@@ -1379,13 +1403,9 @@ namespace SetupHub180Hz.Services
                     }
                 }
 
-                if (tweak.UndoScript != null)
+                if (tweak.UndoScript != null && tweak.UndoScript.Count > 0)
                 {
-                    foreach (var script in tweak.UndoScript)
-                    {
-                        if (!string.IsNullOrWhiteSpace(script))
-                            await RunPowerShellAsync(script);
-                    }
+                    await RunScriptsAsync(tweak.UndoScript);
                 }
 
                 tweak.IsApplied = false;
@@ -1859,23 +1879,169 @@ namespace SetupHub180Hz.Services
             return list.ToArray();
         }
 
-        private static async Task SetServiceStartupAsync(string serviceName, string startupType)
+        private static readonly HashSet<string> ProtectedServiceBlacklist = new(StringComparer.OrdinalIgnoreCase)
         {
-            string psCmd = startupType.ToLowerInvariant() switch
-            {
-                "disabled" => $"Set-Service -Name '{serviceName}' -StartupType Disabled -ErrorAction SilentlyContinue; Stop-Service -Name '{serviceName}' -Force -ErrorAction SilentlyContinue",
-                "manual" => $"Set-Service -Name '{serviceName}' -StartupType Manual -ErrorAction SilentlyContinue",
-                "automatic" => $"Set-Service -Name '{serviceName}' -StartupType Automatic -ErrorAction SilentlyContinue",
-                "automaticdelayedstart" => $"Set-Service -Name '{serviceName}' -StartupType AutomaticDelayedStart -ErrorAction SilentlyContinue",
-                _ => $"Set-Service -Name '{serviceName}' -StartupType Manual -ErrorAction SilentlyContinue"
-            };
+            "csrss", "lsass", "services", "smss", "wininit", "winlogon", "svchost", "explorer", "dwm",
+            "rpcss", "dcomlaunch", "plugplay", "eventlog", "samss", "cryptsvc", "bfe", "mpssvc",
+            "nsi", "netprofm", "dhcp", "dnscache", "lanmanworkstation", "lanmanserver", "audiosrv",
+            "audiodg", "securityhealthservice", "windefend", "msiserver"
+        };
 
-            await RunPowerShellAsync(psCmd);
+        private static Task SetServiceStartupAsync(string serviceName, string startupType)
+        {
+            if (string.IsNullOrWhiteSpace(serviceName)) return Task.CompletedTask;
+            serviceName = serviceName.Trim();
+
+            // 1. NEVER tamper with critical core Windows system services
+            if (ProtectedServiceBlacklist.Contains(serviceName))
+                return Task.CompletedTask;
+
+            return Task.Run(() =>
+            {
+                try
+                {
+                    int startVal = 3; // Default: Manual
+                    int delayedVal = 0;
+
+                    string normalizedType = startupType?.Trim().ToLowerInvariant() ?? "manual";
+                    switch (normalizedType)
+                    {
+                        case "disabled":
+                            startVal = 4;
+                            break;
+                        case "manual":
+                        case "demand":
+                            startVal = 3;
+                            break;
+                        case "automatic":
+                        case "auto":
+                            startVal = 2;
+                            break;
+                        case "automaticdelayedstart":
+                        case "delayed-auto":
+                            startVal = 2;
+                            delayedVal = 1;
+                            break;
+                    }
+
+                    // Direct native Registry configuration: HKLM\SYSTEM\CurrentControlSet\Services\{serviceName}
+                    using (var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+                    using (var svcKey = baseKey.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{serviceName}", writable: true))
+                    {
+                        if (svcKey != null)
+                        {
+                            svcKey.SetValue("Start", startVal, RegistryValueKind.DWord);
+                            if (delayedVal == 1)
+                                svcKey.SetValue("DelayedAutostart", 1, RegistryValueKind.DWord);
+                            else
+                                svcKey.DeleteValue("DelayedAutostart", throwOnMissingValue: false);
+                        }
+                    }
+
+                    // If disabling a service, gently attempt to stop it if running, but NEVER force or block
+                    if (startVal == 4)
+                    {
+                        try
+                        {
+                            using var proc = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("sc.exe", $"stop \"{serviceName}\"")
+                            {
+                                CreateNoWindow = true,
+                                UseShellExecute = false
+                            });
+                            proc?.WaitForExit(1000);
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+            });
         }
 
-        private static Task RunPowerShellAsync(string script)
+        private static readonly System.Threading.SemaphoreSlim ScriptExecutionSemaphore = new(1, 1);
+
+        public static async Task RunScriptsAsync(IEnumerable<string> scripts)
         {
-            if (string.IsNullOrWhiteSpace(script)) return Task.CompletedTask;
+            if (scripts == null) return;
+            var list = scripts.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList();
+            if (list.Count == 0) return;
+
+            // In-process handling for memory garbage collection
+            if (list.All(s => s.Contains("[System.GC]::Collect") || s.Contains("[GC]::Collect")))
+            {
+                GC.Collect(2, GCCollectionMode.Forced, true, true);
+                GC.WaitForPendingFinalizers();
+                return;
+            }
+
+            // Check if all scripts are native console commands (powercfg, bcdedit, netsh, fsutil, schtasks, sc, cleanmgr)
+            bool isAllNative = list.All(s =>
+                s.StartsWith("powercfg", StringComparison.OrdinalIgnoreCase) ||
+                s.StartsWith("bcdedit", StringComparison.OrdinalIgnoreCase) ||
+                s.StartsWith("netsh", StringComparison.OrdinalIgnoreCase) ||
+                s.StartsWith("fsutil", StringComparison.OrdinalIgnoreCase) ||
+                s.StartsWith("schtasks", StringComparison.OrdinalIgnoreCase) ||
+                s.StartsWith("sc.exe", StringComparison.OrdinalIgnoreCase) ||
+                s.StartsWith("sc ", StringComparison.OrdinalIgnoreCase) ||
+                s.StartsWith("cleanmgr", StringComparison.OrdinalIgnoreCase));
+
+            if (isAllNative)
+            {
+                // Filter and sanitize each command
+                var safeCommands = new List<string>();
+                foreach (var cmd in list)
+                {
+                    string sanitized = SanitizeScript(cmd);
+                    if (!string.IsNullOrWhiteSpace(sanitized))
+                    {
+                        safeCommands.Add(sanitized);
+                    }
+                }
+
+                if (safeCommands.Count == 0) return;
+
+                await ScriptExecutionSemaphore.WaitAsync();
+                try
+                {
+                    await Task.Run(() =>
+                    {
+                        try
+                        {
+                            // Chain native commands using &
+                            string chained = string.Join(" & ", safeCommands);
+                            var psi = new System.Diagnostics.ProcessStartInfo("cmd.exe", $"/c \"{chained}\"")
+                            {
+                                CreateNoWindow = true,
+                                UseShellExecute = false,
+                                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                            };
+                            using var proc = System.Diagnostics.Process.Start(psi);
+                            if (proc != null)
+                            {
+                                bool finished = proc.WaitForExit(15_000);
+                                if (!finished)
+                                {
+                                    try { proc.Kill(entireProcessTree: true); } catch { }
+                                }
+                            }
+                        }
+                        catch { }
+                    });
+                }
+                finally
+                {
+                    ScriptExecutionSemaphore.Release();
+                }
+                return;
+            }
+
+            // Otherwise, combine into a single PowerShell script block
+            string combinedScript = string.Join("\r\n", list);
+            await RunPowerShellAsync(combinedScript);
+        }
+
+        private static string SanitizeScript(string script)
+        {
+            if (string.IsNullOrWhiteSpace(script)) return "";
 
             // KERNEL & SYSTEM PROCESS SAFETY INTERCEPTORS:
             // 1. Never allow disabling ACPI CPU idle states (prevents thermal runaway / 100% duty cycle clock watchdog timeout)
@@ -1904,49 +2070,107 @@ namespace SetupHub180Hz.Services
                 (script.IndexOf("Stop-Process", StringComparison.OrdinalIgnoreCase) >= 0 ||
                  script.IndexOf("taskkill", StringComparison.OrdinalIgnoreCase) >= 0))
             {
-                // Silently block fatal termination of Windows core subsystems
-                return Task.CompletedTask;
+                return "";
             }
 
-            return Task.Run(() =>
+            // 5. Silently block force-stopping critical system services
+            if (script.IndexOf("Stop-Service", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                try
+                foreach (var badSvc in ProtectedServiceBlacklist)
                 {
-                    byte[] bytes = System.Text.Encoding.Unicode.GetBytes(script);
-                    string encoded = Convert.ToBase64String(bytes);
-
-                    var psi = new System.Diagnostics.ProcessStartInfo
+                    if (script.IndexOf(badSvc, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        FileName = "powershell.exe",
-                        Arguments = $"-NonInteractive -NoProfile -ExecutionPolicy Bypass -EncodedCommand {encoded}",
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
-                    };
-
-                    using var proc = System.Diagnostics.Process.Start(psi);
-                    proc?.WaitForExit(30_000);
+                        return "";
+                    }
                 }
-                catch
+            }
+
+            return script;
+        }
+
+        public static async Task RunPowerShellAsync(string script)
+        {
+            if (string.IsNullOrWhiteSpace(script)) return;
+
+            script = SanitizeScript(script);
+            if (string.IsNullOrWhiteSpace(script)) return;
+
+            // In-process handling for memory garbage collection
+            if (script.Contains("[System.GC]::Collect") || script.Contains("[GC]::Collect"))
+            {
+                GC.Collect(2, GCCollectionMode.Forced, true, true);
+                GC.WaitForPendingFinalizers();
+                return;
+            }
+
+            // In batch mode, skip running 40-minute DISM /RestoreHealth and SFC to prevent system CBS locks
+            if (_isBatchActive && (script.IndexOf("RestoreHealth", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                  script.IndexOf("sfc /scannow", StringComparison.OrdinalIgnoreCase) >= 0))
+            {
+                return;
+            }
+
+            await ScriptExecutionSemaphore.WaitAsync();
+            try
+            {
+                await Task.Run(() =>
                 {
-                    // Fallback to ShellExecute runas if needed
                     try
                     {
-                        var psiFallback = new System.Diagnostics.ProcessStartInfo
+                        byte[] bytes = System.Text.Encoding.Unicode.GetBytes(script);
+                        string encoded = Convert.ToBase64String(bytes);
+
+                        var psi = new System.Diagnostics.ProcessStartInfo
                         {
                             FileName = "powershell.exe",
-                            Arguments = $"-NonInteractive -NoProfile -ExecutionPolicy Bypass -Command \"{EscapeForPs(script)}\"",
-                            UseShellExecute = true,
-                            Verb = "runas",
-                            WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                            Arguments = $"-NonInteractive -NoProfile -ExecutionPolicy Bypass -EncodedCommand {encoded}",
+                            UseShellExecute = false,
                             CreateNoWindow = true,
+                            WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
                         };
-                        using var procFallback = System.Diagnostics.Process.Start(psiFallback);
-                        procFallback?.WaitForExit(30_000);
+
+                        using var proc = System.Diagnostics.Process.Start(psi);
+                        if (proc != null)
+                        {
+                            bool finished = proc.WaitForExit(15_000);
+                            if (!finished)
+                            {
+                                try { proc.Kill(entireProcessTree: true); } catch { }
+                            }
+                        }
                     }
-                    catch { }
-                }
-            });
+                    catch
+                    {
+                        // Fallback to ShellExecute runas if needed
+                        try
+                        {
+                            var psiFallback = new System.Diagnostics.ProcessStartInfo
+                            {
+                                FileName = "powershell.exe",
+                                Arguments = $"-NonInteractive -NoProfile -ExecutionPolicy Bypass -Command \"{EscapeForPs(script)}\"",
+                                UseShellExecute = true,
+                                Verb = "runas",
+                                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                                CreateNoWindow = true,
+                            };
+                            using var procFallback = System.Diagnostics.Process.Start(psiFallback);
+                            if (procFallback != null)
+                            {
+                                bool finished = procFallback.WaitForExit(15_000);
+                                if (!finished)
+                                {
+                                    try { procFallback.Kill(entireProcessTree: true); } catch { }
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                });
+            }
+            finally
+            {
+                ScriptExecutionSemaphore.Release();
+            }
         }
 
         private static string EscapeForPs(string script)

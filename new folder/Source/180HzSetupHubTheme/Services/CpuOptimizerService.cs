@@ -225,93 +225,117 @@ namespace SetupHub180Hz.Services
             {
                 try
                 {
-                    // Ensure Ultimate or High-Performance scheme is unlocked and active
-                    RunCmd("powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61");
-                    RunCmd("powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61");
-                    RunCmd("powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
-
                     string sub = "54533251-82be-4824-96c1-47b60b740d00";
+                    var commands = new List<string>
+                    {
+                        // Ensure Ultimate or High-Performance scheme is unlocked and active
+                        "powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 >nul 2>&1",
+                        "powercfg /setactive e9a42b02-d5df-448d-aa00-03f14749eb61 >nul 2>&1",
+                        "powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1",
 
-                    // 1. Dynamic Aggressive Boost Mode (2 = Aggressive - boosts up to 5.0GHz Max Turbo on demand)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} be337238-0d82-4146-a960-4f3749d470c7 2");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} be337238-0d82-4146-a960-4f3749d470c7 2");
+                        // 1. Dynamic Aggressive Boost Mode (2 = Aggressive - boosts up to 5.0GHz Max Turbo on demand)
+                        $"powercfg /setacvalueindex scheme_current {sub} be337238-0d82-4146-a960-4f3749d470c7 2 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} be337238-0d82-4146-a960-4f3749d470c7 2 >nul 2>&1",
 
-                    // 2. Processor Performance Boost Policy = 100% (Permits 100% maximum boost frequency headroom)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 45bcc044-d885-43e2-8605-ee0ec6e96b59 100");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 45bcc044-d885-43e2-8605-ee0ec6e96b59 100");
+                        // 2. Processor Performance Boost Policy = 100% (Headroom)
+                        $"powercfg /setacvalueindex scheme_current {sub} 45bcc044-d885-43e2-8605-ee0ec6e96b59 100 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} 45bcc044-d885-43e2-8605-ee0ec6e96b59 100 >nul 2>&1",
 
-                    // 3. Energy Performance Preference = 0 (100% Max Performance, 0% Energy Bias)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6864 0");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6864 0");
+                        // 3. Energy Performance Preference = 0 (100% Max Performance)
+                        $"powercfg /setacvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6863 0 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6864 0 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} 36687f9e-e3a5-4dbf-b1dc-15eb381c6864 0 >nul 2>&1",
 
-                    // 4. Autonomous Mode = 1 (Hardware P-States / AMD CPPC / Intel Speed Shift Active)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 8baa4a8a-14c6-4451-8e8b-14bdbd197537 1");
+                        // 4. Autonomous Mode = 1 (Hardware P-States / AMD CPPC / Intel Speed Shift Active)
+                        $"powercfg /setacvalueindex scheme_current {sub} 8baa4a8a-14c6-4451-8e8b-14bdbd197537 1 >nul 2>&1",
 
-                    // 5. Heterogeneous Thread Scheduling: 2 = Prefer Performant Processors (Zen 4 Big Cores for games/apps, compact cores for background - ZERO thread congestion!)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2");
+                        // 5. Heterogeneous Thread Scheduling: 2 = Prefer Performant Processors
+                        $"powercfg /setacvalueindex scheme_current {sub} 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} 93b8b6dc-0698-4d1c-9ee4-0644e900c85d 2 >nul 2>&1",
 
-                    // 6. Heterogeneous Short Running Thread Policy: 2 = Prefer Performant Processors
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} bae08b81-2d5e-4688-ad6a-13243356654b 2");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} bae08b81-2d5e-4688-ad6a-13243356654b 2");
+                        // 6. Heterogeneous Short Running Thread Policy: 2 = Prefer Performant Processors
+                        $"powercfg /setacvalueindex scheme_current {sub} bae08b81-2d5e-4688-ad6a-13243356654b 2 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} bae08b81-2d5e-4688-ad6a-13243356654b 2 >nul 2>&1",
 
-                    // 7. Heterogeneous Policy in Effect: 0 = Dynamic CPPC balance across all 12 threads
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5 0");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5 0");
+                        // 7. Heterogeneous Policy in Effect: 0 = Dynamic CPPC balance across all threads
+                        $"powercfg /setacvalueindex scheme_current {sub} 7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5 0 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} 7f2f5cfa-f10c-4823-b5e1-e93ae85f46b5 0 >nul 2>&1",
 
-                    // 8. Max Processor Frequency = 0 (Unlimited / Full Turbo Boost)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 75b0ae3f-bce0-45a7-8c89-c9611c25e101 0");
+                        // 8. Max Processor Frequency = 0 (Unlimited / Full Turbo Boost)
+                        $"powercfg /setacvalueindex scheme_current {sub} 75b0ae3f-bce0-45a7-8c89-c9611c25e100 0 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} 75b0ae3f-bce0-45a7-8c89-c9611c25e101 0 >nul 2>&1",
 
-                    // 9. Min Processor State = 5% (Gives APU / discrete GPU 100% thermal and TDP power headroom; never throttles GPU)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964c 5");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964c 5");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964d 5");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964d 5");
+                        // 9. Min Processor State = 5% (TDP headroom)
+                        $"powercfg /setacvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964c 5 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964c 5 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964d 5 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} 893dee8e-2bef-41e0-89c6-b55d0929964d 5 >nul 2>&1",
 
-                    // Max Processor State = 100%
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ec 100");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ec 100");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ed 100");
-                    RunCmd($"powercfg /setdcvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ed 100");
+                        // Max Processor State = 100%
+                        $"powercfg /setacvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ec 100 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ec 100 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ed 100 >nul 2>&1",
+                        $"powercfg /setdcvalueindex scheme_current {sub} bc5038f7-23e0-4960-96da-33abaf5935ed 100 >nul 2>&1",
 
-                    // 9. Core Parking Min / Max Cores = 100% (Unpark all performance & compact cores)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 0cc5b647-c1df-4637-891a-dec35c318583 100");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 0cc5b647-c1df-4637-891a-dec35c318584 100");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} ea062031-0e34-4ff1-9b6d-eb1059334028 100");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} ea062031-0e34-4ff1-9b6d-eb1059334029 100");
+                        // Core Parking Min / Max Cores = 100% (Unpark all performance & compact cores)
+                        $"powercfg /setacvalueindex scheme_current {sub} 0cc5b647-c1df-4637-891a-dec35c318583 100 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} 0cc5b647-c1df-4637-891a-dec35c318584 100 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} ea062031-0e34-4ff1-9b6d-eb1059334028 100 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} ea062031-0e34-4ff1-9b6d-eb1059334029 100 >nul 2>&1",
 
-                    // 10. Latency Sensitivity Hint = 100% Unpark & 100% Performance
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 616cdaa5-695e-4545-97ad-97dc2d1bdd88 100");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 619b7505-003b-4e82-b7a6-4dd29c300971 100");
+                        // Latency Sensitivity Hint = 100% Unpark & 100% Performance
+                        $"powercfg /setacvalueindex scheme_current {sub} 616cdaa5-695e-4545-97ad-97dc2d1bdd88 100 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} 619b7505-003b-4e82-b7a6-4dd29c300971 100 >nul 2>&1",
 
-                    // 11. Instant Frequency Increase (1 interval delay, 10% threshold) & Sustained Decrease (100 intervals)
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 06cadf0e-64ed-448a-8927-ce7bf90eb35d 10");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 12a0ab44-fe28-4fa9-b3bd-4b64f44960a6 5");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} 984cf492-3bed-4488-a8f9-4286c97bf5aa 1");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} d8edeb9b-95cf-4f95-a73c-b061973693c8 100");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} b000397d-9b0b-483d-98c9-692a6060cfbf 10");
-                    RunCmd($"powercfg /setacvalueindex scheme_current {sub} f8861c27-95e7-475c-865b-13c0cb3f9d6b 5");
+                        // Instant Frequency Increase & Sustained Decrease
+                        $"powercfg /setacvalueindex scheme_current {sub} 06cadf0e-64ed-448a-8927-ce7bf90eb35d 10 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} 12a0ab44-fe28-4fa9-b3bd-4b64f44960a6 5 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} 984cf492-3bed-4488-a8f9-4286c97bf5aa 1 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} d8edeb9b-95cf-4f95-a73c-b061973693c8 100 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} b000397d-9b0b-483d-98c9-692a6060cfbf 10 >nul 2>&1",
+                        $"powercfg /setacvalueindex scheme_current {sub} f8861c27-95e7-475c-865b-13c0cb3f9d6b 5 >nul 2>&1",
 
-                    // Activate scheme
-                    RunCmd("powercfg /setactive scheme_current");
+                        // Activate scheme
+                        "powercfg /setactive scheme_current >nul 2>&1",
+
+                        // Ensure Windows Default Kernel Clock Stability (Prevent CLOCK_WATCHDOG_TIMEOUT BSOD)
+                        "bcdedit /deletevalue disabledynamictick >nul 2>&1",
+                        "bcdedit /deletevalue useplatformtick >nul 2>&1",
+                        "bcdedit /deletevalue tscsyncpolicy >nul 2>&1",
+                        "bcdedit /deletevalue useplatformclock >nul 2>&1"
+                    };
+
+                    // Execute all powercfg and bcdedit operations in 1 single chained batch
+                    RunCmdBatch(commands);
 
                     // 12. Global Power Throttling & EcoQoS Registry Elimination
                     using (var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\Power\PowerThrottling", true))
                     {
                         key?.SetValue("PowerThrottlingOff", 1, RegistryValueKind.DWord);
                     }
-
-                    // 13. Ensure Windows Default Kernel Clock Stability (Delete any desynchronized overrides to prevent CLOCK_WATCHDOG_TIMEOUT BSOD)
-                    RunCmd("bcdedit /deletevalue disabledynamictick");
-                    RunCmd("bcdedit /deletevalue useplatformtick");
-                    RunCmd("bcdedit /deletevalue tscsyncpolicy");
-                    RunCmd("bcdedit /deletevalue useplatformclock");
                 }
                 catch { }
             });
+        }
+
+        private static void RunCmdBatch(IEnumerable<string> commands)
+        {
+            try
+            {
+                var list = commands.Where(c => !string.IsNullOrWhiteSpace(c)).ToList();
+                if (list.Count == 0) return;
+                string chained = string.Join(" & ", list);
+                var psi = new ProcessStartInfo("cmd.exe", $"/c \"{chained}\"")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+                using var p = Process.Start(psi);
+                p?.WaitForExit(8000);
+            }
+            catch { }
         }
 
         private static void RunCmd(string cmd)
@@ -321,7 +345,8 @@ namespace SetupHub180Hz.Services
                 using var p = Process.Start(new ProcessStartInfo("cmd.exe", $"/c {cmd}")
                 {
                     CreateNoWindow = true,
-                    UseShellExecute = false
+                    UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 });
                 p?.WaitForExit(3000);
             }
