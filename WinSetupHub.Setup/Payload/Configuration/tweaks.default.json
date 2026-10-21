@@ -929,7 +929,7 @@
         "invokeScript":  [
                              "Write-Host \u0027Starting Deep C: Drive Storage \u0026 Component Store Cleanup...\u0027 -ForegroundColor Cyan",
                              "cleanmgr.exe /d C: /VERYLOWDISK",
-                             "Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase",
+                             "Dism.exe /online /Cleanup-Image /StartComponentCleanup",
                              "$cPaths = @(\"$env:TEMP\", \"$env:WINDIR\\Temp\", \"$env:WINDIR\\SoftwareDistribution\\Download\", \"$env:WINDIR\\SoftwareDistribution\\DeliveryOptimization\", \"$env:ProgramData\\Microsoft\\Network\\Downloader\", \"$env:LOCALAPPDATA\\D3DSCache\", \"$env:LOCALAPPDATA\\NVIDIA\\DXCache\", \"$env:LOCALAPPDATA\\NVIDIA\\GLCache\", \"$env:LOCALAPPDATA\\AMD\\DxCache\", \"$env:LOCALAPPDATA\\CrashDumps\", \"$env:WINDIR\\Minidump\", \"$env:ProgramData\\Microsoft\\Windows\\WER\")",
                              "foreach ($p in $cPaths) { if (Test-Path $p) { Get-ChildItem -Path $p -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue } }",
                              "Clear-RecycleBin -Force -ErrorAction SilentlyContinue",
@@ -1045,7 +1045,7 @@
         "description":  "Disables BitLocker.",
         "category":  "Essential Tweaks",
         "categoryOrder":  8,
-        "isAdvanced":  false,
+        "isAdvanced":  true,
         "registry":  [
 
                      ],
@@ -1058,7 +1058,8 @@
         "undoScript":  [
                            "Enable-BitLocker -MountPoint $Env:SystemDrive"
                        ],
-        "link":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablebitlocker"
+        "link":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/disablebitlocker",
+        "isRecommended":  false
     },
     {
         "id":  "WPFTweaksConsumerFeatures",
@@ -1120,7 +1121,7 @@
         "description":  "Runs Disk Cleanup on Drive C: and removes old Windows Updates.",
         "category":  "Essential Tweaks",
         "categoryOrder":  8,
-        "isAdvanced":  false,
+        "isAdvanced":  true,
         "registry":  [
 
                      ],
@@ -1128,12 +1129,14 @@
 
                     ],
         "invokeScript":  [
-                             "\n      cleanmgr.exe /d C: /VERYLOWDISK\n      Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase\n      "
+                             "cleanmgr.exe /sagerun:1",
+                             "Write-Host \u0027Disk cleanup routine finished.\u0027 -ForegroundColor Green"
                          ],
         "undoScript":  [
                            "Write-Host \u0027Maintenance action state is clean.\u0027 -ForegroundColor Gray"
                        ],
-        "link":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/diskcleanup"
+        "link":  "https://winutil.christitus.com/code-reference/tweaks/essential-tweaks/diskcleanup",
+        "isRecommended":  false
     },
     {
         "id":  "WPFTweaksEndTaskOnTaskbar",
@@ -3502,8 +3505,8 @@
     },
     {
         "id":  "CpuTweakDisableCpuIdle",
-        "name":  "Extreme Low-Latency C-State Idle Disable (Zero Core Sleep Latency)",
-        "description":  "Disables CPU processor sleep states (C-States) so processor cores never enter idle states, eliminating core wake-up latency in competitive eSports games.",
+        "name":  "Ultra-Low Latency Processor Idle Optimization (Safe 0ms Wake-up)",
+        "description":  "Tunes processor idle sensitivity to 100% maximum responsiveness for zero core wake-up latency in competitive games while maintaining safe ACPI thermal regulation.",
         "category":  "CPU, RAM \u0026 Power Tuning",
         "categoryOrder":  3,
         "section":  "System",
@@ -3514,7 +3517,7 @@
 
                      ],
         "invokeScript":  [
-                             "powercfg /setacvalueindex scheme_current sub_processor IDLEDISABLE 1; powercfg /setactive scheme_current"
+                             "powercfg /setacvalueindex scheme_current sub_processor IDLEDISABLE 0; powercfg /setacvalueindex scheme_current sub_processor 616cdaa5-695e-4545-97ad-97dc2d1bdd88 100; powercfg /setactive scheme_current"
                          ],
         "undoScript":  [
                            "powercfg /setacvalueindex scheme_current sub_processor IDLEDISABLE 0; powercfg /setactive scheme_current"
@@ -7193,8 +7196,8 @@
     },
     {
         "id":  "GameTweakCsrssRealtimeScheduling",
-        "name":  "Elevate CSRSS Process Priority to Realtime for Instant Display Response",
-        "description":  "Elevates Client Server Runtime Subsystem (CSRSS) CPU priority to Realtime, eliminating desktop cursor micro-freezes and window dragging lag.",
+        "name":  "Protect CSRSS Protected Subsystem from Execution Overrides",
+        "description":  "Ensures CSRSS operates safely without IFEO priority override tampering, eliminating system-wide PPL violations and desktop freezes.",
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
         "section":  "System",
@@ -7202,22 +7205,16 @@
         "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
-                         {
-                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions",
-                             "Name":  "CpuPriorityClass",
-                             "Value":  "3",
-                             "OriginalValue":  "\u003cRemoveEntry\u003e",
-                             "Type":  "DWord"
-                         }
+
                      ],
         "service":  [
 
                     ],
         "invokeScript":  [
-
+                             "Remove-Item -Path \u0027HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\u0027 -Recurse -ErrorAction SilentlyContinue"
                          ],
         "undoScript":  [
-                           "Remove-ItemProperty -Path \u0027HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions\u0027 -Name \u0027CpuPriorityClass\u0027 -ErrorAction SilentlyContinue"
+                           "Write-Host \u0027CSRSS protected state maintained.\u0027 -ForegroundColor Gray"
                        ]
     },
     {

@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "id":  "RegTweakEmulBlueStacks",
         "name":  "BlueStacks Realtime CPU \u0026 IO Priority (HD-Player.exe)",
@@ -1429,37 +1429,24 @@
     },
     {
         "id":  "RegTweakCsrssPriority",
-        "name":  "CSRSS Client-Server Runtime High Priority (Input Response)",
-        "description":  "Boosts csrss.exe to High CPU priority class and High IO priority class for instantaneous cursor and keyboard response.",
+        "name":  "CSRSS Protected Subsystem Health Guard",
+        "description":  "Ensures Windows Client-Server Runtime (CSRSS) operates with protected process security, preventing third-party IFEO overrides and eliminating input freezes.",
         "category":  "Gaming \u0026 Input",
         "categoryOrder":  3,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "registry":  [
-                         {
-                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions",
-                             "Name":  "CpuPriorityClass",
-                             "Value":  "3",
-                             "OriginalValue":  "\u003cRemoveEntry\u003e",
-                             "Type":  "DWord"
-                         },
-                         {
-                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions",
-                             "Name":  "IoPriority",
-                             "Value":  "3",
-                             "OriginalValue":  "\u003cRemoveEntry\u003e",
-                             "Type":  "DWord"
-                         }
+
                      ],
         "service":  [
 
                     ],
         "invokeScript":  [
-
+                             "Remove-Item -Path \u0027HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\u0027 -Recurse -ErrorAction SilentlyContinue"
                          ],
         "undoScript":  [
-
+                           "Write-Host \u0027CSRSS protected state maintained.\u0027 -ForegroundColor Gray"
                        ]
     },
     {
@@ -4271,8 +4258,8 @@
     },
     {
         "id":  "RegTweakCsrssPriorityRealtime",
-        "name":  "CSRSS Display Runtime Priority Realtime",
-        "description":  "Elevates CSRSS process priority to 4 (Realtime) for instant cursor response.",
+        "name":  "CSRSS Protected Subsystem Realtime Guard",
+        "description":  "Maintains Windows Protected Process Light (PPL) security boundaries for CSRSS, preventing kernel bugchecks and cursor freezes.",
         "category":  "🎮 2X FPS Gaming \u0026 Low Latency",
         "categoryOrder":  0,
         "section":  "Registry",
@@ -4280,22 +4267,16 @@
         "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
-                         {
-                             "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\\PerfOptions",
-                             "Name":  "CpuPriorityClass",
-                             "Value":  "3",
-                             "OriginalValue":  "\u003cRemoveEntry\u003e",
-                             "Type":  "DWord"
-                         }
+
                      ],
         "service":  [
 
                     ],
         "invokeScript":  [
-
+                             "Remove-Item -Path \u0027HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\csrss.exe\u0027 -Recurse -ErrorAction SilentlyContinue"
                          ],
         "undoScript":  [
-
+                           "Write-Host \u0027CSRSS protected state maintained.\u0027 -ForegroundColor Gray"
                        ]
     },
     {

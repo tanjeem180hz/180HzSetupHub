@@ -33,7 +33,6 @@ namespace SetupHub180Hz.Services
             "WPFTweaksServices",
             "WPFTweaksTelemetry",
             "WPFTweaksDeliveryOptimization",
-            "WPFTweaksDiskCleanup",
             "WPFTweaksDeleteTempFiles",
             "WPFTweaksEndTaskOnTaskbar",
             "WPFTweaksRestorePoint",
@@ -59,7 +58,6 @@ namespace SetupHub180Hz.Services
             "WPFTweaksDisplay",
 
             // 🚀 Emulator 100% Extreme Performance
-            "EmulTweakHypervisorVBS",
             "EmulTweakCpuPriority",
             "EmulTweakGpuPreference",
             "EmulTweakPowerThrottling",
@@ -77,12 +75,8 @@ namespace SetupHub180Hz.Services
             "GfxTweakDisableGameBarPresence",
 
             // ⚡ Extreme Low Latency & Kernel Timers
-            "KernelTweakDynamicTick",
-            "KernelTweakTSCClock",
-            "KernelTweakTSCSync",
             "KernelTweakSysResponsiveness",
             "KernelTweakMSIGpu",
-            "KernelTweakCSRSSPriority",
             "KernelTweakDisableDwmGhosting",
             "KernelTweakUsbPolling",
             "KernelTweakAudioLatency",
@@ -124,7 +118,6 @@ namespace SetupHub180Hz.Services
             "NetTweakMaxUserPort",
 
             // 💾 Storage & NVMe Throughput
-            "DiskTweakDeepCDriveCleanup",
             "DiskTweakNtfsFast",
             "DiskTweakEnableTrim",
             "DiskTweakNvmeWriteCache",
@@ -147,7 +140,6 @@ namespace SetupHub180Hz.Services
             "RegTweakDisableStickyKeysPopups",
 
             // 🚀 Emulator 100% Extreme Performance
-            "EmulTweakHypervisorVBS",
             "EmulTweakCpuPriority",
             "EmulTweakGpuPreference",
             "EmulTweakPowerThrottling",
@@ -158,7 +150,6 @@ namespace SetupHub180Hz.Services
             // 🗃️ Dedicated Registry Optimization Recommendations
             "RegTweakDirectFlipIFlip",
             "RegTweakGameBarPresenceKiller",
-            "RegTweakCsrssPriority",
             "RegTweakDwmPriority",
             "RegTweakFaultTolerantHeap",
             "RegTweakQoSZeroReserve",
@@ -327,7 +318,6 @@ namespace SetupHub180Hz.Services
             "GameTweakRawLinearMousePrecision",
             "GameTweakDisableWindowedGpuPowerSaving",
             "GameTweakIntelAmdThreadDirector",
-            "GameTweakCsrssRealtimeScheduling",
             "GameTweakDwmRenderBufferSingle",
             "GameTweakStandbyListAutoPurge",
             "GameTweakNetworkPacketPacingZero",
@@ -347,21 +337,31 @@ namespace SetupHub180Hz.Services
             "RegTweakDirectFlipEnabled",
             "RegTweakMouseAccelerationZero",
             "RegTweakHwSchModeHardware",
-            "RegTweakCsrssPriorityRealtime",
             "RegTweakDwmSingleBuffer",
-            "RegTweakNoLazyModeMMCSS"
+            "RegTweakNoLazyModeMMCSS",
+
+            // Anti-Crash & Continuous Smoothness Guardians
+            "GfxTweakGPUCrashShieldMaximum",
+            "SysTweakInstantFreezeRecovery",
+            "SysTweakLowLevelHooksNoHang",
+            "GfxTweakSmoothFramePacingDXGI",
+            "SysTweakAutoHealthRepairEngine",
+
+            // 🚀 BlueStacks/MSI Player & Super Smoothness & Ping Stabilizers
+            "EmulTweakBlueStacksMsiPlayerOverdrive",
+            "EmulTweakDirectXAngleTexturePacing",
+            "NetTweakEsportsPingStabilizerECN",
+            "NetTweakAfdFastSocketPacing",
+            "GameTweakContinuousSmoothnessEngine",
+            "GameTweakPeakGamingThreadDirector"
         };
 
         // Extreme Performance Preset - forces 100% PC Performance & Ultra-Low Latency
         public static readonly HashSet<string> ExtremePerformanceIds = new(StringComparer.OrdinalIgnoreCase)
         {
             // Latency & Kernel Timers
-            "KernelTweakDynamicTick",
-            "KernelTweakTSCClock",
-            "KernelTweakTSCSync",
             "KernelTweakSysResponsiveness",
             "KernelTweakMSIGpu",
-            "KernelTweakCSRSSPriority",
             "KernelTweakDisableDwmGhosting",
             "KernelTweakUsbPolling",
             "KernelTweakAudioLatency",
@@ -406,7 +406,6 @@ namespace SetupHub180Hz.Services
             "NetTweakMaxUserPort",
 
             // Storage
-            "DiskTweakDeepCDriveCleanup",
             "DiskTweakNtfsFast",
             "DiskTweakEnableTrim",
             "DiskTweakNvmeWriteCache",
@@ -430,7 +429,6 @@ namespace SetupHub180Hz.Services
             "WPFAddUltPerf",
 
             // Emulators
-            "EmulTweakHypervisorVBS",
             "EmulTweakCpuPriority",
             "EmulTweakGpuPreference",
             "EmulTweakPowerThrottling",
@@ -441,7 +439,6 @@ namespace SetupHub180Hz.Services
             // Registry Optimizations
             "RegTweakDirectFlipIFlip",
             "RegTweakGameBarPresenceKiller",
-            "RegTweakCsrssPriority",
             "RegTweakDwmPriority",
             "RegTweakFaultTolerantHeap",
             "RegTweakQoSZeroReserve",
@@ -642,7 +639,6 @@ namespace SetupHub180Hz.Services
             "GameTweakRawLinearMousePrecision",
             "GameTweakDisableWindowedGpuPowerSaving",
             "GameTweakIntelAmdThreadDirector",
-            "GameTweakCsrssRealtimeScheduling",
             "GameTweakDwmRenderBufferSingle",
             "GameTweakStandbyListAutoPurge",
             "GameTweakNetworkPacketPacingZero",
@@ -657,9 +653,23 @@ namespace SetupHub180Hz.Services
             "RegTweakDirectFlipEnabled",
             "RegTweakMouseAccelerationZero",
             "RegTweakHwSchModeHardware",
-            "RegTweakCsrssPriorityRealtime",
             "RegTweakDwmSingleBuffer",
-            "RegTweakNoLazyModeMMCSS"
+            "RegTweakNoLazyModeMMCSS",
+
+            // Anti-Crash & Continuous Smoothness Guardians
+            "GfxTweakGPUCrashShieldMaximum",
+            "SysTweakInstantFreezeRecovery",
+            "SysTweakLowLevelHooksNoHang",
+            "GfxTweakSmoothFramePacingDXGI",
+            "SysTweakAutoHealthRepairEngine",
+
+            // 🚀 BlueStacks/MSI Player & Super Smoothness & Ping Stabilizers
+            "EmulTweakBlueStacksMsiPlayerOverdrive",
+            "EmulTweakDirectXAngleTexturePacing",
+            "NetTweakEsportsPingStabilizerECN",
+            "NetTweakAfdFastSocketPacing",
+            "GameTweakContinuousSmoothnessEngine",
+            "GameTweakPeakGamingThreadDirector"
         };
 
         private List<TweakItem>? _cache;
@@ -977,7 +987,7 @@ namespace SetupHub180Hz.Services
         {
             foreach (var item in items)
             {
-                if (RecommendedIds.Contains(item.Id) || ExtremePerformanceIds.Contains(item.Id) || item.Id.StartsWith("CleanTweak", StringComparison.OrdinalIgnoreCase))
+                if (!item.IsAdvanced && (RecommendedIds.Contains(item.Id) || ExtremePerformanceIds.Contains(item.Id) || item.Id.StartsWith("CleanTweak", StringComparison.OrdinalIgnoreCase)))
                 {
                     item.IsRecommended = true;
                 }
@@ -1649,6 +1659,58 @@ namespace SetupHub180Hz.Services
                 string value = undo ? reg.OriginalValue : reg.Value;
                 string type = reg.Type ?? "DWord";
 
+                string pathLower = path.ToLowerInvariant();
+
+                // ABSOLUTE KERNEL SAFETY SHIELD: Never allow tampering with core protected processes (csrss, lsass, wininit, smss)
+                if (pathLower.Contains("csrss.exe") ||
+                    pathLower.Contains("lsass.exe") ||
+                    pathLower.Contains("wininit.exe") ||
+                    pathLower.Contains("smss.exe"))
+                {
+                    if (undo || value == "<RemoveEntry>")
+                    {
+                        try
+                        {
+                            var (h, sk) = ParseHivePath(path);
+                            if (h.HasValue && !string.IsNullOrWhiteSpace(sk))
+                            {
+                                using var bk = RegistryKey.OpenBaseKey(h.Value, RegistryView.Registry64);
+                                using var k = bk.OpenSubKey(sk, writable: true);
+                                k?.DeleteValue(name, throwOnMissingValue: false);
+                            }
+                        }
+                        catch { }
+                    }
+                    return;
+                }
+
+                // ABSOLUTE GPU DRIVER SAFETY SHIELD: Never allow unstable hardware override flags in display driver classes
+                if (pathLower.Contains("{4d36e968-e325-11ce-bfc1-08002be10318}") &&
+                    (name.Equals("PP_ThermalAutoThrottlingEnable", StringComparison.OrdinalIgnoreCase) ||
+                     name.Equals("PowerMizerLevel", StringComparison.OrdinalIgnoreCase) ||
+                     name.Equals("PowerMizerLevelAC", StringComparison.OrdinalIgnoreCase) ||
+                     name.Equals("PerfLevelSrc", StringComparison.OrdinalIgnoreCase) ||
+                     name.Equals("DisablePowerGovernors", StringComparison.OrdinalIgnoreCase) ||
+                     name.Equals("DalDisableDisplayGating", StringComparison.OrdinalIgnoreCase) ||
+                     name.Equals("DisableDrmdmaPowerGating", StringComparison.OrdinalIgnoreCase)))
+                {
+                    if (undo || value == "<RemoveEntry>")
+                    {
+                        try
+                        {
+                            var (h, sk) = ParseHivePath(path);
+                            if (h.HasValue && !string.IsNullOrWhiteSpace(sk))
+                            {
+                                using var bk = RegistryKey.OpenBaseKey(h.Value, RegistryView.Registry64);
+                                using var k = bk.OpenSubKey(sk, writable: true);
+                                k?.DeleteValue(name, throwOnMissingValue: false);
+                            }
+                        }
+                        catch { }
+                    }
+                    return;
+                }
+
                 var (hiveEnum, subKey) = ParseHivePath(path);
                 if (!hiveEnum.HasValue || string.IsNullOrWhiteSpace(subKey)) return;
 
@@ -1757,9 +1819,10 @@ namespace SetupHub180Hz.Services
             if (string.IsNullOrWhiteSpace(path)) return (null, "");
 
             // Strip PowerShell provider prefix if present: "Registry::" or "Microsoft.PowerShell.Core\Registry::"
-            if (path.Contains("::"))
+            int doubleColonIdx = path.IndexOf("::", StringComparison.Ordinal);
+            if (doubleColonIdx >= 0)
             {
-                path = path.Substring(path.IndexOf("::") + 2);
+                path = path.Substring(doubleColonIdx + 2);
             }
 
             path = path.Replace("/", "\\").Trim('\\');
@@ -1812,6 +1875,39 @@ namespace SetupHub180Hz.Services
 
         private static Task RunPowerShellAsync(string script)
         {
+            if (string.IsNullOrWhiteSpace(script)) return Task.CompletedTask;
+
+            // KERNEL & SYSTEM PROCESS SAFETY INTERCEPTORS:
+            // 1. Never allow disabling ACPI CPU idle states (prevents thermal runaway / 100% duty cycle clock watchdog timeout)
+            if (script.IndexOf("IDLEDISABLE 1", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                script = script.Replace("IDLEDISABLE 1", "IDLEDISABLE 0");
+            }
+
+            // 2. Never allow dynamic tick disabling in BCD (prevents APIC timer desynchronization BSOD)
+            if (script.IndexOf("disabledynamictick yes", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                script = script.Replace("disabledynamictick yes", "disabledynamictick no");
+            }
+
+            // 3. Never allow overriding invariant TSC synchronization in BCD
+            if (script.IndexOf("tscsyncpolicy Enhanced", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                script = script.Replace("tscsyncpolicy Enhanced", "tscsyncpolicy Default");
+            }
+
+            // 4. Never allow terminating critical Windows system processes (svchost, csrss, lsass, smss, wininit)
+            if ((script.IndexOf("svchost", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                 script.IndexOf("csrss", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                 script.IndexOf("lsass", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                 script.IndexOf("wininit", StringComparison.OrdinalIgnoreCase) >= 0) &&
+                (script.IndexOf("Stop-Process", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                 script.IndexOf("taskkill", StringComparison.OrdinalIgnoreCase) >= 0))
+            {
+                // Silently block fatal termination of Windows core subsystems
+                return Task.CompletedTask;
+            }
+
             return Task.Run(() =>
             {
                 try
