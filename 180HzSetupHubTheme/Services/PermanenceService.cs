@@ -106,14 +106,16 @@ for %%i in (0000 0001 0002 0003 0004) do (
 )
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v PowerSavingPolicy /t REG_DWORD /d 0 /f >nul 2>&1
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"" /v HwSchMode /t REG_DWORD /d 2 /f >nul 2>&1
-reg add ""HKCU\Software\Microsoft\Direct3D"" /v EnableDirectFlip /t REG_DWORD /d 1 /f >nul 2>&1
-reg add ""HKCU\Software\Microsoft\Direct3D"" /v DirectFlipHonor /t REG_DWORD /d 1 /f >nul 2>&1
+:: Clean up any legacy DirectFlip keys that break Electron (Antigravity/Discord/VSCode) swapchains
+reg delete ""HKCU\Software\Microsoft\Direct3D"" /v EnableDirectFlip /f >nul 2>&1
+reg delete ""HKCU\Software\Microsoft\Direct3D"" /v DirectFlipHonor /f >nul 2>&1
+reg delete ""HKCU\Software\Microsoft\Direct3D"" /v EnableIndependentFlip /f >nul 2>&1
+reg delete ""HKLM\SOFTWARE\Microsoft\Direct3D\Drivers"" /v SoftwareOnly /f >nul 2>&1
+reg delete ""HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"" /v LargePageMinimum /f >nul 2>&1
 reg add ""HKLM\SOFTWARE\Microsoft\Direct3D\Shaders"" /v ShaderCacheSize /t REG_DWORD /d 10240 /f >nul 2>&1
 reg add ""HKCU\Control Panel\Graphics\WindowedVRR"" /v Enabled /t REG_DWORD /d 1 /f >nul 2>&1
 
-:: 5. Network Zero-Ping & Fast Open Locking
-netsh int tcp set global fastopen=enabled >nul 2>&1
-netsh int tcp set global fastopenfallback=enabled >nul 2>&1
+:: 5. Network Zero-Ping & Fast Handshake Locking (Safe for Localhost IPC)
 netsh int tcp set global rss=enabled >nul 2>&1
 netsh int tcp set global autotuninglevel=normal >nul 2>&1
 netsh int tcp set global timestamps=disabled >nul 2>&1
@@ -159,9 +161,9 @@ reg add ""HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR"" /v AllowGameDVR /t 
 :: 10. Global CPU Power Throttling & EcoQoS Disable
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling"" /v PowerThrottlingOff /t REG_DWORD /d 1 /f >nul 2>&1
 
-:: 11. Memory Management & Paging Executive Locks (Keep Kernel in RAM)
-reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"" /v DisablePagingExecutive /t REG_DWORD /d 1 /f >nul 2>&1
+:: 11. Memory Management & Balanced Working Set
 reg add ""HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"" /v LargeSystemCache /t REG_DWORD /d 0 /f >nul 2>&1
+reg delete ""HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"" /v LargePageMinimum /f >nul 2>&1
 
 :: 12. Emulator Priority Class & Working Set Locks (IFEO)
 for %%g in (HD-Player.exe HD-Agent.exe BlueStacks.exe dnplayer.exe LdBoxHeadless.exe ldvboxheadless.exe dnmultiplayer.exe AppMarket.exe AndroidProcess.exe aow_exe.exe Nox.exe MEmu.exe MuMuPlayer.exe NemuPlayer.exe SmartGaGa.exe) do (
@@ -177,8 +179,9 @@ bcdedit /deletevalue useplatformtick >nul 2>&1
 bcdedit /deletevalue tscsyncpolicy >nul 2>&1
 bcdedit /deletevalue useplatformclock >nul 2>&1
 
-:: 14. Disable RAM Memory Compression & Page Combining Overhead
-powershell -NoProfile -ExecutionPolicy Bypass -Command ""Disable-MMAgent -MemoryCompression -PageCombining"" >nul 2>&1
+:: 14. Essential Services & Software Compatibility Maintenance
+net start StorSvc >nul 2>&1
+net start WpnService >nul 2>&1
 
 :: 15. Auto-Accept Permissions & Silent UAC Elevation for svchost.exe & explorer.exe
 reg add ""HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"" /v ConsentPromptBehaviorAdmin /t REG_DWORD /d 0 /f >nul 2>&1

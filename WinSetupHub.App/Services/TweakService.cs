@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -53,8 +53,6 @@ namespace SetupHub180Hz.Services
             // Advanced Tweaks (Safe popular optimizations)
             "WPFTweaksRightClickMenu",
             "WPFTweaksWindowsAI",
-            "WPFTweaksLogiBlock",
-            "WPFTweaksRazerBlock",
             "WPFTweaksDisplay",
 
             // 🚀 Emulator 100% Extreme Performance
@@ -70,7 +68,6 @@ namespace SetupHub180Hz.Services
             "GfxTweakShaderCache",
             "GfxTweakFSE",
             "GfxTweakMPO",
-            "GfxTweakDirectFlip",
             "GfxTweakNvTelemetry",
             "GfxTweakDisableGameBarPresence",
 
@@ -87,9 +84,7 @@ namespace SetupHub180Hz.Services
             "CpuTweakDynamicTurboOverdrive",
             "CpuTweakUnparkCores",
             "CpuTweakWin32Priority",
-            "CpuTweakDisablePaging",
             "CpuTweakPowerPlanLock",
-            "CpuTweakDisableFTH",
             "CpuTweakEppPerformance",
             "CpuTweakDisableIdleDemote",
             "MemTweakFlushStandby",
@@ -100,11 +95,9 @@ namespace SetupHub180Hz.Services
             "GfxTweakShaderCache",
             "GfxTweakFSE",
             "GfxTweakMPO",
-            "GfxTweakDirectFlip",
             "GfxTweakNvTelemetry",
             "GfxTweakDisableGameBarPresence",
             "GfxTweakShaderCache10GB",
-            "GfxTweakDwmMaxQueuedFrames",
             "GfxTweakDisableDRR",
 
             // 🌐 Network & Ping Tuning
@@ -131,7 +124,6 @@ namespace SetupHub180Hz.Services
             "ServiceTweakErrorReporting",
             "ServiceTweakPcaSvc",
             "ServiceTweakWSearch",
-            "ServiceTweakWpnService",
             "ServiceTweakRemoteServices",
             "ServiceTweakLocationService",
 
@@ -148,10 +140,8 @@ namespace SetupHub180Hz.Services
             "EmulTweakGameloopAow",
 
             // 🗃️ Dedicated Registry Optimization Recommendations
-            "RegTweakDirectFlipIFlip",
             "RegTweakGameBarPresenceKiller",
             "RegTweakDwmPriority",
-            "RegTweakFaultTolerantHeap",
             "RegTweakQoSZeroReserve",
             "RegTweakDnsMaxSpeed",
             "RegTweakHungAppInstantKill",
@@ -166,7 +156,6 @@ namespace SetupHub180Hz.Services
             "RegTweakLinearMouseCurve",
             "RegTweakAccessibilityPopups",
             "RegTweakShaderCache10GB",
-            "RegTweakDwmMaxQueuedFrames1",
             "RegTweakDisableDynamicRefreshRate",
             "RegTweakMaxUserPort65534",
             "RegTweakTcpHashSize",
@@ -178,7 +167,6 @@ namespace SetupHub180Hz.Services
             "RegTweakDisableEdgePreload",
 
             // 🚀 Safe 10x Performance Boosters
-            "NetTweakTcpFastOpen",
             "NetTweakCompoundTcp",
             "DiskTweakNtfsMemoryUsage",
             "DiskTweakDisable8dot3Globally",
@@ -194,11 +182,9 @@ namespace SetupHub180Hz.Services
             "ServiceTweakWindowsErrorReportingSafe",
             "ServiceTweakDeliveryOptimizationSafe",
             "ServiceTweakConnectedDevicesSafe",
-            "RegTweakDirect3DHardwareOnly",
             "NetTweakNetworkThrottlingSafe",
             "ShellTweakNoLowDiskSpaceWarning",
             "EmulTweakDirect3DShaderWarming",
-            "RegTweakTcpFastOpen",
             "RegTweakNtfsMemoryWorker",
             "RegTweakExplorerSeparateProcess",
             "RegTweakStartupDelayZero",
@@ -210,7 +196,6 @@ namespace SetupHub180Hz.Services
             "RegTweakCpuPerfTimeDelay",
             "RegTweakIoPrioritySeparation",
             "RegTweakNoLowDiskSpaceChecks",
-            "RegTweakDirect3DNoSoftware",
             "RegTweakNetworkThrottlingFull",
             "RegTweakSecondLevelCacheAligned",
             "RegTweakCdpSvcManual",
@@ -247,7 +232,6 @@ namespace SetupHub180Hz.Services
             "RegTweakNoUseStoreOpenWith",
             "RegTweakDisableWidgetsEngine",
             "RegTweakEdgeNoStartupBoost",
-            "RegTweakDisablePagingExecutiveActive",
             "RegTweakDisableCrashControlDumpPaging",
             "RegTweakNvmeDisableAPST",
             "RegTweakNtfsDisableLastAccessGlobal",
@@ -263,13 +247,10 @@ namespace SetupHub180Hz.Services
             "KernelTweakEnableThreadDirectorFastTick",
             "KernelTweakDisableSystemProfileThrottling",
             "GfxTweakDisableGpuEnergyDriver",
-            "GfxTweakEnableDirectXIndependentFlip",
             "GfxTweakDisableAeroShakeWindowMinimize",
             "GfxTweakDisableTransparencyBlur",
             "CpuTweakDisablePowerThrottlingAllCores",
             "CpuTweakDisableCoreParkingAggressiveness",
-            "MemTweakOptimizeLargePageMinimum",
-            "MemTweakDisableFaultTolerantHeapEngine",
             "NetTweakEnableReceiveSideScalingNetsh",
             "NetTweakDisableNagleAlgorithmGlobal",
             "NetTweakDisableNetworkHeuristics",
@@ -287,12 +268,9 @@ namespace SetupHub180Hz.Services
             "RegTweakAudioMmcssSchedulingHigh",
             "RegTweakAudioMmcssNoBackgroundOnly",
             "RegTweakWddmPowerSavingOff",
-            "RegTweakDirectFlipIndependent",
             "RegTweakDisallowAeroShaking",
             "RegTweakDisableTransparencyAcrylic",
             "RegTweakPowerThrottlingGlobalOff",
-            "RegTweakLargePageMinimumMax",
-            "RegTweakFaultTolerantHeapOff",
             "RegTweakTcpRssEnabledRegistry",
             "RegTweakTcpWindowAutoTuningNormal",
             "RegTweakMaxUserPortAlloc65534",
@@ -318,12 +296,10 @@ namespace SetupHub180Hz.Services
             "GameTweakRawLinearMousePrecision",
             "GameTweakDisableWindowedGpuPowerSaving",
             "GameTweakIntelAmdThreadDirector",
-            "GameTweakDwmRenderBufferSingle",
             "GameTweakStandbyListAutoPurge",
             "GameTweakNetworkPacketPacingZero",
             "GfxTweakDisableUlpsPowerMizer",
             "GfxTweakDirectXHighPerformanceRouting",
-            "MemTweakDisableMemoryCompression",
             "EmulTweakUniversalAndroidOverdrive",
             "EmulTweakMaxGhzBoostLock",
             "RegTweakMMCSSGpuPriority8",
@@ -334,10 +310,8 @@ namespace SetupHub180Hz.Services
             "RegTweakGameDVRBackgroundDisabled",
             "RegTweakGameDVRFSEBehavior",
             "RegTweakShaderCache10GBOverdrive",
-            "RegTweakDirectFlipEnabled",
             "RegTweakMouseAccelerationZero",
             "RegTweakHwSchModeHardware",
-            "RegTweakDwmSingleBuffer",
             "RegTweakNoLazyModeMMCSS",
 
             // Anti-Crash & Continuous Smoothness Guardians
@@ -372,9 +346,7 @@ namespace SetupHub180Hz.Services
             "CpuTweakDynamicTurboOverdrive",
             "CpuTweakUnparkCores",
             "CpuTweakWin32Priority",
-            "CpuTweakDisablePaging",
             "CpuTweakPowerPlanLock",
-            "CpuTweakDisableFTH",
             "CpuTweakEppPerformance",
             "CpuTweakDisableIdleDemote",
             "MemTweakFlushStandby",
@@ -385,15 +357,12 @@ namespace SetupHub180Hz.Services
             "GfxTweakShaderCache",
             "GfxTweakFSE",
             "GfxTweakMPO",
-            "GfxTweakDirectFlip",
             "GfxTweakNvTelemetry",
             "GfxTweakDisableGameBarPresence",
             "GfxTweakShaderCache10GB",
-            "GfxTweakDwmMaxQueuedFrames",
             "GfxTweakDisableDRR",
             "GfxTweakDisableUlpsPowerMizer",
             "GfxTweakDirectXHighPerformanceRouting",
-            "MemTweakDisableMemoryCompression",
 
             // Network & Ping
             "NetTweakTcpAckNoDelay",
@@ -419,7 +388,6 @@ namespace SetupHub180Hz.Services
             "ServiceTweakErrorReporting",
             "ServiceTweakPcaSvc",
             "ServiceTweakWSearch",
-            "ServiceTweakWpnService",
             "ServiceTweakRemoteServices",
             "ServiceTweakLocationService",
             "WPFTweaksServices",
@@ -437,10 +405,8 @@ namespace SetupHub180Hz.Services
             "EmulTweakUniversalAndroidOverdrive",
 
             // Registry Optimizations
-            "RegTweakDirectFlipIFlip",
             "RegTweakGameBarPresenceKiller",
             "RegTweakDwmPriority",
-            "RegTweakFaultTolerantHeap",
             "RegTweakQoSZeroReserve",
             "RegTweakDnsMaxSpeed",
             "RegTweakHungAppInstantKill",
@@ -455,7 +421,6 @@ namespace SetupHub180Hz.Services
             "RegTweakLinearMouseCurve",
             "RegTweakAccessibilityPopups",
             "RegTweakShaderCache10GB",
-            "RegTweakDwmMaxQueuedFrames1",
             "RegTweakDisableDynamicRefreshRate",
             "RegTweakMaxUserPort65534",
             "RegTweakTcpHashSize",
@@ -499,7 +464,6 @@ namespace SetupHub180Hz.Services
             "RegTweakNtfsMftZone",
 
             // 🚀 Safe 10x Performance Boosters
-            "NetTweakTcpFastOpen",
             "NetTweakCompoundTcp",
             "DiskTweakNtfsMemoryUsage",
             "DiskTweakDisable8dot3Globally",
@@ -515,11 +479,9 @@ namespace SetupHub180Hz.Services
             "ServiceTweakWindowsErrorReportingSafe",
             "ServiceTweakDeliveryOptimizationSafe",
             "ServiceTweakConnectedDevicesSafe",
-            "RegTweakDirect3DHardwareOnly",
             "NetTweakNetworkThrottlingSafe",
             "ShellTweakNoLowDiskSpaceWarning",
             "EmulTweakDirect3DShaderWarming",
-            "RegTweakTcpFastOpen",
             "RegTweakNtfsMemoryWorker",
             "RegTweakExplorerSeparateProcess",
             "RegTweakStartupDelayZero",
@@ -531,7 +493,6 @@ namespace SetupHub180Hz.Services
             "RegTweakCpuPerfTimeDelay",
             "RegTweakIoPrioritySeparation",
             "RegTweakNoLowDiskSpaceChecks",
-            "RegTweakDirect3DNoSoftware",
             "RegTweakNetworkThrottlingFull",
             "RegTweakSecondLevelCacheAligned",
             "RegTweakCdpSvcManual",
@@ -568,7 +529,6 @@ namespace SetupHub180Hz.Services
             "RegTweakNoUseStoreOpenWith",
             "RegTweakDisableWidgetsEngine",
             "RegTweakEdgeNoStartupBoost",
-            "RegTweakDisablePagingExecutiveActive",
             "RegTweakDisableCrashControlDumpPaging",
             "RegTweakNvmeDisableAPST",
             "RegTweakNtfsDisableLastAccessGlobal",
@@ -584,13 +544,10 @@ namespace SetupHub180Hz.Services
             "KernelTweakEnableThreadDirectorFastTick",
             "KernelTweakDisableSystemProfileThrottling",
             "GfxTweakDisableGpuEnergyDriver",
-            "GfxTweakEnableDirectXIndependentFlip",
             "GfxTweakDisableAeroShakeWindowMinimize",
             "GfxTweakDisableTransparencyBlur",
             "CpuTweakDisablePowerThrottlingAllCores",
             "CpuTweakDisableCoreParkingAggressiveness",
-            "MemTweakOptimizeLargePageMinimum",
-            "MemTweakDisableFaultTolerantHeapEngine",
             "NetTweakEnableReceiveSideScalingNetsh",
             "NetTweakDisableNagleAlgorithmGlobal",
             "NetTweakDisableNetworkHeuristics",
@@ -608,12 +565,9 @@ namespace SetupHub180Hz.Services
             "RegTweakAudioMmcssSchedulingHigh",
             "RegTweakAudioMmcssNoBackgroundOnly",
             "RegTweakWddmPowerSavingOff",
-            "RegTweakDirectFlipIndependent",
             "RegTweakDisallowAeroShaking",
             "RegTweakDisableTransparencyAcrylic",
             "RegTweakPowerThrottlingGlobalOff",
-            "RegTweakLargePageMinimumMax",
-            "RegTweakFaultTolerantHeapOff",
             "RegTweakTcpRssEnabledRegistry",
             "RegTweakTcpWindowAutoTuningNormal",
             "RegTweakMaxUserPortAlloc65534",
@@ -639,7 +593,6 @@ namespace SetupHub180Hz.Services
             "GameTweakRawLinearMousePrecision",
             "GameTweakDisableWindowedGpuPowerSaving",
             "GameTweakIntelAmdThreadDirector",
-            "GameTweakDwmRenderBufferSingle",
             "GameTweakStandbyListAutoPurge",
             "GameTweakNetworkPacketPacingZero",
             "RegTweakMMCSSGpuPriority8",
@@ -650,10 +603,8 @@ namespace SetupHub180Hz.Services
             "RegTweakGameDVRBackgroundDisabled",
             "RegTweakGameDVRFSEBehavior",
             "RegTweakShaderCache10GBOverdrive",
-            "RegTweakDirectFlipEnabled",
             "RegTweakMouseAccelerationZero",
             "RegTweakHwSchModeHardware",
-            "RegTweakDwmSingleBuffer",
             "RegTweakNoLazyModeMMCSS",
 
             // Anti-Crash & Continuous Smoothness Guardians
@@ -693,8 +644,66 @@ namespace SetupHub180Hz.Services
             return all.Where(t => string.Equals(t.Section, "Registry", StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
+        
+        /// <summary>
+        /// Software Compatibility Guardian: Ensures any software (Antigravity, Electron, Chromium,
+        /// VS Code, dev servers, games, and peripheral software) can launch and run with 100% stability
+        /// while pushing hardware to maximum performance.
+        /// </summary>
+        public static void EnsureSoftwareCompatibilityGuardian()
+        {
+            try
+            {
+                // 1. Clean up legacy DirectFlip / IndependentFlip overrides in HKCU that break Electron swapchains
+                using (var d3dKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Direct3D", writable: true))
+                {
+                    if (d3dKey != null)
+                    {
+                        d3dKey.DeleteValue("EnableDirectFlip", throwOnMissingValue: false);
+                        d3dKey.DeleteValue("DirectFlipHonor", throwOnMissingValue: false);
+                        d3dKey.DeleteValue("EnableIndependentFlip", throwOnMissingValue: false);
+                    }
+                }
+
+                // 2. Eradicate Direct3D Software WARP block
+                using (var d3dDrv = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Direct3D\Drivers", writable: true))
+                {
+                    d3dDrv?.DeleteValue("SoftwareOnly", throwOnMissingValue: false);
+                }
+
+                // 3. Eradicate LargePageMinimum that causes VirtualAlloc 0xc0000005 crashes
+                using (var memKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management", writable: true))
+                {
+                    memKey?.DeleteValue("LargePageMinimum", throwOnMissingValue: false);
+                }
+
+                // 4. Ensure Fault Tolerant Heap (FTH) remains active as safety net
+                using (var fthKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\FTH", writable: true))
+                {
+                    fthKey?.SetValue("Enabled", 1, RegistryValueKind.DWord);
+                }
+
+                // 5. Ensure essential services (StorSvc, WpnService) are never completely disabled
+                using (var storKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\StorSvc", writable: true))
+                {
+                    if (storKey != null && storKey.GetValue("Start") is int startVal && startVal == 4)
+                    {
+                        storKey.SetValue("Start", 2, RegistryValueKind.DWord); // Automatic
+                    }
+                }
+                using (var wpnKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\WpnService", writable: true))
+                {
+                    if (wpnKey != null && wpnKey.GetValue("Start") is int startVal && startVal == 4)
+                    {
+                        wpnKey.SetValue("Start", 3, RegistryValueKind.DWord); // Manual
+                    }
+                }
+            }
+            catch { }
+        }
         private static async Task<List<TweakItem>> LoadAsync()
         {
+            EnsureSoftwareCompatibilityGuardian();
             var result = new List<TweakItem>();
 
             // 1. Deep PC Cleaner & Cache Flush Tweaks
@@ -1373,6 +1382,7 @@ namespace SetupHub180Hz.Services
                 tweak.IsApplied = true;
                 tweak.IsSelected = true;
                 RecordAppliedTweak(tweak.Id);
+                EnsureSoftwareCompatibilityGuardian();
             }
             catch { }
         }
@@ -1439,6 +1449,7 @@ namespace SetupHub180Hz.Services
                 if (allMatch)
                 {
                     if (!inStore) RecordAppliedTweak(tweak.Id);
+                EnsureSoftwareCompatibilityGuardian();
                     return true;
                 }
                 else if (inStore)
@@ -1466,6 +1477,7 @@ namespace SetupHub180Hz.Services
                 if (allMatch)
                 {
                     if (!inStore) RecordAppliedTweak(tweak.Id);
+                EnsureSoftwareCompatibilityGuardian();
                     return true;
                 }
                 return false;
@@ -1476,6 +1488,7 @@ namespace SetupHub180Hz.Services
             if (scriptCheck.HasValue)
             {
                 if (scriptCheck.Value && !inStore) RecordAppliedTweak(tweak.Id);
+                EnsureSoftwareCompatibilityGuardian();
                 else if (!scriptCheck.Value && inStore) RecordUnappliedTweak(tweak.Id);
                 return scriptCheck.Value;
             }

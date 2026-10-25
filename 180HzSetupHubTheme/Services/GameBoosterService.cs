@@ -333,11 +333,12 @@ namespace SetupHub180Hz.Services
                     key?.SetValue("GameDVR_EFSEFeatureFlags", 0, RegistryValueKind.DWord);
                 }
 
-                // Direct3D DirectFlip & 10GB Shader Cache
-                using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Direct3D", true))
+                // Direct3D 10GB Shader Cache & Clean Up Legacy DirectFlip Overrides (Prevents Electron/Antigravity/Discord crashes)
+                using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Direct3D", true))
                 {
-                    key?.SetValue("EnableDirectFlip", 1, RegistryValueKind.DWord);
-                    key?.SetValue("DirectFlipHonor", 1, RegistryValueKind.DWord);
+                    key?.DeleteValue("EnableDirectFlip", false);
+                    key?.DeleteValue("DirectFlipHonor", false);
+                    key?.DeleteValue("EnableIndependentFlip", false);
                 }
 
                 using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Direct3D\Shaders", true))

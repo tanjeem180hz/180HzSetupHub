@@ -1,4 +1,4 @@
-[
+﻿[
     {
         "id":  "RegTweakEmulBlueStacks",
         "name":  "BlueStacks Realtime CPU \u0026 IO Priority (HD-Player.exe)",
@@ -1364,8 +1364,8 @@
         "category":  "GPU \u0026 DirectX",
         "categoryOrder":  1,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "registry":  [
                          {
                              "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
@@ -1491,8 +1491,8 @@
         "category":  "CPU \u0026 RAM Scheduling",
         "categoryOrder":  2,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "registry":  [
                          {
                              "Path":  "HKLM:\\SOFTWARE\\Microsoft\\FTH",
@@ -2037,8 +2037,8 @@
         "category":  "GPU \u0026 DirectX",
         "categoryOrder":  1,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "registry":  [
                          {
                              "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Dwm",
@@ -2359,8 +2359,8 @@
         "category":  "Network \u0026 Ping",
         "categoryOrder":  4,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "registry":  [
                          {
                              "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters",
@@ -2716,14 +2716,14 @@
         "category":  "GPU \u0026 DirectX",
         "categoryOrder":  1,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "registry":  [
                          {
                              "Path":  "HKLM:\\SOFTWARE\\Microsoft\\Direct3D\\Drivers",
                              "Name":  "SoftwareOnly",
-                             "Value":  "0",
-                             "OriginalValue":  "0",
+                             "Value":  "\u003cRemoveEntry\u003e",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
                              "Type":  "DWord"
                          }
                      ],
@@ -3096,8 +3096,8 @@
         "category":  "CPU \u0026 RAM Scheduling",
         "categoryOrder":  5,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  true,
         "registry":  [
                          {
@@ -3451,15 +3451,15 @@
         "category":  "GPU \u0026 DirectX",
         "categoryOrder":  1,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
                          {
                              "Path":  "HKCU:\\Software\\Microsoft\\Direct3D",
                              "Name":  "EnableDirectFlip",
-                             "Value":  "1",
-                             "OriginalValue":  "0",
+                             "Value":  "\u003cRemoveEntry\u003e",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
                              "Type":  "DWord"
                          }
                      ],
@@ -3567,15 +3567,15 @@
         "category":  "CPU \u0026 RAM Scheduling",
         "categoryOrder":  5,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  true,
         "registry":  [
                          {
                              "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
                              "Name":  "LargePageMinimum",
-                             "Value":  "4294967295",
-                             "OriginalValue":  "0",
+                             "Value":  "\u003cRemoveEntry\u003e",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
                              "Type":  "DWord"
                          }
                      ],
@@ -3596,8 +3596,8 @@
         "category":  "CPU \u0026 RAM Scheduling",
         "categoryOrder":  5,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
                          {
@@ -4176,15 +4176,15 @@
         "category":  "🎮 2X FPS Gaming \u0026 Low Latency",
         "categoryOrder":  0,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
                          {
                              "Path":  "HKCU:\\Software\\Microsoft\\Direct3D",
                              "Name":  "EnableDirectFlip",
-                             "Value":  "1",
-                             "OriginalValue":  "0",
+                             "Value":  "\u003cRemoveEntry\u003e",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
                              "Type":  "DWord"
                          }
                      ],
@@ -4286,8 +4286,8 @@
         "category":  "🎮 2X FPS Gaming \u0026 Low Latency",
         "categoryOrder":  0,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
                          {
@@ -4467,14 +4467,14 @@
         "category":  "GPU \u0026 DirectX",
         "categoryOrder":  1,
         "section":  "Registry",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
                          {
                              "Path":  "HKCU:\\Software\\Microsoft\\Direct3D",
                              "Name":  "EnableIndependentFlip",
-                             "Value":  "1",
+                             "Value":  "\u003cRemoveEntry\u003e",
                              "OriginalValue":  "\u003cRemoveEntry\u003e",
                              "Type":  "DWord"
                          }

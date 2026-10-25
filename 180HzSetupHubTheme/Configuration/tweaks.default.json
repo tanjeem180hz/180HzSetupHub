@@ -1,4 +1,4 @@
-[
+﻿[
     {
         "id":  "EmulTweakHypervisorVBS",
         "name":  "Emulator 100% CPU Utilization \u0026 VBS/Hypervisor Bypass",
@@ -808,8 +808,8 @@
         "category":  "CPU, RAM \u0026 Power Tuning",
         "categoryOrder":  3,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  true,
         "registry":  [
                          {
@@ -1364,16 +1364,6 @@
                         {
                             "Name":  "MapsBroker",
                             "StartupType":  "Manual",
-                            "OriginalType":  "Automatic"
-                        },
-                        {
-                            "Name":  "StorSvc",
-                            "StartupType":  "Manual",
-                            "OriginalType":  "Automatic"
-                        },
-                        {
-                            "Name":  "SharedAccess",
-                            "StartupType":  "Disabled",
                             "OriginalType":  "Automatic"
                         }
                     ],
@@ -2767,7 +2757,8 @@
         "undoScript":  [
                            "$pf = if ($Env:ProgramW6432) { $Env:ProgramW6432 } else { $Env:ProgramFiles }; $dir = Join-Path $pf \u0027LogiDownloadAssistant\u0027; if (Test-Path $dir) { icacls $dir /remove:d \u0027*S-1-1-0\u0027 | Out-Null }"
                        ],
-        "link":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock"
+        "link":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/logiblock",
+        "isRecommended":  false
     },
     {
         "id":  "WPFTweaksEdgeDebloat",
@@ -3037,7 +3028,8 @@
         "undoScript":  [
                            "$dir = \"$Env:SystemRoot\\Installer\\Razer\"; if (Test-Path $dir) { icacls $dir /remove:d \u0027*S-1-1-0\u0027 | Out-Null }"
                        ],
-        "link":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/razerblock"
+        "link":  "https://winutil.christitus.com/code-reference/tweaks/z--advanced-tweaks---caution/razerblock",
+        "isRecommended":  false
     },
     {
         "id":  "WPFTweaksRightClickMenu",
@@ -3481,8 +3473,8 @@
         "category":  "CPU, RAM \u0026 Power Tuning",
         "categoryOrder":  3,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
                          {
@@ -3530,8 +3522,8 @@
         "category":  "Graphical \u0026 Visual Responsiveness",
         "categoryOrder":  4,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  true,
         "registry":  [
                          {
@@ -4556,8 +4548,8 @@
         "category":  "Essential Tweaks",
         "categoryOrder":  8,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
 
@@ -4565,7 +4557,7 @@
         "service":  [
                         {
                             "Name":  "WpnService",
-                            "StartupType":  "Disabled",
+                            "StartupType":  "Manual",
                             "OriginalType":  "Automatic"
                         }
                     ],
@@ -4783,8 +4775,8 @@
         "category":  "Network, TCP \u0026 Ultra-Low Ping",
         "categoryOrder":  5,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
                          {
@@ -6154,15 +6146,15 @@
         "category":  "Graphical \u0026 Visual Responsiveness",
         "categoryOrder":  4,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
                          {
                              "Path":  "HKCU:\\Software\\Microsoft\\Direct3D",
                              "Name":  "EnableDirectFlip",
-                             "Value":  "1",
-                             "OriginalValue":  "0",
+                             "Value":  "\u003cRemoveEntry\u003e",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
                              "Type":  "DWord"
                          }
                      ],
@@ -6293,15 +6285,15 @@
         "category":  "CPU, RAM \u0026 Power Tuning",
         "categoryOrder":  3,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  true,
         "registry":  [
                          {
                              "Path":  "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
                              "Name":  "LargePageMinimum",
-                             "Value":  "4294967295",
-                             "OriginalValue":  "0",
+                             "Value":  "\u003cRemoveEntry\u003e",
+                             "OriginalValue":  "\u003cRemoveEntry\u003e",
                              "Type":  "DWord"
                          }
                      ],
@@ -6322,8 +6314,8 @@
         "category":  "CPU, RAM \u0026 Power Tuning",
         "categoryOrder":  3,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
                          {
@@ -7371,8 +7363,8 @@
         "category":  "2X FPS Ultra Gaming \u0026 Esports Overdrive",
         "categoryOrder":  1,
         "section":  "System",
-        "isAdvanced":  false,
-        "isRecommended":  true,
+        "isAdvanced":  true,
+        "isRecommended":  false,
         "requiresReboot":  false,
         "registry":  [
 
