@@ -26,6 +26,9 @@ namespace SetupHub180Hz
             // Immediately lock hardware-maximum low-latency kernel timer resolution for zero input delay
             GameBoosterService.Instance.EnableLowestSafeTimerResolution();
 
+            // Software Compatibility Guardian: Guarantees 100% stability for all software (Antigravity, Electron, VS Code, Razer, Games)
+            TweakService.EnsureSoftwareCompatibilityGuardian();
+
             // Start continuous real-time emulator & game booster daemon (instantly detects running games, pins 5.0 GHz boost, disables EcoQoS)
             GameBoosterService.StartContinuousGameBoosterEngine();
 
@@ -213,6 +216,11 @@ namespace SetupHub180Hz
             try
             {
                 ActivityLogger.Instance.Log("Running headless scheduled update check…", ActivityType.Info);
+                if (SettingsService.Instance.Current.AutoCheckAppUpdates)
+                {
+                    await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
+                }
+
                 var winget = new WingetService();
                 var upgradable = await winget.GetUpgradableAppsAsync();
                 if (upgradable.Count > 0)

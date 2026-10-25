@@ -49,6 +49,10 @@ namespace SetupHub180Hz.Services
                 try
                 {
                     await RefreshAsync(force: false);
+                    if (SettingsService.Instance.Current.AutoCheckAppUpdates)
+                    {
+                        await AppUpdateService.Instance.CheckForUpdatesAsync(silent: true);
+                    }
                 }
                 catch (Exception ex)
                 {

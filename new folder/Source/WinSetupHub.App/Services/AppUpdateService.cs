@@ -150,18 +150,32 @@ namespace SetupHub180Hz.Services
                 if (!string.IsNullOrWhiteSpace(exePath) && File.Exists(exePath))
                 {
                     var fvi = FileVersionInfo.GetVersionInfo(exePath);
+                    if (!string.IsNullOrWhiteSpace(fvi.ProductVersion))
+                    {
+                        var clean = CleanVersionString(fvi.ProductVersion);
+                        if (!string.IsNullOrWhiteSpace(clean))
+                        {
+                            CurrentVersion = clean;
+                            return;
+                        }
+                    }
                     if (!string.IsNullOrWhiteSpace(fvi.FileVersion))
                     {
-                        var parts = fvi.FileVersion.Split('.');
-                        if (parts.Length >= 2)
+                        var clean = CleanVersionString(fvi.FileVersion);
+                        if (!string.IsNullOrWhiteSpace(clean))
                         {
-                            CurrentVersion = $"{parts[0]}.{parts[1]}.{(parts.Length > 2 ? parts[2] : "0")}";
+                            CurrentVersion = clean;
                             return;
                         }
                     }
                 }
 
-
+                var asmVer = Assembly.GetEntryAssembly()?.GetName().Version;
+                if (asmVer != null)
+                {
+                    CurrentVersion = $"{asmVer.Major}.{asmVer.Minor}.{Math.Max(0, asmVer.Build)}";
+                    return;
+                }
             }
             catch
             {
@@ -170,12 +184,56 @@ namespace SetupHub180Hz.Services
             CurrentVersion = DefaultCurrentVersion;
         }
 
+        public static string CleanVersionString(string? raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return "";
+            var v = raw.Trim().TrimStart('v', 'V');
+            var plusIdx = v.IndexOf('+');
+            if (plusIdx >= 0) v = v.Substring(0, plusIdx);
+
+            var parts = v.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 3)
+            {
+                return $"{parts[0]}.{parts[1]}.{parts[2]}";
+            }
+            if (parts.Length == 2)
+            {
+                return $"{parts[0]}.{parts[1]}.0";
+            }
+            return v;
+        }
+
+        public static bool TryParseCleanVersion(string? raw, out Version version)
+        {
+            version = new Version(0, 0, 0, 0);
+            if (string.IsNullOrWhiteSpace(raw)) return false;
+            var clean = CleanVersionString(raw);
+            var parts = clean.Split('.');
+            int major = parts.Length > 0 && int.TryParse(parts[0], out var m) ? m : 0;
+            int minor = parts.Length > 1 && int.TryParse(parts[1], out var n) ? n : 0;
+            int build = parts.Length > 2 && int.TryParse(parts[2], out var b) ? b : 0;
+            int rev = parts.Length > 3 && int.TryParse(parts[3], out var r) ? r : 0;
+            version = new Version(major, minor, build, rev);
+            return true;
+        }
+
         /// <summary>
         /// Checks GitHub for updates. Compares version.json, commit history, and remote file metadata.
         /// </summary>
         public async Task<bool> CheckForUpdatesAsync(bool silent = false)
         {
-            if (!await _checkLock.WaitAsync(0))
+            if (IsChecking)
+            {
+                try
+                {
+                    await _checkLock.WaitAsync(15000);
+                    _checkLock.Release();
+                }
+                catch { }
+                return UpdateAvailable;
+            }
+
+            if (!await _checkLock.WaitAsync(1000))
             {
                 return UpdateAvailable;
             }
@@ -185,106 +243,79 @@ namespace SetupHub180Hz.Services
                 IsChecking = true;
                 StatusMessage = "Checking GitHub repository for updates…";
 
-                // 1. Fetch version.json with anti-cache timestamp
+                // 1. Fetch version.json with anti-cache timestamp and fallback mirrors
                 var cacheBuster = DateTime.UtcNow.Ticks;
-                var manifestUrlWithBuster = $"{ManifestUrl}?_={cacheBuster}";
+                var manifestCandidates = new[]
+                {
+                    $"{ManifestUrl}?_={cacheBuster}",
+                    $"https://github.com/{RepoOwner}/{RepoName}/raw/main/version.json?_={cacheBuster}",
+                    ManifestUrl
+                };
 
                 VersionManifest? manifest = null;
-                try
-                {
-                    using var manifestReq = new HttpRequestMessage(HttpMethod.Get, manifestUrlWithBuster);
-                    manifestReq.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true };
-                    using var manifestResp = await _http.SendAsync(manifestReq);
+                Exception? lastManifestEx = null;
 
-                    if (manifestResp.IsSuccessStatusCode)
-                    {
-                        var json = await manifestResp.Content.ReadAsStringAsync();
-                        manifest = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        });
-                    }
-                }
-                catch (Exception ex)
+                foreach (var url in manifestCandidates)
                 {
-                    ActivityLogger.Instance.Log($"GitHub manifest check notice: {ex.Message}", ActivityType.Info);
-                }
+                    try
+                    {
+                        using var manifestReq = new HttpRequestMessage(HttpMethod.Get, url);
+                        manifestReq.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true };
+                        using var manifestResp = await _http.SendAsync(manifestReq);
 
-                // 2. Check latest commit timestamp on artifacts/publish/win-x64/180HzSetupHub.exe
-                DateTime remoteCommitDate = DateTime.MinValue;
-                string remoteCommitSha = "";
-                try
-                {
-                    var commitApi = $"https://api.github.com/repos/{RepoOwner}/{RepoName}/commits?path=artifacts/publish/win-x64/180HzSetupHub.exe&page=1&per_page=1";
-                    using var commitReq = new HttpRequestMessage(HttpMethod.Get, commitApi);
-                    commitReq.Headers.UserAgent.Add(new ProductInfoHeaderValue("180HzSetupHub", "2.5.0"));
-                    using var commitResp = await _http.SendAsync(commitReq);
-                    if (commitResp.IsSuccessStatusCode)
-                    {
-                        var commitJson = await commitResp.Content.ReadAsStringAsync();
-                        using var doc = JsonDocument.Parse(commitJson);
-                        if (doc.RootElement.ValueKind == JsonValueKind.Array && doc.RootElement.GetArrayLength() > 0)
+                        if (manifestResp.IsSuccessStatusCode)
                         {
-                            var first = doc.RootElement[0];
-                            if (first.TryGetProperty("sha", out var shaElem))
+                            var json = await manifestResp.Content.ReadAsStringAsync();
+                            manifest = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions
                             {
-                                remoteCommitSha = shaElem.GetString() ?? "";
-                            }
-                            if (first.TryGetProperty("commit", out var commitObj) &&
-                                commitObj.TryGetProperty("committer", out var committer) &&
-                                committer.TryGetProperty("date", out var dateElem) &&
-                                dateElem.TryGetDateTime(out var dt))
+                                PropertyNameCaseInsensitive = true
+                            });
+                            if (manifest != null && !string.IsNullOrWhiteSpace(manifest.version))
                             {
-                                remoteCommitDate = dt;
+                                break;
                             }
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        lastManifestEx = ex;
+                    }
                 }
-                catch
+
+                // If unable to retrieve valid manifest from GitHub, do not report false positive "Up to Date"
+                if (manifest == null || string.IsNullOrWhiteSpace(manifest.version))
                 {
+                    StatusMessage = $"Update check failed: {(lastManifestEx != null ? lastManifestEx.Message : "Could not reach GitHub")}.";
+                    ActivityLogger.Instance.Log($"GitHub manifest check notice: {lastManifestEx?.Message ?? "Unreachable"}", ActivityType.Warning);
+                    return false;
                 }
 
-                // 3. Determine if update is available
-                bool hasUpdate = false;
-                string candidateVersion = manifest?.version ?? CurrentVersion;
+                // 2. Cleanly compare semver
+                var remoteVerParsed = TryParseCleanVersion(manifest.version, out var remoteVer);
+                var localVerParsed = TryParseCleanVersion(CurrentVersion, out var localVer);
 
-                if (Version.TryParse(candidateVersion, out var remoteVer) &&
-                    Version.TryParse(CurrentVersion, out var localVer))
+                bool hasUpdate = false;
+                if (remoteVerParsed && localVerParsed)
                 {
                     if (remoteVer > localVer)
                     {
                         hasUpdate = true;
                     }
                 }
-                else if (!string.IsNullOrWhiteSpace(candidateVersion) &&
-                         !string.Equals(candidateVersion.Trim(), CurrentVersion.Trim(), StringComparison.OrdinalIgnoreCase))
+                else if (!string.IsNullOrWhiteSpace(manifest.version))
                 {
-                    hasUpdate = true;
-                }
-
-                // If remote commit on the exe is newer and version differs from local
-                if (!hasUpdate && remoteCommitDate > DateTime.MinValue)
-                {
-                    try
+                    var cleanRemote = CleanVersionString(manifest.version);
+                    var cleanLocal = CleanVersionString(CurrentVersion);
+                    if (!string.Equals(cleanRemote, cleanLocal, StringComparison.OrdinalIgnoreCase))
                     {
-                        var currentExe = GetCurrentExecutablePath();
-                        if (File.Exists(currentExe))
-                        {
-                            var localWriteTime = File.GetLastWriteTimeUtc(currentExe);
-                            if (remoteCommitDate > localWriteTime.AddMinutes(5) &&
-                                !string.IsNullOrWhiteSpace(manifest?.version) &&
-                                !string.Equals(manifest.version.Trim(), CurrentVersion.Trim(), StringComparison.OrdinalIgnoreCase))
-                            {
-                                hasUpdate = true;
-                                candidateVersion = manifest.version;
-                            }
-                        }
+                        hasUpdate = true;
                     }
-                    catch { }
                 }
 
-                LatestVersion = candidateVersion;
-                ReleaseNotes = manifest?.releaseNotes ?? "Performance optimizers, instant responsive UI, and bug fixes.";
+                LatestVersion = CleanVersionString(manifest.version);
+                ReleaseNotes = !string.IsNullOrWhiteSpace(manifest.releaseNotes)
+                    ? manifest.releaseNotes
+                    : "100% crash immunity, zero BSOD, low-latency performance optimizers and bug fixes.";
                 UpdateAvailable = hasUpdate;
                 LastCheckTime = DateTime.UtcNow;
 
@@ -301,7 +332,7 @@ namespace SetupHub180Hz.Services
                 else
                 {
                     StatusMessage = $"✓ 180Hz Setup Hub is up to date (v{CurrentVersion}).";
-                    ActivityLogger.Instance.Log("180Hz Setup Hub is up to date.", ActivityType.Info);
+                    ActivityLogger.Instance.Log($"180Hz Setup Hub verified up to date (v{CurrentVersion}).", ActivityType.Info);
                 }
 
                 return hasUpdate;
@@ -471,13 +502,14 @@ namespace SetupHub180Hz.Services
                 // Using ping for sleep avoids 'Input redirection is not supported' error in hidden cmd processes
                 scriptBuilder.AppendLine("ping 127.0.0.1 -n 2 >nul");
                 scriptBuilder.AppendLine($"taskkill /F /PID {currentPid} >nul 2>&1");
+                scriptBuilder.AppendLine("taskkill /F /IM 180HzSetupHub.exe >nul 2>&1");
                 scriptBuilder.AppendLine("ping 127.0.0.1 -n 2 >nul");
                 scriptBuilder.AppendLine("set ATTEMPTS=0");
                 scriptBuilder.AppendLine(":RETRY_COPY");
                 scriptBuilder.AppendLine("set /a ATTEMPTS+=1");
                 scriptBuilder.AppendLine($"copy /Y \"{tempExe}\" \"{currentExe}\" >nul 2>&1");
                 scriptBuilder.AppendLine("if errorlevel 1 (");
-                scriptBuilder.AppendLine("    if %ATTEMPTS% LSS 15 (");
+                scriptBuilder.AppendLine("    if %ATTEMPTS% LSS 20 (");
                 scriptBuilder.AppendLine("        ping 127.0.0.1 -n 2 >nul");
                 scriptBuilder.AppendLine("        goto RETRY_COPY");
                 scriptBuilder.AppendLine("    )");

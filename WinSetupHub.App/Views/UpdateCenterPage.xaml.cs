@@ -91,10 +91,22 @@ namespace SetupHub180Hz.Views
                         PnlAppReleaseNotes.Visibility = Visibility.Collapsed;
                     }
                 }
-                else
+                else if (s.IsChecking)
+                {
+                    BtnApplyAppUpdate.IsEnabled = false;
+                    BtnApplyAppUpdate.Content = "Checking…";
+                    PnlAppReleaseNotes.Visibility = Visibility.Collapsed;
+                }
+                else if (s.LastCheckTime > DateTime.MinValue)
                 {
                     BtnApplyAppUpdate.IsEnabled = false;
                     BtnApplyAppUpdate.Content = "✓ Up to Date";
+                    PnlAppReleaseNotes.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    BtnApplyAppUpdate.IsEnabled = false;
+                    BtnApplyAppUpdate.Content = "Ready to Check";
                     PnlAppReleaseNotes.Visibility = Visibility.Collapsed;
                 }
             }
@@ -105,6 +117,8 @@ namespace SetupHub180Hz.Views
             try
             {
                 BtnCheckAppUpdate.IsEnabled = false;
+                BtnApplyAppUpdate.IsEnabled = false;
+                BtnApplyAppUpdate.Content = "Checking…";
                 TxtAppUpdateStatus.Text = "Checking GitHub for updates…";
 
                 await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);

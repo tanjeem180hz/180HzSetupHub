@@ -12,7 +12,11 @@ namespace SetupHub180Hz.Views
     {
         private readonly WingetService _winget = new();
 
-        public void RefreshRealtime() => UpdateSummary();
+        public void RefreshRealtime()
+        {
+            UpdateSummary();
+            UpdateAppSelfUpdateUi();
+        }
 
         public UpdateCenterPage()
         {
@@ -20,15 +24,169 @@ namespace SetupHub180Hz.Views
             UpdatesListBox.ItemsSource = UpdateMonitorService.Instance.UpgradableApps;
             UpdateMonitorService.Instance.UpgradableApps.CollectionChanged += (_, _) => UpdateSummary();
 
+            AppUpdateService.Instance.StatusChanged += (_, _) =>
+            {
+                Dispatcher.InvokeAsync(UpdateAppSelfUpdateUi);
+            };
+
             Loaded += async (_, _) =>
             {
+                UpdateAppSelfUpdateUi();
                 UpdateSummary();
+
+                // Check for 180Hz Setup Hub GitHub updates in background if needed
+                _ = Task.Run(async () =>
+                {
+                    if (SettingsService.Instance.Current.AutoCheckAppUpdates &&
+                        (DateTime.UtcNow - AppUpdateService.Instance.LastCheckTime).TotalMinutes > 15)
+                    {
+                        await AppUpdateService.Instance.CheckForUpdatesAsync(silent: true);
+                    }
+                });
+
                 if (UpdateMonitorService.Instance.UpgradableApps.Count == 0)
                 {
                     await UpdateMonitorService.Instance.RefreshAsync(force: false);
                     UpdateSummary();
                 }
             };
+        }
+
+        private void UpdateAppSelfUpdateUi()
+        {
+            var s = AppUpdateService.Instance;
+            TxtAppCurrentVersion.Text = $"Installed: v{s.CurrentVersion}";
+            TxtAppUpdateStatus.Text = s.StatusMessage;
+
+            if (s.IsDownloading)
+            {
+                PnlAppDownloadProgress.Visibility = Visibility.Visible;
+                PrgAppDownload.Value = s.DownloadProgress;
+                TxtAppDownloadBytes.Text = string.IsNullOrWhiteSpace(s.DownloadBytesText) ? "Downloading update…" : s.DownloadBytesText;
+                TxtAppDownloadSpeed.Text = s.DownloadSpeedText;
+
+                BtnCheckAppUpdate.IsEnabled = false;
+                BtnApplyAppUpdate.IsEnabled = false;
+                BtnForceAppUpdate.IsEnabled = false;
+            }
+            else
+            {
+                PnlAppDownloadProgress.Visibility = Visibility.Collapsed;
+                BtnCheckAppUpdate.IsEnabled = !s.IsChecking;
+                BtnForceAppUpdate.IsEnabled = true;
+
+                if (s.UpdateAvailable)
+                {
+                    BtnApplyAppUpdate.IsEnabled = true;
+                    BtnApplyAppUpdate.Content = $"🚀 Update to v{s.LatestVersion}";
+                    BtnApplyAppUpdate.Visibility = Visibility.Visible;
+
+                    if (!string.IsNullOrWhiteSpace(s.ReleaseNotes))
+                    {
+                        TxtAppReleaseNotes.Text = s.ReleaseNotes;
+                        PnlAppReleaseNotes.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        PnlAppReleaseNotes.Visibility = Visibility.Collapsed;
+                    }
+                }
+                else if (s.IsChecking)
+                {
+                    BtnApplyAppUpdate.IsEnabled = false;
+                    BtnApplyAppUpdate.Content = "Checking…";
+                    PnlAppReleaseNotes.Visibility = Visibility.Collapsed;
+                }
+                else if (s.LastCheckTime > DateTime.MinValue)
+                {
+                    BtnApplyAppUpdate.IsEnabled = false;
+                    BtnApplyAppUpdate.Content = "✓ Up to Date";
+                    PnlAppReleaseNotes.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    BtnApplyAppUpdate.IsEnabled = false;
+                    BtnApplyAppUpdate.Content = "Ready to Check";
+                    PnlAppReleaseNotes.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        private async void BtnCheckAppUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                BtnCheckAppUpdate.IsEnabled = false;
+                BtnApplyAppUpdate.IsEnabled = false;
+                BtnApplyAppUpdate.Content = "Checking…";
+                TxtAppUpdateStatus.Text = "Checking GitHub for updates…";
+
+                await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
+                UpdateAppSelfUpdateUi();
+            }
+            catch (Exception ex)
+            {
+                TxtAppUpdateStatus.Text = $"Check failed: {ex.Message}";
+            }
+            finally
+            {
+                BtnCheckAppUpdate.IsEnabled = true;
+            }
+        }
+
+        private async void BtnApplyAppUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var res = ThemedMessageBox.Show(
+                    $"180Hz Setup Hub will now download and install v{AppUpdateService.Instance.LatestVersion} from GitHub.\n\nThe application will automatically restart once the update is applied.\n\nDo you want to proceed?",
+                    "Install 180Hz Setup Hub Update",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (res != MessageBoxResult.Yes) return;
+
+                await StartSelfUpdate();
+            }
+            catch (Exception ex)
+            {
+                ThemedMessageBox.Show($"Update error: {ex.Message}", "Update Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnForceAppUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var res = ThemedMessageBox.Show(
+                    "This will force download the latest executable from GitHub (main branch) and reinstall it, even if versions appear identical.\n\nThe application will restart automatically.\n\nDo you want to continue?",
+                    "Force Sync from GitHub",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (res != MessageBoxResult.Yes) return;
+
+                await StartSelfUpdate();
+            }
+            catch (Exception ex)
+            {
+                ThemedMessageBox.Show($"Update error: {ex.Message}", "Update Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async Task StartSelfUpdate()
+        {
+            UpdateAppSelfUpdateUi();
+            var success = await AppUpdateService.Instance.DownloadAndApplyUpdateAsync();
+            if (!success)
+            {
+                UpdateAppSelfUpdateUi();
+                ThemedMessageBox.Show(
+                    $"Could not complete application update: {AppUpdateService.Instance.StatusMessage}",
+                    "Update Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
         private void UpdateSummary()
@@ -48,10 +206,21 @@ namespace SetupHub180Hz.Views
 
         private async void Refresh_Click(object sender, RoutedEventArgs e)
         {
-            SummaryText.Text = "Checking for updates via Winget…";
-            UpgradeAllButton.IsEnabled = false;
-            await UpdateMonitorService.Instance.RefreshAsync(force: true);
-            UpdateSummary();
+            try
+            {
+                SummaryText.Text = "Checking for updates via Winget…";
+                UpgradeAllButton.IsEnabled = false;
+                await UpdateMonitorService.Instance.RefreshAsync(force: true);
+                UpdateSummary();
+            }
+            catch (Exception ex)
+            {
+                SummaryText.Text = $"Update check notice: {ex.Message}";
+            }
+            finally
+            {
+                UpgradeAllButton.IsEnabled = UpdateMonitorService.Instance.UpgradableApps.Count > 0;
+            }
         }
 
         private void UpgradeAll_Click(object sender, RoutedEventArgs e)

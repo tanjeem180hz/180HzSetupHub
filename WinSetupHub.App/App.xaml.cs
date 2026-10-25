@@ -216,6 +216,11 @@ namespace SetupHub180Hz
             try
             {
                 ActivityLogger.Instance.Log("Running headless scheduled update check…", ActivityType.Info);
+                if (SettingsService.Instance.Current.AutoCheckAppUpdates)
+                {
+                    await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
+                }
+
                 var winget = new WingetService();
                 var upgradable = await winget.GetUpgradableAppsAsync();
                 if (upgradable.Count > 0)

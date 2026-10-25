@@ -63,6 +63,15 @@ namespace SetupHub180Hz.Views
 
             UpdateAppUpdateStatusUi();
             _isInitializing = false;
+
+            // Trigger background verification if auto-check is enabled and not checked recently
+            if (settings.AutoCheckAppUpdates && (DateTime.UtcNow - AppUpdateService.Instance.LastCheckTime).TotalMinutes > 15)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await AppUpdateService.Instance.CheckForUpdatesAsync(silent: true);
+                });
+            }
         }
 
         private void UpdateAppUpdateStatusUi()
@@ -88,7 +97,13 @@ namespace SetupHub180Hz.Views
                 BtnSettingsCheckUpdate.IsEnabled = !s.IsChecking;
                 BtnSettingsForceUpdate.IsEnabled = true;
 
-                if (s.UpdateAvailable)
+                if (s.IsChecking)
+                {
+                    BtnSettingsUpdateNow.IsEnabled = false;
+                    BtnSettingsUpdateNow.Content = "Checking…";
+                    PnlSettingsReleaseNotes.Visibility = Visibility.Collapsed;
+                }
+                else if (s.UpdateAvailable)
                 {
                     BtnSettingsUpdateNow.IsEnabled = true;
                     BtnSettingsUpdateNow.Content = $"🚀 Update to v{s.LatestVersion}";
@@ -103,10 +118,16 @@ namespace SetupHub180Hz.Views
                         PnlSettingsReleaseNotes.Visibility = Visibility.Collapsed;
                     }
                 }
-                else
+                else if (s.LastCheckTime > DateTime.MinValue)
                 {
                     BtnSettingsUpdateNow.IsEnabled = false;
                     BtnSettingsUpdateNow.Content = "✓ Up to Date";
+                    PnlSettingsReleaseNotes.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    BtnSettingsUpdateNow.IsEnabled = false;
+                    BtnSettingsUpdateNow.Content = "Ready to Check";
                     PnlSettingsReleaseNotes.Visibility = Visibility.Collapsed;
                 }
             }
@@ -214,6 +235,14 @@ namespace SetupHub180Hz.Views
             ActivityLogger.Instance.Log(
                 enabled ? "Enabled auto-check for 180Hz Setup Hub updates on launch." : "Disabled auto-check for 180Hz Setup Hub updates on launch.",
                 ActivityType.Info);
+
+            if (enabled && (DateTime.UtcNow - AppUpdateService.Instance.LastCheckTime).TotalMinutes > 5)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await AppUpdateService.Instance.CheckForUpdatesAsync(silent: true);
+                });
+            }
         }
 
         private async void BtnSettingsCheckUpdate_Click(object sender, RoutedEventArgs e)
@@ -221,6 +250,8 @@ namespace SetupHub180Hz.Views
             try
             {
                 BtnSettingsCheckUpdate.IsEnabled = false;
+                BtnSettingsUpdateNow.IsEnabled = false;
+                BtnSettingsUpdateNow.Content = "Checking…";
                 TxtSettingsAppUpdateStatus.Text = "Checking GitHub repository for updates…";
 
                 await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
