@@ -1,9 +1,9 @@
 {
-  "version": "2.5.0",
-  "buildDate": "2026-10-20",
+  "version": "2.5.1",
+  "buildDate": "2026-10-26",
   "productName": "180Hz Setup Hub",
   "repository": "https://github.com/tanjeem180hz/180HzSetupHub",
-  "releaseNotes": "• 100% Stable Performance Optimizers (Zero BSOD / Crash-free)\n• Win32PrioritySeparation 3:1 foreground gaming quanta boost\n• Direct3D Independent Flip (IFlip) & GPU TDR Watchdog Headroom\n• Native GitHub Auto-Updater with live self-update engine",
+  "releaseNotes": "• Simple & Professional Modern Installer UI\n• 100% Software Compatibility & Stability (Antigravity & Games)\n• Settings Auto-Update Verification Engine\n• Direct in-place self-updater",
   "downloadUrl": "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/artifacts/publish/win-x64/180HzSetupHub.exe",
   "fallbackUrl": "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe",
   "installerUrl": "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/installer/180HzSetupHubSetup.exe"

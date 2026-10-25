@@ -1,0 +1,10 @@
+{
+  "version": "2.5.1",
+  "buildDate": "2026-10-26",
+  "productName": "180Hz Setup Hub",
+  "repository": "https://github.com/tanjeem180hz/180HzSetupHub",
+  "releaseNotes": "• Simple & Professional Modern Installer UI\n• 100% Software Compatibility & Stability (Antigravity & Games)\n• Settings Auto-Update Verification Engine\n• Direct in-place self-updater",
+  "downloadUrl": "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/artifacts/publish/win-x64/180HzSetupHub.exe",
+  "fallbackUrl": "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe",
+  "installerUrl": "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/installer/180HzSetupHubSetup.exe"
+}

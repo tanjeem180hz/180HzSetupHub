@@ -32,7 +32,7 @@ namespace SetupHub180Hz.Services
         private static readonly Lazy<AppUpdateService> _instance = new(() => new AppUpdateService());
         public static AppUpdateService Instance => _instance.Value;
 
-        public const string DefaultCurrentVersion = "2.5.0";
+        public const string DefaultCurrentVersion = "2.5.1";
         public const string RepoOwner = "tanjeem180hz";
         public const string RepoName = "180HzSetupHub";
         public const string ManifestUrl = "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/version.json";
@@ -147,6 +147,38 @@ namespace SetupHub180Hz.Services
             try
             {
                 var exePath = GetCurrentExecutablePath();
+                var exeDir = !string.IsNullOrWhiteSpace(exePath) ? Path.GetDirectoryName(exePath) : AppContext.BaseDirectory;
+
+                // 1. Check local version.json in install directory or Configuration directory
+                if (!string.IsNullOrWhiteSpace(exeDir))
+                {
+                    var localVJson = Path.Combine(exeDir, "version.json");
+                    if (File.Exists(localVJson))
+                    {
+                        var json = File.ReadAllText(localVJson);
+                        var doc = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        var clean = CleanVersionString(doc?.version);
+                        if (!string.IsNullOrWhiteSpace(clean))
+                        {
+                            CurrentVersion = clean;
+                            return;
+                        }
+                    }
+
+                    var configVJson = Path.Combine(exeDir, "Configuration", "version.json");
+                    if (File.Exists(configVJson))
+                    {
+                        var json = File.ReadAllText(configVJson);
+                        var doc = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        var clean = CleanVersionString(doc?.version);
+                        if (!string.IsNullOrWhiteSpace(clean))
+                        {
+                            CurrentVersion = clean;
+                            return;
+                        }
+                    }
+                }
+
                 if (!string.IsNullOrWhiteSpace(exePath) && File.Exists(exePath))
                 {
                     var fvi = FileVersionInfo.GetVersionInfo(exePath);
@@ -474,6 +506,8 @@ namespace SetupHub180Hz.Services
                 await TryDownloadConfigAsync("tweaks.default.json", tempConfigDir);
                 await TryDownloadConfigAsync("registry_tweaks.default.json", tempConfigDir);
                 await TryDownloadConfigAsync("packages.default.json", tempConfigDir);
+                await TryDownloadRootFileAsync("version.json", tempConfigDir);
+                await TryDownloadRootFileAsync("version.json", tempDir);
 
                 // 3. Build bulletproof detached batch updater script
                 StatusMessage = "Finalizing update and restarting…";
@@ -520,6 +554,15 @@ namespace SetupHub180Hz.Services
                     var targetConfigDir = Path.Combine(installDir, "Configuration");
                     scriptBuilder.AppendLine($"if exist \"{tempConfigDir}\" (");
                     scriptBuilder.AppendLine($"    xcopy /Y /E /I \"{tempConfigDir}\\*\" \"{targetConfigDir}\\\" >nul 2>&1");
+                    scriptBuilder.AppendLine(")");
+                }
+
+                if (!string.IsNullOrWhiteSpace(installDir))
+                {
+                    var tempVJson = Path.Combine(tempDir, "version.json");
+                    var targetVJson = Path.Combine(installDir, "version.json");
+                    scriptBuilder.AppendLine($"if exist \"{tempVJson}\" (");
+                    scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetVJson}\" >nul 2>&1");
                     scriptBuilder.AppendLine(")");
                 }
 
@@ -589,6 +632,27 @@ namespace SetupHub180Hz.Services
                 {
                     var data = await resp.Content.ReadAsByteArrayAsync();
                     if (data.Length > 100)
+                    {
+                        var target = Path.Combine(targetDir, filename);
+                        await File.WriteAllBytesAsync(target, data);
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private async Task TryDownloadRootFileAsync(string filename, string targetDir)
+        {
+            try
+            {
+                var url = $"https://raw.githubusercontent.com/{RepoOwner}/{RepoName}/main/{filename}?_={DateTime.UtcNow.Ticks}";
+                using var resp = await _http.GetAsync(url);
+                if (resp.IsSuccessStatusCode)
+                {
+                    var data = await resp.Content.ReadAsByteArrayAsync();
+                    if (data.Length > 10)
                     {
                         var target = Path.Combine(targetDir, filename);
                         await File.WriteAllBytesAsync(target, data);
