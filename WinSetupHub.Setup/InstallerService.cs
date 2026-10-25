@@ -27,6 +27,7 @@ public sealed class InstallerService
     private const string PayloadAppSettings = "appsettings.default.json";
     private const string PayloadTweaks = "tweaks.default.json";
     private const string PayloadRegistryTweaks = "registry_tweaks.default.json";
+    private const string PayloadVersion = "version.json";
 
     public static string GetDefaultInstallRoot()
     {
@@ -162,6 +163,8 @@ public sealed class InstallerService
         ExtractResourceToFile(PayloadAppSettings, Path.Combine(configDir, "appsettings.default.json"));
         ExtractResourceToFile(PayloadTweaks, Path.Combine(configDir, "tweaks.default.json"));
         ExtractResourceToFile(PayloadRegistryTweaks, Path.Combine(configDir, "registry_tweaks.default.json"));
+        ExtractResourceToFile(PayloadVersion, Path.Combine(configDir, "version.json"));
+        ExtractResourceToFile(PayloadVersion, Path.Combine(installRoot, "version.json"));
 
         // 6. Copy current installer as Uninstaller (90%)
         var uninstallerTarget = Path.Combine(installRoot, UninstallerExeName);
@@ -224,6 +227,8 @@ public sealed class InstallerService
         ExtractResourceToFile(PayloadAppSettings, Path.Combine(configDir, "appsettings.default.json"));
         ExtractResourceToFile(PayloadTweaks, Path.Combine(configDir, "tweaks.default.json"));
         ExtractResourceToFile(PayloadRegistryTweaks, Path.Combine(configDir, "registry_tweaks.default.json"));
+        ExtractResourceToFile(PayloadVersion, Path.Combine(configDir, "version.json"));
+        ExtractResourceToFile(PayloadVersion, Path.Combine(installRoot, "version.json"));
 
         // 5. Ensure uninstaller binary is healthy (90%)
         var uninstallerTarget = Path.Combine(installRoot, UninstallerExeName);

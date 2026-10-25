@@ -38,7 +38,7 @@ namespace SetupHub180Hz.Services
         private static readonly Lazy<AppUpdateService> _instance = new(() => new AppUpdateService());
         public static AppUpdateService Instance => _instance.Value;
 
-        public const string DefaultCurrentVersion = "2.5.1";
+        public const string DefaultCurrentVersion = "2.5.2";
         public const string RepoOwner = "tanjeem180hz";
         public const string RepoName = "180HzSetupHub";
         public const string ManifestUrl = "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/version.json";
@@ -203,6 +203,20 @@ namespace SetupHub180Hz.Services
                             CurrentVersion = clean;
                             return;
                         }
+                    }
+                }
+
+                // Check AppData storage for persisted update manifest
+                var appDataVJson = Path.Combine(StorageService.AppDataFolder, "version.json");
+                if (File.Exists(appDataVJson))
+                {
+                    var json = File.ReadAllText(appDataVJson);
+                    var doc = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var clean = CleanVersionString(doc?.version);
+                    if (!string.IsNullOrWhiteSpace(clean))
+                    {
+                        CurrentVersion = clean;
+                        return;
                     }
                 }
 
@@ -607,12 +621,16 @@ namespace SetupHub180Hz.Services
 
                 // If in delta mode, ensure version.json is staged with the new version manifest
                 var tempVJson = Path.Combine(tempDir, "version.json");
-                if (!File.Exists(tempVJson) && LatestManifest != null)
+                if (LatestManifest != null)
                 {
                     try
                     {
                         var json = JsonSerializer.Serialize(LatestManifest, new JsonSerializerOptions { WriteIndented = true });
                         File.WriteAllText(tempVJson, json);
+
+                        var appDataVJson = Path.Combine(StorageService.AppDataFolder, "version.json");
+                        Directory.CreateDirectory(StorageService.AppDataFolder);
+                        File.WriteAllText(appDataVJson, json);
                     }
                     catch { }
                 }
@@ -621,6 +639,9 @@ namespace SetupHub180Hz.Services
                 StatusMessage = "Finalizing update and restarting…";
                 progressCallback?.Invoke(100, "Finalizing update and restarting…");
                 DownloadProgress = 100;
+
+                CurrentVersion = CleanVersionString(LatestVersion);
+                UpdateAvailable = false;
 
                 // Test whether install directory is directly writable without elevation
                 bool isInstallDirWritable = false;

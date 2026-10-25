@@ -67,6 +67,10 @@ $regTweaksJson = Join-Path $root "WinSetupHub.App\Configuration\registry_tweaks.
 if (Test-Path -LiteralPath $regTweaksJson) {
     Copy-Item -Path $regTweaksJson -Destination (Join-Path $payloadConfigDir "registry_tweaks.default.json") -Force
 }
+$versionJson = Join-Path $root "version.json"
+if (Test-Path -LiteralPath $versionJson) {
+    Copy-Item -Path $versionJson -Destination (Join-Path $payloadConfigDir "version.json") -Force
+}
 
 # Ensure the 72 MB executable is not embedded so the installer stays ~2 MB
 $payloadExe = Join-Path $payloadDir "180HzSetupHub.exe"

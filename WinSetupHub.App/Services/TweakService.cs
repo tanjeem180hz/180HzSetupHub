@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -1488,8 +1488,8 @@ namespace SetupHub180Hz.Services
             if (scriptCheck.HasValue)
             {
                 if (scriptCheck.Value && !inStore) RecordAppliedTweak(tweak.Id);
-                EnsureSoftwareCompatibilityGuardian();
                 else if (!scriptCheck.Value && inStore) RecordUnappliedTweak(tweak.Id);
+                EnsureSoftwareCompatibilityGuardian();
                 return scriptCheck.Value;
             }
 
