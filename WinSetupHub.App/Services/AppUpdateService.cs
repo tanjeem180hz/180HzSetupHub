@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -25,6 +27,10 @@ namespace SetupHub180Hz.Services
         public string? downloadUrl { get; set; }
         public string? fallbackUrl { get; set; }
         public string? installerUrl { get; set; }
+        public string? exeSha256 { get; set; }
+        public bool? deltaOnly { get; set; }
+        public string? deltaSizeText { get; set; }
+        public string? fullSizeText { get; set; }
     }
 
     public class AppUpdateService : INotifyPropertyChanged
@@ -53,6 +59,9 @@ namespace SetupHub180Hz.Services
         private bool _isChecking = false;
         private bool _isDownloading = false;
         private bool _updateAvailable = false;
+        private bool _isDeltaUpdate = false;
+        private string _updateSizeText = "";
+        private VersionManifest? _latestManifest = null;
         private DateTime _lastCheckTime = DateTime.MinValue;
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -122,6 +131,24 @@ namespace SetupHub180Hz.Services
         {
             get => _updateAvailable;
             private set { _updateAvailable = value; OnPropertyChanged(); }
+        }
+
+        public bool IsDeltaUpdate
+        {
+            get => _isDeltaUpdate;
+            private set { _isDeltaUpdate = value; OnPropertyChanged(); }
+        }
+
+        public string UpdateSizeText
+        {
+            get => _updateSizeText;
+            private set { _updateSizeText = value; OnPropertyChanged(); }
+        }
+
+        public VersionManifest? LatestManifest
+        {
+            get => _latestManifest;
+            private set { _latestManifest = value; OnPropertyChanged(); }
         }
 
         public DateTime LastCheckTime
@@ -216,6 +243,22 @@ namespace SetupHub180Hz.Services
             CurrentVersion = DefaultCurrentVersion;
         }
 
+        public static string ComputeFileSha256(string filePath)
+        {
+            try
+            {
+                if (!File.Exists(filePath)) return "";
+                using var sha = SHA256.Create();
+                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 65536);
+                var hash = sha.ComputeHash(stream);
+                return BitConverter.ToString(hash).Replace("-", "").ToUpperInvariant();
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
         public static string CleanVersionString(string? raw)
         {
             if (string.IsNullOrWhiteSpace(raw)) return "";
@@ -250,7 +293,8 @@ namespace SetupHub180Hz.Services
         }
 
         /// <summary>
-        /// Checks GitHub for updates. Compares version.json, commit history, and remote file metadata.
+        /// Checks GitHub for updates. Compares version.json, semver, and executable SHA256 hash
+        /// to determine whether an update is available and whether it can be applied as a fast Delta Patch (~150 KB).
         /// </summary>
         public async Task<bool> CheckForUpdatesAsync(bool silent = false)
         {
@@ -314,7 +358,6 @@ namespace SetupHub180Hz.Services
                     }
                 }
 
-                // If unable to retrieve valid manifest from GitHub, do not report false positive "Up to Date"
                 if (manifest == null || string.IsNullOrWhiteSpace(manifest.version))
                 {
                     StatusMessage = $"Update check failed: {(lastManifestEx != null ? lastManifestEx.Message : "Could not reach GitHub")}.";
@@ -348,17 +391,50 @@ namespace SetupHub180Hz.Services
                 ReleaseNotes = !string.IsNullOrWhiteSpace(manifest.releaseNotes)
                     ? manifest.releaseNotes
                     : "100% crash immunity, zero BSOD, low-latency performance optimizers and bug fixes.";
-                UpdateAvailable = hasUpdate;
+                LatestManifest = manifest;
                 LastCheckTime = DateTime.UtcNow;
+
+                // 3. Determine if update is a Fast Delta Patch (~150 KB) or Full Package (~85 MB)
+                var currentExe = GetCurrentExecutablePath();
+                var localHash = ComputeFileSha256(currentExe);
+                var remoteExeHash = (manifest.exeSha256 ?? "").Trim();
+
+                bool isDelta = false;
+                if (manifest.deltaOnly == true)
+                {
+                    isDelta = true;
+                }
+                else if (!string.IsNullOrWhiteSpace(remoteExeHash) &&
+                         !string.IsNullOrWhiteSpace(localHash) &&
+                         string.Equals(remoteExeHash, localHash, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Local binary matches GitHub binary bit-for-bit: only config/rules changed!
+                    isDelta = true;
+                }
+
+                IsDeltaUpdate = isDelta;
+                UpdateSizeText = isDelta
+                    ? (!string.IsNullOrWhiteSpace(manifest.deltaSizeText) ? manifest.deltaSizeText : "Delta Patch ~150 KB")
+                    : (!string.IsNullOrWhiteSpace(manifest.fullSizeText) ? manifest.fullSizeText : "Full App ~85 MB");
+
+                UpdateAvailable = hasUpdate;
 
                 if (hasUpdate)
                 {
-                    StatusMessage = $"🚀 Update available: v{LatestVersion}! Click Update Now to install.";
-                    ActivityLogger.Instance.Log($"180Hz Setup Hub update available: v{LatestVersion}", ActivityType.Info);
+                    if (isDelta)
+                    {
+                        StatusMessage = $"⚡ Fast Delta Patch available: v{LatestVersion} ({UpdateSizeText})! Click Update Now to patch.";
+                        ActivityLogger.Instance.Log($"180Hz Setup Hub delta update available: v{LatestVersion} ({UpdateSizeText})", ActivityType.Info);
+                    }
+                    else
+                    {
+                        StatusMessage = $"🚀 Update available: v{LatestVersion} ({UpdateSizeText})! Click Update Now to install.";
+                        ActivityLogger.Instance.Log($"180Hz Setup Hub full update available: v{LatestVersion} ({UpdateSizeText})", ActivityType.Info);
+                    }
 
                     if (!silent)
                     {
-                        NotificationService.Notify("180Hz Setup Hub Update", $"New version v{LatestVersion} is available on GitHub!");
+                        NotificationService.Notify("180Hz Setup Hub Update", $"New version v{LatestVersion} ({UpdateSizeText}) is available on GitHub!");
                     }
                 }
                 else
@@ -383,10 +459,11 @@ namespace SetupHub180Hz.Services
         }
 
         /// <summary>
-        /// Downloads the latest 180HzSetupHub.exe from GitHub, verifies binary integrity,
-        /// creates a zero-friction detached helper script to replace the locked executable, and relaunches.
+        /// Downloads the latest update from GitHub and applies it in-place.
+        /// If IsDeltaUpdate is true (and forceFullBinary is false), it skips downloading the ~85MB executable
+        /// and only downloads the changed configuration files and manifest (~150 KB), completing in seconds.
         /// </summary>
-        public async Task<bool> DownloadAndApplyUpdateAsync(Action<double, string>? progressCallback = null)
+        public async Task<bool> DownloadAndApplyUpdateAsync(Action<double, string>? progressCallback = null, bool forceFullBinary = false)
         {
             if (IsDownloading) return false;
 
@@ -405,109 +482,140 @@ namespace SetupHub180Hz.Services
             {
                 IsDownloading = true;
                 DownloadProgress = 0;
-                StatusMessage = "Connecting to GitHub…";
-                progressCallback?.Invoke(0, "Connecting to GitHub…");
+                StatusMessage = "Preparing update…";
+                progressCallback?.Invoke(0, "Preparing update…");
 
                 Directory.CreateDirectory(tempDir);
                 var tempExe = Path.Combine(tempDir, "180HzSetupHub_new.exe");
 
-                // Download URL candidate list
-                var downloadUrls = new[]
-                {
-                    RawExeUrl,
-                    $"{RawExeUrl}?_={DateTime.UtcNow.Ticks}",
-                    FallbackExeUrl
-                };
+                bool needBinary = forceFullBinary || !IsDeltaUpdate;
 
-                bool downloaded = false;
-                Exception? lastEx = null;
-
-                foreach (var url in downloadUrls)
+                if (needBinary)
                 {
-                    try
+                    StatusMessage = "Connecting to GitHub for executable download…";
+                    progressCallback?.Invoke(5, "Connecting to GitHub…");
+
+                    // Download URL candidate list
+                    var downloadUrls = new[]
                     {
-                        StatusMessage = "Downloading latest 180Hz Setup Hub from GitHub…";
-                        using var req = new HttpRequestMessage(HttpMethod.Get, url);
-                        req.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
+                        RawExeUrl,
+                        $"{RawExeUrl}?_={DateTime.UtcNow.Ticks}",
+                        FallbackExeUrl
+                    };
 
-                        using var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
-                        if (!resp.IsSuccessStatusCode) continue;
+                    bool downloaded = false;
+                    Exception? lastEx = null;
 
-                        var totalBytes = resp.Content.Headers.ContentLength ?? -1L;
-                        var sw = Stopwatch.StartNew();
-                        long totalRead = 0;
-                        var buffer = new byte[65536]; // 64 KB buffer
-
-                        using (var src = await resp.Content.ReadAsStreamAsync())
-                        using (var dst = new FileStream(tempExe, FileMode.Create, FileAccess.Write, FileShare.None, 65536, true))
+                    foreach (var url in downloadUrls)
+                    {
+                        try
                         {
-                            int read;
-                            long lastReportTicks = 0;
+                            StatusMessage = "Downloading latest 180Hz Setup Hub from GitHub…";
+                            using var req = new HttpRequestMessage(HttpMethod.Get, url);
+                            req.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
 
-                            while ((read = await src.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                            using var resp = await _http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
+                            if (!resp.IsSuccessStatusCode) continue;
+
+                            var totalBytes = resp.Content.Headers.ContentLength ?? -1L;
+                            var sw = Stopwatch.StartNew();
+                            long totalRead = 0;
+                            var buffer = new byte[65536]; // 64 KB buffer
+
+                            using (var src = await resp.Content.ReadAsStreamAsync())
+                            using (var dst = new FileStream(tempExe, FileMode.Create, FileAccess.Write, FileShare.None, 65536, true))
                             {
-                                await dst.WriteAsync(buffer, 0, read);
-                                totalRead += read;
+                                int read;
+                                long lastReportTicks = 0;
 
-                                var nowTicks = sw.ElapsedMilliseconds;
-                                if (nowTicks - lastReportTicks >= 120 || (totalBytes > 0 && totalRead == totalBytes))
+                                while ((read = await src.ReadAsync(buffer, 0, buffer.Length)) > 0)
                                 {
-                                    lastReportTicks = nowTicks;
-                                    double pct = totalBytes > 0 ? (double)totalRead / totalBytes * 100.0 : 0.0;
-                                    double secs = sw.Elapsed.TotalSeconds;
-                                    double speedBytesPerSec = secs > 0 ? totalRead / secs : 0;
-                                    string speedText = FormatSpeed(speedBytesPerSec);
-                                    string bytesText = totalBytes > 0
-                                        ? $"{FormatBytes(totalRead)} / {FormatBytes(totalBytes)}"
-                                        : FormatBytes(totalRead);
+                                    await dst.WriteAsync(buffer, 0, read);
+                                    totalRead += read;
 
-                                    DownloadProgress = pct;
-                                    DownloadSpeedText = speedText;
-                                    DownloadBytesText = bytesText;
-                                    StatusMessage = $"Downloading: {pct:0.0}% ({speedText})";
-                                    progressCallback?.Invoke(pct, StatusMessage);
+                                    var nowTicks = sw.ElapsedMilliseconds;
+                                    if (nowTicks - lastReportTicks >= 120 || (totalBytes > 0 && totalRead == totalBytes))
+                                    {
+                                        lastReportTicks = nowTicks;
+                                        double pct = totalBytes > 0 ? (double)totalRead / totalBytes * 100.0 : 0.0;
+                                        double secs = sw.Elapsed.TotalSeconds;
+                                        double speedBytesPerSec = secs > 0 ? totalRead / secs : 0;
+                                        string speedText = FormatSpeed(speedBytesPerSec);
+                                        string bytesText = totalBytes > 0
+                                            ? $"{FormatBytes(totalRead)} / {FormatBytes(totalBytes)}"
+                                            : FormatBytes(totalRead);
+
+                                        DownloadProgress = pct;
+                                        DownloadSpeedText = speedText;
+                                        DownloadBytesText = bytesText;
+                                        StatusMessage = $"Downloading: {pct:0.0}% ({speedText})";
+                                        progressCallback?.Invoke(pct, StatusMessage);
+                                    }
+                                }
+                            }
+
+                            // Validate downloaded file
+                            if (File.Exists(tempExe) && new FileInfo(tempExe).Length > 2 * 1024 * 1024)
+                            {
+                                // Validate PE header
+                                using (var fs = File.OpenRead(tempExe))
+                                {
+                                    int b1 = fs.ReadByte();
+                                    int b2 = fs.ReadByte();
+                                    if (b1 == 0x4D && b2 == 0x5A) // 'MZ'
+                                    {
+                                        downloaded = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
-
-                        // Validate downloaded file
-                        if (File.Exists(tempExe) && new FileInfo(tempExe).Length > 2 * 1024 * 1024)
+                        catch (Exception ex)
                         {
-                            // Validate PE header
-                            using (var fs = File.OpenRead(tempExe))
-                            {
-                                int b1 = fs.ReadByte();
-                                int b2 = fs.ReadByte();
-                                if (b1 == 0x4D && b2 == 0x5A) // 'MZ'
-                                {
-                                    downloaded = true;
-                                    break;
-                                }
-                            }
+                            lastEx = ex;
                         }
                     }
-                    catch (Exception ex)
+
+                    if (!downloaded || !File.Exists(tempExe))
                     {
-                        lastEx = ex;
+                        StatusMessage = $"Download failed: {lastEx?.Message ?? "Corrupted or incomplete file received."}";
+                        ActivityLogger.Instance.Log($"App update download error: {lastEx?.Message}", ActivityType.Warning);
+                        return false;
                     }
                 }
-
-                if (!downloaded || !File.Exists(tempExe))
+                else
                 {
-                    StatusMessage = $"Download failed: {lastEx?.Message ?? "Corrupted or incomplete file received."}";
-                    ActivityLogger.Instance.Log($"App update download error: {lastEx?.Message}", ActivityType.Warning);
-                    return false;
+                    // Fast Delta mode: 85MB executable download is skipped!
+                    DownloadProgress = 25;
+                    DownloadBytesText = "Delta Patch (~150 KB) • Binary skipped";
+                    DownloadSpeedText = "Instant";
+                    StatusMessage = "⚡ Fast Delta active: Downloading updated configs (~150 KB)…";
+                    progressCallback?.Invoke(25, StatusMessage);
                 }
 
-                // 2. Also download latest config files from GitHub to temp staging so tweaks catalog is updated
+                // 2. Download latest config files from GitHub to temp staging
                 StatusMessage = "Fetching updated configuration catalogs…";
+                progressCallback?.Invoke(60, "Fetching updated configurations…");
                 var tempConfigDir = Path.Combine(tempDir, "Configuration");
                 Directory.CreateDirectory(tempConfigDir);
                 await TryDownloadConfigAsync("tweaks.default.json", tempConfigDir);
                 await TryDownloadConfigAsync("registry_tweaks.default.json", tempConfigDir);
                 await TryDownloadConfigAsync("packages.default.json", tempConfigDir);
+                await TryDownloadConfigAsync("appsettings.default.json", tempConfigDir);
                 await TryDownloadRootFileAsync("version.json", tempConfigDir);
                 await TryDownloadRootFileAsync("version.json", tempDir);
+
+                // If in delta mode, ensure version.json is staged with the new version manifest
+                var tempVJson = Path.Combine(tempDir, "version.json");
+                if (!File.Exists(tempVJson) && LatestManifest != null)
+                {
+                    try
+                    {
+                        var json = JsonSerializer.Serialize(LatestManifest, new JsonSerializerOptions { WriteIndented = true });
+                        File.WriteAllText(tempVJson, json);
+                    }
+                    catch { }
+                }
 
                 // 3. Build bulletproof detached batch updater script
                 StatusMessage = "Finalizing update and restarting…";
@@ -529,15 +637,20 @@ namespace SetupHub180Hz.Services
                 }
 
                 var helperCmd = Path.Combine(tempDir, "apply_update.cmd");
+                var targetConfigDir = Path.Combine(installDir, "Configuration");
+                var targetVJson = Path.Combine(installDir, "version.json");
+                var targetConfigVJson = Path.Combine(targetConfigDir, "version.json");
+
                 var scriptBuilder = new StringBuilder();
                 scriptBuilder.AppendLine("@echo off");
                 scriptBuilder.AppendLine("chcp 65001 >nul");
-                scriptBuilder.AppendLine(":: 180Hz Setup Hub Direct EXE In-Place Auto-Updater");
-                // Using ping for sleep avoids 'Input redirection is not supported' error in hidden cmd processes
+                scriptBuilder.AppendLine(":: 180Hz Setup Hub Fast Delta & Full Auto-Updater");
                 scriptBuilder.AppendLine("ping 127.0.0.1 -n 2 >nul");
                 scriptBuilder.AppendLine($"taskkill /F /PID {currentPid} >nul 2>&1");
                 scriptBuilder.AppendLine("taskkill /F /IM 180HzSetupHub.exe >nul 2>&1");
                 scriptBuilder.AppendLine("ping 127.0.0.1 -n 2 >nul");
+
+                scriptBuilder.AppendLine($"if not exist \"{tempExe}\" goto SKIP_EXE");
                 scriptBuilder.AppendLine("set ATTEMPTS=0");
                 scriptBuilder.AppendLine(":RETRY_COPY");
                 scriptBuilder.AppendLine("set /a ATTEMPTS+=1");
@@ -548,10 +661,10 @@ namespace SetupHub180Hz.Services
                 scriptBuilder.AppendLine("        goto RETRY_COPY");
                 scriptBuilder.AppendLine("    )");
                 scriptBuilder.AppendLine(")");
+                scriptBuilder.AppendLine(":SKIP_EXE");
 
                 if (Directory.Exists(tempConfigDir) && !string.IsNullOrWhiteSpace(installDir))
                 {
-                    var targetConfigDir = Path.Combine(installDir, "Configuration");
                     scriptBuilder.AppendLine($"if exist \"{tempConfigDir}\" (");
                     scriptBuilder.AppendLine($"    xcopy /Y /E /I \"{tempConfigDir}\\*\" \"{targetConfigDir}\\\" >nul 2>&1");
                     scriptBuilder.AppendLine(")");
@@ -559,10 +672,9 @@ namespace SetupHub180Hz.Services
 
                 if (!string.IsNullOrWhiteSpace(installDir))
                 {
-                    var tempVJson = Path.Combine(tempDir, "version.json");
-                    var targetVJson = Path.Combine(installDir, "version.json");
                     scriptBuilder.AppendLine($"if exist \"{tempVJson}\" (");
                     scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetVJson}\" >nul 2>&1");
+                    scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetConfigVJson}\" >nul 2>&1");
                     scriptBuilder.AppendLine(")");
                 }
 
@@ -586,7 +698,7 @@ namespace SetupHub180Hz.Services
                     WorkingDirectory = Path.GetTempPath()
                 };
 
-                // If install directory requires Administrator privileges, elevate to ensure copy succeeds
+                // If install directory requires Administrator privileges, elevate
                 if (!isInstallDirWritable)
                 {
                     psi.Verb = "runas";
@@ -631,7 +743,7 @@ namespace SetupHub180Hz.Services
                 if (resp.IsSuccessStatusCode)
                 {
                     var data = await resp.Content.ReadAsByteArrayAsync();
-                    if (data.Length > 100)
+                    if (data.Length > 10)
                     {
                         var target = Path.Combine(targetDir, filename);
                         await File.WriteAllBytesAsync(target, data);

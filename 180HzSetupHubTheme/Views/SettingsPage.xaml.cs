@@ -106,7 +106,9 @@ namespace SetupHub180Hz.Views
                 else if (s.UpdateAvailable)
                 {
                     BtnSettingsUpdateNow.IsEnabled = true;
-                    BtnSettingsUpdateNow.Content = $"🚀 Update to v{s.LatestVersion}";
+                    BtnSettingsUpdateNow.Content = s.IsDeltaUpdate
+                        ? $"⚡ Quick Patch ({s.UpdateSizeText})"
+                        : $"🚀 Update to v{s.LatestVersion} ({s.UpdateSizeText})";
 
                     if (!string.IsNullOrWhiteSpace(s.ReleaseNotes))
                     {
@@ -271,15 +273,20 @@ namespace SetupHub180Hz.Views
         {
             try
             {
+                var s = AppUpdateService.Instance;
+                var modeText = s.IsDeltaUpdate ? "⚡ Fast Delta Patch (only changed files)" : "🚀 Full Application Update";
                 var res = ThemedMessageBox.Show(
-                    $"180Hz Setup Hub will download the latest build (v{AppUpdateService.Instance.LatestVersion}) from GitHub and automatically replace the running executable and restart.\n\nDo you want to proceed?",
-                    "Direct EXE Update from GitHub",
+                    $"180Hz Setup Hub will apply update v{s.LatestVersion} from GitHub.\n\n" +
+                    $"• Mode: {modeText}\n" +
+                    $"• Download Size: {s.UpdateSizeText}\n\n" +
+                    "The application will update in-place and restart automatically.\n\nDo you want to proceed?",
+                    "180Hz Setup Hub Auto-Update",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
 
                 if (res != MessageBoxResult.Yes) return;
 
-                await RunExeUpdate();
+                await RunExeUpdate(forceFullBinary: false);
             }
             catch (Exception ex)
             {
@@ -292,14 +299,14 @@ namespace SetupHub180Hz.Views
             try
             {
                 var res = ThemedMessageBox.Show(
-                    "This will force download the latest 180HzSetupHub.exe from GitHub (main branch) and replace the running executable in-place.\n\nThe app will restart automatically once completed.\n\nDo you want to continue?",
+                    "This will force download the latest 180HzSetupHub.exe (~85 MB) from GitHub (main branch) and replace the running executable in-place.\n\nThe app will restart automatically once completed.\n\nDo you want to continue?",
                     "Force Re-download Latest EXE",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
 
                 if (res != MessageBoxResult.Yes) return;
 
-                await RunExeUpdate();
+                await RunExeUpdate(forceFullBinary: true);
             }
             catch (Exception ex)
             {
@@ -307,15 +314,15 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private async Task RunExeUpdate()
+        private async Task RunExeUpdate(bool forceFullBinary = false)
         {
             UpdateAppUpdateStatusUi();
-            var success = await AppUpdateService.Instance.DownloadAndApplyUpdateAsync();
+            var success = await AppUpdateService.Instance.DownloadAndApplyUpdateAsync(forceFullBinary: forceFullBinary);
             if (!success)
             {
                 UpdateAppUpdateStatusUi();
                 ThemedMessageBox.Show(
-                    $"Could not complete EXE update: {AppUpdateService.Instance.StatusMessage}",
+                    $"Could not complete update: {AppUpdateService.Instance.StatusMessage}",
                     "Update Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

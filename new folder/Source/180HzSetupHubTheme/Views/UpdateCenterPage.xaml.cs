@@ -78,7 +78,9 @@ namespace SetupHub180Hz.Views
                 if (s.UpdateAvailable)
                 {
                     BtnApplyAppUpdate.IsEnabled = true;
-                    BtnApplyAppUpdate.Content = $"🚀 Update to v{s.LatestVersion}";
+                    BtnApplyAppUpdate.Content = s.IsDeltaUpdate
+                        ? $"⚡ Quick Patch ({s.UpdateSizeText})"
+                        : $"🚀 Update to v{s.LatestVersion} ({s.UpdateSizeText})";
                     BtnApplyAppUpdate.Visibility = Visibility.Visible;
 
                     if (!string.IsNullOrWhiteSpace(s.ReleaseNotes))
@@ -138,15 +140,20 @@ namespace SetupHub180Hz.Views
         {
             try
             {
+                var s = AppUpdateService.Instance;
+                var modeText = s.IsDeltaUpdate ? "⚡ Fast Delta Patch (only changed files)" : "🚀 Full Application Update";
                 var res = ThemedMessageBox.Show(
-                    $"180Hz Setup Hub will now download and install v{AppUpdateService.Instance.LatestVersion} from GitHub.\n\nThe application will automatically restart once the update is applied.\n\nDo you want to proceed?",
+                    $"180Hz Setup Hub will now download and install v{s.LatestVersion} from GitHub.\n\n" +
+                    $"• Mode: {modeText}\n" +
+                    $"• Download Size: {s.UpdateSizeText}\n\n" +
+                    "The application will automatically restart once the update is applied.\n\nDo you want to proceed?",
                     "Install 180Hz Setup Hub Update",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
 
                 if (res != MessageBoxResult.Yes) return;
 
-                await StartSelfUpdate();
+                await StartSelfUpdate(forceFullBinary: false);
             }
             catch (Exception ex)
             {
@@ -159,14 +166,14 @@ namespace SetupHub180Hz.Views
             try
             {
                 var res = ThemedMessageBox.Show(
-                    "This will force download the latest executable from GitHub (main branch) and reinstall it, even if versions appear identical.\n\nThe application will restart automatically.\n\nDo you want to continue?",
+                    "This will force download the latest executable (~85 MB) from GitHub (main branch) and reinstall it, even if versions appear identical.\n\nThe application will restart automatically.\n\nDo you want to continue?",
                     "Force Sync from GitHub",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
 
                 if (res != MessageBoxResult.Yes) return;
 
-                await StartSelfUpdate();
+                await StartSelfUpdate(forceFullBinary: true);
             }
             catch (Exception ex)
             {
@@ -174,10 +181,10 @@ namespace SetupHub180Hz.Views
             }
         }
 
-        private async Task StartSelfUpdate()
+        private async Task StartSelfUpdate(bool forceFullBinary = false)
         {
             UpdateAppSelfUpdateUi();
-            var success = await AppUpdateService.Instance.DownloadAndApplyUpdateAsync();
+            var success = await AppUpdateService.Instance.DownloadAndApplyUpdateAsync(forceFullBinary: forceFullBinary);
             if (!success)
             {
                 UpdateAppSelfUpdateUi();

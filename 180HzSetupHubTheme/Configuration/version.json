@@ -1,9 +1,13 @@
 {
-  "version": "2.5.1",
+  "version": "2.5.2",
   "buildDate": "2026-10-26",
   "productName": "180Hz Setup Hub",
   "repository": "https://github.com/tanjeem180hz/180HzSetupHub",
-  "releaseNotes": "• Simple & Professional Modern Installer UI\n• 100% Software Compatibility & Stability (Antigravity & Games)\n• Settings Auto-Update Verification Engine\n• Direct in-place self-updater",
+  "releaseNotes": "• Ultra-Fast Delta Incremental Auto-Updater (~150 KB patch)\n• Downloads only changed files instead of full 85 MB binary\n• 100% Software Compatibility & Crash Immunity (Antigravity & Gaming)\n• Modern Professional Clean UI",
+  "exeSha256": "DCBA19146BAD0811AE932342F88E15392629BA8E0DD15B850BE6A329FE1EBEF9",
+  "deltaOnly": true,
+  "deltaSizeText": "Delta Patch (~150 KB)",
+  "fullSizeText": "Full App (~85 MB)",
   "downloadUrl": "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/artifacts/publish/win-x64/180HzSetupHub.exe",
   "fallbackUrl": "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe",
   "installerUrl": "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/installer/180HzSetupHubSetup.exe"
