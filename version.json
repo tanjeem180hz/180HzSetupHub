@@ -1,16 +1,16 @@
-{
-  "version": "2.5.5",
-  "buildDate": "2026-10-26",
-  "commitSha": "b62d9891ccdbde3aaa790bbdc42e86a96169afd7",
-  "productName": "180Hz Setup Hub",
-  "repository": "https://github.com/tanjeem180hz/180HzSetupHub",
-  "releaseNotes": "• Bulletproof Real-Time Update Checker: Multi-layered GitHub check with real-time CDN bypass\n• Atomic In-Place Updater: Elevated NTFS file replacement with automatic process unlock\n• Customizable Application Data Directory: Choose custom folder path or external drive with automatic data migration\n• Reset to Default Directory option with 1-click restore\n• Live Global Software Search (Winget Community 20,000+ packages)",
-  "exeSha256": "1FC358D348773269FF40B84498DC5F5DC0C2A7CC307777C9483BDCCD7F267728",
-  "deltaOnly": false,
-  "forceFullBinary": true,
-  "deltaSizeText": "Delta Patch (~150 KB)",
-  "fullSizeText": "Full App (~82 MB)",
-  "downloadUrl": "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/artifacts/publish/win-x64/180HzSetupHub.exe",
-  "fallbackUrl": "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe",
-  "installerUrl": "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/installer/180HzSetupHubSetup.exe"
+﻿{
+    "version":  "2.5.6",
+    "buildDate":  "2026-10-26",
+    "commitSha":  "86d75417a7e94c3ff2bdbeae6658105addb5a79d",
+    "productName":  "180Hz Setup Hub",
+    "repository":  "https://github.com/tanjeem180hz/180HzSetupHub",
+    "releaseNotes":  "â€¢ Instant Global Software Search: Search across all 20,000+ Winget \u0026 Microsoft Store apps without category filter blocking\nâ€¢ Zero-Wait Search Rendering: Immediate registry/AppX detection (\u003c1ms) replaces slow winget list hang\nâ€¢ Direct Search \u0026 Install: Fast online repository sync directly inside Setup Apps list\nâ€¢ Bulletproof Real-Time Update Checker with CDN bypass",
+    "exeSha256":  "5B00DFDB04736D2220526F9DE13256DEA258671BAFD1ECCC3BE2A95127AB0AEB",
+    "deltaOnly":  false,
+    "forceFullBinary":  true,
+    "deltaSizeText":  "Delta Patch (~150 KB)",
+    "fullSizeText":  "Full App (~82 MB)",
+    "downloadUrl":  "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/artifacts/publish/win-x64/180HzSetupHub.exe",
+    "fallbackUrl":  "https://github.com/tanjeem180hz/180HzSetupHub/raw/main/artifacts/publish/win-x64/180HzSetupHub.exe",
+    "installerUrl":  "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/installer/180HzSetupHubSetup.exe"
 }

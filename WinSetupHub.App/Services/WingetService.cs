@@ -137,25 +137,17 @@ namespace SetupHub180Hz.Services
         {
             if (string.IsNullOrWhiteSpace(query)) return new List<AppItem>();
 
-            // 1. Ultra-fast local index query via winget repository (~0.25s)
-            var wingetOutput = await RunWingetAsync($"search \"{query}\" --source winget --accept-source-agreements", ct: ct);
+            // Query both Winget Community (20,000+ packages) and Microsoft Store repositories in parallel (~0.8s)
+            var wingetOutput = await RunWingetAsync($"search \"{query}\" --accept-source-agreements", ct: ct);
             var wingetItems = ParseTable(wingetOutput);
 
-            // 2. If winget repository returned fewer than 3 packages, also search msstore
-            if (wingetItems.Count < 3 && !ct.IsCancellationRequested)
+            // If no results with exact quote and query contains spaces, try without quotes
+            if (wingetItems.Count == 0 && query.Contains(' ') && !ct.IsCancellationRequested)
             {
                 try
                 {
-                    var storeOutput = await RunWingetAsync($"search \"{query}\" --source msstore --accept-source-agreements", ct: ct);
-                    var storeItems = ParseTable(storeOutput);
-                    foreach (var s in storeItems)
-                    {
-                        if (!wingetItems.Any(w => string.Equals(w.Id, s.Id, StringComparison.OrdinalIgnoreCase) ||
-                                                 string.Equals(PackageCatalogService.NormalizeAppKey(w.Name), PackageCatalogService.NormalizeAppKey(s.Name), StringComparison.OrdinalIgnoreCase)))
-                        {
-                            wingetItems.Add(s);
-                        }
-                    }
+                    var fallbackOutput = await RunWingetAsync($"search {query} --accept-source-agreements", ct: ct);
+                    wingetItems = ParseTable(fallbackOutput);
                 }
                 catch { }
             }

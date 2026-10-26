@@ -41,7 +41,7 @@ namespace SetupHub180Hz.Services
         private static readonly Lazy<AppUpdateService> _instance = new(() => new AppUpdateService());
         public static AppUpdateService Instance => _instance.Value;
 
-        public const string DefaultCurrentVersion = "2.5.5";
+        public const string DefaultCurrentVersion = "2.5.6";
         public const string RepoOwner = "tanjeem180hz";
         public const string RepoName = "180HzSetupHub";
         public const string ManifestUrl = "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/version.json";

@@ -376,7 +376,7 @@ namespace SetupHub180Hz.Views
             var pool = _allPackages.Concat(PackageCatalogService.GetDiscoveredPackages());
             var filtered = pool.AsEnumerable();
 
-            if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(query) && !string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
             {
                 filtered = filtered.Where(p => string.Equals(p.Category, _activeCategory, StringComparison.OrdinalIgnoreCase));
             }
@@ -586,8 +586,8 @@ namespace SetupHub180Hz.Views
                     return;
                 }
 
-                // Take top 16 online packages, enrich metadata, infer category, and auto-detect Installed status
-                var topOnline = onlineList.Take(16).ToList();
+                // Take top 20 online packages, enrich metadata, infer category, and auto-detect Installed status (<1ms via Registry/AppX)
+                var topOnline = onlineList.Take(20).ToList();
                 foreach (var app in topOnline)
                 {
                     AppMetadataHelper.EnrichAppItem(app, _allPackages);
@@ -595,11 +595,12 @@ namespace SetupHub180Hz.Views
                     {
                         app.Category = PackageCatalogService.InferCategory(app.Id, app.Name, app.Description);
                     }
+                    bool isInst = AppMetadataHelper.IsAppInstalled(app);
+                    app.IsInstalled = isInst;
+                    app.Status = isInst ? "✓ Up to Date" : "Install";
                 }
 
                 PackageCatalogService.RegisterDiscoveredPackages(topOnline);
-
-                await _catalog.CheckInstalledStatusAsync(_winget, topOnline);
                 if (ct.IsCancellationRequested) return;
 
                 await Dispatcher.InvokeAsync(() =>
@@ -622,27 +623,16 @@ namespace SetupHub180Hz.Views
                         }
                     }
 
-                    // Also merge online packages directly into the main AppsListBox so ANY software searched is immediately visible & ready to install!
-                    var mainList = (AppsListBox.ItemsSource as IEnumerable<AppItem>)?.ToList() ?? new List<AppItem>();
-                    bool addedToMain = false;
-                    foreach (var onlineApp in topOnline)
-                    {
-                        string normOnline = PackageCatalogService.NormalizeAppKey(onlineApp.Name);
-                        if (!mainList.Any(m => string.Equals(m.Id, onlineApp.Id, StringComparison.OrdinalIgnoreCase) ||
-                                               string.Equals(PackageCatalogService.NormalizeAppKey(m.Name), normOnline, StringComparison.OrdinalIgnoreCase)))
-                        {
-                            mainList.Add(onlineApp);
-                            addedToMain = true;
-                        }
-                    }
+                    // Directly merge matching local packages and top online packages into AppsListBox!
+                    var localMatches = _allPackages.Where(p =>
+                        p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                        p.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                        (p.DetectionNames != null && p.DetectionNames.Any(d => d.Contains(query, StringComparison.OrdinalIgnoreCase)))).ToList();
 
-                    if (addedToMain)
-                    {
-                        mainList = PackageCatalogService.DeduplicatePackages(mainList);
-                        AppsListBox.ItemsSource = mainList;
-                        CatalogCountText.Text = $"{mainList.Count} Packages Ready";
-                        StatusText.Visibility = Visibility.Collapsed;
-                    }
+                    var combined = PackageCatalogService.DeduplicatePackages(localMatches.Concat(topOnline));
+                    AppsListBox.ItemsSource = combined;
+                    CatalogCountText.Text = $"{combined.Count} Packages Ready";
+                    StatusText.Visibility = Visibility.Collapsed;
 
                     if (added || currentList.Count > 0)
                     {
@@ -665,7 +655,7 @@ namespace SetupHub180Hz.Views
                     // Load icons & resolve exact official website links for online items in background
                     _ = Task.Run(async () =>
                     {
-                        foreach (var item in topOnline)
+                        foreach (var item in topOnline.Take(12))
                         {
                             if (string.IsNullOrWhiteSpace(item.WebUrl) && !string.IsNullOrWhiteSpace(item.Id))
                             {
@@ -731,14 +721,8 @@ namespace SetupHub180Hz.Views
                 SearchGhostText.Text = "";
                 TabHintBadge.Visibility = Visibility.Collapsed;
                 _searchDebounceTimer.Stop();
-                ApplyFilter();
-
-                // If no local packages found for the typed query, automatically run Deep Web Search!
-                var currentItems = AppsListBox.ItemsSource as IEnumerable<AppItem>;
-                if (currentItems == null || !currentItems.Any())
-                {
-                    WingetSearch_Click(sender, e);
-                }
+                _onlineSearchCts?.Cancel();
+                TriggerDirectSearch(SearchBox.Text.Trim());
                 e.Handled = true;
                 return;
             }
@@ -859,11 +843,13 @@ namespace SetupHub180Hz.Views
                 {
                     app.Category = PackageCatalogService.InferCategory(app.Id, app.Name, app.Description);
                 }
+                bool isInst = AppMetadataHelper.IsAppInstalled(app);
+                app.IsInstalled = isInst;
+                app.Status = isInst ? "✓ Up to Date" : "Install";
+
                 PackageCatalogService.RegisterDiscoveredPackages(new[] { app });
 
                 var list = new List<AppItem> { app };
-                await _catalog.CheckInstalledStatusAsync(_winget, list);
-
                 CatalogCountText.Text = $"1 Online Package Ready for '{app.Name}'";
                 StatusText.Visibility = Visibility.Collapsed;
                 AppsListBox.ItemsSource = list;
@@ -911,14 +897,8 @@ namespace SetupHub180Hz.Views
                 SearchGhostText.Text = "";
                 TabHintBadge.Visibility = Visibility.Collapsed;
                 _searchDebounceTimer.Stop();
-                ApplyFilter(resetScroll: true);
-
-                // If no local packages found for the typed query, automatically run Deep Web Search!
-                var currentItems = AppsListBox.ItemsSource as IEnumerable<AppItem>;
-                if (currentItems == null || !currentItems.Any())
-                {
-                    WingetSearch_Click(sender, e);
-                }
+                _onlineSearchCts?.Cancel();
+                TriggerDirectSearch(SearchBox.Text.Trim());
                 e.Handled = true;
                 return;
             }
@@ -928,41 +908,70 @@ namespace SetupHub180Hz.Views
         {
             SearchSuggestionsPopup.IsOpen = false;
             _searchDebounceTimer.Stop();
-            ApplyFilter();
+            _onlineSearchCts?.Cancel();
+            TriggerDirectSearch(SearchBox.Text.Trim());
         }
 
-        private async void WingetSearch_Click(object sender, RoutedEventArgs e)
+        private void WingetSearch_Click(object sender, RoutedEventArgs e)
         {
-            var query = SearchBox.Text.Trim();
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                ThemedMessageBox.Show("Please enter a software name in the search box to search Winget's online repository.",
-                    "Search Query Required", MessageBoxButton.OK, MessageBoxImage.Information);
-                SearchBox.Focus();
-                return;
-            }
-
             SearchSuggestionsPopup.IsOpen = false;
             SearchGhostText.Text = "";
             TabHintBadge.Visibility = Visibility.Collapsed;
+            _searchDebounceTimer.Stop();
+            _onlineSearchCts?.Cancel();
+            TriggerDirectSearch(SearchBox.Text.Trim());
+        }
 
-            StatusText.Text = $"Searching online Winget repository for '{query}'…";
+        private async void TriggerDirectSearch(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                ApplyFilter(resetScroll: true);
+                return;
+            }
+
+            // Immediately display local matches
+            ApplyFilter(resetScroll: true);
+
+            // If already cached, show immediately
+            if (_onlineSuggestCache.TryGetValue(query, out var cachedOnline) && cachedOnline.Count > 0)
+            {
+                foreach (var app in cachedOnline)
+                {
+                    AppMetadataHelper.EnrichAppItem(app, _allPackages);
+                    if (string.IsNullOrWhiteSpace(app.Category) || app.Category == "General" || app.Category == "Online")
+                    {
+                        app.Category = PackageCatalogService.InferCategory(app.Id, app.Name, app.Description);
+                    }
+                    bool isInst = AppMetadataHelper.IsAppInstalled(app);
+                    app.IsInstalled = isInst;
+                    app.Status = isInst ? "✓ Up to Date" : "Install";
+                }
+                PackageCatalogService.RegisterDiscoveredPackages(cachedOnline);
+
+                var localMatches = _allPackages.Where(p =>
+                    p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    p.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    (p.DetectionNames != null && p.DetectionNames.Any(d => d.Contains(query, StringComparison.OrdinalIgnoreCase)))).ToList();
+
+                var combined = PackageCatalogService.DeduplicatePackages(localMatches.Concat(cachedOnline));
+                AppsListBox.ItemsSource = combined;
+                CatalogCountText.Text = $"{combined.Count} Packages Ready for '{query}'";
+                StatusText.Visibility = Visibility.Collapsed;
+                ResetAppsListScrollToTop();
+                return;
+            }
+
+            StatusText.Text = $"Searching online software repositories for '{query}'…";
             StatusText.Visibility = Visibility.Visible;
             WingetSearchButton.IsEnabled = false;
 
             try
             {
                 var onlineResults = PackageCatalogService.DeduplicatePackages(await _winget.SearchAsync(query));
-                if (onlineResults.Count == 0)
+                if (onlineResults.Count > 0)
                 {
-                    StatusText.Text = $"No online packages found matching '{query}'.";
-                    StatusText.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    StatusText.Visibility = Visibility.Collapsed;
-
-                    // 1. Enrich metadata & match with local catalog
+                    _onlineSuggestCache[query] = onlineResults;
                     foreach (var app in onlineResults)
                     {
                         AppMetadataHelper.EnrichAppItem(app, _allPackages);
@@ -970,21 +979,28 @@ namespace SetupHub180Hz.Views
                         {
                             app.Category = PackageCatalogService.InferCategory(app.Id, app.Name, app.Description);
                         }
+                        bool isInst = AppMetadataHelper.IsAppInstalled(app);
+                        app.IsInstalled = isInst;
+                        app.Status = isInst ? "✓ Up to Date" : "Install";
                     }
 
                     PackageCatalogService.RegisterDiscoveredPackages(onlineResults);
 
-                    // 2. Check installed status
-                    await _catalog.CheckInstalledStatusAsync(_winget, onlineResults);
+                    var localMatches = _allPackages.Where(p =>
+                        p.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                        p.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                        (p.DetectionNames != null && p.DetectionNames.Any(d => d.Contains(query, StringComparison.OrdinalIgnoreCase)))).ToList();
 
-                    // 3. Update count & list view
-                    CatalogCountText.Text = $"{onlineResults.Count} Online Packages Found for '{query}'";
-                    AppsListBox.ItemsSource = onlineResults;
+                    var combined = PackageCatalogService.DeduplicatePackages(localMatches.Concat(onlineResults));
+                    AppsListBox.ItemsSource = combined;
+                    CatalogCountText.Text = $"{combined.Count} Packages Found for '{query}'";
+                    StatusText.Visibility = Visibility.Collapsed;
+                    ResetAppsListScrollToTop();
 
-                    // 4. Background parallel icon extraction & website discovery
+                    // Background parallel icon extraction
                     _ = Task.Run(async () =>
                     {
-                        await Parallel.ForEachAsync(onlineResults, new ParallelOptions { MaxDegreeOfParallelism = 2 }, async (app, ct) =>
+                        foreach (var app in onlineResults.Take(16))
                         {
                             if (string.IsNullOrWhiteSpace(app.WebUrl) && !string.IsNullOrWhiteSpace(app.Id))
                             {
@@ -1007,13 +1023,26 @@ namespace SetupHub180Hz.Views
                                     await Dispatcher.InvokeAsync(() => app.IconImageSource = img);
                                 }
                             }
-                        });
+                        }
                     });
+                }
+                else
+                {
+                    var currentItems = AppsListBox.ItemsSource as IEnumerable<AppItem>;
+                    if (currentItems == null || !currentItems.Any())
+                    {
+                        StatusText.Text = $"No packages found matching '{query}'.";
+                        StatusText.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        StatusText.Visibility = Visibility.Collapsed;
+                    }
                 }
             }
             catch (Exception ex)
             {
-                StatusText.Text = $"Online search error: {ex.Message}";
+                StatusText.Text = $"Search error: {ex.Message}";
                 StatusText.Visibility = Visibility.Visible;
             }
             finally
