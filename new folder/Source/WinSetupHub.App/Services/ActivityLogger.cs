@@ -18,14 +18,19 @@ namespace SetupHub180Hz.Services
 
         public ObservableCollection<ActivityLogEntry> Entries { get; } = new();
 
-        private readonly string _logFile;
+        private string LogFilePath => Path.Combine(StorageService.LogsFolder, "activity.json");
         private const int MaxEntries = 500;
 
         private ActivityLogger()
         {
             Directory.CreateDirectory(StorageService.LogsFolder);
-            _logFile = Path.Combine(StorageService.LogsFolder, "activity.json");
             Load();
+
+            StorageService.AppDataFolderChanged += (_, _) =>
+            {
+                Directory.CreateDirectory(StorageService.LogsFolder);
+                Load();
+            };
         }
 
         public void Log(string message, ActivityType type = ActivityType.Info)
@@ -46,15 +51,26 @@ namespace SetupHub180Hz.Services
                 Add();
         }
 
-        private void Load()
+        public void Load()
         {
             try
             {
-                if (!File.Exists(_logFile)) return;
-                var json = File.ReadAllText(_logFile);
+                var path = LogFilePath;
+                if (!File.Exists(path)) return;
+                var json = File.ReadAllText(path);
                 var items = JsonSerializer.Deserialize<ActivityLogEntry[]>(json);
                 if (items == null) return;
-                foreach (var i in items) Entries.Add(i);
+
+                void Populate()
+                {
+                    Entries.Clear();
+                    foreach (var i in items) Entries.Add(i);
+                }
+
+                if (Application.Current?.Dispatcher.CheckAccess() == false)
+                    Application.Current.Dispatcher.Invoke(Populate);
+                else
+                    Populate();
             }
             catch
             {
@@ -69,7 +85,8 @@ namespace SetupHub180Hz.Services
                 Entries.Clear();
                 try
                 {
-                    if (File.Exists(_logFile)) File.Delete(_logFile);
+                    var path = LogFilePath;
+                    if (File.Exists(path)) File.Delete(path);
                 }
                 catch
                 {
@@ -86,8 +103,10 @@ namespace SetupHub180Hz.Services
         {
             try
             {
+                var path = LogFilePath;
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
                 var json = JsonSerializer.Serialize(Entries, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(_logFile, json);
+                File.WriteAllText(path, json);
             }
             catch
             {

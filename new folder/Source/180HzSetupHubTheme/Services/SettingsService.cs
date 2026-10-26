@@ -10,14 +10,22 @@ namespace SetupHub180Hz.Services
         private static readonly Lazy<SettingsService> _instance = new(() => new SettingsService());
         public static SettingsService Instance => _instance.Value;
 
-        private readonly string _settingsFilePath;
+        private string SettingsFilePath => Path.Combine(StorageService.ConfigFolder, "settings.json");
         private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
         public AppSettings Current { get; private set; }
 
         private SettingsService()
         {
-            _settingsFilePath = Path.Combine(StorageService.ConfigFolder, "settings.json");
+            Current = Load();
+            StorageService.AppDataFolderChanged += (_, _) =>
+            {
+                Current = Load();
+            };
+        }
+
+        public void Reload()
+        {
             Current = Load();
         }
 
@@ -27,7 +35,7 @@ namespace SetupHub180Hz.Services
             {
                 Directory.CreateDirectory(StorageService.ConfigFolder);
                 var json = JsonSerializer.Serialize(Current, _jsonOptions);
-                File.WriteAllText(_settingsFilePath, json);
+                File.WriteAllText(SettingsFilePath, json);
             }
             catch (Exception ex)
             {
@@ -39,9 +47,10 @@ namespace SetupHub180Hz.Services
         {
             try
             {
-                if (File.Exists(_settingsFilePath))
+                var path = SettingsFilePath;
+                if (File.Exists(path))
                 {
-                    var json = File.ReadAllText(_settingsFilePath);
+                    var json = File.ReadAllText(path);
                     var settings = JsonSerializer.Deserialize<AppSettings>(json);
                     if (settings != null) return settings;
                 }

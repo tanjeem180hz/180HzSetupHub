@@ -12,8 +12,8 @@ namespace SetupHub180Hz.Services
         private static readonly Lazy<StartupHistoryService> _instance = new(() => new StartupHistoryService());
         public static StartupHistoryService Instance => _instance.Value;
 
-        private readonly string _historyFilePath;
-        private readonly string _statesFilePath;
+        private static string HistoryFilePath => Path.Combine(StorageService.ConfigFolder, "startup_history.json");
+        private static string StatesFilePath => Path.Combine(StorageService.ConfigFolder, "startup_states.json");
         private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
         private readonly object _lock = new();
 
@@ -28,10 +28,16 @@ namespace SetupHub180Hz.Services
             var baseDir = StorageService.ConfigFolder;
             try { Directory.CreateDirectory(baseDir); } catch { }
 
-            _historyFilePath = Path.Combine(baseDir, "startup_history.json");
-            _statesFilePath = Path.Combine(baseDir, "startup_states.json");
-
             LoadFromDisk();
+
+            StorageService.AppDataFolderChanged += (_, _) =>
+            {
+                lock (_lock)
+                {
+                    _isLoaded = false;
+                    LoadFromDisk();
+                }
+            };
         }
 
         private void LoadFromDisk()
@@ -43,9 +49,9 @@ namespace SetupHub180Hz.Services
                 // 1. Load History
                 try
                 {
-                    if (File.Exists(_historyFilePath))
+                    if (File.Exists(HistoryFilePath))
                     {
-                        var json = File.ReadAllText(_historyFilePath);
+                        var json = File.ReadAllText(HistoryFilePath);
                         var list = JsonSerializer.Deserialize<List<StartupHistoryEntry>>(json, _jsonOptions);
                         if (list != null)
                         {
@@ -61,9 +67,9 @@ namespace SetupHub180Hz.Services
                 // 2. Load States
                 try
                 {
-                    if (File.Exists(_statesFilePath))
+                    if (File.Exists(StatesFilePath))
                     {
-                        var json = File.ReadAllText(_statesFilePath);
+                        var json = File.ReadAllText(StatesFilePath);
                         var states = JsonSerializer.Deserialize<Dictionary<string, bool>>(json, _jsonOptions);
                         if (states != null)
                         {
@@ -185,9 +191,9 @@ namespace SetupHub180Hz.Services
         {
             try
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(_historyFilePath)!);
+                Directory.CreateDirectory(StorageService.ConfigFolder);
                 var json = JsonSerializer.Serialize(_historyCache, _jsonOptions);
-                File.WriteAllText(_historyFilePath, json);
+                File.WriteAllText(HistoryFilePath, json);
             }
             catch (Exception ex)
             {
@@ -199,9 +205,9 @@ namespace SetupHub180Hz.Services
         {
             try
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(_statesFilePath)!);
+                Directory.CreateDirectory(StorageService.ConfigFolder);
                 var json = JsonSerializer.Serialize(_statesCache, _jsonOptions);
-                File.WriteAllText(_statesFilePath, json);
+                File.WriteAllText(StatesFilePath, json);
             }
             catch (Exception ex)
             {

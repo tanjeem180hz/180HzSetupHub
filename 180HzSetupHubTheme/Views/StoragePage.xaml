@@ -49,35 +49,71 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,14">
-                            <lottie:LottieAnimationView Width="22" Height="22" AutoPlay="True" RepeatCount="-1"
-                                                        services:LottieHelper.AssetName="scan.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="180Hz HUB APPLICATION DATA" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
-                        </StackPanel>
+                        <!-- Header -->
+                        <Grid Grid.Row="0" Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <lottie:LottieAnimationView Width="22" Height="22" AutoPlay="True" RepeatCount="-1"
+                                                            services:LottieHelper.AssetName="scan.json" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="180Hz HUB APPLICATION DATA" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" x:Name="LocationBadge" Background="{DynamicResource BrushSurface}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="4" Padding="7,2" VerticalAlignment="Center">
+                                <TextBlock x:Name="LocationBadgeText" Text="DEFAULT DIRECTORY" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource BrushTextSecondary}"/>
+                            </Border>
+                        </Grid>
 
+                        <!-- Size on Disk -->
                         <StackPanel Grid.Row="1" Margin="0,0,0,16">
                             <TextBlock Text="SIZE ON DISK" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
                             <TextBlock x:Name="SizeText" Text="Calculating…" Foreground="{DynamicResource BrushAccent}" FontSize="28" FontWeight="Bold" Margin="0,4,0,2"/>
                             <TextBlock Text="Includes installer cache, manifests, app catalogs, and event history" FontSize="11" Foreground="{DynamicResource BrushTextSecondary}"/>
                         </StackPanel>
 
-                        <StackPanel Grid.Row="2" Margin="0,0,0,16">
+                        <!-- Directory Path Box -->
+                        <StackPanel Grid.Row="2" Margin="0,0,0,14">
                             <TextBlock Text="APPLICATION DATA DIRECTORY" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource BrushTextSecondary}"/>
                             <Border Background="{DynamicResource BrushBackground}" BorderBrush="{DynamicResource BrushBorder}" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,4,0,0">
-                                <TextBlock x:Name="PathText" Text="—" Foreground="{DynamicResource BrushTextPrimary}"
-                                           FontFamily="{StaticResource AppFont}" FontSize="12" TextWrapping="Wrap"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="PathText" Text="—" Foreground="{DynamicResource BrushTextPrimary}"
+                                               FontFamily="{StaticResource AppFont}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1" Content="📋" Tag="Copy Path" Style="{StaticResource ExpandableOutlineButton}" Click="CopyPath_Click" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                                </Grid>
                             </Border>
+                            <TextBlock x:Name="PathHintText" Text="Standard AppData location. Contains system logs, user configurations, app catalogs, and downloaded installers." FontSize="11" Foreground="{DynamicResource BrushTextSecondary}" Margin="0,4,0,0"/>
                         </StackPanel>
 
-                        <StackPanel Grid.Row="3" Orientation="Horizontal">
-                            <Button Content="📁" Tag="Open Directory" Style="{StaticResource ExpandableAccentButton}" Click="OpenStorage_Click" Margin="0,0,8,0"/>
-                            <Button Tag="Recalculate" Style="{StaticResource ExpandableOutlineButton}" Click="Refresh_Click">
+                        <!-- Action Buttons -->
+                        <WrapPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,4">
+                            <Button Content="📁" Tag="Open Directory" Style="{StaticResource ExpandableAccentButton}" Click="OpenStorage_Click" Margin="0,0,8,8"/>
+                            <Button Content="✏️" Tag="Customize Directory" Style="{StaticResource ExpandableOutlineButton}" Click="ChangeDirectory_Click" Margin="0,0,8,8"/>
+                            <Button x:Name="ResetDefaultButton" Content="🔄" Tag="Reset to Default" Style="{StaticResource ExpandableOutlineButton}" Click="ResetDefault_Click" Margin="0,0,8,8" Visibility="Collapsed"/>
+                            <Button Tag="Recalculate" Style="{StaticResource ExpandableOutlineButton}" Click="Refresh_Click" Margin="0,0,8,8">
                                 <lottie:LottieAnimationView Width="14" Height="14" AutoPlay="True" RepeatCount="-1"
                                                             services:LottieHelper.AssetName="loading_disc.json"/>
                             </Button>
-                        </StackPanel>
+                        </WrapPanel>
+
+                        <!-- Notification Banner -->
+                        <Border Grid.Row="4" x:Name="StatusBanner" Visibility="Collapsed" Background="#1526DFD0" BorderBrush="{DynamicResource BrushAccent}" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,4,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="StatusBannerIcon" Text="ℹ️" FontSize="13" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" x:Name="StatusBannerText" Text="Directory customized successfully." FontSize="11" Foreground="{DynamicResource BrushTextPrimary}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            </Grid>
+                        </Border>
                     </Grid>
                 </Border>
 

@@ -762,7 +762,7 @@ namespace SetupHub180Hz.Services
                 {
                     scriptBuilder.AppendLine($"if exist \"{tempConfigDir}\" (");
                     scriptBuilder.AppendLine($"    xcopy /Y /E /I /Q /H /R \"{tempConfigDir}\\*\" \"{targetConfigDir}\\\" >nul 2>&1");
-                    scriptBuilder.AppendLine($"    xcopy /Y /E /I /Q /H /R \"{tempConfigDir}\\*\" \"%LOCALAPPDATA%\\180HzSetupHub\\config\\\" >nul 2>&1");
+                    scriptBuilder.AppendLine($"    xcopy /Y /E /I /Q /H /R \"{tempConfigDir}\\*\" \"{StorageService.ConfigFolder}\\\" >nul 2>&1");
                     scriptBuilder.AppendLine(")");
                 }
 
@@ -771,7 +771,7 @@ namespace SetupHub180Hz.Services
                     scriptBuilder.AppendLine($"if exist \"{tempVJson}\" (");
                     scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetVJson}\" >nul 2>&1");
                     scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetConfigVJson}\" >nul 2>&1");
-                    scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"%LOCALAPPDATA%\\180HzSetupHub\\version.json\" >nul 2>&1");
+                    scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{Path.Combine(StorageService.AppDataFolder, "version.json")}\" >nul 2>&1");
                     scriptBuilder.AppendLine(")");
                 }
 
