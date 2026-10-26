@@ -46,7 +46,23 @@ if (-not (Test-Path -LiteralPath $appExe)) {
 
 $appFileInfo = Get-Item -LiteralPath $appExe
 $appSizeMb = [Math]::Round($appFileInfo.Length / 1MB, 2)
+$appHash = (Get-FileHash -LiteralPath $appExe -Algorithm SHA256).Hash
 Write-Host "App package built: $appExe ($appSizeMb MB)" -ForegroundColor Green
+Write-Host "Computed SHA256: $appHash" -ForegroundColor Cyan
+
+# Synchronize version.json with current binary hash and git commit
+$versionJsonPath = Join-Path $root "version.json"
+if (Test-Path -LiteralPath $versionJsonPath) {
+    try {
+        $vContent = Get-Content -Raw -LiteralPath $versionJsonPath | ConvertFrom-Json
+        $vContent.exeSha256 = $appHash
+        $latestGitSha = (git rev-parse HEAD 2>$null)
+        if ($latestGitSha) { $vContent.commitSha = $latestGitSha }
+        $vContent.buildDate = (Get-Date -Format "yyyy-MM-dd")
+        $vContent | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $versionJsonPath -Encoding utf8
+        Write-Host "Synchronized version.json (SHA256: $appHash)" -ForegroundColor Green
+    } catch { }
+}
 
 Write-Host "`nStaging configurations for web bootstrapper..." -ForegroundColor Green
 New-Item -ItemType Directory -Path $payloadConfigDir -Force | Out-Null

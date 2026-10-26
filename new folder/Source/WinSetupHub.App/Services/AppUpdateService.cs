@@ -21,6 +21,7 @@ namespace SetupHub180Hz.Services
     {
         public string? version { get; set; }
         public string? buildDate { get; set; }
+        public string? commitSha { get; set; }
         public string? productName { get; set; }
         public string? repository { get; set; }
         public string? releaseNotes { get; set; }
@@ -39,7 +40,7 @@ namespace SetupHub180Hz.Services
         private static readonly Lazy<AppUpdateService> _instance = new(() => new AppUpdateService());
         public static AppUpdateService Instance => _instance.Value;
 
-        public const string DefaultCurrentVersion = "2.5.2";
+        public const string DefaultCurrentVersion = "2.5.4";
         public const string RepoOwner = "tanjeem180hz";
         public const string RepoName = "180HzSetupHub";
         public const string ManifestUrl = "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/version.json";
@@ -51,6 +52,7 @@ namespace SetupHub180Hz.Services
         private readonly SemaphoreSlim _checkLock = new(1, 1);
 
         private string _currentVersion = DefaultCurrentVersion;
+        private string? _currentCommitSha = null;
         private string _latestVersion = DefaultCurrentVersion;
         private string _releaseNotes = "";
         private string _statusMessage = "Ready to check for updates.";
@@ -78,6 +80,12 @@ namespace SetupHub180Hz.Services
         {
             get => _currentVersion;
             private set { _currentVersion = value; OnPropertyChanged(); }
+        }
+
+        public string? CurrentCommitSha
+        {
+            get => _currentCommitSha;
+            private set { _currentCommitSha = value; OnPropertyChanged(); }
         }
 
         public string LatestVersion
@@ -185,6 +193,7 @@ namespace SetupHub180Hz.Services
                     {
                         var json = File.ReadAllText(localVJson);
                         var doc = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        if (!string.IsNullOrWhiteSpace(doc?.commitSha)) CurrentCommitSha = doc.commitSha.Trim();
                         var clean = CleanVersionString(doc?.version);
                         if (!string.IsNullOrWhiteSpace(clean))
                         {
@@ -198,6 +207,7 @@ namespace SetupHub180Hz.Services
                     {
                         var json = File.ReadAllText(configVJson);
                         var doc = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        if (!string.IsNullOrWhiteSpace(doc?.commitSha)) CurrentCommitSha = doc.commitSha.Trim();
                         var clean = CleanVersionString(doc?.version);
                         if (!string.IsNullOrWhiteSpace(clean))
                         {
@@ -213,6 +223,7 @@ namespace SetupHub180Hz.Services
                 {
                     var json = File.ReadAllText(appDataVJson);
                     var doc = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (!string.IsNullOrWhiteSpace(doc?.commitSha)) CurrentCommitSha = doc.commitSha.Trim();
                     var clean = CleanVersionString(doc?.version);
                     if (!string.IsNullOrWhiteSpace(clean))
                     {
@@ -380,11 +391,15 @@ namespace SetupHub180Hz.Services
                     return false;
                 }
 
-                // 2. Cleanly compare semver
+                // 2. Multi-criterion Update Detection Engine
+                // Checks SemVer, Binary Executable Hash, Manifest Commit SHA, and Live GitHub Commits API
+                // so that if EVEN A SINGLE LINE OF CODE changes in GitHub, an update is immediately detected!
                 var remoteVerParsed = TryParseCleanVersion(manifest.version, out var remoteVer);
                 var localVerParsed = TryParseCleanVersion(CurrentVersion, out var localVer);
 
                 bool hasUpdate = false;
+
+                // Criterion A: SemVer comparison
                 if (remoteVerParsed && localVerParsed)
                 {
                     if (remoteVer > localVer)
@@ -402,6 +417,62 @@ namespace SetupHub180Hz.Services
                     }
                 }
 
+                // Criterion B: Executable Binary Hash comparison (detects recompiled/new code binaries)
+                var currentExe = GetCurrentExecutablePath();
+                var localHash = ComputeFileSha256(currentExe);
+                var remoteExeHash = (manifest.exeSha256 ?? "").Trim();
+                if (!hasUpdate && !string.IsNullOrWhiteSpace(remoteExeHash) && !string.IsNullOrWhiteSpace(localHash))
+                {
+                    if (!string.Equals(remoteExeHash, localHash, StringComparison.OrdinalIgnoreCase))
+                    {
+                        hasUpdate = true;
+                    }
+                }
+
+                // Criterion C: Manifest Commit SHA check
+                if (!hasUpdate && !string.IsNullOrWhiteSpace(manifest.commitSha) && !string.IsNullOrWhiteSpace(CurrentCommitSha))
+                {
+                    if (!string.Equals(manifest.commitSha.Trim(), CurrentCommitSha.Trim(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        hasUpdate = true;
+                    }
+                }
+
+                // Criterion D: Live GitHub Commits API query (Direct real-time GitHub sync)
+                // If any commit was pushed to 'main', GitHub API immediately returns the latest commit SHA
+                string? latestGitSha = null;
+                try
+                {
+                    using var commitReq = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repos/{RepoOwner}/{RepoName}/commits/main");
+                    commitReq.Headers.UserAgent.Add(new ProductInfoHeaderValue("180HzSetupHub-AutoUpdater", "2.5.0"));
+                    commitReq.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true };
+
+                    using var commitResp = await _http.SendAsync(commitReq);
+                    if (commitResp.IsSuccessStatusCode)
+                    {
+                        var commitJson = await commitResp.Content.ReadAsStringAsync();
+                        using var doc = JsonDocument.Parse(commitJson);
+                        if (doc.RootElement.TryGetProperty("sha", out var shaProp))
+                        {
+                            latestGitSha = shaProp.GetString()?.Trim();
+                            if (!string.IsNullOrWhiteSpace(latestGitSha))
+                            {
+                                if (!string.IsNullOrWhiteSpace(CurrentCommitSha) &&
+                                    !string.Equals(latestGitSha, CurrentCommitSha, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    hasUpdate = true;
+                                }
+                                else if (!string.IsNullOrWhiteSpace(manifest.commitSha) &&
+                                         !string.Equals(latestGitSha, manifest.commitSha.Trim(), StringComparison.OrdinalIgnoreCase))
+                                {
+                                    hasUpdate = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+
                 LatestVersion = CleanVersionString(manifest.version);
                 ReleaseNotes = !string.IsNullOrWhiteSpace(manifest.releaseNotes)
                     ? manifest.releaseNotes
@@ -409,23 +480,22 @@ namespace SetupHub180Hz.Services
                 LatestManifest = manifest;
                 LastCheckTime = DateTime.UtcNow;
 
-                // 3. Determine if update is a Fast Delta Patch (~150 KB) or Full Package (~82 MB)
-                // All regular updates from GitHub are fast delta incremental patches (~150 KB) by default,
-                // completely avoiding the 82 MB binary re-download!
-                var currentExe = GetCurrentExecutablePath();
-                var localHash = ComputeFileSha256(currentExe);
-                var remoteExeHash = (manifest.exeSha256 ?? "").Trim();
+                // 3. Determine if update requires executable binary or is a fast delta patch
+                // If the remote binary hash is different from the local executable, the binary MUST be updated!
+                bool needBinary = !string.IsNullOrWhiteSpace(remoteExeHash) &&
+                                  !string.IsNullOrWhiteSpace(localHash) &&
+                                  !string.Equals(remoteExeHash, localHash, StringComparison.OrdinalIgnoreCase);
 
-                bool isDelta = true;
                 if (manifest.forceFullBinary == true)
                 {
-                    isDelta = false;
+                    needBinary = true;
                 }
-                else if (manifest.deltaOnly == false)
+                else if (manifest.deltaOnly == true && !needBinary)
                 {
-                    isDelta = false;
+                    needBinary = false;
                 }
 
+                bool isDelta = !needBinary;
                 IsDeltaUpdate = isDelta;
                 UpdateSizeText = isDelta
                     ? (!string.IsNullOrWhiteSpace(manifest.deltaSizeText) ? manifest.deltaSizeText : "Delta Patch ~150 KB")
@@ -641,6 +711,10 @@ namespace SetupHub180Hz.Services
                 DownloadProgress = 100;
 
                 CurrentVersion = CleanVersionString(LatestVersion);
+                if (!string.IsNullOrWhiteSpace(LatestManifest?.commitSha))
+                {
+                    CurrentCommitSha = LatestManifest.commitSha.Trim();
+                }
                 UpdateAvailable = false;
 
                 // Test whether install directory is directly writable without elevation

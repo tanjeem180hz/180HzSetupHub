@@ -13,10 +13,10 @@
     <Product>180Hz Setup Hub</Product>
     <AssemblyTitle>180Hz Setup Hub</AssemblyTitle>
     <Company>180Hz</Company>
-    <Version>2.5.2</Version>
-    <AssemblyVersion>2.5.2.0</AssemblyVersion>
-    <FileVersion>2.5.2.0</FileVersion>
-    <InformationalVersion>2.5.2</InformationalVersion>
+    <Version>2.5.4</Version>
+    <AssemblyVersion>2.5.4.0</AssemblyVersion>
+    <FileVersion>2.5.4.0</FileVersion>
+    <InformationalVersion>2.5.4</InformationalVersion>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <SelfContained>true</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
