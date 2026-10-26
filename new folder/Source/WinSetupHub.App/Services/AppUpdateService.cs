@@ -29,6 +29,7 @@ namespace SetupHub180Hz.Services
         public string? installerUrl { get; set; }
         public string? exeSha256 { get; set; }
         public bool? deltaOnly { get; set; }
+        public bool? forceFullBinary { get; set; }
         public string? deltaSizeText { get; set; }
         public string? fullSizeText { get; set; }
     }
@@ -408,28 +409,27 @@ namespace SetupHub180Hz.Services
                 LatestManifest = manifest;
                 LastCheckTime = DateTime.UtcNow;
 
-                // 3. Determine if update is a Fast Delta Patch (~150 KB) or Full Package (~85 MB)
+                // 3. Determine if update is a Fast Delta Patch (~150 KB) or Full Package (~82 MB)
+                // All regular updates from GitHub are fast delta incremental patches (~150 KB) by default,
+                // completely avoiding the 82 MB binary re-download!
                 var currentExe = GetCurrentExecutablePath();
                 var localHash = ComputeFileSha256(currentExe);
                 var remoteExeHash = (manifest.exeSha256 ?? "").Trim();
 
-                bool isDelta = false;
-                if (manifest.deltaOnly == true)
+                bool isDelta = true;
+                if (manifest.forceFullBinary == true)
                 {
-                    isDelta = true;
+                    isDelta = false;
                 }
-                else if (!string.IsNullOrWhiteSpace(remoteExeHash) &&
-                         !string.IsNullOrWhiteSpace(localHash) &&
-                         string.Equals(remoteExeHash, localHash, StringComparison.OrdinalIgnoreCase))
+                else if (manifest.deltaOnly == false)
                 {
-                    // Local binary matches GitHub binary bit-for-bit: only config/rules changed!
-                    isDelta = true;
+                    isDelta = false;
                 }
 
                 IsDeltaUpdate = isDelta;
                 UpdateSizeText = isDelta
                     ? (!string.IsNullOrWhiteSpace(manifest.deltaSizeText) ? manifest.deltaSizeText : "Delta Patch ~150 KB")
-                    : (!string.IsNullOrWhiteSpace(manifest.fullSizeText) ? manifest.fullSizeText : "Full App ~85 MB");
+                    : (!string.IsNullOrWhiteSpace(manifest.fullSizeText) ? manifest.fullSizeText : "Full App ~82 MB");
 
                 UpdateAvailable = hasUpdate;
 
@@ -687,7 +687,8 @@ namespace SetupHub180Hz.Services
                 if (Directory.Exists(tempConfigDir) && !string.IsNullOrWhiteSpace(installDir))
                 {
                     scriptBuilder.AppendLine($"if exist \"{tempConfigDir}\" (");
-                    scriptBuilder.AppendLine($"    xcopy /Y /E /I \"{tempConfigDir}\\*\" \"{targetConfigDir}\\\" >nul 2>&1");
+                    scriptBuilder.AppendLine($"    xcopy /Y /E /I /Q /H /R \"{tempConfigDir}\\*\" \"{targetConfigDir}\\\" >nul 2>&1");
+                    scriptBuilder.AppendLine($"    xcopy /Y /E /I /Q /H /R \"{tempConfigDir}\\*\" \"%LOCALAPPDATA%\\180HzSetupHub\\config\\\" >nul 2>&1");
                     scriptBuilder.AppendLine(")");
                 }
 
@@ -696,6 +697,7 @@ namespace SetupHub180Hz.Services
                     scriptBuilder.AppendLine($"if exist \"{tempVJson}\" (");
                     scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetVJson}\" >nul 2>&1");
                     scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetConfigVJson}\" >nul 2>&1");
+                    scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"%LOCALAPPDATA%\\180HzSetupHub\\version.json\" >nul 2>&1");
                     scriptBuilder.AppendLine(")");
                 }
 
