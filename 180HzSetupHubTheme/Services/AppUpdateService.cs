@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -40,7 +41,7 @@ namespace SetupHub180Hz.Services
         private static readonly Lazy<AppUpdateService> _instance = new(() => new AppUpdateService());
         public static AppUpdateService Instance => _instance.Value;
 
-        public const string DefaultCurrentVersion = "2.5.4";
+        public const string DefaultCurrentVersion = "2.5.5";
         public const string RepoOwner = "tanjeem180hz";
         public const string RepoName = "180HzSetupHub";
         public const string ManifestUrl = "https://raw.githubusercontent.com/tanjeem180hz/180HzSetupHub/main/version.json";
@@ -170,9 +171,9 @@ namespace SetupHub180Hz.Services
         {
             _http = new HttpClient
             {
-                Timeout = TimeSpan.FromSeconds(30)
+                Timeout = TimeSpan.FromSeconds(15)
             };
-            _http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("180HzSetupHub-AutoUpdater", "2.5.0"));
+            _http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("180HzSetupHub-AutoUpdater", "2.5.5"));
             _http.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true };
 
             InitCurrentVersion();
@@ -182,91 +183,60 @@ namespace SetupHub180Hz.Services
         {
             try
             {
+                // Primary source of truth: Running executable's FileVersionInfo
                 var exePath = GetCurrentExecutablePath();
-                var exeDir = !string.IsNullOrWhiteSpace(exePath) ? Path.GetDirectoryName(exePath) : AppContext.BaseDirectory;
-
-                // 1. Check local version.json in install directory or Configuration directory
-                if (!string.IsNullOrWhiteSpace(exeDir))
-                {
-                    var localVJson = Path.Combine(exeDir, "version.json");
-                    if (File.Exists(localVJson))
-                    {
-                        var json = File.ReadAllText(localVJson);
-                        var doc = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                        if (!string.IsNullOrWhiteSpace(doc?.commitSha)) CurrentCommitSha = doc.commitSha.Trim();
-                        var clean = CleanVersionString(doc?.version);
-                        if (!string.IsNullOrWhiteSpace(clean))
-                        {
-                            CurrentVersion = clean;
-                            return;
-                        }
-                    }
-
-                    var configVJson = Path.Combine(exeDir, "Configuration", "version.json");
-                    if (File.Exists(configVJson))
-                    {
-                        var json = File.ReadAllText(configVJson);
-                        var doc = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                        if (!string.IsNullOrWhiteSpace(doc?.commitSha)) CurrentCommitSha = doc.commitSha.Trim();
-                        var clean = CleanVersionString(doc?.version);
-                        if (!string.IsNullOrWhiteSpace(clean))
-                        {
-                            CurrentVersion = clean;
-                            return;
-                        }
-                    }
-                }
-
-                // Check AppData storage for persisted update manifest
-                var appDataVJson = Path.Combine(StorageService.AppDataFolder, "version.json");
-                if (File.Exists(appDataVJson))
-                {
-                    var json = File.ReadAllText(appDataVJson);
-                    var doc = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                    if (!string.IsNullOrWhiteSpace(doc?.commitSha)) CurrentCommitSha = doc.commitSha.Trim();
-                    var clean = CleanVersionString(doc?.version);
-                    if (!string.IsNullOrWhiteSpace(clean))
-                    {
-                        CurrentVersion = clean;
-                        return;
-                    }
-                }
-
                 if (!string.IsNullOrWhiteSpace(exePath) && File.Exists(exePath))
                 {
                     var fvi = FileVersionInfo.GetVersionInfo(exePath);
-                    if (!string.IsNullOrWhiteSpace(fvi.ProductVersion))
+                    var clean = CleanVersionString(fvi.ProductVersion);
+                    if (string.IsNullOrWhiteSpace(clean)) clean = CleanVersionString(fvi.FileVersion);
+                    if (!string.IsNullOrWhiteSpace(clean))
                     {
-                        var clean = CleanVersionString(fvi.ProductVersion);
-                        if (!string.IsNullOrWhiteSpace(clean))
-                        {
-                            CurrentVersion = clean;
-                            return;
-                        }
-                    }
-                    if (!string.IsNullOrWhiteSpace(fvi.FileVersion))
-                    {
-                        var clean = CleanVersionString(fvi.FileVersion);
-                        if (!string.IsNullOrWhiteSpace(clean))
-                        {
-                            CurrentVersion = clean;
-                            return;
-                        }
+                        CurrentVersion = clean;
                     }
                 }
 
-                var asmVer = Assembly.GetEntryAssembly()?.GetName().Version;
-                if (asmVer != null)
+                if (string.IsNullOrWhiteSpace(CurrentVersion) || CurrentVersion == "0.0.0")
                 {
-                    CurrentVersion = $"{asmVer.Major}.{asmVer.Minor}.{Math.Max(0, asmVer.Build)}";
-                    return;
+                    var asmVer = Assembly.GetEntryAssembly()?.GetName().Version;
+                    if (asmVer != null)
+                    {
+                        CurrentVersion = $"{asmVer.Major}.{asmVer.Minor}.{Math.Max(0, asmVer.Build)}";
+                    }
+                }
+
+                // Read Git commit SHA and build metadata from local manifests
+                var exeDir = !string.IsNullOrWhiteSpace(exePath) ? Path.GetDirectoryName(exePath) : AppContext.BaseDirectory;
+                var candidates = new[]
+                {
+                    Path.Combine(exeDir ?? "", "version.json"),
+                    Path.Combine(exeDir ?? "", "Configuration", "version.json"),
+                    Path.Combine(StorageService.AppDataFolder, "version.json")
+                };
+
+                foreach (var path in candidates)
+                {
+                    if (File.Exists(path))
+                    {
+                        try
+                        {
+                            var json = File.ReadAllText(path);
+                            var doc = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                            if (!string.IsNullOrWhiteSpace(doc?.commitSha))
+                            {
+                                CurrentCommitSha = doc.commitSha.Trim();
+                                break;
+                            }
+                        }
+                        catch { }
+                    }
                 }
             }
             catch
             {
             }
 
-            CurrentVersion = DefaultCurrentVersion;
+            if (string.IsNullOrWhiteSpace(CurrentVersion)) CurrentVersion = DefaultCurrentVersion;
         }
 
         public static string ComputeFileSha256(string filePath)
@@ -319,8 +289,112 @@ namespace SetupHub180Hz.Services
         }
 
         /// <summary>
-        /// Checks GitHub for updates. Compares version.json, semver, and executable SHA256 hash
-        /// to determine whether an update is available and whether it can be applied as a fast Delta Patch (~150 KB).
+        /// Fetches the remote version manifest with real-time freshness, bypassing CDN cache.
+        /// </summary>
+        private async Task<(VersionManifest? manifest, string? latestCommitSha)> FetchRemoteManifestAsync()
+        {
+            var cacheBuster = DateTime.UtcNow.Ticks;
+            VersionManifest? manifest = null;
+            string? latestCommitSha = null;
+
+            // 1. Direct GitHub Commits API query for instantaneous HEAD commit SHA
+            try
+            {
+                using var commitReq = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repos/{RepoOwner}/{RepoName}/commits/main?_={cacheBuster}");
+                commitReq.Headers.UserAgent.Add(new ProductInfoHeaderValue("180HzSetupHub-AutoUpdater", "2.5.5"));
+                commitReq.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true };
+
+                using var commitResp = await _http.SendAsync(commitReq);
+                if (commitResp.IsSuccessStatusCode)
+                {
+                    var commitJson = await commitResp.Content.ReadAsStringAsync();
+                    using var doc = JsonDocument.Parse(commitJson);
+                    if (doc.RootElement.TryGetProperty("sha", out var shaProp))
+                    {
+                        latestCommitSha = shaProp.GetString()?.Trim();
+                    }
+                }
+            }
+            catch { }
+
+            // 2. Direct GitHub API contents/version.json (Bypasses Fastly CDN completely!)
+            try
+            {
+                using var apiReq = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repos/{RepoOwner}/{RepoName}/contents/version.json?_={cacheBuster}");
+                apiReq.Headers.UserAgent.Add(new ProductInfoHeaderValue("180HzSetupHub-AutoUpdater", "2.5.5"));
+                apiReq.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true };
+
+                using var apiResp = await _http.SendAsync(apiReq);
+                if (apiResp.IsSuccessStatusCode)
+                {
+                    var apiJson = await apiResp.Content.ReadAsStringAsync();
+                    using var doc = JsonDocument.Parse(apiJson);
+                    if (doc.RootElement.TryGetProperty("content", out var contentProp))
+                    {
+                        var base64 = contentProp.GetString()?.Replace("\n", "").Replace("\r", "");
+                        if (!string.IsNullOrWhiteSpace(base64))
+                        {
+                            var decodedBytes = Convert.FromBase64String(base64);
+                            var decodedJson = Encoding.UTF8.GetString(decodedBytes);
+                            manifest = JsonSerializer.Deserialize<VersionManifest>(decodedJson, new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = true
+                            });
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            // 3. Fallback candidates if API contents was rate-limited or unavailable
+            if (manifest == null || string.IsNullOrWhiteSpace(manifest.version))
+            {
+                var candidates = new List<string>();
+                if (!string.IsNullOrWhiteSpace(latestCommitSha))
+                {
+                    // Commit-addressed URL is 100% immune to stale CDN cache
+                    candidates.Add($"https://raw.githubusercontent.com/{RepoOwner}/{RepoName}/{latestCommitSha}/version.json");
+                }
+                candidates.Add($"{ManifestUrl}?_={cacheBuster}");
+                candidates.Add($"https://github.com/{RepoOwner}/{RepoName}/raw/main/version.json?_={cacheBuster}");
+                candidates.Add(ManifestUrl);
+
+                foreach (var url in candidates)
+                {
+                    try
+                    {
+                        using var req = new HttpRequestMessage(HttpMethod.Get, url);
+                        req.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true };
+                        req.Headers.UserAgent.Add(new ProductInfoHeaderValue("180HzSetupHub-AutoUpdater", "2.5.5"));
+
+                        using var resp = await _http.SendAsync(req);
+                        if (resp.IsSuccessStatusCode)
+                        {
+                            var json = await resp.Content.ReadAsStringAsync();
+                            manifest = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = true
+                            });
+                            if (manifest != null && !string.IsNullOrWhiteSpace(manifest.version))
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            if (manifest != null && string.IsNullOrWhiteSpace(manifest.commitSha) && !string.IsNullOrWhiteSpace(latestCommitSha))
+            {
+                manifest.commitSha = latestCommitSha;
+            }
+
+            return (manifest, latestCommitSha);
+        }
+
+        /// <summary>
+        /// Checks GitHub for updates using multi-layer verification.
         /// </summary>
         public async Task<bool> CheckForUpdatesAsync(bool silent = false)
         {
@@ -328,7 +402,7 @@ namespace SetupHub180Hz.Services
             {
                 try
                 {
-                    await _checkLock.WaitAsync(15000);
+                    await _checkLock.WaitAsync(10000);
                     _checkLock.Release();
                 }
                 catch { }
@@ -345,91 +419,51 @@ namespace SetupHub180Hz.Services
                 IsChecking = true;
                 StatusMessage = "Checking GitHub repository for updates…";
 
-                // 1. Fetch version.json with anti-cache timestamp and fallback mirrors
-                var cacheBuster = DateTime.UtcNow.Ticks;
-                var manifestCandidates = new[]
-                {
-                    $"{ManifestUrl}?_={cacheBuster}",
-                    $"https://github.com/{RepoOwner}/{RepoName}/raw/main/version.json?_={cacheBuster}",
-                    ManifestUrl
-                };
-
-                VersionManifest? manifest = null;
-                Exception? lastManifestEx = null;
-
-                foreach (var url in manifestCandidates)
-                {
-                    try
-                    {
-                        using var manifestReq = new HttpRequestMessage(HttpMethod.Get, url);
-                        manifestReq.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true };
-                        using var manifestResp = await _http.SendAsync(manifestReq);
-
-                        if (manifestResp.IsSuccessStatusCode)
-                        {
-                            var json = await manifestResp.Content.ReadAsStringAsync();
-                            manifest = JsonSerializer.Deserialize<VersionManifest>(json, new JsonSerializerOptions
-                            {
-                                PropertyNameCaseInsensitive = true
-                            });
-                            if (manifest != null && !string.IsNullOrWhiteSpace(manifest.version))
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        lastManifestEx = ex;
-                    }
-                }
+                var (manifest, latestCommitSha) = await FetchRemoteManifestAsync();
 
                 if (manifest == null || string.IsNullOrWhiteSpace(manifest.version))
                 {
-                    StatusMessage = $"Update check failed: {(lastManifestEx != null ? lastManifestEx.Message : "Could not reach GitHub")}.";
-                    ActivityLogger.Instance.Log($"GitHub manifest check notice: {lastManifestEx?.Message ?? "Unreachable"}", ActivityType.Warning);
+                    StatusMessage = "Update check failed: Unable to fetch version manifest from GitHub.";
+                    ActivityLogger.Instance.Log("Update check failed: GitHub manifest unreachable.", ActivityType.Warning);
                     return false;
                 }
 
-                // 2. Multi-criterion Update Detection Engine
-                // Checks SemVer, Binary Executable Hash, Manifest Commit SHA, and Live GitHub Commits API
-                // so that if EVEN A SINGLE LINE OF CODE changes in GitHub, an update is immediately detected!
-                var remoteVerParsed = TryParseCleanVersion(manifest.version, out var remoteVer);
-                var localVerParsed = TryParseCleanVersion(CurrentVersion, out var localVer);
+                InitCurrentVersion();
+                var remoteVerClean = CleanVersionString(manifest.version);
+                var localVerClean = CleanVersionString(CurrentVersion);
+
+                bool remoteParsed = TryParseCleanVersion(remoteVerClean, out var rVer);
+                bool localParsed = TryParseCleanVersion(localVerClean, out var lVer);
 
                 bool hasUpdate = false;
 
-                // Criterion A: SemVer comparison
-                if (remoteVerParsed && localVerParsed)
+                // 1. SemVer comparison: remote version greater than local
+                if (remoteParsed && localParsed)
                 {
-                    if (remoteVer > localVer)
+                    if (rVer > lVer)
                     {
                         hasUpdate = true;
                     }
                 }
-                else if (!string.IsNullOrWhiteSpace(manifest.version))
+                else if (!string.IsNullOrWhiteSpace(remoteVerClean) && !string.Equals(remoteVerClean, localVerClean, StringComparison.OrdinalIgnoreCase))
                 {
-                    var cleanRemote = CleanVersionString(manifest.version);
-                    var cleanLocal = CleanVersionString(CurrentVersion);
-                    if (!string.Equals(cleanRemote, cleanLocal, StringComparison.OrdinalIgnoreCase))
-                    {
-                        hasUpdate = true;
-                    }
+                    hasUpdate = true;
                 }
 
-                // Criterion B: Executable Binary Hash comparison (detects recompiled/new code binaries)
+                // 2. Executable SHA256 comparison: detects updated code binaries on same or untagged versions
                 var currentExe = GetCurrentExecutablePath();
                 var localHash = ComputeFileSha256(currentExe);
-                var remoteExeHash = (manifest.exeSha256 ?? "").Trim();
-                if (!hasUpdate && !string.IsNullOrWhiteSpace(remoteExeHash) && !string.IsNullOrWhiteSpace(localHash))
+                var remoteHash = (manifest.exeSha256 ?? "").Trim();
+
+                if (!hasUpdate && !string.IsNullOrWhiteSpace(remoteHash) && !string.IsNullOrWhiteSpace(localHash))
                 {
-                    if (!string.Equals(remoteExeHash, localHash, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(remoteHash, localHash, StringComparison.OrdinalIgnoreCase))
                     {
                         hasUpdate = true;
                     }
                 }
 
-                // Criterion C: Manifest Commit SHA check
+                // 3. Commit SHA comparison: detects committed updates
                 if (!hasUpdate && !string.IsNullOrWhiteSpace(manifest.commitSha) && !string.IsNullOrWhiteSpace(CurrentCommitSha))
                 {
                     if (!string.Equals(manifest.commitSha.Trim(), CurrentCommitSha.Trim(), StringComparison.OrdinalIgnoreCase))
@@ -437,56 +471,27 @@ namespace SetupHub180Hz.Services
                         hasUpdate = true;
                     }
                 }
-
-                // Criterion D: Live GitHub Commits API query (Direct real-time GitHub sync)
-                // If any commit was pushed to 'main', GitHub API immediately returns the latest commit SHA
-                string? latestGitSha = null;
-                try
+                else if (!hasUpdate && !string.IsNullOrWhiteSpace(latestCommitSha) && !string.IsNullOrWhiteSpace(CurrentCommitSha))
                 {
-                    using var commitReq = new HttpRequestMessage(HttpMethod.Get, $"https://api.github.com/repos/{RepoOwner}/{RepoName}/commits/main");
-                    commitReq.Headers.UserAgent.Add(new ProductInfoHeaderValue("180HzSetupHub-AutoUpdater", "2.5.0"));
-                    commitReq.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true };
-
-                    using var commitResp = await _http.SendAsync(commitReq);
-                    if (commitResp.IsSuccessStatusCode)
+                    if (!string.Equals(latestCommitSha.Trim(), CurrentCommitSha.Trim(), StringComparison.OrdinalIgnoreCase))
                     {
-                        var commitJson = await commitResp.Content.ReadAsStringAsync();
-                        using var doc = JsonDocument.Parse(commitJson);
-                        if (doc.RootElement.TryGetProperty("sha", out var shaProp))
-                        {
-                            latestGitSha = shaProp.GetString()?.Trim();
-                            if (!string.IsNullOrWhiteSpace(latestGitSha))
-                            {
-                                if (!string.IsNullOrWhiteSpace(CurrentCommitSha) &&
-                                    !string.Equals(latestGitSha, CurrentCommitSha, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    hasUpdate = true;
-                                }
-                                else if (!string.IsNullOrWhiteSpace(manifest.commitSha) &&
-                                         !string.Equals(latestGitSha, manifest.commitSha.Trim(), StringComparison.OrdinalIgnoreCase))
-                                {
-                                    hasUpdate = true;
-                                }
-                            }
-                        }
+                        hasUpdate = true;
                     }
                 }
-                catch { }
 
-                LatestVersion = CleanVersionString(manifest.version);
+                LatestVersion = remoteVerClean;
                 ReleaseNotes = !string.IsNullOrWhiteSpace(manifest.releaseNotes)
                     ? manifest.releaseNotes
-                    : "100% crash immunity, zero BSOD, low-latency performance optimizers and bug fixes.";
+                    : "Performance enhancements, zero latency optimizations and bug fixes.";
                 LatestManifest = manifest;
                 LastCheckTime = DateTime.UtcNow;
 
-                // 3. Determine if update requires executable binary or is a fast delta patch
-                // If the remote binary hash is different from the local executable, the binary MUST be updated!
-                bool needBinary = !string.IsNullOrWhiteSpace(remoteExeHash) &&
+                // Determine if binary update is required
+                bool needBinary = !string.IsNullOrWhiteSpace(remoteHash) &&
                                   !string.IsNullOrWhiteSpace(localHash) &&
-                                  !string.Equals(remoteExeHash, localHash, StringComparison.OrdinalIgnoreCase);
+                                  !string.Equals(remoteHash, localHash, StringComparison.OrdinalIgnoreCase);
 
-                if (manifest.forceFullBinary == true)
+                if (manifest.forceFullBinary == true || (hasUpdate && (rVer.Major != lVer.Major || rVer.Minor != lVer.Minor)))
                 {
                     needBinary = true;
                 }
@@ -498,27 +503,19 @@ namespace SetupHub180Hz.Services
                 bool isDelta = !needBinary;
                 IsDeltaUpdate = isDelta;
                 UpdateSizeText = isDelta
-                    ? (!string.IsNullOrWhiteSpace(manifest.deltaSizeText) ? manifest.deltaSizeText : "Delta Patch ~150 KB")
-                    : (!string.IsNullOrWhiteSpace(manifest.fullSizeText) ? manifest.fullSizeText : "Full App ~82 MB");
+                    ? (!string.IsNullOrWhiteSpace(manifest.deltaSizeText) ? manifest.deltaSizeText : "Delta Patch (~150 KB)")
+                    : (!string.IsNullOrWhiteSpace(manifest.fullSizeText) ? manifest.fullSizeText : "Full App (~82 MB)");
 
                 UpdateAvailable = hasUpdate;
 
                 if (hasUpdate)
                 {
-                    if (isDelta)
-                    {
-                        StatusMessage = $"⚡ Fast Delta Patch available: v{LatestVersion} ({UpdateSizeText})! Click Update Now to patch.";
-                        ActivityLogger.Instance.Log($"180Hz Setup Hub delta update available: v{LatestVersion} ({UpdateSizeText})", ActivityType.Info);
-                    }
-                    else
-                    {
-                        StatusMessage = $"🚀 Update available: v{LatestVersion} ({UpdateSizeText})! Click Update Now to install.";
-                        ActivityLogger.Instance.Log($"180Hz Setup Hub full update available: v{LatestVersion} ({UpdateSizeText})", ActivityType.Info);
-                    }
+                    StatusMessage = $"🚀 Update available: v{LatestVersion} ({UpdateSizeText})! Click Update Now to install.";
+                    ActivityLogger.Instance.Log($"180Hz Setup Hub update detected: v{LatestVersion} ({UpdateSizeText})", ActivityType.Info);
 
                     if (!silent)
                     {
-                        NotificationService.Notify("180Hz Setup Hub Update", $"New version v{LatestVersion} ({UpdateSizeText}) is available on GitHub!");
+                        NotificationService.Notify("180Hz Setup Hub Update", $"New version v{LatestVersion} ({UpdateSizeText}) is ready to install!");
                     }
                 }
                 else
@@ -531,7 +528,7 @@ namespace SetupHub180Hz.Services
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Update check notice: {ex.Message}";
+                StatusMessage = $"Update check error: {ex.Message}";
                 ActivityLogger.Instance.Log($"Update check failed: {ex.Message}", ActivityType.Warning);
                 return false;
             }
@@ -543,9 +540,7 @@ namespace SetupHub180Hz.Services
         }
 
         /// <summary>
-        /// Downloads the latest update from GitHub and applies it in-place.
-        /// If IsDeltaUpdate is true (and forceFullBinary is false), it skips downloading the ~85MB executable
-        /// and only downloads the changed configuration files and manifest (~150 KB), completing in seconds.
+        /// Downloads the latest update from GitHub and applies it safely with elevated NTFS atomic rename.
         /// </summary>
         public async Task<bool> DownloadAndApplyUpdateAsync(Action<double, string>? progressCallback = null, bool forceFullBinary = false)
         {
@@ -579,7 +574,6 @@ namespace SetupHub180Hz.Services
                     StatusMessage = "Connecting to GitHub for executable download…";
                     progressCallback?.Invoke(5, "Connecting to GitHub…");
 
-                    // Download URL candidate list
                     var downloadUrls = new[]
                     {
                         RawExeUrl,
@@ -604,7 +598,7 @@ namespace SetupHub180Hz.Services
                             var totalBytes = resp.Content.Headers.ContentLength ?? -1L;
                             var sw = Stopwatch.StartNew();
                             long totalRead = 0;
-                            var buffer = new byte[65536]; // 64 KB buffer
+                            var buffer = new byte[65536];
 
                             using (var src = await resp.Content.ReadAsStreamAsync())
                             using (var dst = new FileStream(tempExe, FileMode.Create, FileAccess.Write, FileShare.None, 65536, true))
@@ -618,7 +612,7 @@ namespace SetupHub180Hz.Services
                                     totalRead += read;
 
                                     var nowTicks = sw.ElapsedMilliseconds;
-                                    if (nowTicks - lastReportTicks >= 120 || (totalBytes > 0 && totalRead == totalBytes))
+                                    if (nowTicks - lastReportTicks >= 100 || (totalBytes > 0 && totalRead == totalBytes))
                                     {
                                         lastReportTicks = nowTicks;
                                         double pct = totalBytes > 0 ? (double)totalRead / totalBytes * 100.0 : 0.0;
@@ -638,10 +632,8 @@ namespace SetupHub180Hz.Services
                                 }
                             }
 
-                            // Validate downloaded file
                             if (File.Exists(tempExe) && new FileInfo(tempExe).Length > 2 * 1024 * 1024)
                             {
-                                // Validate PE header
                                 using (var fs = File.OpenRead(tempExe))
                                 {
                                     int b1 = fs.ReadByte();
@@ -662,14 +654,13 @@ namespace SetupHub180Hz.Services
 
                     if (!downloaded || !File.Exists(tempExe))
                     {
-                        StatusMessage = $"Download failed: {lastEx?.Message ?? "Corrupted or incomplete file received."}";
+                        StatusMessage = $"Download failed: {lastEx?.Message ?? "Incomplete file received."}";
                         ActivityLogger.Instance.Log($"App update download error: {lastEx?.Message}", ActivityType.Warning);
                         return false;
                     }
                 }
                 else
                 {
-                    // Fast Delta mode: 85MB executable download is skipped!
                     DownloadProgress = 25;
                     DownloadBytesText = "Delta Patch (~150 KB) • Binary skipped";
                     DownloadSpeedText = "Instant";
@@ -677,7 +668,7 @@ namespace SetupHub180Hz.Services
                     progressCallback?.Invoke(25, StatusMessage);
                 }
 
-                // 2. Download latest config files from GitHub to temp staging
+                // Download latest configurations
                 StatusMessage = "Fetching updated configuration catalogs…";
                 progressCallback?.Invoke(60, "Fetching updated configurations…");
                 var tempConfigDir = Path.Combine(tempDir, "Configuration");
@@ -689,7 +680,6 @@ namespace SetupHub180Hz.Services
                 await TryDownloadRootFileAsync("version.json", tempConfigDir);
                 await TryDownloadRootFileAsync("version.json", tempDir);
 
-                // If in delta mode, ensure version.json is staged with the new version manifest
                 var tempVJson = Path.Combine(tempDir, "version.json");
                 if (LatestManifest != null)
                 {
@@ -697,15 +687,11 @@ namespace SetupHub180Hz.Services
                     {
                         var json = JsonSerializer.Serialize(LatestManifest, new JsonSerializerOptions { WriteIndented = true });
                         File.WriteAllText(tempVJson, json);
-
-                        var appDataVJson = Path.Combine(StorageService.AppDataFolder, "version.json");
-                        Directory.CreateDirectory(StorageService.AppDataFolder);
-                        File.WriteAllText(appDataVJson, json);
+                        File.WriteAllText(Path.Combine(StorageService.AppDataFolder, "version.json"), json);
                     }
                     catch { }
                 }
 
-                // 3. Build bulletproof detached batch updater script
                 StatusMessage = "Finalizing update and restarting…";
                 progressCallback?.Invoke(100, "Finalizing update and restarting…");
                 DownloadProgress = 100;
@@ -717,74 +703,88 @@ namespace SetupHub180Hz.Services
                 }
                 UpdateAvailable = false;
 
-                // Test whether install directory is directly writable without elevation
-                bool isInstallDirWritable = false;
-                try
-                {
-                    var testFile = Path.Combine(installDir, $"write_test_{Guid.NewGuid():N}.tmp");
-                    File.WriteAllText(testFile, "test");
-                    File.Delete(testFile);
-                    isInstallDirWritable = true;
-                }
-                catch
-                {
-                    isInstallDirWritable = false;
-                }
-
+                // Build bulletproof detached batch script using NTFS atomic rename
                 var helperCmd = Path.Combine(tempDir, "apply_update.cmd");
                 var targetConfigDir = Path.Combine(installDir, "Configuration");
                 var targetVJson = Path.Combine(installDir, "version.json");
                 var targetConfigVJson = Path.Combine(targetConfigDir, "version.json");
 
-                var scriptBuilder = new StringBuilder();
-                scriptBuilder.AppendLine("@echo off");
-                scriptBuilder.AppendLine("chcp 65001 >nul");
-                scriptBuilder.AppendLine(":: 180Hz Setup Hub Fast Delta & Full Auto-Updater");
-                scriptBuilder.AppendLine("ping 127.0.0.1 -n 2 >nul");
-                scriptBuilder.AppendLine($"taskkill /F /PID {currentPid} >nul 2>&1");
-                scriptBuilder.AppendLine("taskkill /F /IM 180HzSetupHub.exe >nul 2>&1");
-                scriptBuilder.AppendLine("ping 127.0.0.1 -n 2 >nul");
+                var script = new StringBuilder();
+                script.AppendLine("@echo off");
+                script.AppendLine("chcp 65001 >nul");
+                script.AppendLine(":: 180Hz Setup Hub Atomic Auto-Updater");
+                script.AppendLine("ping 127.0.0.1 -n 2 >nul");
+                script.AppendLine($"taskkill /F /PID {currentPid} >nul 2>&1");
+                script.AppendLine("taskkill /F /IM 180HzSetupHub.exe >nul 2>&1");
 
-                scriptBuilder.AppendLine($"if not exist \"{tempExe}\" goto SKIP_EXE");
-                scriptBuilder.AppendLine("set ATTEMPTS=0");
-                scriptBuilder.AppendLine(":RETRY_COPY");
-                scriptBuilder.AppendLine("set /a ATTEMPTS+=1");
-                scriptBuilder.AppendLine($"copy /Y \"{tempExe}\" \"{currentExe}\" >nul 2>&1");
-                scriptBuilder.AppendLine("if errorlevel 1 (");
-                scriptBuilder.AppendLine("    if %ATTEMPTS% LSS 20 (");
-                scriptBuilder.AppendLine("        ping 127.0.0.1 -n 2 >nul");
-                scriptBuilder.AppendLine("        goto RETRY_COPY");
-                scriptBuilder.AppendLine("    )");
-                scriptBuilder.AppendLine(")");
-                scriptBuilder.AppendLine(":SKIP_EXE");
+                // Wait for process handle closure
+                script.AppendLine("set /a WAIT_COUNT=0");
+                script.AppendLine(":WAIT_LOOP");
+                script.AppendLine("set /a WAIT_COUNT+=1");
+                script.AppendLine($"tasklist /FI \"PID eq {currentPid}\" 2>nul | find \"{currentPid}\" >nul");
+                script.AppendLine("if not errorlevel 1 (");
+                script.AppendLine("    if %WAIT_COUNT% LSS 15 (");
+                script.AppendLine("        ping 127.0.0.1 -n 1 >nul");
+                script.AppendLine($"        taskkill /F /PID {currentPid} >nul 2>&1");
+                script.AppendLine("        goto WAIT_LOOP");
+                script.AppendLine("    )");
+                script.AppendLine(")");
 
+                // Atomic executable replacement using NTFS rename
+                script.AppendLine($"if not exist \"{tempExe}\" goto SKIP_EXE");
+                script.AppendLine($"del /F /Q \"{currentExe}.old\" >nul 2>&1");
+                script.AppendLine($"move /Y \"{currentExe}\" \"{currentExe}.old\" >nul 2>&1");
+                script.AppendLine($"copy /Y \"{tempExe}\" \"{currentExe}\" >nul 2>&1");
+                script.AppendLine("if errorlevel 1 (");
+                script.AppendLine("    for /L %%i in (1,1,10) do (");
+                script.AppendLine("        ping 127.0.0.1 -n 1 >nul");
+                script.AppendLine($"        copy /Y \"{tempExe}\" \"{currentExe}\" >nul 2>&1");
+                script.AppendLine("        if not errorlevel 1 goto COPY_SUCCESS");
+                script.AppendLine("    )");
+                script.AppendLine(")");
+                script.AppendLine(":COPY_SUCCESS");
+                script.AppendLine($"del /F /Q \"{currentExe}.old\" >nul 2>&1");
+                script.AppendLine(":SKIP_EXE");
+
+                // Deploy configuration files
                 if (Directory.Exists(tempConfigDir) && !string.IsNullOrWhiteSpace(installDir))
                 {
-                    scriptBuilder.AppendLine($"if exist \"{tempConfigDir}\" (");
-                    scriptBuilder.AppendLine($"    xcopy /Y /E /I /Q /H /R \"{tempConfigDir}\\*\" \"{targetConfigDir}\\\" >nul 2>&1");
-                    scriptBuilder.AppendLine($"    xcopy /Y /E /I /Q /H /R \"{tempConfigDir}\\*\" \"{StorageService.ConfigFolder}\\\" >nul 2>&1");
-                    scriptBuilder.AppendLine(")");
+                    script.AppendLine($"if exist \"{tempConfigDir}\" (");
+                    script.AppendLine($"    xcopy /Y /E /I /Q /H /R \"{tempConfigDir}\\*\" \"{targetConfigDir}\\\" >nul 2>&1");
+                    script.AppendLine($"    xcopy /Y /E /I /Q /H /R \"{tempConfigDir}\\*\" \"{StorageService.ConfigFolder}\\\" >nul 2>&1");
+                    script.AppendLine(")");
                 }
 
+                // Deploy version manifests
                 if (!string.IsNullOrWhiteSpace(installDir))
                 {
-                    scriptBuilder.AppendLine($"if exist \"{tempVJson}\" (");
-                    scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetVJson}\" >nul 2>&1");
-                    scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetConfigVJson}\" >nul 2>&1");
-                    scriptBuilder.AppendLine($"    copy /Y \"{tempVJson}\" \"{Path.Combine(StorageService.AppDataFolder, "version.json")}\" >nul 2>&1");
-                    scriptBuilder.AppendLine(")");
+                    script.AppendLine($"if exist \"{tempVJson}\" (");
+                    script.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetVJson}\" >nul 2>&1");
+                    script.AppendLine($"    copy /Y \"{tempVJson}\" \"{targetConfigVJson}\" >nul 2>&1");
+                    script.AppendLine($"    copy /Y \"{tempVJson}\" \"{Path.Combine(StorageService.AppDataFolder, "version.json")}\" >nul 2>&1");
+                    script.AppendLine(")");
                 }
 
-                scriptBuilder.AppendLine(":: Launch updated application");
-                scriptBuilder.AppendLine($"start \"\" \"{currentExe}\"");
-                scriptBuilder.AppendLine("ping 127.0.0.1 -n 3 >nul");
-                scriptBuilder.AppendLine($"rd /S /Q \"{tempDir}\" >nul 2>&1");
-                scriptBuilder.AppendLine("del \"%~f0\" >nul 2>&1");
-                scriptBuilder.AppendLine("exit");
+                // Relaunch application
+                script.AppendLine(":: Launch updated application");
+                script.AppendLine($"start \"\" \"{currentExe}\"");
+                script.AppendLine("ping 127.0.0.1 -n 2 >nul");
+                script.AppendLine($"rd /S /Q \"{tempDir}\" >nul 2>&1");
+                script.AppendLine("del \"%~f0\" >nul 2>&1");
+                script.AppendLine("exit");
 
-                File.WriteAllText(helperCmd, scriptBuilder.ToString(), Encoding.ASCII);
+                File.WriteAllText(helperCmd, script.ToString(), Encoding.ASCII);
 
-                // 4. Launch detached updater process
+                // Determine if Administrator elevation is needed
+                bool isAdmin = false;
+                try
+                {
+                    using var identity = WindowsIdentity.GetCurrent();
+                    var principal = new WindowsPrincipal(identity);
+                    isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+                }
+                catch { }
+
                 var psi = new ProcessStartInfo
                 {
                     FileName = "cmd.exe",
@@ -795,28 +795,18 @@ namespace SetupHub180Hz.Services
                     WorkingDirectory = Path.GetTempPath()
                 };
 
-                // If install directory requires Administrator privileges, elevate
-                if (!isInstallDirWritable)
+                if (isAdmin)
                 {
                     psi.Verb = "runas";
                 }
 
                 Process.Start(psi);
 
-                // 5. Cleanly shut down current application
                 ActivityLogger.Instance.Log("Update applied. Relaunching 180Hz Setup Hub…", ActivityType.Info);
-                await Task.Delay(300);
+                await Task.Delay(200);
 
-                var app = Application.Current;
-                if (app != null)
-                {
-                    app.Dispatcher.Invoke(() => app.Shutdown());
-                }
-                else
-                {
-                    Environment.Exit(0);
-                }
-
+                // Terminate immediately so file lock on executable is completely released
+                Environment.Exit(0);
                 return true;
             }
             catch (Exception ex)
@@ -847,9 +837,7 @@ namespace SetupHub180Hz.Services
                     }
                 }
             }
-            catch
-            {
-            }
+            catch { }
         }
 
         private async Task TryDownloadRootFileAsync(string filename, string targetDir)
@@ -868,9 +856,7 @@ namespace SetupHub180Hz.Services
                     }
                 }
             }
-            catch
-            {
-            }
+            catch { }
         }
 
         public static string GetCurrentExecutablePath()
@@ -918,15 +904,13 @@ namespace SetupHub180Hz.Services
         public static string FormatBytes(long bytes)
         {
             if (bytes <= 0) return "0 B";
-            string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
-            int i = 0;
-            double d = bytes;
-            while (d >= 1024.0 && i < suffixes.Length - 1)
-            {
-                d /= 1024.0;
-                i++;
-            }
-            return $"{d:0.0} {suffixes[i]}";
+            if (bytes >= 1024L * 1024L * 1024L)
+                return $"{bytes / (1024.0 * 1024.0 * 1024.0):0.0} GB";
+            if (bytes >= 1024L * 1024L)
+                return $"{bytes / (1024.0 * 1024.0):0.0} MB";
+            if (bytes >= 1024L)
+                return $"{bytes / 1024.0:0.0} KB";
+            return $"{bytes} B";
         }
     }
 }

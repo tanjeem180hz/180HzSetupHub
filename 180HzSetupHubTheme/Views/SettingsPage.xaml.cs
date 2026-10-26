@@ -256,12 +256,50 @@ namespace SetupHub180Hz.Views
                 BtnSettingsUpdateNow.Content = "Checking…";
                 TxtSettingsAppUpdateStatus.Text = "Checking GitHub repository for updates…";
 
-                await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
+                bool hasUpdate = await AppUpdateService.Instance.CheckForUpdatesAsync(silent: false);
                 UpdateAppUpdateStatusUi();
+
+                var s = AppUpdateService.Instance;
+                if (hasUpdate)
+                {
+                    var res = ThemedMessageBox.Show(
+                        $"🚀 A new update is available on GitHub!\n\n" +
+                        $"• New Version: v{s.LatestVersion} (Current: v{s.CurrentVersion})\n" +
+                        $"• Download Size: {s.UpdateSizeText}\n\n" +
+                        $"Release Highlights:\n{s.ReleaseNotes}\n\n" +
+                        "Would you like to download and install this update now?",
+                        "Update Available - 180Hz Setup Hub",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Information);
+
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        BtnSettingsUpdateNow_Click(sender, e);
+                    }
+                }
+                else if (s.LastCheckTime > DateTime.MinValue &&
+                         !s.StatusMessage.Contains("failed", StringComparison.OrdinalIgnoreCase) &&
+                         !s.StatusMessage.Contains("error", StringComparison.OrdinalIgnoreCase))
+                {
+                    ThemedMessageBox.Show(
+                        $"✓ 180Hz Setup Hub is completely up to date!\n\nYou are running the latest version: v{s.CurrentVersion}.\nNo newer updates were found on GitHub.",
+                        "180Hz Setup Hub Up to Date",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                else
+                {
+                    ThemedMessageBox.Show(
+                        s.StatusMessage,
+                        "Update Check Notice",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
             }
             catch (Exception ex)
             {
                 TxtSettingsAppUpdateStatus.Text = $"Check failed: {ex.Message}";
+                ThemedMessageBox.Show($"Check failed: {ex.Message}", "Update Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
