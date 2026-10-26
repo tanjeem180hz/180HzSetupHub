@@ -373,7 +373,8 @@ namespace SetupHub180Hz.Views
         private void ApplyFilter(bool resetScroll = false)
         {
             var query = SearchBox.Text.Trim();
-            var filtered = _allPackages.AsEnumerable();
+            var pool = _allPackages.Concat(PackageCatalogService.GetDiscoveredPackages());
+            var filtered = pool.AsEnumerable();
 
             if (!string.Equals(_activeCategory, "All", StringComparison.OrdinalIgnoreCase))
             {
@@ -553,14 +554,14 @@ namespace SetupHub180Hz.Views
 
             try
             {
-                // 250ms debounce before invoking winget CLI
-                await Task.Delay(250, ct);
+                // 200ms debounce before invoking winget CLI
+                await Task.Delay(200, ct);
                 if (ct.IsCancellationRequested) return;
 
                 List<AppItem>? onlineList;
                 if (!_onlineSuggestCache.TryGetValue(query, out onlineList))
                 {
-                    onlineList = await _winget.SearchAsync(query);
+                    onlineList = await _winget.SearchAsync(query, ct);
                     if (onlineList != null)
                     {
                         onlineList = PackageCatalogService.DeduplicatePackages(onlineList);
@@ -585,16 +586,18 @@ namespace SetupHub180Hz.Views
                     return;
                 }
 
-                // Take top 12 online packages, enrich metadata, and auto-detect Installed / Update / Not Installed status
-                var topOnline = onlineList.Take(12).ToList();
+                // Take top 16 online packages, enrich metadata, infer category, and auto-detect Installed status
+                var topOnline = onlineList.Take(16).ToList();
                 foreach (var app in topOnline)
                 {
                     AppMetadataHelper.EnrichAppItem(app, _allPackages);
-                    if (string.IsNullOrWhiteSpace(app.Category) || app.Category == "General")
+                    if (string.IsNullOrWhiteSpace(app.Category) || app.Category == "General" || app.Category == "Online")
                     {
-                        app.Category = "🌐 Winget Repository";
+                        app.Category = PackageCatalogService.InferCategory(app.Id, app.Name, app.Description);
                     }
                 }
+
+                PackageCatalogService.RegisterDiscoveredPackages(topOnline);
 
                 await _catalog.CheckInstalledStatusAsync(_winget, topOnline);
                 if (ct.IsCancellationRequested) return;
@@ -852,6 +855,12 @@ namespace SetupHub180Hz.Views
             try
             {
                 AppMetadataHelper.EnrichAppItem(app, _allPackages);
+                if (string.IsNullOrWhiteSpace(app.Category) || app.Category == "General" || app.Category == "Online")
+                {
+                    app.Category = PackageCatalogService.InferCategory(app.Id, app.Name, app.Description);
+                }
+                PackageCatalogService.RegisterDiscoveredPackages(new[] { app });
+
                 var list = new List<AppItem> { app };
                 await _catalog.CheckInstalledStatusAsync(_winget, list);
 
@@ -957,7 +966,13 @@ namespace SetupHub180Hz.Views
                     foreach (var app in onlineResults)
                     {
                         AppMetadataHelper.EnrichAppItem(app, _allPackages);
+                        if (string.IsNullOrWhiteSpace(app.Category) || app.Category == "General" || app.Category == "Online")
+                        {
+                            app.Category = PackageCatalogService.InferCategory(app.Id, app.Name, app.Description);
+                        }
                     }
+
+                    PackageCatalogService.RegisterDiscoveredPackages(onlineResults);
 
                     // 2. Check installed status
                     await _catalog.CheckInstalledStatusAsync(_winget, onlineResults);

@@ -1332,7 +1332,8 @@ namespace SetupHub180Hz.Services
             }
             catch { }
 
-            return "/S /quiet /norestart";
+            // Do not pass unsupported flags to unknown vendor executables (avoids command syntax errors)
+            return "";
         }
 
         private async Task InstallViaWingetDirectAsync(AppItem app, int queueIndex, int queueTotal)
@@ -1522,14 +1523,14 @@ namespace SetupHub180Hz.Services
             {
                 // Invalidate cache and retry checking IsAppInstalled with small delays to allow registry flush
                 AppMetadataHelper.InvalidateCache();
-                for (int attempt = 0; attempt < 3; attempt++)
+                for (int attempt = 0; attempt < 5; attempt++)
                 {
                     if (AppMetadataHelper.IsAppInstalled(app))
                     {
                         success = true;
                         break;
                     }
-                    System.Threading.Thread.Sleep(500);
+                    System.Threading.Thread.Sleep(600);
                     AppMetadataHelper.InvalidateCache();
                 }
             }

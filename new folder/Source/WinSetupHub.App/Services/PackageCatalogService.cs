@@ -42,13 +42,132 @@ namespace SetupHub180Hz.Services
             return _cachedPackages;
         }
 
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, AppItem> _discoveredGlobalPackages =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        public static void RegisterDiscoveredPackages(IEnumerable<AppItem> packages)
+        {
+            foreach (var p in packages)
+            {
+                if (p != null && !string.IsNullOrWhiteSpace(p.Id))
+                {
+                    _discoveredGlobalPackages[p.Id] = p;
+                }
+            }
+        }
+
+        public static IEnumerable<AppItem> GetDiscoveredPackages() => _discoveredGlobalPackages.Values;
+
+        public static string InferCategory(string id, string name, string? description = null)
+        {
+            var combined = $"{id} {name} {description ?? ""}".ToLowerInvariant();
+
+            if (combined.Contains("capcut") || combined.Contains("premiere") || combined.Contains("davinci") ||
+                combined.Contains("handbrake") || combined.Contains("obs-studio") || combined.Contains("obs studio") ||
+                combined.Contains("kdenlive") || combined.Contains("filmora") || combined.Contains("video editor") ||
+                combined.Contains("video editing") || combined.Contains("clipchamp"))
+            {
+                return "Video Editing";
+            }
+
+            if (combined.Contains("code") || combined.Contains("postman") || combined.Contains("git") ||
+                combined.Contains("docker") || combined.Contains("python") || combined.Contains("node") ||
+                combined.Contains("cursor") || combined.Contains("windsurf") || combined.Contains("visual studio") ||
+                combined.Contains("intellij") || combined.Contains("sublime") || combined.Contains("terminal") ||
+                combined.Contains("compiler") || combined.Contains("sdk") || combined.Contains("ide") ||
+                combined.Contains("neovim") || combined.Contains("powershell") || combined.Contains("dbeaver"))
+            {
+                return "Developer";
+            }
+
+            if (combined.Contains("browser") || combined.Contains("chrome") || combined.Contains("firefox") ||
+                combined.Contains("brave") || combined.Contains("opera") || combined.Contains("edge") ||
+                combined.Contains("vivaldi") || combined.Contains("tor") || combined.Contains("waterfox"))
+            {
+                return "Browsers";
+            }
+
+            if (combined.Contains("chatgpt") || combined.Contains("claude") || combined.Contains("ollama") ||
+                combined.Contains("lm studio") || combined.Contains("lmstudio") || combined.Contains("perplexity") ||
+                combined.Contains("ai assistant") || combined.Contains("copilot") || combined.Contains("llm"))
+            {
+                return "AI";
+            }
+
+            if (combined.Contains("steam") || combined.Contains("epic games") || combined.Contains("discord") ||
+                combined.Contains("battle.net") || combined.Contains("gog") || combined.Contains("rivatuner") ||
+                combined.Contains("afterburner") || combined.Contains("game") || combined.Contains("gaming") ||
+                combined.Contains("geforce") || combined.Contains("razer"))
+            {
+                return "Gaming";
+            }
+
+            if (combined.Contains("vlc") || combined.Contains("spotify") || combined.Contains("media") ||
+                combined.Contains("music") || combined.Contains("audio") || combined.Contains("player") ||
+                combined.Contains("audacity") || combined.Contains("foobar") || combined.Contains("aimp") ||
+                combined.Contains("potplayer") || combined.Contains("itunes"))
+            {
+                return "Media & Streaming";
+            }
+
+            if (combined.Contains("telegram") || combined.Contains("whatsapp") || combined.Contains("zoom") ||
+                combined.Contains("slack") || combined.Contains("signal") || combined.Contains("teams") ||
+                combined.Contains("skype") || combined.Contains("messenger") || combined.Contains("chat"))
+            {
+                return "Communication";
+            }
+
+            if (combined.Contains("photoshop") || combined.Contains("gimp") || combined.Contains("figma") ||
+                combined.Contains("blender") || combined.Contains("inkscape") || combined.Contains("canva") ||
+                combined.Contains("krita") || combined.Contains("draw") || combined.Contains("design") ||
+                combined.Contains("paint.net") || combined.Contains("illustrator"))
+            {
+                return "Design & Creative";
+            }
+
+            if (combined.Contains("antivirus") || combined.Contains("vpn") || combined.Contains("malware") ||
+                combined.Contains("security") || combined.Contains("bitwarden") || combined.Contains("keepass") ||
+                combined.Contains("1password") || combined.Contains("proton") || combined.Contains("firewall") ||
+                combined.Contains("privacy") || combined.Contains("nordvpn"))
+            {
+                return "Security";
+            }
+
+            if (combined.Contains("office") || combined.Contains("notion") || combined.Contains("obsidian") ||
+                combined.Contains("pdf") || combined.Contains("acrobat") || combined.Contains("word") ||
+                combined.Contains("excel") || combined.Contains("notes") || combined.Contains("libreoffice") ||
+                combined.Contains("todoist") || combined.Contains("trello"))
+            {
+                return "Productivity";
+            }
+
+            if (combined.Contains("7zip") || combined.Contains("7-zip") || combined.Contains("winrar") ||
+                combined.Contains("everything") || combined.Contains("notepad++") || combined.Contains("powertoys") ||
+                combined.Contains("rufus") || combined.Contains("bleachbit") || combined.Contains("sharex") ||
+                combined.Contains("cleaner") || combined.Contains("utility") || combined.Contains("uninstaller") ||
+                combined.Contains("revo") || combined.Contains("crystaldisk") || combined.Contains("hwinfo") ||
+                combined.Contains("cpu-z") || combined.Contains("gpu-z"))
+            {
+                return "Utilities";
+            }
+
+            return "🌐 Global Repository";
+        }
+
         public static List<AppItem> DeduplicatePackages(IEnumerable<AppItem> items)
         {
             var seenIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var seenNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var result = new List<AppItem>();
 
-            foreach (var item in items)
+            // Prioritize packages with known versions, winget official sources, and resolved web URLs
+            var ordered = items
+                .Where(item => item != null && !string.IsNullOrWhiteSpace(item.Id))
+                .OrderByDescending(item => !string.IsNullOrWhiteSpace(item.Version) && !item.Version.Equals("Unknown", StringComparison.OrdinalIgnoreCase))
+                .ThenByDescending(item => string.Equals(item.Source, "winget", StringComparison.OrdinalIgnoreCase))
+                .ThenByDescending(item => !string.IsNullOrWhiteSpace(item.WebUrl));
+
+            foreach (var item in ordered)
             {
                 if (item == null || string.IsNullOrWhiteSpace(item.Id)) continue;
                 string idKey = item.Id.Trim();

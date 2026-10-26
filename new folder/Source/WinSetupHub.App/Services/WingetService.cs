@@ -133,11 +133,34 @@ namespace SetupHub180Hz.Services
             return ParseTable(output);
         }
 
-        public async Task<List<AppItem>> SearchAsync(string query)
+        public async Task<List<AppItem>> SearchAsync(string query, System.Threading.CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(query)) return new List<AppItem>();
-            var output = await RunWingetAsync($"search \"{query}\" --accept-source-agreements");
-            return ParseTable(output);
+
+            // 1. Ultra-fast local index query via winget repository (~0.25s)
+            var wingetOutput = await RunWingetAsync($"search \"{query}\" --source winget --accept-source-agreements", ct: ct);
+            var wingetItems = ParseTable(wingetOutput);
+
+            // 2. If winget repository returned fewer than 3 packages, also search msstore
+            if (wingetItems.Count < 3 && !ct.IsCancellationRequested)
+            {
+                try
+                {
+                    var storeOutput = await RunWingetAsync($"search \"{query}\" --source msstore --accept-source-agreements", ct: ct);
+                    var storeItems = ParseTable(storeOutput);
+                    foreach (var s in storeItems)
+                    {
+                        if (!wingetItems.Any(w => string.Equals(w.Id, s.Id, StringComparison.OrdinalIgnoreCase) ||
+                                                 string.Equals(PackageCatalogService.NormalizeAppKey(w.Name), PackageCatalogService.NormalizeAppKey(s.Name), StringComparison.OrdinalIgnoreCase)))
+                        {
+                            wingetItems.Add(s);
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            return wingetItems;
         }
 
         private class CacheEntry<T>
@@ -317,7 +340,11 @@ namespace SetupHub180Hz.Services
                 string output = "";
                 if (!string.IsNullOrWhiteSpace(id))
                 {
-                    output = await RunWingetAsync($"show --id \"{id}\" --exact --accept-source-agreements");
+                    output = await RunWingetAsync($"show --id \"{id}\" --source winget --exact --accept-source-agreements");
+                    if (string.IsNullOrWhiteSpace(output) || !output.Contains("Installer Url:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        output = await RunWingetAsync($"show --id \"{id}\" --exact --accept-source-agreements");
+                    }
                     if (string.IsNullOrWhiteSpace(output) || !output.Contains("Installer Url:", StringComparison.OrdinalIgnoreCase))
                     {
                         var fallbackIdOutput = await RunWingetAsync($"show \"{id}\" --accept-source-agreements");
@@ -331,10 +358,14 @@ namespace SetupHub180Hz.Services
                 if ((string.IsNullOrWhiteSpace(output) || !output.Contains("Installer Url:", StringComparison.OrdinalIgnoreCase)) &&
                     !string.IsNullOrWhiteSpace(name))
                 {
-                    var fallbackNameOutput = await RunWingetAsync($"show --name \"{name}\" --accept-source-agreements");
+                    var fallbackNameOutput = await RunWingetAsync($"show --name \"{name}\" --source winget --accept-source-agreements");
                     if (!string.IsNullOrWhiteSpace(fallbackNameOutput))
                     {
                         output = fallbackNameOutput;
+                    }
+                    else
+                    {
+                        output = await RunWingetAsync($"show --name \"{name}\" --accept-source-agreements");
                     }
                 }
 
@@ -488,50 +519,56 @@ namespace SetupHub180Hz.Services
                     ? $"--source \"{effectiveSource}\" "
                     : (!string.IsNullOrWhiteSpace(effectiveSource) ? "--source winget " : "");
 
-                // Tier 1: Exact ID match with silent & force
-                var success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                // Tier 1: Exact ID match with silent, force, disable-interactivity, and ignore-security-hash
+                var success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --force --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                 if (success || ct.IsCancellationRequested) return success;
 
-                // Tier 1b: Exact ID match with --ignore-security-hash (handles evergreen vendor hotfixes before manifest hash sync)
-                success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --silent --force --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                // Tier 2: Exact ID match WITHOUT --silent (handles packages whose installer rejects or does not support silent mode)
+                success = await RunActionAsync($"install --id \"{id}\" {srcArg}-e --force --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                 if (success || ct.IsCancellationRequested) return success;
 
-                // Tier 2: Non-exact ID match with silent & force
-                success = await RunActionAsync($"install \"{id}\" {srcArg}--silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                // Tier 3: Non-exact ID match with silent & force
+                success = await RunActionAsync($"install \"{id}\" {srcArg}--silent --force --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                 if (success || ct.IsCancellationRequested) return success;
 
-                // Tier 3: Source fallback (if specific source was specified, try without source restriction)
+                // Tier 4: Non-exact ID match without silent
+                success = await RunActionAsync($"install \"{id}\" {srcArg}--force --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                if (success || ct.IsCancellationRequested) return success;
+
+                // Tier 5: Source fallback (if specific source was specified, try without source restriction)
                 if (!string.IsNullOrWhiteSpace(effectiveSource))
                 {
-                    success = await RunActionAsync($"install --id \"{id}\" -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    success = await RunActionAsync($"install --id \"{id}\" -e --force --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                     if (success || ct.IsCancellationRequested) return success;
                 }
 
-                // Tier 4: Interactive / Unattended fallback without --silent (in case silent mode is unsupported by installer)
-                success = await RunActionAsync($"install --id \"{id}\" {srcArg}--force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-                if (success || ct.IsCancellationRequested) return success;
-
-                // Tier 5: Fallback search and install by Name
+                // Tier 6: Fallback search and install by Name
                 if (!string.IsNullOrWhiteSpace(name))
                 {
-                    // Exact Name
-                    success = await RunActionAsync($"install --name \"{name}\" -e --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    // Exact Name with silent
+                    success = await RunActionAsync($"install --name \"{name}\" -e --silent --force --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    if (success || ct.IsCancellationRequested) return success;
+
+                    // Exact Name without silent
+                    success = await RunActionAsync($"install --name \"{name}\" -e --force --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                     if (success || ct.IsCancellationRequested) return success;
 
                     // Fuzzy Name
-                    success = await RunActionAsync($"install --name \"{name}\" --silent --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
-                    if (success || ct.IsCancellationRequested) return success;
-
-                    // Interactive Name fallback
-                    success = await RunActionAsync($"install --name \"{name}\" --force --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                    success = await RunActionAsync($"install --name \"{name}\" --force --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                     if (success || ct.IsCancellationRequested) return success;
                 }
 
-                // Tier 6: Final check - verify if app is already installed on the machine
-                if (AppMetadataHelper.IsAppInstalled(new AppItem { Id = id, Name = name ?? id, Source = source ?? "" }))
+                // Tier 7: Final verification with cache invalidation and retry delay
+                AppMetadataHelper.InvalidateCache();
+                for (int i = 0; i < 4; i++)
                 {
-                    onOutputLine?.Invoke($"Verified {name ?? id} is installed on system.");
-                    return true;
+                    if (AppMetadataHelper.IsAppInstalled(new AppItem { Id = id, Name = name ?? id, Source = source ?? "" }))
+                    {
+                        onOutputLine?.Invoke($"Verified {name ?? id} is installed on system.");
+                        return true;
+                    }
+                    await Task.Delay(500, ct);
+                    AppMetadataHelper.InvalidateCache();
                 }
 
                 return false;
@@ -554,16 +591,16 @@ namespace SetupHub180Hz.Services
                     if (storeSuccess || ct.IsCancellationRequested) return storeSuccess;
                 }
 
-                // Tier 1: Exact ID upgrade with force & include-unknown
-                var success = await RunActionAsync($"upgrade --id \"{id}\" -e --silent --force --include-unknown --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                // Tier 1: Exact ID upgrade with force & include-unknown & disable-interactivity
+                var success = await RunActionAsync($"upgrade --id \"{id}\" -e --silent --force --include-unknown --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                 if (success || ct.IsCancellationRequested) return success;
 
-                // Tier 1b: Exact ID upgrade with --ignore-security-hash (handles vendor hotfix updates)
-                success = await RunActionAsync($"upgrade --id \"{id}\" -e --silent --force --include-unknown --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                // Tier 1b: Exact ID upgrade WITHOUT silent
+                success = await RunActionAsync($"upgrade --id \"{id}\" -e --force --include-unknown --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                 if (success || ct.IsCancellationRequested) return success;
 
                 // Tier 2: Non-exact ID upgrade
-                success = await RunActionAsync($"upgrade \"{id}\" --silent --force --include-unknown --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
+                success = await RunActionAsync($"upgrade \"{id}\" --force --include-unknown --disable-interactivity --ignore-security-hash --accept-package-agreements --accept-source-agreements", onOutputLine, ct);
                 if (success || ct.IsCancellationRequested) return success;
 
                 // Tier 3: Fallback to install with --force (Winget will pull latest version and overwrite)
@@ -631,7 +668,9 @@ namespace SetupHub180Hz.Services
             uint uExitCode = unchecked((uint)exitCode);
             // 0 = Success, 3010 = Reboot required / Success, 1641 = Reboot initiated
             // 0x8A15002B = Already installed / up to date, 0x8A15002C = No applicable update
-            if (exitCode == 0 || exitCode == 3010 || exitCode == 1641 || uExitCode == 0x8A15002B || uExitCode == 0x8A15002C)
+            // 0x8A15001E = Package in use (already installed)
+            if (exitCode == 0 || exitCode == 3010 || exitCode == 1641 ||
+                uExitCode == 0x8A15002B || uExitCode == 0x8A15002C || uExitCode == 0x8A15001E)
             {
                 return true;
             }
@@ -665,13 +704,13 @@ namespace SetupHub180Hz.Services
             return false;
         }
 
-        private Task<string> RunWingetAsync(string arguments, Action<string>? onOutputLine = null)
+        private Task<string> RunWingetAsync(string arguments, Action<string>? onOutputLine = null, System.Threading.CancellationToken ct = default)
         {
             return Task.Run(async () =>
             {
-                var (_, output) = await RunWingetWithCodeAsync(arguments, onOutputLine, timeoutMs: 120000);
+                var (_, output) = await RunWingetWithCodeAsync(arguments, onOutputLine, timeoutMs: 120000, ct: ct);
                 return output;
-            });
+            }, ct);
         }
 
         private Task<(int ExitCode, string Output)> RunWingetWithCodeAsync(string arguments, Action<string>? onOutputLine = null, int timeoutMs = 300000, System.Threading.CancellationToken ct = default)
@@ -681,6 +720,14 @@ namespace SetupHub180Hz.Services
                 if (!arguments.Contains("--accept-source-agreements", StringComparison.OrdinalIgnoreCase))
                 {
                     arguments += " --accept-source-agreements";
+                }
+
+                if (!arguments.Contains("--disable-interactivity", StringComparison.OrdinalIgnoreCase) &&
+                    (arguments.StartsWith("install", StringComparison.OrdinalIgnoreCase) ||
+                     arguments.StartsWith("upgrade", StringComparison.OrdinalIgnoreCase) ||
+                     arguments.StartsWith("uninstall", StringComparison.OrdinalIgnoreCase)))
+                {
+                    arguments += " --disable-interactivity";
                 }
 
                 var psi = new ProcessStartInfo
@@ -904,7 +951,7 @@ namespace SetupHub180Hz.Services
                     Version = rawVer,
                     AvailableVersion = availVer,
                     Source = sourceCol > 0 ? Slice(line, sourceCol, -1) : "winget",
-                    Category = "Online"
+                    Category = PackageCatalogService.InferCategory(idStr, nameStr)
                 };
 
                 if (string.IsNullOrWhiteSpace(item.Source)) item.Source = "winget";
