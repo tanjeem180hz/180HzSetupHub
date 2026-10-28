@@ -137,22 +137,59 @@ namespace SetupHub180Hz.Services
         {
             if (string.IsNullOrWhiteSpace(query)) return new List<AppItem>();
 
-            // Query both Winget Community (20,000+ packages) and Microsoft Store repositories in parallel (~0.8s)
-            var wingetOutput = await RunWingetAsync($"search \"{query}\" --accept-source-agreements", ct: ct);
-            var wingetItems = ParseTable(wingetOutput);
+            var cleanQuery = query.Trim().Trim('"', '\'');
+            if (string.IsNullOrWhiteSpace(cleanQuery)) return new List<AppItem>();
 
-            // If no results with exact quote and query contains spaces, try without quotes
-            if (wingetItems.Count == 0 && query.Contains(' ') && !ct.IsCancellationRequested)
+            var allFound = new List<AppItem>();
+
+            // 1. Exact quoted search across Winget Community (20,000+ packages) and Microsoft Store (~0.8s)
+            var wingetOutput = await RunWingetAsync($"search \"{cleanQuery}\" --accept-source-agreements", ct: ct);
+            var wingetItems = ParseTable(wingetOutput);
+            if (wingetItems.Count > 0)
             {
-                try
-                {
-                    var fallbackOutput = await RunWingetAsync($"search {query} --accept-source-agreements", ct: ct);
-                    wingetItems = ParseTable(fallbackOutput);
-                }
-                catch { }
+                allFound.AddRange(wingetItems);
             }
 
-            return wingetItems;
+            // 2. Intelligent Stop-Word Stripping Fallback (e.g. "vlc player" -> "vlc", "chrome browser" -> "chrome")
+            if (allFound.Count < 3 && !ct.IsCancellationRequested)
+            {
+                var stripped = Regex.Replace(cleanQuery, @"\b(player|browser|desktop|app|apps|client|pc|software|tool|tools|official|windows|win|edition|free|pro|setup|installer|game|for pc|for windows|for win)\b", "", RegexOptions.IgnoreCase).Trim();
+                stripped = Regex.Replace(stripped, @"\s+", " ").Trim();
+
+                if (!string.IsNullOrWhiteSpace(stripped) && !string.Equals(stripped, cleanQuery, StringComparison.OrdinalIgnoreCase) && stripped.Length >= 2)
+                {
+                    try
+                    {
+                        var strippedOutput = await RunWingetAsync($"search \"{stripped}\" --accept-source-agreements", ct: ct);
+                        var strippedItems = ParseTable(strippedOutput);
+                        allFound.AddRange(strippedItems);
+                    }
+                    catch { }
+                }
+            }
+
+            // 3. Keyword Token Fallback: If still few/no results and query has multiple words, search primary keyword (len >= 3)
+            if (allFound.Count == 0 && cleanQuery.Contains(' ') && !ct.IsCancellationRequested)
+            {
+                var words = cleanQuery.Split(new[] { ' ', '-', '_' }, StringSplitOptions.RemoveEmptyEntries)
+                                      .Where(w => w.Length >= 3 && !Regex.IsMatch(w, @"^(download|install|free|latest|app|soft)$", RegexOptions.IgnoreCase))
+                                      .ToList();
+
+                foreach (var word in words.Take(2))
+                {
+                    if (ct.IsCancellationRequested) break;
+                    try
+                    {
+                        var wordOutput = await RunWingetAsync($"search \"{word}\" --accept-source-agreements", ct: ct);
+                        var wordItems = ParseTable(wordOutput);
+                        allFound.AddRange(wordItems);
+                        if (allFound.Count >= 5) break;
+                    }
+                    catch { }
+                }
+            }
+
+            return PackageCatalogService.DeduplicatePackages(allFound);
         }
 
         private class CacheEntry<T>
@@ -922,15 +959,34 @@ namespace SetupHub180Hz.Services
                 }
 
                 var rawVer = Slice(line, versionCol, versionEnd);
-                if (rawVer.Contains("Tag:", StringComparison.OrdinalIgnoreCase))
+                foreach (var prefix in new[] { "Tag:", "Moniker:", "ProductCode:", "Command:", "Custom:" })
                 {
-                    rawVer = rawVer.Split("Tag:")[0].Trim();
+                    var idx = rawVer.IndexOf(prefix, StringComparison.OrdinalIgnoreCase);
+                    if (idx >= 0)
+                    {
+                        rawVer = rawVer.Substring(0, idx).Trim();
+                    }
                 }
                 rawVer = rawVer.TrimStart('<', '>', ' ').TrimEnd('…').Trim();
 
                 var availVer = availCol > 0 ? Slice(line, availCol, sourceCol).TrimEnd('…').Trim() : "";
                 var nameStr = Slice(line, nameCol, idCol).TrimEnd('…').Trim();
                 var idStr = Slice(line, idCol, versionCol).TrimEnd('…').Trim();
+
+                // If idStr contains spaces due to long Name overflowing into idCol, recover ID from the last token
+                if (idStr.Contains(' '))
+                {
+                    var parts = idStr.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length > 1)
+                    {
+                        var candidateId = parts[^1];
+                        if (candidateId.Contains('.') || candidateId.Length >= 4)
+                        {
+                            nameStr = (nameStr + " " + string.Join(" ", parts.Take(parts.Length - 1))).Trim();
+                            idStr = candidateId;
+                        }
+                    }
+                }
 
                 // Filter out non-package rows (valid Winget/Store/ARP IDs do not contain spaces)
                 if (string.IsNullOrWhiteSpace(nameStr) || string.IsNullOrWhiteSpace(idStr) || idStr.Contains(' '))

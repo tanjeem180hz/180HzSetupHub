@@ -919,7 +919,17 @@ namespace SetupHub180Hz.Views
             TabHintBadge.Visibility = Visibility.Collapsed;
             _searchDebounceTimer.Stop();
             _onlineSearchCts?.Cancel();
-            TriggerDirectSearch(SearchBox.Text.Trim());
+
+            var query = SearchBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                SearchBox.Focus();
+                StatusText.Text = "Please enter an application name in the search box to search online.";
+                StatusText.Visibility = Visibility.Visible;
+                return;
+            }
+
+            TriggerDirectSearch(query);
         }
 
         private async void TriggerDirectSearch(string query)
@@ -1007,11 +1017,14 @@ namespace SetupHub180Hz.Views
                                 var meta = await _winget.GetMetadataAsync(app.Id);
                                 if (meta?.BestLink != null)
                                 {
-                                    app.WebUrl = meta.BestLink;
-                                    if (string.IsNullOrWhiteSpace(app.IconUrl))
+                                    await Dispatcher.InvokeAsync(() =>
                                     {
-                                        app.IconUrl = IconCacheService.DeriveFaviconUrl(app.WebUrl) ?? "";
-                                    }
+                                        app.WebUrl = meta.BestLink;
+                                        if (string.IsNullOrWhiteSpace(app.IconUrl))
+                                        {
+                                            app.IconUrl = IconCacheService.DeriveFaviconUrl(app.WebUrl) ?? "";
+                                        }
+                                    });
                                 }
                             }
 
@@ -1028,11 +1041,26 @@ namespace SetupHub180Hz.Views
                 }
                 else
                 {
-                    var currentItems = AppsListBox.ItemsSource as IEnumerable<AppItem>;
-                    if (currentItems == null || !currentItems.Any())
+                    var currentItems = (AppsListBox.ItemsSource as IEnumerable<AppItem>)?.ToList() ?? new List<AppItem>();
+                    if (currentItems.Count == 0)
                     {
-                        StatusText.Text = $"No packages found matching '{query}'.";
+                        var fallbackApp = new AppItem
+                        {
+                            Id = $"Web.{PackageCatalogService.NormalizeAppKey(query)}",
+                            Name = query,
+                            Category = "🌐 Web Download",
+                            Description = $"Search and download the latest official version of {query} directly from official web sources.",
+                            Source = "WEB",
+                            Status = "🌐 Download from Web",
+                            WebUrl = $"https://www.google.com/search?q={Uri.EscapeDataString(query + " official download")}",
+                            IconUrl = IconCacheService.DeriveFaviconUrl("https://www.google.com") ?? ""
+                        };
+                        var fallbackList = new List<AppItem> { fallbackApp };
+                        AppsListBox.ItemsSource = fallbackList;
+                        CatalogCountText.Text = $"1 Web Match for '{query}'";
+                        StatusText.Text = $"No Winget package found for '{query}'. Click 'Download from Web' to get it directly.";
                         StatusText.Visibility = Visibility.Visible;
+                        ResetAppsListScrollToTop();
                     }
                     else
                     {
@@ -1055,6 +1083,25 @@ namespace SetupHub180Hz.Views
         {
             if (sender is Button btn && btn.DataContext is AppItem app)
             {
+                // Web Fallback: If item is a web search package, open official download in browser
+                if (string.Equals(app.Source, "WEB", StringComparison.OrdinalIgnoreCase) ||
+                    (app.Id != null && app.Id.StartsWith("Web.", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var targetUrl = !string.IsNullOrWhiteSpace(app.WebUrl) ? app.WebUrl : app.EffectiveWebUrl;
+                    if (string.IsNullOrWhiteSpace(targetUrl))
+                    {
+                        targetUrl = $"https://www.google.com/search?q={Uri.EscapeDataString(app.Name + " official download")}";
+                    }
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo(targetUrl) { UseShellExecute = true });
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error launching web url: {ex.Message}");
+                    }
+                    return;
+                }
                 var dm = DownloadManagerService.Instance;
                 if (dm.CurrentApp == app)
                 {

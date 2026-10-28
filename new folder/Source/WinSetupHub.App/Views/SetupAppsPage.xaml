@@ -575,8 +575,8 @@
                             <!-- Deep Web Search Action Row -->
                             <Border Grid.Row="2" Margin="0,4,0,0" Padding="8,8"
                                     Background="{DynamicResource BrushSurfaceHover}" BorderBrush="{DynamicResource BrushAccent}"
-                                    BorderThickness="1" CornerRadius="6" Cursor="Hand"
-                                    MouseLeftButtonDown="PopupDeepWebSearch_Click">
+                                    BorderThickness="1" CornerRadius="6" Cursor="Hand" Focusable="True"
+                                    PreviewMouseLeftButtonDown="PopupDeepWebSearch_Click">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
